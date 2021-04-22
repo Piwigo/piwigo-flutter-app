@@ -5,10 +5,11 @@ import 'package:photo_view/photo_view_gallery.dart';
 
 
 class ImageViewPage extends StatefulWidget {
-  ImageViewPage({Key key, this.images, this.index}) : super(key: key);
+  ImageViewPage({Key key, this.images, this.index, this.isAdmin}) : super(key: key);
 
   final int index;
   final List<dynamic> images;
+  final bool isAdmin;
 
   @override
   _ImageViewPageState createState() => _ImageViewPageState();
@@ -29,21 +30,31 @@ class _ImageViewPageState extends State<ImageViewPage> {
 
   @override
   Widget build(BuildContext context) {
+    ThemeData _theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
         iconTheme: IconThemeData(
-          color: Colors.orange, //change your color here
+          color: _theme.iconTheme.color, //change your color here
         ),
-        backgroundColor: Colors.grey.shade200,
+        leading: IconButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          icon: Icon(Icons.chevron_left),
+        ),
+        backgroundColor: _theme.scaffoldBackgroundColor,
         actions: [
-          Container(
-            padding: EdgeInsets.all(15),
-            child: IconButton(
-              onPressed: () {
-                _settingModalBottomSheet(context, widget.images[_pageController.page.toInt()]);
-              },
-              icon: Icon(Icons.edit),
-            ),
+          widget.isAdmin? IconButton(
+            onPressed: () {
+              _settingModalBottomSheet(context, widget.images[_pageController.page.toInt()]);
+            },
+            icon: Icon(Icons.edit),
+          ) :  IconButton(
+            onPressed: () {
+              //TODO: Implement share image
+              print("share");
+            },
+            icon: Icon(Icons.share),
           ),
         ],
       ),
@@ -71,40 +82,40 @@ class _ImageViewPageState extends State<ImageViewPage> {
           ),
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
+      bottomNavigationBar: widget.isAdmin? BottomNavigationBar(
+        items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: Icon(Icons.file_upload, color: Colors.orange),
+            icon: Icon(Icons.file_upload, color: _theme.iconTheme.color),
             label: "upload",
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.reply_outlined, color: Colors.orange),
+            icon: Icon(Icons.reply_outlined, color: _theme.iconTheme.color),
             label: "share",
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.attach_file, color: Colors.orange),
+            icon: Icon(Icons.attach_file, color: _theme.iconTheme.color),
             label: "attach",
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.delete_outline, color: Colors.red),
+            icon: Icon(Icons.delete_outline, color: _theme.errorColor),
             label: "delete",
           ),
         ],
-        backgroundColor: Colors.grey.shade200,
+        backgroundColor: _theme.scaffoldBackgroundColor,
         type: BottomNavigationBarType.fixed,
         selectedFontSize: 16,
         unselectedFontSize: 16,
         showSelectedLabels: false,
         showUnselectedLabels: false,
         currentIndex: _selectedIndex,
-      ),
+      ) : Text(""),
     );
 
 
   }
 
   void _settingModalBottomSheet(context, dynamic image) async {
-
+    //TODO: copy IOS edit page
     List<String> derivs = image["derivatives"].keys.toList();
 
     await showModalBottomSheet(

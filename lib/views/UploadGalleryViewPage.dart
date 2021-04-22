@@ -138,22 +138,22 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
         child: Container(
           padding: EdgeInsets.all(5),
           child: Column(
-            children: [Container(
-                  padding: EdgeInsets.all(10),
-                  child: GridView.builder( // Put images on a grid
-                      physics: NeverScrollableScrollPhysics(),
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 3
-                      ),
-                      itemCount: widget.imageData.length,
-                      scrollDirection: Axis.vertical,
-                      shrinkWrap: true,
-                      itemBuilder: (BuildContext context, int index) {
-                        return createCardImage(context, widget.imageData[index]); // Custom grid cells
-                      }
+            children: [
+              Container(
+                padding: EdgeInsets.all(10),
+                child: GridView.builder( // Put images on a grid
+                  physics: NeverScrollableScrollPhysics(),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 3
                   ),
+                  itemCount: widget.imageData.length,
+                  scrollDirection: Axis.vertical,
+                  shrinkWrap: true,
+                  itemBuilder: (BuildContext context, int index) {
+                    return createCardImage(context, widget.imageData[index]); // Custom grid cells
+                  }
                 ),
-
+              ),
               Container(
                 margin: EdgeInsets.all(10),
                 child: ElevatedButton(

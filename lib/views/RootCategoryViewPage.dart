@@ -262,11 +262,11 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
                                                 Text('${albums.data[index]["name"]}', style: _theme.textTheme.headline6),
                                                 Column(
                                                   children: [
-                                                    Text('${albums.data[index]["description"] == null ?
-                                                    "(no description)" :
-                                                    albums.data[index]["description"]
-                                                    }',
-                                                        style: _theme.textTheme.subtitle1),
+                                                    Text('${albums.data[index]["comment"] == null ?
+                                                        "(no description)" :
+                                                        albums.data[index]["comment"]
+                                                      }',
+                                                      style: _theme.textTheme.subtitle1),
                                                     Container(
                                                       padding: EdgeInsets.all(5),
                                                       child: Text(albumSubCount(albums.data[index]),
