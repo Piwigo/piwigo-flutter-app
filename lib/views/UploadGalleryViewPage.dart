@@ -159,6 +159,7 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
                 child: ElevatedButton(
                   onPressed: () {
                     uploadPhotos(widget.imageData);
+                    Navigator.of(context).pop();
                   },
                   style: ButtonStyle(
                     backgroundColor: MaterialStateProperty.all<Color>(Color(0xffff7700)),
