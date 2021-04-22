@@ -19,7 +19,7 @@ Clone or download the project.
 ## Copy the APK to your Android phone
 
  1. Plug your phone into your PC.
- 2. Go into the **/build** folder and copy the **app-release.apk** file into your phone (in **/Downloads** for example).
+ 2. Go into the **/apk** folder and copy the **app-release.apk** file into your phone (in **/Downloads** for example).
 
 ## Install the APK
 
