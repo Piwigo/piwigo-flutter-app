@@ -38,6 +38,7 @@ dependencies:
   cached_network_image: ^3.0.0
   chunked_uploader:
   md5_plugin:
+  pull_to_refresh:
 
   flutter_speed_dial:
   flutter_slidable:

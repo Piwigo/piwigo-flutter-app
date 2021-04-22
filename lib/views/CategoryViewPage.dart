@@ -16,8 +16,8 @@ import 'UploadGalleryViewPage.dart';
 
 
 class CategoryViewPage extends StatefulWidget {
-  CategoryViewPage({Key key, this.title, this.category}) : super(key: key);
-
+  CategoryViewPage({Key key, this.title, this.category, this.isAdmin}) : super(key: key);
+  final bool isAdmin;
   final String title;
   final String category;
 
@@ -31,28 +31,18 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
   Map<int, bool> _selectedItems = Map();
   Map<int, bool> _swipedItems = Map();
 
-  TextEditingController _searchTextController = new TextEditingController();
-  String _filter;
 
   @override
   void initState() {
     super.initState();
-
-    _filter = "";
     _isEditMode = false;
   }
+
+
+
   @override
   void dispose() {
     super.dispose();
-  }
-
-  bool _filterSearch(String name) {
-    if(_filter != null) {
-      if(!name.toLowerCase().contains(_filter.toLowerCase())) {
-        return true;
-      }
-    }
-    return false;
   }
 
   Future<List<dynamic>> fetchAlbums(String albumID) async {
@@ -110,327 +100,313 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
   bool _isSelected(int index) {
     return _selectedItems[index] == null ? false : _selectedItems[index];
   }
-
   int _selectedPhotos() {
     int n = 0;
     _selectedItems.forEach((key, value) {if(value) n++;});
     return n;
   }
+  String albumSubCount(dynamic album) {
+    String displayString = '${album["total_nb_images"]} ${album["total_nb_images"] == 1 ? 'photo' : 'photos'}';
+    if(album["nb_categories"] > 0) {
+      displayString += ', ${album["nb_categories"]} ${album["nb_categories"] == 1 ? 'sub-album' : 'sub-albums'}';
+    }
+    return displayString;
+  }
 
   @override
   Widget build(BuildContext context) {
+    ThemeData _theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: Colors.grey.shade200,
-      body: FutureBuilder<List<dynamic>>(
+      body: NestedScrollView(
+        headerSliverBuilder: (context, innerBoxScrolled) => [
+          SliverAppBar(
+            pinned: true,
+            snap: false,
+            floating: false,
+            centerTitle: true,
+            iconTheme: IconThemeData(
+              color: _theme.iconTheme.color,//change your color here
+            ),
+            leading: _isEditMode ? IconButton(
+              onPressed: () {
+                setState(() {
+                  _isEditMode = false;
+                });
+                _selectedItems.forEach((key, value) {
+                  setState(() {
+                    _selectedItems[key] = false;
+                  });
+                });
+              },
+              icon: Icon(Icons.cancel),
+            ) : IconButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              icon: Icon(Icons.chevron_left),
+            ),
+            title: _isEditMode ?
+            Text("${_selectedPhotos()}", overflow: TextOverflow.fade, softWrap: true) :
+            Text(widget.title),
+            actions: [
+              _isEditMode ? IconButton(
+                onPressed: () {
+                  List<int> selection = [];
+                  _selectedItems.forEach((key, value) {
+                    if(value) selection.add(key);
+                  });
+                  print('Selected: $selection');
+                },
+                icon: Icon(Icons.edit),
+              ) : widget.isAdmin? IconButton(
+                onPressed: () {
+                  setState(() {
+                    _isEditMode = true;
+                  });
+                },
+                icon: Icon(Icons.touch_app),
+              ) : Container(),
+            ],
+          ),
+        ],
+        body: FutureBuilder<List<dynamic>>(
           future: fetchAlbums(widget.category), // Albums of the list
           builder: (BuildContext context, AsyncSnapshot albums) {
-            if(albums.hasData){
-              albums.data.removeWhere((category) => (
-                  category["id"].toString() == widget.category || _filterSearch(category["name"].toString()))
+            if (albums.hasData) {
+              int nbPhotos = albums.data[0]["total_nb_images"];
+              albums.data.removeWhere((category) =>
+              (category["id"].toString() == widget.category)
               );
               return FutureBuilder<List<dynamic>>(
                   future: fetchImages(widget.category), // Images of the list
                   builder: (BuildContext context, AsyncSnapshot images) {
-                    if(images.hasData) {
-                      return CustomScrollView(
-                        slivers: <Widget>[
-                          SliverAppBar(
-                            backgroundColor: Colors.grey.shade200,
-                            pinned: true,
-                            snap: false,
-                            floating: false,
-                            expandedHeight: 180.0,
-                            iconTheme: IconThemeData(
-                              color: Colors.orange, //change your color here
-                            ),
-                            title: _isEditMode ? Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                IconButton(
-                                  onPressed: () {
-                                    setState(() {
-                                      _isEditMode = false;
+                    if (images.hasData) {
+                      return RefreshIndicator(
+                        displacement: 20,
+                        onRefresh: () {
+                          setState(() {
+                            print("refresh");
+                          });
+
+                          return Future.delayed(Duration(milliseconds: 1000));
+                        },
+                        child: SingleChildScrollView(
+                          child: Column(
+                            children: [
+                              ListView.builder(
+                                padding: EdgeInsets.symmetric(horizontal: 5),
+                                itemCount: albums.data.length,
+                                shrinkWrap: true,
+                                physics: NeverScrollableScrollPhysics(),
+                                itemBuilder: (BuildContext context, int index) {
+                                  if(_swipedItems.isEmpty) {
+                                    albums.data.forEach((item) {
+                                      _swipedItems[index] = false;
                                     });
-                                    _selectedItems.forEach((key, value) {
-                                      setState(() {
-                                        _selectedItems[key] = false;
-                                      });
-                                    });
-                                  },
-                                  icon: Icon(Icons.cancel),
-                                ),
-                                Text("${_selectedPhotos()}", overflow: TextOverflow.fade, softWrap: true,),
-                                IconButton(
-                                  onPressed: () {
-                                    List<int> selection = [];
-                                    _selectedItems.forEach((key, value) {
-                                      if(value) selection.add(key);
-                                    });
-                                    print('Selected: $selection');
-                                  },
-                                  icon: Icon(Icons.edit),
-                                ),
-                              ],
-                            ) : Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Container(),
-                                Text(widget.title),
-                                IconButton(
-                                  onPressed: () {
-                                    setState(() {
-                                      _isEditMode = true;
-                                    });
-                                  },
-                                  icon: Icon(Icons.touch_app),
-                                ),
-                              ],
-                            ),
-                            flexibleSpace: FlexibleSpaceBar(
-                              background: Column(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Container(
-                                    margin: EdgeInsets.only(left: 20),
-                                    child: Text("Albums", style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold)),
-                                  ),
-                                  Container(
-                                    margin: EdgeInsets.all(20),
-                                    decoration: BoxDecoration(
-                                      color: Colors.grey.shade300,
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                    child: TextField(
-                                      controller: _searchTextController,
-                                      onChanged: (str) {
-                                        setState(() {
-                                          _filter = str;
-                                        });
-                                      },
-                                      decoration: InputDecoration(
-                                        border: InputBorder.none,
-                                        prefixIcon: new Icon(Icons.search, color: Colors.grey),
-                                        hintText: "Search",
-                                        hintStyle: new TextStyle(color: Colors.grey)
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          SliverPadding(
-                            padding: EdgeInsets.all(5),
-                            sliver: SliverList(
-                              delegate: SliverChildBuilderDelegate(
-                                    (BuildContext context, int index) {
-                                      if(_swipedItems.isEmpty) {
-                                        albums.data.forEach((item) {
-                                          _swipedItems[index] = false;
-                                        });
-                                      }
+                                  }
                                   return InkWell(
-                                      onTap: () {
-                                        Navigator.of(context).push(
-                                          MaterialPageRoute(builder: (context) => CategoryViewPage(
-                                            title: albums.data[index]["name"],
-                                            category: albums.data[index]["id"].toString(),
-                                          )),
-                                        );
-                                      },
-                                      child: Container(
-                                        margin: EdgeInsets.only(top: 5, bottom: 5),
-                                        decoration: BoxDecoration(
-                                          // boxShadow: [
-                                          //   BoxShadow(
-                                          //     color: Colors.grey.withOpacity(0.5),
-                                          //     spreadRadius: 2,
-                                          //     blurRadius: 4,
-                                          //     offset: Offset(0, 3), // changes position of shadow
-                                          //   ),
-                                          // ],
-                                        ),
-                                        child: Slidable(
-                                          actionPane: SlidableDrawerActionPane(),
-                                          actionExtentRatio: 0.15,
-                                          child: Row(
-                                            children: [
-                                              Container(
+                                    onTap: () {
+                                      Navigator.of(context).push(
+                                        MaterialPageRoute(builder: (context) => CategoryViewPage(
+                                          title: albums.data[index]["name"],
+                                          category: albums.data[index]["id"].toString(),
+                                          isAdmin: widget.isAdmin,
+                                        )),
+                                      );
+                                    },
+                                    child: Container(
+                                      margin: EdgeInsets.only(top: 5, bottom: 5),
+                                      decoration: BoxDecoration(
+                                      ),
+                                      child: Slidable(
+                                        actionPane: SlidableDrawerActionPane(),
+                                        actionExtentRatio: 0.15,
+                                        child: Row(
+                                          children: [
+                                            Container(
+                                              decoration: BoxDecoration(
+                                                border: Border.all(width: 0, color: _theme.backgroundColor),
+                                                color: _theme.backgroundColor,
+                                                borderRadius: BorderRadius.only(
+                                                  topLeft: Radius.circular(10),
+                                                  bottomLeft: Radius.circular(10),
+                                                ),
+                                              ),
+                                              padding: EdgeInsets.all(5),
+                                              height: 130.0,
+                                              width: 130.0,
+                                              child: albums.data[index]["tn_url"] == null ?
+                                              Icon(Icons.image_not_supported_outlined, size: 50)
+                                                  :
+                                              ClipRRect(
+                                                borderRadius: BorderRadius.circular(7.0),
+                                                child: Image.network(
+                                                  albums.data[index]["tn_url"],
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ),
+                                            Container(
+                                              decoration: ShapeDecoration(
+                                                shape: WeirdBorder(radius: 7),
+                                                color: _theme.backgroundColor,
+                                              ),
+                                              width: 14,
+                                              height: 130.0,
+                                            ),
+                                            Expanded(
+                                              child: Container(
                                                 decoration: BoxDecoration(
-                                                  border: Border.all(width: 0, color: Colors.white),
-                                                  color: Colors.white,
-                                                  borderRadius: BorderRadius.only(
-                                                    topLeft: Radius.circular(10),
-                                                    bottomLeft: Radius.circular(10),
-                                                  ),
+                                                  border: Border.all(width: 0, color: _theme.backgroundColor),
+                                                  color: _theme.backgroundColor,
                                                 ),
                                                 padding: EdgeInsets.all(5),
                                                 height: 130.0,
-                                                width: 130.0,
-                                                child: albums.data[index]["tn_url"] == null ?
-                                                Icon(Icons.image_not_supported_outlined, size: 50)
-                                                    :
-                                                ClipRRect(
-                                                  borderRadius: BorderRadius.circular(7.0),
-                                                  child: Image.network(
-                                                    albums.data[index]["tn_url"],
-                                                    fit: BoxFit.cover,
-                                                  ),
-                                                ),
-                                              ),
-                                              Container(
-                                                decoration: ShapeDecoration(
-                                                  shape: WeirdBorder(radius: 7),
-                                                  color: Colors.white,
-                                                ),
-                                                width: 14,
-                                                height: 130.0,
-                                              ),
-                                              Expanded(
-                                                child: Container(
-                                                  decoration: BoxDecoration(
-                                                    border: Border.all(width: 0, color: Colors.white),
-                                                    color: Colors.white,
-                                                  ),
-                                                  padding: EdgeInsets.all(5),
-                                                  height: 130.0,
-                                                  child: Column(
+                                                child: Column(
                                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                     children: [
-                                                      Text('${albums.data[index]["name"]}', style: TextStyle(color: Colors.orange, fontSize: 20)),
+                                                      Text('${albums.data[index]["name"]}', style: _theme.textTheme.headline6),
                                                       Column(
                                                         children: [
-                                                          Text('${albums.data[index]["description"] == null ? "no description" : albums.data[index]["description"]}', style: TextStyle(color: Colors.grey)),
+                                                          Text('${albums.data[index]["description"] == null ?
+                                                          "(no description)" :
+                                                          albums.data[index]["description"]
+                                                          }',
+                                                              style: _theme.textTheme.subtitle1),
                                                           Container(
                                                             padding: EdgeInsets.all(5),
-                                                            child: Text('${albums.data[index]["total_nb_images"]} photos', style: TextStyle(color: Colors.black)),
+                                                            child: Text(albumSubCount(albums.data[index]),
+                                                                style: Theme.of(context).textTheme.bodyText2
+                                                            ),
                                                           ),
                                                         ],
                                                       ),
-                                                    ],
-                                                  ),
+                                                    ]
                                                 ),
                                               ),
-                                              Container(
-                                                height: 130.0,
-                                                decoration: BoxDecoration(
-                                                  border: Border.all(width: 0, color: Colors.white),
-                                                  color: Colors.white,
-                                                  borderRadius: BorderRadius.only(
-                                                    topRight: Radius.circular(10),
-                                                    bottomRight: Radius.circular(10),
-                                                  ),
-                                                ),
-                                                child: Center(
-                                                  child: Container(
-                                                    width: 8,
-                                                    height: 60,
-                                                    decoration: BoxDecoration(
-                                                        borderRadius: BorderRadius.only(
-                                                          topLeft: Radius.circular(10),
-                                                          bottomLeft: Radius.circular(10),
-                                                        ),
-                                                        color: Colors.orange
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                          secondaryActions: <Widget>[
-                                            IconSlideAction(
-                                              color: Colors.orange,
-                                              iconWidget: Icon(Icons.edit, size: 38, color: Colors.white),
-                                              onTap: () {
-                                                print('Edit');
-                                              },
-                                            ),
-                                            IconSlideAction(
-                                              color: Colors.black45,
-                                              iconWidget: Icon(Icons.reply, size: 38, color: Colors.white),
-                                              onTap: () {
-                                                print('More');
-                                              },
                                             ),
                                             Container(
-                                              height: 130,
+                                              height: 130.0,
                                               decoration: BoxDecoration(
+                                                color: _theme.backgroundColor,
                                                 borderRadius: BorderRadius.only(
-                                                  bottomRight: Radius.circular(20),
-                                                  topRight: Radius.circular(20),
+                                                  topRight: Radius.circular(10),
+                                                  bottomRight: Radius.circular(10),
                                                 ),
-                                                color: Colors.red,
                                               ),
-                                              child: IconButton(
-                                                onPressed: () {
-                                                  print("delete");
-                                                },
-                                                icon: Icon(Icons.delete, size: 38, color: Colors.white),
-                                              ),
+                                              child: widget.isAdmin? Center(
+                                                child: Container(
+                                                  width: 8,
+                                                  height: 60,
+                                                  decoration: BoxDecoration(
+                                                    border: Border.all(width: 1, color: _theme.accentColor),
+                                                    borderRadius: BorderRadius.only(
+                                                      topLeft: Radius.circular(10),
+                                                      bottomLeft: Radius.circular(10),
+                                                    ),
+                                                    color: _theme.accentColor,
+                                                  ),
+                                                ),
+                                              ) : Container(width: 8),
                                             ),
                                           ],
                                         ),
-                                      ),
-                                  );
-                                },
-                                childCount: albums.data.length,
-                              ),
-                            ),
-                          ),
-                          SliverPadding(
-                            padding: EdgeInsets.all(5),
-                            sliver: SliverGrid(
-                              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 4,
-                                mainAxisSpacing: 3.0,
-                                crossAxisSpacing: 3.0,
-                              ),
-                              delegate: SliverChildBuilderDelegate(
-                                    (BuildContext context, int index) {
-                                      if(_selectedItems.isEmpty) {
-                                        images.data.forEach((item) {
-                                          _selectedItems[index] = false;
-                                        });
-                                      }
-                                  return InkWell(
-                                    onTap: () {
-                                      _isEditMode ?
-                                        setState(() {
-                                          _isSelected(index) ?
-                                          _selectedItems[index] = false :
-                                          _selectedItems[index] = true;
-                                        }) :
-                                        Navigator.of(context).push(
-                                          MaterialPageRoute(builder: (context) => ImageViewPage(
-                                            images: images.data,
-                                            index: index,
-                                          )),
-                                        );
-                                    },
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                      ),
-                                      alignment: Alignment.center,
-                                      child: Stack(
-                                        children: [
-                                          Image.network(images.data[index]["derivatives"]["square"]["url"]),
-                                          _isEditMode ? Container(
-                                            child: _isSelected(index) ?
-                                                Icon(Icons.check_circle, color: Colors.orange) :
-                                                Icon(Icons.check_circle_outline, color: Colors.grey),
-                                            ) : Text(""),
+                                        secondaryActions: <Widget>[
+                                          IconSlideAction(
+                                            color: _theme.iconTheme.color,
+                                            iconWidget: Icon(Icons.edit, size: 38, color: _theme.accentIconTheme.color),
+                                            onTap: () {
+                                              print('Edit');
+                                            },
+                                          ),
+                                          IconSlideAction(
+                                            color: Color(0xFF4B4B4B),
+                                            iconWidget: Icon(Icons.reply, size: 38, color: _theme.accentIconTheme.color),
+                                            onTap: () {
+                                              print('More');
+                                            },
+                                          ),
+                                          Container(
+                                            height: 130,
+                                            decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.only(
+                                                bottomRight: Radius.circular(20),
+                                                topRight: Radius.circular(20),
+                                              ),
+                                              color: _theme.errorColor,
+                                            ),
+                                            child: IconButton(
+                                              onPressed: () {
+                                                print("delete");
+                                              },
+                                              icon: Icon(Icons.delete, size: 38, color: _theme.accentIconTheme.color),
+                                            ),
+                                          ),
                                         ],
-                                      )
+                                      ),
                                     ),
                                   );
                                 },
-                                childCount: images.data.length,
                               ),
-                            ),
+                              GridView.builder(
+                                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 4,
+                                  mainAxisSpacing: 3.0,
+                                  crossAxisSpacing: 3.0,
+                                ),
+                                padding: EdgeInsets.symmetric(horizontal: 5),
+                                itemCount: images.data.length,
+                                shrinkWrap: true,
+                                physics: NeverScrollableScrollPhysics(),
+                                itemBuilder: (BuildContext context, int index) {
+                                  if(_selectedItems.isEmpty) {
+                                    images.data.forEach((item) {
+                                      _selectedItems[index] = false;
+                                    });
+                                  }
+                                  return InkWell(
+                                    onTap: () {
+                                      _isEditMode ?
+                                      setState(() {
+                                        _isSelected(index) ?
+                                        _selectedItems[index] = false :
+                                        _selectedItems[index] = true;
+                                      }) :
+                                      Navigator.of(context).push(
+                                        MaterialPageRoute(builder: (context) => ImageViewPage(
+                                          images: images.data,
+                                          index: index,
+                                        )),
+                                      );
+                                    },
+                                    child: Container(
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                        ),
+                                        alignment: Alignment.center,
+                                        child: Stack(
+                                          children: [
+                                            Image.network(images.data[index]["derivatives"]["square"]["url"]),
+                                            _isEditMode ? Container(
+                                              child: _isSelected(index) ?
+                                              Icon(Icons.check_circle, color: Colors.orange) :
+                                              Icon(Icons.check_circle_outline, color: Colors.grey),
+                                            ) : Text(""),
+                                          ],
+                                        )
+                                    ),
+                                  );
+                                },
+                              ),
+                              Center(
+                                child: Container(
+                                  padding: EdgeInsets.all(10),
+                                  child: Text("$nbPhotos photos", style: TextStyle(fontSize: 20, color: _theme.textTheme.bodyText2.color, fontWeight: FontWeight.w300)),
+                                ),
+                              )
+                            ],
                           ),
-                        ],
+                        ),
                       );
                     } else {
                       return Center(
@@ -445,26 +421,33 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
               );
             }
           }
+        ),
       ),
       floatingActionButton: _isEditMode ?
         Text("") :
-        Stack(
-        children: [
-          createUploadActionButton(),
-            Align(
-              alignment: Alignment.bottomRight,
-              child: Container(
-                margin: EdgeInsets.only(bottom: 0, right: 70),
-                child: FloatingActionButton(
-                  backgroundColor: Color(0xaa868686),
-                  onPressed: () {
-                    Navigator.popUntil(context, ModalRoute.withName('/'));
-                  },
-                  child: Icon(Icons.home, color: Colors.grey.shade200, size: 30),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Stack(
+            children: <Widget>[
+              widget.isAdmin? Align(
+                alignment: Alignment.bottomRight,
+                child: createUploadActionButton(),
+              ) : Container(),
+              Align(
+                alignment: Alignment.bottomRight,
+                child: Container(
+                  margin: EdgeInsets.only(bottom: 0, right: widget.isAdmin? 70 : 0),
+                  child: FloatingActionButton(
+                    backgroundColor: Color(0xaa868686),
+                    onPressed: () {
+                      Navigator.of(context).popUntil((route) => route.isFirst);
+                    },
+                    child: Icon(Icons.home, color: Colors.grey.shade200, size: 30),
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       bottomNavigationBar: _isEditMode ? bottomBar() : Container(height: 0),
     );
@@ -472,6 +455,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
 
 
   Widget createUploadActionButton() {
+    ThemeData _theme = Theme.of(context);
     final _formKey = GlobalKey<FormState>();
     return SpeedDial(
       marginEnd: 10,
@@ -480,17 +464,17 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
       animatedIconTheme: IconThemeData(size: 22.0),
       closeManually: true,
       curve: Curves.bounceIn,
-      overlayColor: Colors.black,
-      overlayOpacity: 0.1,
-      backgroundColor: Colors.orange,
-      foregroundColor: Colors.white,
+      // overlayColor: Colors.black,
+      // overlayOpacity: 0.1,
+      backgroundColor: _theme.floatingActionButtonTheme.backgroundColor,
+      foregroundColor: _theme.floatingActionButtonTheme.foregroundColor,
       elevation: 8.0,
       shape: CircleBorder(),
       children: [
         SpeedDialChild(
           child: Icon(Icons.create_new_folder),
-          backgroundColor: Colors.orangeAccent,
-          foregroundColor: Colors.white,
+          backgroundColor: _theme.floatingActionButtonTheme.backgroundColor,
+          foregroundColor: _theme.floatingActionButtonTheme.foregroundColor,
           onTap: () async {
             showDialog(
               context: context,
@@ -502,8 +486,8 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
         ),
         SpeedDialChild(
             child: Icon(Icons.image),
-            backgroundColor: Colors.orangeAccent,
-            foregroundColor: Colors.white,
+            backgroundColor: _theme.floatingActionButtonTheme.backgroundColor,
+            foregroundColor: _theme.floatingActionButtonTheme.foregroundColor,
             onTap: () async {
               try {
                 var imageList = await MultiImagePicker.pickImages(
@@ -524,7 +508,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
                 );
 
                 Navigator.push(context, MaterialPageRoute(
-                    builder: (context) => UploadGalleryViewPage(imageData: imageList, category: widget.category,)
+                    builder: (context) => UploadGalleryViewPage(imageData: imageList, category: widget.category)
                 ));
               } catch (e){
                 print(e.toString());
@@ -597,22 +581,23 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
   }
 
   Widget bottomBar() {
+    ThemeData _theme = Theme.of(context);
     return BottomNavigationBar(
-      items: const <BottomNavigationBarItem>[
+      items: <BottomNavigationBarItem>[
         BottomNavigationBarItem(
-          icon: Icon(Icons.file_upload, color: Colors.orange),
+          icon: Icon(Icons.file_upload, color: _theme.iconTheme.color),
           label: "upload",
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.reply_outlined, color: Colors.orange),
+          icon: Icon(Icons.reply_outlined, color: _theme.iconTheme.color),
           label: "share",
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.delete_outline, color: Colors.red),
+          icon: Icon(Icons.delete_outline, color: _theme.errorColor),
           label: "delete",
         ),
       ],
-      backgroundColor: Colors.grey.shade200,
+      backgroundColor: _theme.scaffoldBackgroundColor,
       type: BottomNavigationBarType.fixed,
       selectedFontSize: 16,
       unselectedFontSize: 16,

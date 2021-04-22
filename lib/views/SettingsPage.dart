@@ -119,28 +119,20 @@ class _SettingsPageState extends State<SettingsPage> {
                                     backgroundColor: MaterialStateProperty.all(Colors.transparent),
                                   ),
                                   onPressed: () {
-                                    if(prefs.getBool('is_guest')) {
-                                      print('Log in');
-                                    } else {
-                                      Navigator.of(context).pushAndRemoveUntil(
-                                        // the new route
-                                        MaterialPageRoute(
-                                          builder: (BuildContext context) => LoginViewPage(),
-                                        ),
-
-                                        // this function should return true when we're done removing routes
-                                        // but because we want to remove all other screens, we make it
-                                        // always return false
-                                            (Route route) => false,
-                                      );
-                                    }
+                                    prefs.setBool("is_logged", false);
+                                    Navigator.of(context).pushAndRemoveUntil(
+                                      MaterialPageRoute(
+                                        builder: (BuildContext context) => LoginViewPage(),
+                                      ),
+                                      (Route route) => false,
+                                    );
                                   },
                                   child: Text('${prefs.getBool('is_guest') ? 'Log in' : 'Log out' }', style: TextStyle(color: Color(0xffff7700), fontSize: 20),),
                                 ),
                               ),
-                              Container(
-                                padding: EdgeInsets.all(5),
-                                child: Center(
+                              Center(
+                                child: Container(
+                                  padding: EdgeInsets.all(5),
                                   child: Text('This server handles these file types: ${prefs.getString("file_types")}', style: TextStyle(color: Colors.black, fontSize: 12)),
                                 ),
                               ),

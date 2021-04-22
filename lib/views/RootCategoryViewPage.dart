@@ -13,6 +13,9 @@ import 'CategoryViewPage.dart';
 
 
 class RootCategoryViewPage extends StatefulWidget {
+  final bool isAdmin;
+
+  const RootCategoryViewPage({Key key, this.isAdmin = false}) : super(key: key);
   @override
   _RootCategoryViewPageState createState() => _RootCategoryViewPageState();
 }
@@ -36,6 +39,8 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
   void dispose() {
     super.dispose();
   }
+
+
 
   bool _filterSearch(String name) {
     if(_filter != null) {
@@ -93,7 +98,73 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
   Widget build(BuildContext context) {
     ThemeData _theme = Theme.of(context);
     return Scaffold(
-      body: GestureDetector(
+      resizeToAvoidBottomInset: true,
+      body: NestedScrollView(
+        headerSliverBuilder: (context, innerBoxScrolled) => [
+          SliverAppBar(
+            pinned: true,
+            snap: false,
+            floating: false,
+            expandedHeight: 180.0,
+            title: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                IconButton(
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (context) => SettingsPage()),
+                    );
+                  },
+                  icon: Icon(Icons.settings, color: _theme.iconTheme.color),
+                ),
+
+                // Consumer<ThemeNotifier>(
+                //   builder: (context, notifier, child) => Switch(
+                //     onChanged:(value){
+                //       notifier.toggleTheme();
+                //     },
+                //     value: notifier.darkTheme,
+                //   ),
+                // ),
+                Icon(Icons.menu, color: _theme.iconTheme.color),
+              ],
+            ),
+            flexibleSpace: FlexibleSpaceBar(
+              background: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    margin: EdgeInsets.only(left: 20),
+                    child: Text("Albums", style: _theme.textTheme.headline1),
+                  ),
+                  Container(
+                    margin: EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: _theme.inputDecorationTheme.fillColor
+                    ),
+                    child: TextField(
+                      controller: _searchTextController,
+                      onChanged: (str) {
+                        setState(() {
+                          _filter = str;
+                        });
+                      },
+                      decoration: InputDecoration(
+                        border: InputBorder.none,
+                        prefixIcon: Icon(Icons.search, color: _theme.inputDecorationTheme.prefixStyle.color),
+                        hintText: "Search",
+                        hintStyle: _theme.inputDecorationTheme.hintStyle,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+        body: GestureDetector(
           onTap: () {
             FocusScope.of(context).unfocus();
           },
@@ -101,78 +172,28 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
               future: fetchAlbums(_rootCategory), // Albums of the list
               builder: (BuildContext context, AsyncSnapshot albums) {
                 if(albums.hasData){
+                  int nbPhotos = 0;
+                  albums.data.forEach((cat) => nbPhotos+=cat["total_nb_images"]);
                   albums.data.removeWhere((category) => (
                       category["id"].toString() == _rootCategory || _filterSearch(category["name"].toString()))
                   );
-                  return CustomScrollView(
-                    slivers: <Widget>[
-                      SliverAppBar(
-                        pinned: true,
-                        snap: false,
-                        floating: false,
-                        expandedHeight: 180.0,
-                        title: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            IconButton(
-                              onPressed: () {
-                                Navigator.of(context).push(
-                                  MaterialPageRoute(builder: (context) => SettingsPage()),
-                                );
-                              },
-                              icon: Icon(Icons.settings, color: _theme.iconTheme.color),
-                            ),
+                  return RefreshIndicator(
+                    displacement: 20,
+                    onRefresh: () {
+                      setState(() {
+                        print("refresh");
+                      });
 
-                            // Consumer<ThemeNotifier>(
-                            //   builder: (context, notifier, child) => Switch(
-                            //     onChanged:(value){
-                            //       notifier.toggleTheme();
-                            //     },
-                            //     value: notifier.darkTheme,
-                            //   ),
-                            // ),
-                            Icon(Icons.menu, color: _theme.iconTheme.color),
-                          ],
-                        ),
-                        flexibleSpace: FlexibleSpaceBar(
-                          background: Column(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                margin: EdgeInsets.only(left: 20),
-                                child: Text("Albums", style: _theme.textTheme.headline1),
-                              ),
-                              Container(
-                                margin: EdgeInsets.all(20),
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10),
-                                    color: _theme.inputDecorationTheme.fillColor
-                                ),
-                                child: TextField(
-                                  controller: _searchTextController,
-                                  onChanged: (str) {
-                                    setState(() {
-                                      _filter = str;
-                                    });
-                                  },
-                                  decoration: InputDecoration(
-                                    border: InputBorder.none,
-                                    prefixIcon: Icon(Icons.search, color: _theme.inputDecorationTheme.prefixStyle.color),
-                                    hintText: "Search",
-                                    hintStyle: _theme.inputDecorationTheme.hintStyle,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      SliverPadding(
-                        padding: EdgeInsets.all(5),
-                        sliver: SliverList(
-                          delegate: SliverChildBuilderDelegate(
-                                (BuildContext context, int index) {
+                      return Future.delayed(Duration(milliseconds: 1000));
+                    },
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          ListView.builder(
+                            itemCount: albums.data.length,
+                            shrinkWrap: true,
+                            physics: NeverScrollableScrollPhysics(),
+                            itemBuilder: (context, index) {
                               if(_swipedItems.isEmpty) {
                                 albums.data.forEach((item) {
                                   _swipedItems[index] = false;
@@ -184,20 +205,22 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
                                     MaterialPageRoute(builder: (context) => CategoryViewPage(
                                       title: albums.data[index]["name"],
                                       category: albums.data[index]["id"].toString(),
+                                      isAdmin: widget.isAdmin,
                                     )),
                                   );
                                 },
                                 child: Container(
                                   margin: EdgeInsets.only(top: 5, bottom: 5),
                                   child: Slidable(
+                                    enabled: widget.isAdmin,
                                     actionPane: SlidableDrawerActionPane(),
                                     actionExtentRatio: 0.15,
                                     child: Row(
                                       children: [
                                         Container(
                                           decoration: BoxDecoration(
-                                            border: Border.all(width: 0, color: Theme.of(context).backgroundColor),
-                                            color: Theme.of(context).backgroundColor,
+                                            border: Border.all(width: 0, color: _theme.backgroundColor),
+                                            color: _theme.backgroundColor,
                                             borderRadius: BorderRadius.only(
                                               topLeft: Radius.circular(10),
                                               bottomLeft: Radius.circular(10),
@@ -265,7 +288,7 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
                                               bottomRight: Radius.circular(10),
                                             ),
                                           ),
-                                          child: Center(
+                                          child: widget.isAdmin? Center(
                                             child: Container(
                                               width: 8,
                                               height: 60,
@@ -278,7 +301,7 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
                                                 color: _theme.accentColor,
                                               ),
                                             ),
-                                          ),
+                                          ) : Container(width: 8),
                                         ),
                                       ],
                                     ),
@@ -318,11 +341,16 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
                                 ),
                               );
                             },
-                            childCount: albums.data.length,
                           ),
-                        ),
+                          Center(
+                            child: Container(
+                              padding: EdgeInsets.all(10),
+                              child: Text("$nbPhotos photos", style: TextStyle(fontSize: 20, color: _theme.textTheme.bodyText2.color, fontWeight: FontWeight.w300)),
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   );
                 } else {
                   return Center(
@@ -331,8 +359,9 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
                 }
               }
           ),
+        ),
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: widget.isAdmin? FloatingActionButton(
         onPressed: () {
           final _formKey = GlobalKey<FormState>();
           showDialog(
@@ -343,7 +372,7 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
           );
         },
         child: Icon(Icons.create_new_folder, color: _theme.primaryColorLight, size: 30),
-      ),
+      ) : Container(),
     );
   }
 

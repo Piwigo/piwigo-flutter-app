@@ -3,3 +3,6 @@
 /build/
 /pubspec.lock
 /flutter_01.log
+/.flutter-plugins
+/.flutter-plugins-dependencies
+/.packages

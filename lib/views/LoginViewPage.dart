@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:poc_piwigo/api/API.dart';
@@ -7,6 +8,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
 
 import 'RootCategoryViewPage.dart';
+
+
+class CategoryPageArguments {
+  final bool isAdmin;
+
+  CategoryPageArguments(this.isAdmin);
+}
 
 class LoginViewPage extends StatefulWidget {
   LoginViewPage({Key key}) : super(key: key);
@@ -26,6 +34,8 @@ class _LoginViewPageState extends State<LoginViewPage> {
   TextEditingController passwordController = TextEditingController();
 
   void createDio() async {
+    API.dio = Dio();
+    API.cookieJar = CookieJar();
     API.dio.interceptors.add(CookieManager(API.cookieJar));
     SharedPreferences prefs = await SharedPreferences.getInstance();
     if(prefs.getBool("is_logged") != null && prefs.getBool("is_logged")) {
@@ -33,8 +43,8 @@ class _LoginViewPageState extends State<LoginViewPage> {
       if(prefs.getBool("is_guest") != null && !prefs.getBool("is_guest")) {
         loginUser(prefs.getString("base_url"), prefs.getString("username"), prefs.getString("password"));
       } else {
-        Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (context) => RootCategoryViewPage())
+        Navigator.of(context).pushReplacementNamed("/root",
+          arguments: false,
         );
       }
     }
@@ -47,7 +57,7 @@ class _LoginViewPageState extends State<LoginViewPage> {
     prefs.setString("status", status["status"]);
     prefs.setString("version", status["version"]);
     prefs.setStringList("available_sizes", status["available_sizes"].cast<String>());
-    if(prefs.getBool("is_logged")) {
+    if(prefs.getBool("is_logged") && !prefs.getBool("is_guest")) {
       prefs.setInt('upload_form_chunk_size', status['upload_form_chunk_size']);
       prefs.setString("file_types", status["upload_file_types"]);
     }
@@ -80,6 +90,19 @@ class _LoginViewPageState extends State<LoginViewPage> {
     }
     saveStatus(status);
   }
+  Future<Null> getSharedPrefs() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    if(prefs.getString("base_url") != null) {
+      String url = prefs.getString("base_url");
+      url = url.split('//')[1];
+      url = url.substring(0, url.lastIndexOf('/'));
+      setState(() {
+        urlController.text = url;
+        usernameController.text = prefs.getString("username") == null? '' : prefs.getString("username");
+        passwordController.text = prefs.getString("password") == null? '' : prefs.getString("password");
+      });
+    }
+  }
 
   Future<String> loginUser(String url, String username, String password) async {
     Map<String, String> queries = {
@@ -107,8 +130,8 @@ class _LoginViewPageState extends State<LoginViewPage> {
           var status = await sessionStatus(url);
           if(status["stat"] == "ok") {
             savePreferences(status["result"], url: url, username: username, password: password, isLogged: true, isGuest: false);
-            Navigator.of(context).pushReplacement(
-                MaterialPageRoute(builder: (context) => RootCategoryViewPage())
+            Navigator.of(context).pushReplacementNamed("/root",
+                arguments: true,
             );
             return null;
           }
@@ -134,8 +157,8 @@ class _LoginViewPageState extends State<LoginViewPage> {
       setState(() {
         _isLoading = false;
       });
-      Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => RootCategoryViewPage())
+      Navigator.of(context).pushReplacementNamed("/root",
+        arguments: false,
       );
       return null;
     }
@@ -159,12 +182,6 @@ class _LoginViewPageState extends State<LoginViewPage> {
 
   bool validateUrl(String value) {
     if (value == null || value.isEmpty /*|| !Uri.parse(value).isAbsolute*/) return false;
-    // if(value.contains(" ")) {
-    //   return false;
-    // }
-    // if(value.substring(value.length-1) != '/') {
-    //   return false;
-    // }
     return true;
   }
 
@@ -193,6 +210,7 @@ class _LoginViewPageState extends State<LoginViewPage> {
         print("Has focus: ${urlFieldFocus.hasFocus}");
       });
     });
+    getSharedPrefs();
   }
 
   @override
@@ -233,6 +251,7 @@ class _LoginViewPageState extends State<LoginViewPage> {
                       padding: EdgeInsets.symmetric(horizontal: 10),
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10),
+                          border: _validUrl? Border.all(width: 0, color: Colors.transparent) : Border.all(color: _theme.errorColor),
                           color: _theme.inputDecorationTheme.fillColor
                       ),
 
@@ -241,7 +260,7 @@ class _LoginViewPageState extends State<LoginViewPage> {
                         style: TextStyle(fontSize: 14, color: Color(0xff5c5c5c)),
                         focusNode: urlFieldFocus,
                         decoration: InputDecoration(
-                          icon: Icon(Icons.public, color: _theme.disabledColor),
+                          icon: _validUrl? Icon(Icons.public, color: _theme.disabledColor) : Icon(Icons.error_outline, color: _theme.errorColor),
                           border: InputBorder.none,
                           hintText: 'example.com',
                           hintStyle: TextStyle(fontStyle: FontStyle.italic, color: _theme.disabledColor),
@@ -276,11 +295,22 @@ class _LoginViewPageState extends State<LoginViewPage> {
                       child: TextFormField(
                         controller: usernameController,
                         style: TextStyle(fontSize: 14, color: Color(0xff5c5c5c)),
+                        maxLines: 1,
+                        textAlignVertical: TextAlignVertical.center,
                         decoration: InputDecoration(
+                          contentPadding: EdgeInsets.symmetric(vertical: 10),
                           icon: Icon(Icons.person, color: _theme.disabledColor),
                           border: InputBorder.none,
                           hintText: 'username (optional)',
-                          hintStyle: TextStyle(fontStyle: FontStyle.italic, color: _theme.disabledColor),
+                          hintStyle: TextStyle(fontSize: 14, fontStyle: FontStyle.italic, color: _theme.disabledColor),
+                          suffix: InkWell(
+                            onTap: () {
+                              setState(() {
+                                usernameController.text = '';
+                              });
+                            },
+                            child: Icon(Icons.highlight_remove),
+                          ),
                         ),
                       ),
                     ),
@@ -302,6 +332,14 @@ class _LoginViewPageState extends State<LoginViewPage> {
                           border: InputBorder.none,
                           hintText: 'password (optional)',
                           hintStyle: TextStyle(fontStyle: FontStyle.italic, color: _theme.disabledColor),
+                          suffix: InkWell(
+                            onTap: () {
+                              setState(() {
+                                passwordController.text = '';
+                              });
+                            },
+                            child: Icon(Icons.highlight_remove),
+                          ),
                         ),
                       ),
                     ),
@@ -354,7 +392,6 @@ class _LoginViewPageState extends State<LoginViewPage> {
                       child: _isLoading? CircularProgressIndicator() : Text('Log in', style: TextStyle(fontSize: 16, color: Colors.white)),
                     ),
                   ),
-                  Text(_validUrl? '' : 'Incorrect Url', style: TextStyle(color: _theme.errorColor, fontSize: 14)),
                 ],
               ),
             ),
@@ -367,15 +404,9 @@ class _LoginViewPageState extends State<LoginViewPage> {
   }
 
   AlertDialog connectionErrorDialog(String error) {
-    double height = MediaQuery.of(context).size.height;
     return AlertDialog(
       title: Text('Connection failed'),
-      content: Container(
-        child: Align(
-          alignment: Alignment.center,
-          child:Text('$error'),
-        ),
-      ),
+      content: Text('$error'),
       actions: [
         IconButton(
           color: Color(0xffff0e00),
