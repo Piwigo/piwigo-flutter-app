@@ -9,7 +9,9 @@ import 'dart:async';
 import 'package:poc_piwigo/api/API.dart';
 import 'package:poc_piwigo/api/CategoryAPI.dart';
 import 'package:poc_piwigo/services/MoveAlbumService.dart';
+import 'package:poc_piwigo/ui/Dialogs.dart';
 import 'package:poc_piwigo/ui/ListItems.dart';
+import 'package:poc_piwigo/ui/SnackBars.dart';
 import 'package:poc_piwigo/views/SettingsPage.dart';
 import 'package:poc_piwigo/views/CategoryViewPage.dart';
 import 'package:poc_piwigo/views/UploadGalleryViewPage.dart';
@@ -237,10 +239,10 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
                                                   0xff479900))),
                                               textCancel: Text('No', style: TextStyle(color: _theme.errorColor)),
                                             )) {
-                                              print("delete ${albums.data[index]["name"]}");
                                               var result = await deleteCategory(albums.data[index]['id'].toString());
+                                              ScaffoldMessenger.of(context).showSnackBar(albumDeletedSnackBar(albums.data[index]["name"]));
                                               setState(() {
-                                                print('Delete album $result');
+                                                print('Delete album ${albums.data[index]["name"]} : $result');
                                               });
                                             }
                                           },
@@ -277,7 +279,7 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
           showDialog(
             context: context,
             builder: (BuildContext context) {
-              return createCategoryAlert(context);
+              return createCategoryAlert(context, "0");
             }
           ).whenComplete(() {
             setState(() {
@@ -287,125 +289,6 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
         },
         child: Icon(Icons.create_new_folder, color: _theme.primaryColorLight, size: 30),
       ) : Container(),
-    );
-  }
-
-  Widget createCategoryAlert(context) {
-    ThemeData _theme = Theme.of(context);
-    final _formKey = GlobalKey<FormState>();
-    final _addAlbumNameController = TextEditingController();
-    final _addAlbumDescController = TextEditingController();
-
-    return AlertDialog(
-      insetPadding: EdgeInsets.all(10),
-      actions: [
-        InkResponse(
-          onTap: () {
-            Navigator.of(context).pop();
-          },
-          child: CircleAvatar(
-            child: Icon(Icons.close, color: _theme.errorColor),
-            backgroundColor: Colors.transparent,
-          ),
-        ),
-      ],
-      title: Text("Album creation"),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          Container(
-            width: 250,
-            child: Form(
-              key: _formKey,
-              child: Column(
-                children: <Widget>[
-                  Padding(
-                    padding: EdgeInsets.all(5),
-                    child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 10),
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          color: _theme.inputDecorationTheme.fillColor
-                      ),
-                      child: TextFormField(
-                        maxLines: 1,
-                        controller: _addAlbumNameController,
-                        style: TextStyle(fontSize: 14, color: Color(0xff5c5c5c)),
-                        textAlignVertical: TextAlignVertical.top,
-                        decoration: InputDecoration(
-                          contentPadding: EdgeInsets.zero,
-                          border: InputBorder.none,
-                          hintText: 'album name',
-                          hintStyle: TextStyle(fontSize: 14, fontStyle: FontStyle.italic, color: _theme.disabledColor),
-                        ),
-                        validator: (value) {
-                          if(value.isEmpty) {
-                            return 'Please enter a name';
-                          }
-                          return null;
-                        },
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.all(5),
-                    child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 10),
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          color: _theme.inputDecorationTheme.fillColor
-                      ),
-                      child: TextFormField(
-                        minLines: 1,
-                        maxLines: 3,
-                        controller: _addAlbumDescController,
-                        style: TextStyle(fontSize: 14, color: Color(0xff5c5c5c)),
-                        textAlignVertical: TextAlignVertical.top,
-                        decoration: InputDecoration(
-                          contentPadding: EdgeInsets.zero,
-                          border: InputBorder.none,
-                          hintText: 'description (optional)',
-                          hintStyle: TextStyle(fontSize: 14, fontStyle: FontStyle.italic, color: _theme.disabledColor),
-                        ),
-                      ),
-                    ),
-                  ),
-                  Divider(
-                    thickness: 1,
-                  ),
-                  Padding(
-                    padding: EdgeInsets.all(5.0),
-                    child: Container(
-                      width: double.infinity,
-                      height: 50,
-                      child: TextButton(
-                        style: ButtonStyle(
-                          shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                            RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
-                          backgroundColor: MaterialStateProperty.all(_theme.accentColor),
-                        ),
-                        child: Text('Create album', style: TextStyle(fontSize: 16, color: Colors.white)),
-                        onPressed: () async {
-                          if (_formKey.currentState.validate()) {
-                            _formKey.currentState.save();
-                            var result = await addCategory(_addAlbumNameController.text, _addAlbumDescController.text, "0");
-                            print(result);
-                            _addAlbumNameController.text = "";
-                            Navigator.of(context).pop();
-                          }
-                        },
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
     );
   }
 }
