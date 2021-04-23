@@ -6,6 +6,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:poc_piwigo/api/API.dart';
 import 'package:poc_piwigo/views/SettingsPage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../ui/WeirdBorder.dart';
 import 'CategoryViewPage.dart';
@@ -21,7 +22,6 @@ class RootCategoryViewPage extends StatefulWidget {
 }
 
 class _RootCategoryViewPageState extends State<RootCategoryViewPage> with SingleTickerProviderStateMixin {
-  final _addAlbumController = TextEditingController();
   Map<int, bool> _swipedItems = Map();
   String _rootCategory;
 
@@ -68,12 +68,13 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
     }
   }
 
-  void addCategory(String catName) async {
+  void addCategory(String catName, String catDesc) async {
     Map<String, String> queries = {
       "format": "json",
       "method": "pwg.categories.add",
       "name": catName,
-      "parent": _rootCategory
+      "comment": catDesc,
+      "parent": "0"
     };
 
     Response response = await API.dio.post('ws.php', queryParameters: queries);
@@ -83,6 +84,34 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
       setState(() {
         print("refresh");
       });
+    }
+  }
+
+  void deleteCategory(String catId) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    Map<String, String> queries = {
+      "format": "json",
+      "method": "pwg.categories.delete",
+    };
+    FormData formData =  FormData.fromMap({
+      "category_id": catId,
+      "pwg_token": prefs.getString("pwg_token"),
+    });
+    try {
+      Response response = await API.dio.post(
+          'ws.php',
+          data: formData,
+          queryParameters: queries
+      );
+
+      if (response.statusCode == 200) {
+        print(response.data);
+        setState(() {
+          print("refresh");
+        });
+      }
+    } catch (e) {
+      print(e);
     }
   }
 
@@ -106,18 +135,17 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
             snap: false,
             floating: false,
             expandedHeight: 180.0,
+            leading: IconButton(
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => SettingsPage()),
+                );
+              },
+              icon: Icon(Icons.settings, color: _theme.iconTheme.color),
+            ),
             title: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                IconButton(
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(builder: (context) => SettingsPage()),
-                    );
-                  },
-                  icon: Icon(Icons.settings, color: _theme.iconTheme.color),
-                ),
-
                 // Consumer<ThemeNotifier>(
                 //   builder: (context, notifier, child) => Switch(
                 //     onChanged:(value){
@@ -126,9 +154,18 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
                 //     value: notifier.darkTheme,
                 //   ),
                 // ),
-                Icon(Icons.menu, color: _theme.iconTheme.color),
               ],
             ),
+            /*
+            actions: [
+              IconButton(
+                onPressed: () {
+                  // TODO: implement exploration menu | favorites
+                },
+                icon: Icon(Icons.menu, color: _theme.iconTheme.color),
+              ),
+            ],
+             */
             flexibleSpace: FlexibleSpaceBar(
               background: Column(
                 mainAxisAlignment: MainAxisAlignment.end,
@@ -138,6 +175,7 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
                     margin: EdgeInsets.only(left: 20),
                     child: Text("Albums", style: _theme.textTheme.headline1),
                   ),
+                  // TODO: implement all image search
                   Container(
                     margin: EdgeInsets.all(20),
                     decoration: BoxDecoration(
@@ -154,7 +192,7 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
                       decoration: InputDecoration(
                         border: InputBorder.none,
                         prefixIcon: Icon(Icons.search, color: _theme.inputDecorationTheme.prefixStyle.color),
-                        hintText: "Search",
+                        hintText: "Search album",
                         hintStyle: _theme.inputDecorationTheme.hintStyle,
                       ),
                     ),
@@ -259,14 +297,16 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
                                             child: Column(
                                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                               children: [
-                                                Text('${albums.data[index]["name"]}', style: _theme.textTheme.headline6),
+                                                Text('${albums.data[index]["name"]}', style: _theme.textTheme.headline6, textAlign: TextAlign.center,),
                                                 Column(
                                                   children: [
-                                                    Text('${albums.data[index]["comment"] == null ?
+                                                    Text('${albums.data[index]["comment"] == "" ?
                                                         "(no description)" :
                                                         albums.data[index]["comment"]
                                                       }',
-                                                      style: _theme.textTheme.subtitle1),
+                                                      style: _theme.textTheme.subtitle1,
+                                                      textAlign: TextAlign.center
+                                                    ),
                                                     Container(
                                                       padding: EdgeInsets.all(5),
                                                       child: Text(albumSubCount(albums.data[index]),
@@ -293,12 +333,12 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
                                               width: 8,
                                               height: 60,
                                               decoration: BoxDecoration(
-                                                border: Border.all(width: 1, color: _theme.accentColor),
+                                                border: Border.all(width: 1, color: _theme.errorColor), //TODO: Change color to adapt the first IconSlideAction
                                                 borderRadius: BorderRadius.only(
                                                   topLeft: Radius.circular(10),
                                                   bottomLeft: Radius.circular(10),
                                                 ),
-                                                color: _theme.accentColor,
+                                                color: _theme.errorColor, //TODO: Change color to adapt the first IconSlideAction
                                               ),
                                             ),
                                           ) : Container(width: 8),
@@ -306,34 +346,44 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
                                       ],
                                     ),
                                     secondaryActions: <Widget>[
+                                      /*
                                       IconSlideAction(
                                         color: _theme.iconTheme.color,
                                         iconWidget: Icon(Icons.edit, size: 38, color: _theme.accentIconTheme.color),
                                         onTap: () {
+                                          // TODO: Add edit album view
                                           print('Edit');
                                         },
                                       ),
+                                       */
+                                      /*
                                       IconSlideAction(
                                         color: Color(0xFF4B4B4B),
                                         iconWidget: Icon(Icons.reply, size: 38, color: _theme.accentIconTheme.color),
                                         onTap: () {
-                                          print('More');
+                                          // TODO: Add album tree structure for moving albums
+                                          print('Move');
                                         },
                                       ),
+
+                                       */
                                       Container(
                                         height: 130,
                                         decoration: BoxDecoration(
                                           borderRadius: BorderRadius.only(
-                                            bottomRight: Radius.circular(20),
-                                            topRight: Radius.circular(20),
+                                            bottomRight: Radius.circular(10),
+                                            topRight: Radius.circular(10),
                                           ),
                                           color: _theme.errorColor,
                                         ),
-                                        child: IconButton(
-                                          onPressed: () {
-                                            print("delete");
+                                        child: IconSlideAction(
+                                          color: Colors.transparent,
+                                          iconWidget: Icon(Icons.delete, size: 38, color: _theme.accentIconTheme.color),
+                                          onTap: () {
+                                            print("delete ${albums.data[index]["name"]}");
+                                            deleteCategory(albums.data[index]['id'].toString());
                                           },
-                                          icon: Icon(Icons.delete, size: 38, color: _theme.accentIconTheme.color),
+                                          closeOnTap: true,
                                         ),
                                       ),
                                     ],
@@ -367,7 +417,7 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
           showDialog(
             context: context,
             builder: (BuildContext context) {
-              return createCategoryAlert(_formKey, context);
+              return createCategoryAlert(context);
             }
           );
         },
@@ -376,61 +426,118 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
     );
   }
 
-  Widget createCategoryAlert(_formKey, context) {
+  Widget createCategoryAlert(context) {
     ThemeData _theme = Theme.of(context);
+    final _formKey = GlobalKey<FormState>();
+    final _addAlbumNameController = TextEditingController();
+    final _addAlbumDescController = TextEditingController();
+
+
     return AlertDialog(
+      insetPadding: EdgeInsets.all(10),
+      actions: [
+        InkResponse(
+          onTap: () {
+            Navigator.of(context).pop();
+          },
+          child: CircleAvatar(
+            child: Icon(Icons.close, color: _theme.errorColor),
+            backgroundColor: Colors.transparent,
+          ),
+        ),
+      ],
+      title: Text("Album creation"),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children:[
-              InkResponse(
-                onTap: () {
-                  Navigator.of(context).pop();
-                },
-                child: CircleAvatar(
-                  child: Icon(Icons.close),
-                  backgroundColor: _theme.errorColor,
-                ),
-              ),
-            ]
-          ),
-          Form(
-            key: _formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Padding(
-                  padding: EdgeInsets.all(5),
-                  child: TextFormField(
-                    controller: _addAlbumController,
-                    decoration: InputDecoration(
-                        hintText: "Album name"
+          Container(
+            width: 250,
+            child: Form(
+              key: _formKey,
+              child: Column(
+                children: <Widget>[
+                  Padding(
+                    padding: EdgeInsets.all(5),
+                    child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 10),
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: _theme.inputDecorationTheme.fillColor
+                      ),
+                      child: TextFormField(
+                        maxLines: 1,
+                        controller: _addAlbumNameController,
+                        style: TextStyle(fontSize: 14, color: Color(0xff5c5c5c)),
+                        textAlignVertical: TextAlignVertical.top,
+                        decoration: InputDecoration(
+                          contentPadding: EdgeInsets.zero,
+                          border: InputBorder.none,
+                          hintText: 'album name',
+                          hintStyle: TextStyle(fontSize: 14, fontStyle: FontStyle.italic, color: _theme.disabledColor),
+                        ),
+                        validator: (value) {
+                          if(value.isEmpty) {
+                            return 'Please enter a name';
+                          }
+                          return null;
+                        },
+                      ),
                     ),
-                    validator: (value) {
-                      if(value.isEmpty) {
-                        return 'Please enter some text';
-                      }
-                      return null;
-                    },
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(5.0),
-                  child: ElevatedButton(
-                    child: Text("Create album"),
-                    onPressed: () {
-                      if (_formKey.currentState.validate()) {
-                        _formKey.currentState.save();
-                        addCategory(_addAlbumController.text);
-                        _addAlbumController.text = "";
-                        Navigator.of(context).pop();
-                      }
-                    },
+                  Padding(
+                    padding: EdgeInsets.all(5),
+                    child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 10),
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: _theme.inputDecorationTheme.fillColor
+                      ),
+                      child: TextFormField(
+                        minLines: 1,
+                        maxLines: 3,
+                        controller: _addAlbumDescController,
+                        style: TextStyle(fontSize: 14, color: Color(0xff5c5c5c)),
+                        textAlignVertical: TextAlignVertical.top,
+                        decoration: InputDecoration(
+                          contentPadding: EdgeInsets.zero,
+                          border: InputBorder.none,
+                          hintText: 'description (optional)',
+                          hintStyle: TextStyle(fontSize: 14, fontStyle: FontStyle.italic, color: _theme.disabledColor),
+                        ),
+                      ),
+                    ),
                   ),
-                )
-              ],
+                  Divider(
+                    thickness: 1,
+                  ),
+                  Padding(
+                    padding: EdgeInsets.all(5.0),
+                    child: Container(
+                      width: double.infinity,
+                      height: 50,
+                      child: TextButton(
+                        style: ButtonStyle(
+                          shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                            RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          backgroundColor: MaterialStateProperty.all(_theme.accentColor),
+                        ),
+                        child: Text('Create album', style: TextStyle(fontSize: 16, color: Colors.white)),
+                        onPressed: () {
+                          if (_formKey.currentState.validate()) {
+                            _formKey.currentState.save();
+                            addCategory(_addAlbumNameController.text, _addAlbumDescController.text);
+                            _addAlbumNameController.text = "";
+                            Navigator.of(context).pop();
+                          }
+                        },
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ],

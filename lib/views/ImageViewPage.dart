@@ -43,20 +43,24 @@ class _ImageViewPageState extends State<ImageViewPage> {
           icon: Icon(Icons.chevron_left),
         ),
         backgroundColor: _theme.scaffoldBackgroundColor,
+
         actions: [
           widget.isAdmin? IconButton(
             onPressed: () {
               _settingModalBottomSheet(context, widget.images[_pageController.page.toInt()]);
             },
             icon: Icon(Icons.edit),
-          ) :  IconButton(
+          ) : /*IconButton(
             onPressed: () {
               //TODO: Implement share image
               print("share");
             },
             icon: Icon(Icons.share),
           ),
+          */ Text(""),
         ],
+
+
       ),
       backgroundColor: Colors.black,
       resizeToAvoidBottomInset: false,
@@ -82,23 +86,28 @@ class _ImageViewPageState extends State<ImageViewPage> {
           ),
         ),
       ),
+      /*
       bottomNavigationBar: widget.isAdmin? BottomNavigationBar(
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.file_upload, color: _theme.iconTheme.color),
-            label: "upload",
+            label: "share",
+            // TODO: Implement share image
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.reply_outlined, color: _theme.iconTheme.color),
-            label: "share",
+            label: "move",
+            // TODO: implement move image
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.attach_file, color: _theme.iconTheme.color),
             label: "attach",
+            // TODO: implement attach miniature
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.delete_outline, color: _theme.errorColor),
             label: "delete",
+            // TODO: implement delete image
           ),
         ],
         backgroundColor: _theme.scaffoldBackgroundColor,
@@ -109,6 +118,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
         showUnselectedLabels: false,
         currentIndex: _selectedIndex,
       ) : Text(""),
+       */
     );
 
 

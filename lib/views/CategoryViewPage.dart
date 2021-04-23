@@ -8,6 +8,7 @@ import 'dart:convert';
 
 import 'package:multi_image_picker/multi_image_picker.dart';
 import 'package:poc_piwigo/api/API.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../ui/WeirdBorder.dart';
 import 'ImageViewPage.dart';
@@ -36,8 +37,6 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
     super.initState();
     _isEditMode = false;
   }
-
-
 
   @override
   void dispose() {
@@ -97,6 +96,33 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
     }
   }
 
+  void deleteCategory(String catId) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    Map<String, String> queries = {
+      "format": "json",
+      "method": "pwg.categories.delete",
+    };
+    FormData formData =  FormData.fromMap({
+      "category_id": catId,
+      "pwg_token": prefs.getString("pwg_token"),
+    });
+    try{
+      Response response = await API.dio.post(
+          'ws.php',
+          data: formData,
+          queryParameters: queries
+      );
+      if(response.statusCode == 200) {
+        print(response.data);
+        setState(() {
+          print("refresh");
+        });
+      }
+    } catch(e) {
+      print(e);
+    }
+  }
+
   bool _isSelected(int index) {
     return _selectedItems[index] == null ? false : _selectedItems[index];
   }
@@ -148,6 +174,8 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
             title: _isEditMode ?
             Text("${_selectedPhotos()}", overflow: TextOverflow.fade, softWrap: true) :
             Text(widget.title),
+            // TODO: Implement selection actions
+            /*
             actions: [
               _isEditMode ? IconButton(
                 onPressed: () {
@@ -167,6 +195,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
                 icon: Icon(Icons.touch_app),
               ) : Container(),
             ],
+             */
           ),
         ],
         body: FutureBuilder<List<dynamic>>(
@@ -264,14 +293,15 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
                                                 child: Column(
                                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                     children: [
-                                                      Text('${albums.data[index]["name"]}', style: _theme.textTheme.headline6),
+                                                      Text('${albums.data[index]["name"]}', style: _theme.textTheme.headline6, textAlign: TextAlign.center),
                                                       Column(
                                                         children: [
                                                           Text('${albums.data[index]["comment"] == "" ?
                                                               "(no description)" :
                                                               albums.data[index]["comment"]
                                                             }',
-                                                            style: _theme.textTheme.subtitle1
+                                                            style: _theme.textTheme.subtitle1,
+                                                            textAlign: TextAlign.center
                                                           ),
                                                           Container(
                                                             padding: EdgeInsets.all(5),
@@ -299,12 +329,12 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
                                                   width: 8,
                                                   height: 60,
                                                   decoration: BoxDecoration(
-                                                    border: Border.all(width: 1, color: _theme.accentColor),
+                                                    border: Border.all(width: 1, color: _theme.errorColor), //TODO: Change color to adapt the first IconSlideAction
                                                     borderRadius: BorderRadius.only(
                                                       topLeft: Radius.circular(10),
                                                       bottomLeft: Radius.circular(10),
                                                     ),
-                                                    color: _theme.accentColor,
+                                                    color: _theme.errorColor, //TODO: Change color to adapt the first IconSlideAction
                                                   ),
                                                 ),
                                               ) : Container(width: 8),
@@ -312,34 +342,44 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
                                           ],
                                         ),
                                         secondaryActions: <Widget>[
+                                          /*
                                           IconSlideAction(
                                             color: _theme.iconTheme.color,
                                             iconWidget: Icon(Icons.edit, size: 38, color: _theme.accentIconTheme.color),
                                             onTap: () {
+                                              // TODO: Add edit album view
                                               print('Edit');
                                             },
                                           ),
+                                           */
+                                          /*
                                           IconSlideAction(
                                             color: Color(0xFF4B4B4B),
                                             iconWidget: Icon(Icons.reply, size: 38, color: _theme.accentIconTheme.color),
                                             onTap: () {
-                                              print('More');
+                                              // TODO: Add album tree structure for moving albums
+                                              print('Move');
                                             },
                                           ),
+
+                                           */
                                           Container(
                                             height: 130,
                                             decoration: BoxDecoration(
                                               borderRadius: BorderRadius.only(
-                                                bottomRight: Radius.circular(20),
-                                                topRight: Radius.circular(20),
+                                                bottomRight: Radius.circular(10),
+                                                topRight: Radius.circular(10),
                                               ),
                                               color: _theme.errorColor,
                                             ),
-                                            child: IconButton(
-                                              onPressed: () {
-                                                print("delete");
+                                            child: IconSlideAction(
+                                              color: Colors.transparent,
+                                              iconWidget: Icon(Icons.delete, size: 38, color: _theme.accentIconTheme.color),
+                                              onTap: () {
+                                                print("delete ${albums.data[index]["name"]}");
+                                                deleteCategory(albums.data[index]['id'].toString());
                                               },
-                                              icon: Icon(Icons.delete, size: 38, color: _theme.accentIconTheme.color),
+                                              closeOnTap: true,
                                             ),
                                           ),
                                         ],
@@ -495,7 +535,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
                   cupertinoOptions: CupertinoOptions(takePhotoIcon: "chat"),
                   materialOptions: MaterialOptions(
                     actionBarTitle: "Piwigo",
-                    allViewTitle: "Selecting photos",
+                    allViewTitle: "All Photos",
                     actionBarColor: "#ffff7700",
                     actionBarTitleColor: "#ffeeeeee",
                     lightStatusBar: false,
@@ -505,13 +545,12 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
                     selectionLimitReachedText: "You can't select any more.",
                   ),
                 );
-
                 if(imageList.isNotEmpty) {
                   Navigator.push(context, MaterialPageRoute(
                       builder: (context) => UploadGalleryViewPage(imageData: imageList, category: widget.category)
                   ));
                 }
-              } catch (e){
+              } catch (e) {
                 print(e.toString());
               }
             }

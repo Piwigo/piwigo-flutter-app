@@ -389,7 +389,7 @@ class _LoginViewPageState extends State<LoginViewPage> {
                           );
                         }
                       },
-                      child: _isLoading? CircularProgressIndicator() : Text('Log in', style: TextStyle(fontSize: 16, color: Colors.white)),
+                      child: _isLoading? CircularProgressIndicator(valueColor: new AlwaysStoppedAnimation<Color>(Colors.white)) : Text('Log in', style: TextStyle(fontSize: 16, color: Colors.white)),
                     ),
                   ),
                 ],

@@ -55,7 +55,8 @@ class _SettingsPageState extends State<SettingsPage> {
                       //     value: notifier.darkTheme,
                       //   ),
                       // ),
-                      Icon(Icons.info_outline, color: _theme.iconTheme.color),
+                      // TODO: Add tutorials
+                      //Icon(Icons.info_outline, color: _theme.iconTheme.color),
                     ],
                   ),
                   flexibleSpace: FlexibleSpaceBar(
@@ -136,6 +137,8 @@ class _SettingsPageState extends State<SettingsPage> {
                                   child: Text('This server handles these file types: ${prefs.getString("file_types")}', textAlign: TextAlign.center, style: TextStyle(color: Colors.black, fontSize: 12)),
                                 ),
                               ),
+                              // TODO: Implement albums options
+                              /*
                               SizedBox(height: 20),
                               Padding(
                                 padding: EdgeInsets.only(left: 10, bottom: 3),
@@ -150,6 +153,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                   children: [
                                     InkWell(
                                       onTap: () {
+                                        // TODO: Implement change root album
                                         print('change root album');
                                       },
                                       child: tableCell(
@@ -166,6 +170,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                     ),
                                     InkWell(
                                       onTap: () {
+                                        // TODO: Implement change miniature size
                                         print('change image miniatures size');
                                       },
                                       child: tableCell(
@@ -182,6 +187,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                     ),
                                     InkWell(
                                       onTap: () {
+                                        // TODO: implement change sort method
                                         print('change sort');
                                       },
                                       child: tableCell(
@@ -211,6 +217,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                                   divisions: 7,
                                                   value: _currentSliderValue,
                                                   onChanged: (value) {
+                                                    // TODO: implement change number of recent albums
                                                     setState(() {
                                                       _currentSliderValue = value;
                                                     });
@@ -229,6 +236,8 @@ class _SettingsPageState extends State<SettingsPage> {
                                   ],
                                 ),
                               ),
+
+                               */
                             ],
                           ),
                         );

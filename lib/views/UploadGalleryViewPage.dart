@@ -129,9 +129,31 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
 
   @override
   Widget build(BuildContext context) {
+    ThemeData _theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
+        iconTheme: _theme.iconTheme,
+        leading: IconButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          icon: Icon(Icons.chevron_left),
+        ),
         title: Text("Upload Photos"),
+        actions: [
+          IconButton(
+            onPressed: () {
+              uploadPhotos(widget.imageData);
+              SnackBar snackBar = SnackBar(
+                content: Text("Started Upload of ${widget.imageData.length} images"),
+                duration: Duration(seconds: 2),
+              );
+              ScaffoldMessenger.of(context).showSnackBar(snackBar);
+              Navigator.of(context).pop();
+            },
+            icon: Icon(Icons.upload_file),
+          ),
+        ],
       ),
       resizeToAvoidBottomInset: false,
       body: SingleChildScrollView(
@@ -159,6 +181,11 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
                 child: ElevatedButton(
                   onPressed: () {
                     uploadPhotos(widget.imageData);
+                    SnackBar snackBar = SnackBar(
+                      content: Text("Started Upload of ${widget.imageData.length} images"),
+                      duration: Duration(seconds: 2),
+                    );
+                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
                     Navigator.of(context).pop();
                   },
                   style: ButtonStyle(
