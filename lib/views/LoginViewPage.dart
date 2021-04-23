@@ -7,8 +7,6 @@ import 'package:poc_piwigo/api/API.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
 
-import 'RootCategoryViewPage.dart';
-
 
 class CategoryPageArguments {
   final bool isAdmin;
@@ -237,12 +235,8 @@ class _LoginViewPageState extends State<LoginViewPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Padding(
-                    padding: EdgeInsets.all(15),
-                    child: Text("Piwigo", style: _theme.textTheme.headline3),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.all(15),
-                    child: Text("- Android@piwigo.org -", style: _theme.textTheme.headline4),
+                    padding: EdgeInsets.all(50),
+                    child: Image.asset('assets/logo/piwigo_logo.png'),
                   ),
                   Padding(
                     padding: EdgeInsets.all(5),

@@ -1,15 +1,19 @@
-import 'package:dio/dio.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:confirm_dialog/confirm_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'dart:async';
-import 'dart:convert';
-import 'package:poc_piwigo/api/API.dart';
-import 'package:poc_piwigo/views/SettingsPage.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
-import '../ui/WeirdBorder.dart';
-import 'CategoryViewPage.dart';
+import 'dart:async';
+
+import 'package:poc_piwigo/api/API.dart';
+import 'package:poc_piwigo/api/CategoryAPI.dart';
+import 'package:poc_piwigo/services/MoveAlbumService.dart';
+import 'package:poc_piwigo/ui/ListItems.dart';
+import 'package:poc_piwigo/views/SettingsPage.dart';
+import 'package:poc_piwigo/views/CategoryViewPage.dart';
+import 'package:poc_piwigo/views/UploadGalleryViewPage.dart';
+import 'package:poc_piwigo/ui/WeirdBorder.dart';
 
 
 
@@ -31,7 +35,7 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
   @override
   void initState() {
     super.initState();
-
+    API.uploader = Uploader(context);
     _rootCategory = "0";
     _filter = "";
   }
@@ -40,8 +44,6 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
     super.dispose();
   }
 
-
-
   bool _filterSearch(String name) {
     if(_filter != null) {
       if(!name.toLowerCase().contains(_filter.toLowerCase())) {
@@ -49,70 +51,6 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
       }
     }
     return false;
-  }
-
-  Future<List<dynamic>> fetchAlbums(String albumID) async {
-
-    Map<String, String> queries = {
-      "format": "json",
-      "method": "pwg.categories.getList",
-      "cat_id": albumID
-    };
-
-    Response response = await API.dio.get('ws.php', queryParameters: queries);
-
-    if (response.statusCode == 200) {
-      return json.decode(response.data)["result"]["categories"];
-    } else {
-      throw Exception("bad request: "+response.statusCode.toString());
-    }
-  }
-
-  void addCategory(String catName, String catDesc) async {
-    Map<String, String> queries = {
-      "format": "json",
-      "method": "pwg.categories.add",
-      "name": catName,
-      "comment": catDesc,
-      "parent": "0"
-    };
-
-    Response response = await API.dio.post('ws.php', queryParameters: queries);
-
-    if(response.statusCode == 200) {
-      print(response.data);
-      setState(() {
-        print("refresh");
-      });
-    }
-  }
-
-  void deleteCategory(String catId) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    Map<String, String> queries = {
-      "format": "json",
-      "method": "pwg.categories.delete",
-    };
-    FormData formData =  FormData.fromMap({
-      "category_id": catId,
-      "pwg_token": prefs.getString("pwg_token"),
-    });
-    try {
-      Response response = await API.dio.post(
-          'ws.php',
-          data: formData,
-          queryParameters: queries
-      );
-
-      if (response.statusCode == 200) {
-        print(response.data);
-        setState(() {
-          print("refresh");
-        });
-      }
-    } catch (e) {
-      print(e);
-    }
   }
 
   String albumSubCount(dynamic album) {
@@ -253,98 +191,7 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
                                     enabled: widget.isAdmin,
                                     actionPane: SlidableDrawerActionPane(),
                                     actionExtentRatio: 0.15,
-                                    child: Row(
-                                      children: [
-                                        Container(
-                                          decoration: BoxDecoration(
-                                            border: Border.all(width: 0, color: _theme.backgroundColor),
-                                            color: _theme.backgroundColor,
-                                            borderRadius: BorderRadius.only(
-                                              topLeft: Radius.circular(10),
-                                              bottomLeft: Radius.circular(10),
-                                            ),
-                                          ),
-                                          padding: EdgeInsets.all(5),
-                                          height: 130.0,
-                                          width: 130.0,
-                                          child: albums.data[index]["tn_url"] == null ?
-                                          Icon(Icons.image_not_supported_outlined, size: 50)
-                                              :
-                                          ClipRRect(
-                                            borderRadius: BorderRadius.circular(7.0),
-                                            child: Image.network(
-                                              albums.data[index]["tn_url"],
-                                              fit: BoxFit.cover,
-                                            ),
-                                          ),
-                                        ),
-                                        Container(
-                                          decoration: ShapeDecoration(
-                                            shape: WeirdBorder(radius: 7),
-                                            color: Theme.of(context).backgroundColor,
-                                          ),
-                                          width: 14,
-                                          height: 130.0,
-                                        ),
-                                        Expanded(
-                                          child: Container(
-                                            decoration: BoxDecoration(
-                                              border: Border.all(width: 0, color: Theme.of(context).backgroundColor),
-                                              color: Theme.of(context).backgroundColor,
-                                            ),
-                                            padding: EdgeInsets.all(5),
-                                            height: 130.0,
-                                            child: Column(
-                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                              children: [
-                                                Text('${albums.data[index]["name"]}', style: _theme.textTheme.headline6, textAlign: TextAlign.center,),
-                                                Column(
-                                                  children: [
-                                                    Text('${albums.data[index]["comment"] == "" ?
-                                                        "(no description)" :
-                                                        albums.data[index]["comment"]
-                                                      }',
-                                                      style: _theme.textTheme.subtitle1,
-                                                      textAlign: TextAlign.center
-                                                    ),
-                                                    Container(
-                                                      padding: EdgeInsets.all(5),
-                                                      child: Text(albumSubCount(albums.data[index]),
-                                                          style: Theme.of(context).textTheme.bodyText2
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                        Container(
-                                          height: 130.0,
-                                          decoration: BoxDecoration(
-                                            color: _theme.backgroundColor,
-                                            borderRadius: BorderRadius.only(
-                                              topRight: Radius.circular(10),
-                                              bottomRight: Radius.circular(10),
-                                            ),
-                                          ),
-                                          child: widget.isAdmin? Center(
-                                            child: Container(
-                                              width: 8,
-                                              height: 60,
-                                              decoration: BoxDecoration(
-                                                border: Border.all(width: 1, color: _theme.errorColor), //TODO: Change color to adapt the first IconSlideAction
-                                                borderRadius: BorderRadius.only(
-                                                  topLeft: Radius.circular(10),
-                                                  bottomLeft: Radius.circular(10),
-                                                ),
-                                                color: _theme.errorColor, //TODO: Change color to adapt the first IconSlideAction
-                                              ),
-                                            ),
-                                          ) : Container(width: 8),
-                                        ),
-                                      ],
-                                    ),
+                                    child: categoryListCard(context, albums.data[index], widget.isAdmin),
                                     secondaryActions: <Widget>[
                                       /*
                                       IconSlideAction(
@@ -356,17 +203,19 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
                                         },
                                       ),
                                        */
-                                      /*
                                       IconSlideAction(
                                         color: Color(0xFF4B4B4B),
                                         iconWidget: Icon(Icons.reply, size: 38, color: _theme.accentIconTheme.color),
-                                        onTap: () {
-                                          // TODO: Add album tree structure for moving albums
-                                          print('Move');
+                                        onTap: () async {
+                                          var result = await moveCategoryModalBottomSheet(context,
+                                            albums.data[index]['id'].toString(),
+                                            albums.data[index]['name']
+                                          );
+                                          setState(() {
+                                            print('Moved album $result');
+                                          });
                                         },
                                       ),
-
-                                       */
                                       Container(
                                         height: 130,
                                         decoration: BoxDecoration(
@@ -379,9 +228,21 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
                                         child: IconSlideAction(
                                           color: Colors.transparent,
                                           iconWidget: Icon(Icons.delete, size: 38, color: _theme.accentIconTheme.color),
-                                          onTap: () {
-                                            print("delete ${albums.data[index]["name"]}");
-                                            deleteCategory(albums.data[index]['id'].toString());
+                                          onTap: () async {
+                                            if (await confirm(
+                                              context,
+                                              title: Text('Confirm'),
+                                              content: Text('Delete ${albums.data[index]["name"]} ?', softWrap: true, maxLines: 3),
+                                              textOK: Text('Yes', style: TextStyle(color: Color(
+                                                  0xff479900))),
+                                              textCancel: Text('No', style: TextStyle(color: _theme.errorColor)),
+                                            )) {
+                                              print("delete ${albums.data[index]["name"]}");
+                                              var result = await deleteCategory(albums.data[index]['id'].toString());
+                                              setState(() {
+                                                print('Delete album $result');
+                                              });
+                                            }
                                           },
                                           closeOnTap: true,
                                         ),
@@ -413,13 +274,16 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
       ),
       floatingActionButton: widget.isAdmin? FloatingActionButton(
         onPressed: () {
-          final _formKey = GlobalKey<FormState>();
           showDialog(
             context: context,
             builder: (BuildContext context) {
               return createCategoryAlert(context);
             }
-          );
+          ).whenComplete(() {
+            setState(() {
+              print('refresh');
+            });
+          });
         },
         child: Icon(Icons.create_new_folder, color: _theme.primaryColorLight, size: 30),
       ) : Container(),
@@ -431,7 +295,6 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
     final _formKey = GlobalKey<FormState>();
     final _addAlbumNameController = TextEditingController();
     final _addAlbumDescController = TextEditingController();
-
 
     return AlertDialog(
       insetPadding: EdgeInsets.all(10),
@@ -525,10 +388,11 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
                           backgroundColor: MaterialStateProperty.all(_theme.accentColor),
                         ),
                         child: Text('Create album', style: TextStyle(fontSize: 16, color: Colors.white)),
-                        onPressed: () {
+                        onPressed: () async {
                           if (_formKey.currentState.validate()) {
                             _formKey.currentState.save();
-                            addCategory(_addAlbumNameController.text, _addAlbumDescController.text);
+                            var result = await addCategory(_addAlbumNameController.text, _addAlbumDescController.text, "0");
+                            print(result);
                             _addAlbumNameController.text = "";
                             Navigator.of(context).pop();
                           }

@@ -1,11 +1,9 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:poc_piwigo/constants/SettingsConstants.dart';
 import 'package:poc_piwigo/views/LoginViewPage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'RootCategoryViewPage.dart';
 
 class SettingsPage extends StatefulWidget {
   @override
@@ -86,9 +84,9 @@ class _SettingsPageState extends State<SettingsPage> {
                                 padding: EdgeInsets.only(left: 10),
                                 child: Text('Piwigo Server ${prefs.getString('version')}', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 18)),
                               ),
-                              Padding(
+                              prefs.getString('base_url').substring(0, 4) != 'https' ? Text('') : Padding(
                                 padding: EdgeInsets.only(left: 10, bottom: 3),
-                                child: Text(prefs.getString('base_url').substring(0, 4) != 'https' ? 'Unsecured Website !' : 'Secured Website', style: TextStyle(color: Colors.black, fontSize: 12)),
+                                child: Text('Unsecured Website !', style: TextStyle(color: Colors.black, fontSize: 12)),
                               ),
                               Container(
                                 decoration: BoxDecoration(

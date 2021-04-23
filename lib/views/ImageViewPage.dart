@@ -18,7 +18,6 @@ class ImageViewPage extends StatefulWidget {
 class _ImageViewPageState extends State<ImageViewPage> {
   String _derivative;
   PageController _pageController;
-  int _selectedIndex = 0;
 
   @override
   void initState() {
