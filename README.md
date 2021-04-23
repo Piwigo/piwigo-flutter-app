@@ -1,4 +1,4 @@
-# Piwigo²
+# Piwigo Mobile (for Android)
 
 An android application for managing and uploading images to Piwigo servers.
 
