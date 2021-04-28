@@ -1,6 +1,8 @@
+import 'package:confirm_dialog/confirm_dialog.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'dart:async';
@@ -8,19 +10,23 @@ import 'dart:convert';
 
 import 'package:multi_image_picker/multi_image_picker.dart';
 import 'package:poc_piwigo/api/API.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:poc_piwigo/api/CategoryAPI.dart';
+import 'package:poc_piwigo/services/MoveAlbumService.dart';
+import 'package:poc_piwigo/ui/Dialogs.dart';
+import 'package:poc_piwigo/ui/ListItems.dart';
+import 'package:poc_piwigo/ui/SnackBars.dart';
 
-import '../ui/WeirdBorder.dart';
 import 'ImageViewPage.dart';
 import 'UploadGalleryViewPage.dart';
 
 
 
 class CategoryViewPage extends StatefulWidget {
-  CategoryViewPage({Key key, this.title, this.category, this.isAdmin}) : super(key: key);
+  CategoryViewPage({Key key, this.title, this.category, this.isAdmin, this.nbImages}) : super(key: key);
   final bool isAdmin;
   final String title;
   final String category;
+  final int nbImages;
 
   @override
   _CategoryViewPageState createState() => _CategoryViewPageState();
@@ -28,14 +34,30 @@ class CategoryViewPage extends StatefulWidget {
 
 class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerProviderStateMixin {
   bool _isEditMode;
+  int _page;
+  int _nbImages;
   Map<int, bool> _selectedItems = Map();
-  Map<int, bool> _swipedItems = Map();
+  ScrollController _controller = ScrollController();
+  List<dynamic> imageList = [];
 
 
   @override
   void initState() {
     super.initState();
+    _page = 0;
+    _nbImages = widget.nbImages;
     _isEditMode = false;
+    _controller.addListener(() async {
+      if (_controller.offset >= _controller.position.maxScrollExtent &&
+          !_controller.position.outOfRange && _nbImages > (_page+1)*100) {
+        _page++;
+        var newListPage = await fetchImages(widget.category, _page);
+        print('Fetch images of page $_page');
+        setState(() {
+          imageList.addAll(newListPage);
+        });
+      }
+    });
   }
 
   @override
@@ -43,83 +65,22 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
     super.dispose();
   }
 
-  Future<List<dynamic>> fetchAlbums(String albumID) async {
-
-    Map<String, String> queries = {
-      "format": "json",
-      "method": "pwg.categories.getList",
-      "cat_id": albumID
-    };
-
-    Response response = await API.dio.get('ws.php', queryParameters: queries);
-
-    if (response.statusCode == 200) {
-      return json.decode(response.data)["result"]["categories"];
-    } else {
-      throw Exception("bad request: "+response.statusCode.toString());
-    }
-  }
-  Future<List<dynamic>> fetchImages(String albumID) async {
+  Future<List<dynamic>> fetchImages(String albumID, int page) async {
 
     Map<String, String> queries = {
       "format":"json",
       "method": "pwg.categories.getImages",
-      "cat_id":albumID
+      "cat_id": albumID,
+      "per_page": "100",
+      "page": page.toString(),
     };
 
     Response response = await API.dio.get('ws.php', queryParameters: queries);
 
     if (response.statusCode == 200) {
-      var data = json.decode(response.data)["result"]["images"];
-      return data;
+      return json.decode(response.data)["result"]["images"];
     } else {
       throw Exception("bad request: "+response.statusCode.toString());
-    }
-  }
-
-  void addCategory(String catName, String catDesc) async {
-    Map<String, String> queries = {
-      "format": "json",
-      "method": "pwg.categories.add",
-      "name": catName,
-      "comment": catDesc,
-      "parent": widget.category
-    };
-
-    Response response = await API.dio.post('ws.php', queryParameters: queries);
-
-    if(response.statusCode == 200) {
-      print(response.data);
-      setState(() {
-        print("refresh");
-      });
-    }
-  }
-
-  void deleteCategory(String catId) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    Map<String, String> queries = {
-      "format": "json",
-      "method": "pwg.categories.delete",
-    };
-    FormData formData =  FormData.fromMap({
-      "category_id": catId,
-      "pwg_token": prefs.getString("pwg_token"),
-    });
-    try{
-      Response response = await API.dio.post(
-          'ws.php',
-          data: formData,
-          queryParameters: queries
-      );
-      if(response.statusCode == 200) {
-        print(response.data);
-        setState(() {
-          print("refresh");
-        });
-      }
-    } catch(e) {
-      print(e);
     }
   }
 
@@ -143,13 +104,16 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
   Widget build(BuildContext context) {
     ThemeData _theme = Theme.of(context);
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       body: NestedScrollView(
+        controller: _controller,
         headerSliverBuilder: (context, innerBoxScrolled) => [
           SliverAppBar(
             pinned: true,
             snap: false,
             floating: false,
             centerTitle: true,
+            // expandedHeight: 100.0,
             iconTheme: IconThemeData(
               color: _theme.iconTheme.color,//change your color here
             ),
@@ -172,8 +136,8 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
               icon: Icon(Icons.chevron_left),
             ),
             title: _isEditMode ?
-            Text("${_selectedPhotos()}", overflow: TextOverflow.fade, softWrap: true) :
-            Text(widget.title),
+              Text("${_selectedPhotos()}", overflow: TextOverflow.fade, softWrap: true) :
+              Text(widget.title),
             // TODO: Implement selection actions
             /*
             actions: [
@@ -202,23 +166,31 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
           future: fetchAlbums(widget.category), // Albums of the list
           builder: (BuildContext context, AsyncSnapshot albums) {
             if (albums.hasData) {
-              int nbPhotos = albums.data[0]["total_nb_images"];
+              int nbImages = _nbImages;
+              if(albums.data[0]["id"].toString() == widget.category) {
+                nbImages = albums.data[0]["total_nb_images"];
+                _nbImages = nbImages;
+              }
               albums.data.removeWhere((category) =>
                 (category["id"].toString() == widget.category)
               );
               return FutureBuilder<List<dynamic>>(
-                  future: fetchImages(widget.category), // Images of the list
+                  future: fetchImages(widget.category, _page), // Images of the list
                   builder: (BuildContext context, AsyncSnapshot images) {
                     if (images.hasData) {
+                      if (imageList.isEmpty) {
+                        imageList = images.data;
+                      }
                       return RefreshIndicator(
                         displacement: 20,
                         onRefresh: () {
                           setState(() {
                             print("refresh");
                           });
-                          return Future.delayed(Duration(milliseconds: 1000));
+                          return Future.delayed(Duration(milliseconds: 500));
                         },
                         child: SingleChildScrollView(
+                          // controller: _controller,
                           child: Column(
                             children: [
                               ListView.builder(
@@ -227,11 +199,6 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
                                 shrinkWrap: true,
                                 physics: NeverScrollableScrollPhysics(),
                                 itemBuilder: (BuildContext context, int index) {
-                                  if(_swipedItems.isEmpty) {
-                                    albums.data.forEach((item) {
-                                      _swipedItems[index] = false;
-                                    });
-                                  }
                                   return InkWell(
                                     onTap: () {
                                       Navigator.of(context).push(
@@ -249,120 +216,31 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
                                       child: Slidable(
                                         actionPane: SlidableDrawerActionPane(),
                                         actionExtentRatio: 0.15,
-                                        child: Row(
-                                          children: [
-                                            Container(
-                                              decoration: BoxDecoration(
-                                                border: Border.all(width: 0, color: _theme.backgroundColor),
-                                                color: _theme.backgroundColor,
-                                                borderRadius: BorderRadius.only(
-                                                  topLeft: Radius.circular(10),
-                                                  bottomLeft: Radius.circular(10),
-                                                ),
-                                              ),
-                                              padding: EdgeInsets.all(5),
-                                              height: 130.0,
-                                              width: 130.0,
-                                              child: albums.data[index]["tn_url"] == null ?
-                                              Icon(Icons.image_not_supported_outlined, size: 50)
-                                                  :
-                                              ClipRRect(
-                                                borderRadius: BorderRadius.circular(7.0),
-                                                child: Image.network(
-                                                  albums.data[index]["tn_url"],
-                                                  fit: BoxFit.cover,
-                                                ),
-                                              ),
-                                            ),
-                                            Container(
-                                              decoration: ShapeDecoration(
-                                                shape: WeirdBorder(radius: 7),
-                                                color: _theme.backgroundColor,
-                                              ),
-                                              width: 14,
-                                              height: 130.0,
-                                            ),
-                                            Expanded(
-                                              child: Container(
-                                                decoration: BoxDecoration(
-                                                  border: Border.all(width: 0, color: _theme.backgroundColor),
-                                                  color: _theme.backgroundColor,
-                                                ),
-                                                padding: EdgeInsets.all(5),
-                                                height: 130.0,
-                                                child: Column(
-                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                    children: [
-                                                      Text('${albums.data[index]["name"]}', style: _theme.textTheme.headline6, textAlign: TextAlign.center),
-                                                      Column(
-                                                        children: [
-                                                          Text('${albums.data[index]["comment"] == "" ?
-                                                              "(no description)" :
-                                                              albums.data[index]["comment"]
-                                                            }',
-                                                            style: _theme.textTheme.subtitle1,
-                                                            textAlign: TextAlign.center
-                                                          ),
-                                                          Container(
-                                                            padding: EdgeInsets.all(5),
-                                                            child: Text(albumSubCount(albums.data[index]),
-                                                                style: Theme.of(context).textTheme.bodyText2
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ]
-                                                ),
-                                              ),
-                                            ),
-                                            Container(
-                                              height: 130.0,
-                                              decoration: BoxDecoration(
-                                                color: _theme.backgroundColor,
-                                                borderRadius: BorderRadius.only(
-                                                  topRight: Radius.circular(10),
-                                                  bottomRight: Radius.circular(10),
-                                                ),
-                                              ),
-                                              child: widget.isAdmin? Center(
-                                                child: Container(
-                                                  width: 8,
-                                                  height: 60,
-                                                  decoration: BoxDecoration(
-                                                    border: Border.all(width: 1, color: _theme.errorColor), //TODO: Change color to adapt the first IconSlideAction
-                                                    borderRadius: BorderRadius.only(
-                                                      topLeft: Radius.circular(10),
-                                                      bottomLeft: Radius.circular(10),
-                                                    ),
-                                                    color: _theme.errorColor, //TODO: Change color to adapt the first IconSlideAction
-                                                  ),
-                                                ),
-                                              ) : Container(width: 8),
-                                            ),
-                                          ],
-                                        ),
+                                        child: categoryListCard(context, albums.data[index], widget.isAdmin),
                                         secondaryActions: <Widget>[
                                           /*
-                                          IconSlideAction(
-                                            color: _theme.iconTheme.color,
-                                            iconWidget: Icon(Icons.edit, size: 38, color: _theme.accentIconTheme.color),
-                                            onTap: () {
-                                              // TODO: Add edit album view
-                                              print('Edit');
-                                            },
-                                          ),
-                                           */
-                                          /*
+                                      IconSlideAction(
+                                        color: _theme.iconTheme.color,
+                                        iconWidget: Icon(Icons.edit, size: 38, color: _theme.accentIconTheme.color),
+                                        onTap: () {
+                                          // TODO: Add edit album view
+                                          print('Edit');
+                                        },
+                                      ),
+                                       */
                                           IconSlideAction(
                                             color: Color(0xFF4B4B4B),
                                             iconWidget: Icon(Icons.reply, size: 38, color: _theme.accentIconTheme.color),
-                                            onTap: () {
-                                              // TODO: Add album tree structure for moving albums
-                                              print('Move');
+                                            onTap: () async {
+                                              var result = await moveCategoryModalBottomSheet(context,
+                                                  albums.data[index]['id'].toString(),
+                                                  albums.data[index]['name']
+                                              );
+                                              setState(() {
+                                                print('Moved album $result');
+                                              });
                                             },
                                           ),
-
-                                           */
                                           Container(
                                             height: 130,
                                             decoration: BoxDecoration(
@@ -375,9 +253,21 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
                                             child: IconSlideAction(
                                               color: Colors.transparent,
                                               iconWidget: Icon(Icons.delete, size: 38, color: _theme.accentIconTheme.color),
-                                              onTap: () {
-                                                print("delete ${albums.data[index]["name"]}");
-                                                deleteCategory(albums.data[index]['id'].toString());
+                                              onTap: () async {
+                                                if (await confirm(
+                                                  context,
+                                                  title: Text('Confirm'),
+                                                  content: Text('Delete ${albums.data[index]["name"]} ?', softWrap: true, maxLines: 3),
+                                                  textOK: Text('Yes', style: TextStyle(color: Color(0xff479900))),
+                                                  textCancel: Text('No', style: TextStyle(color: _theme.errorColor)),
+                                                )) {
+                                                  print("delete ${albums.data[index]["name"]}");
+                                                  var result = await deleteCategory(albums.data[index]['id'].toString());
+                                                  ScaffoldMessenger.of(context).showSnackBar(albumDeletedSnackBar(albums.data[index]["name"]));
+                                                  setState(() {
+                                                    print('Delete album ${albums.data[index]["name"]} : $result');
+                                                  });
+                                                }
                                               },
                                               closeOnTap: true,
                                             ),
@@ -395,12 +285,12 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
                                   crossAxisSpacing: 3.0,
                                 ),
                                 padding: EdgeInsets.symmetric(horizontal: 5),
-                                itemCount: images.data.length,
+                                itemCount: imageList.length,
                                 shrinkWrap: true,
                                 physics: NeverScrollableScrollPhysics(),
                                 itemBuilder: (BuildContext context, int index) {
                                   if(_selectedItems.isEmpty) {
-                                    images.data.forEach((item) {
+                                    imageList.forEach((item) {
                                       _selectedItems[index] = false;
                                     });
                                   }
@@ -414,35 +304,43 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
                                       }) :
                                       Navigator.of(context).push(
                                         MaterialPageRoute(builder: (context) => ImageViewPage(
-                                          images: images.data,
+                                          images: imageList,
                                           index: index,
                                           isAdmin: widget.isAdmin,
                                         )),
                                       );
                                     },
                                     child: Container(
-                                        decoration: BoxDecoration(
-                                          color: Colors.white,
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        image: DecorationImage(
+                                          image: Image.network(imageList[index]["derivatives"]["small"]["url"]).image,
+                                          fit: BoxFit.cover,
                                         ),
-                                        alignment: Alignment.center,
-                                        child: Stack(
-                                          children: [
-                                            Image.network(images.data[index]["derivatives"]["square"]["url"]),
-                                            _isEditMode ? Container(
-                                              child: _isSelected(index) ?
-                                              Icon(Icons.check_circle, color: Colors.orange) :
-                                              Icon(Icons.check_circle_outline, color: Colors.grey),
-                                            ) : Text(""),
-                                          ],
-                                        )
+                                      ),
+                                      child: _isEditMode? Align(
+                                        alignment: Alignment.topRight,
+                                        child: Padding(
+                                          padding: EdgeInsets.all(5),
+                                          child: _isSelected(index) ?
+                                          Icon(Icons.check_circle, color: Colors.orange) :
+                                          Icon(Icons.check_circle_outline, color: Colors.grey),
+                                        ),
+                                      ) : Text(""),
                                     ),
                                   );
                                 },
                               ),
+                              nbImages > (_page+1)*100 ? Center(
+                                child: Padding(
+                                  padding: EdgeInsets.all(5),
+                                  child: Icon(Icons.more_horiz, color: _theme.disabledColor),
+                                ),
+                              ) : Text(''),
                               Center(
                                 child: Container(
                                   padding: EdgeInsets.all(10),
-                                  child: Text("$nbPhotos photos", style: TextStyle(fontSize: 20, color: _theme.textTheme.bodyText2.color, fontWeight: FontWeight.w300)),
+                                  child: Text('$nbImages ${nbImages == 1 ? 'photo' : 'photos'}', style: TextStyle(fontSize: 20, color: _theme.textTheme.bodyText2.color, fontWeight: FontWeight.w300)),
                                 ),
                               )
                             ],
@@ -494,7 +392,6 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
     );
   }
 
-
   Widget createUploadActionButton() {
     ThemeData _theme = Theme.of(context);
     return SpeedDial(
@@ -518,9 +415,13 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
             showDialog(
               context: context,
               builder: (BuildContext context) {
-                return createCategoryAlert(context);
+                return createCategoryAlert(context, widget.category);
               }
-            );
+            ).whenComplete(() {
+              setState(() {
+                print('refresh');
+              });
+            });
           },
         ),
         SpeedDialChild(
@@ -556,125 +457,6 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
             }
         )
       ],
-    );
-  }
-
-  Widget createCategoryAlert(context) {
-    ThemeData _theme = Theme.of(context);
-    final _formKey = GlobalKey<FormState>();
-    final _addAlbumNameController = TextEditingController();
-    final _addAlbumDescController = TextEditingController();
-
-
-    return AlertDialog(
-      insetPadding: EdgeInsets.all(10),
-      actions: [
-        InkResponse(
-          onTap: () {
-            Navigator.of(context).pop();
-          },
-          child: CircleAvatar(
-            child: Icon(Icons.close, color: _theme.errorColor),
-            backgroundColor: Colors.transparent,
-          ),
-        ),
-      ],
-      title: Text("Album creation"),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          Container(
-            width: 250,
-            child: Form(
-              key: _formKey,
-              child: Column(
-                children: <Widget>[
-                  Padding(
-                    padding: EdgeInsets.all(5),
-                    child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 10),
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          color: _theme.inputDecorationTheme.fillColor
-                      ),
-                      child: TextFormField(
-                        maxLines: 1,
-                        controller: _addAlbumNameController,
-                        style: TextStyle(fontSize: 14, color: Color(0xff5c5c5c)),
-                        textAlignVertical: TextAlignVertical.top,
-                        decoration: InputDecoration(
-                          contentPadding: EdgeInsets.zero,
-                          border: InputBorder.none,
-                          hintText: 'album name',
-                          hintStyle: TextStyle(fontSize: 14, fontStyle: FontStyle.italic, color: _theme.disabledColor),
-                        ),
-                        validator: (value) {
-                          if(value.isEmpty) {
-                            return 'Please enter a name';
-                          }
-                          return null;
-                        },
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.all(5),
-                    child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 10),
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          color: _theme.inputDecorationTheme.fillColor
-                      ),
-                      child: TextFormField(
-                        minLines: 1,
-                        maxLines: 3,
-                        controller: _addAlbumDescController,
-                        style: TextStyle(fontSize: 14, color: Color(0xff5c5c5c)),
-                        textAlignVertical: TextAlignVertical.top,
-                        decoration: InputDecoration(
-                          contentPadding: EdgeInsets.zero,
-                          border: InputBorder.none,
-                          hintText: 'description (optional)',
-                          hintStyle: TextStyle(fontSize: 14, fontStyle: FontStyle.italic, color: _theme.disabledColor),
-                        ),
-                      ),
-                    ),
-                  ),
-                  Divider(
-                    thickness: 1,
-                  ),
-                  Padding(
-                    padding: EdgeInsets.all(5.0),
-                    child: Container(
-                      width: double.infinity,
-                      height: 50,
-                      child: TextButton(
-                        style: ButtonStyle(
-                          shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                            RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
-                          backgroundColor: MaterialStateProperty.all(_theme.accentColor),
-                        ),
-                        child: Text('Create album', style: TextStyle(fontSize: 16, color: Colors.white)),
-                        onPressed: () {
-                          if (_formKey.currentState.validate()) {
-                            _formKey.currentState.save();
-                            addCategory(_addAlbumNameController.text, _addAlbumDescController.text);
-                            _addAlbumNameController.text = "";
-                            Navigator.of(context).pop();
-                          }
-                        },
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
     );
   }
 

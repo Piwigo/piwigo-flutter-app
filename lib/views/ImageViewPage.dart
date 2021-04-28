@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
 
@@ -18,13 +19,21 @@ class ImageViewPage extends StatefulWidget {
 class _ImageViewPageState extends State<ImageViewPage> {
   String _derivative;
   PageController _pageController;
-  int _selectedIndex = 0;
+  int _page;
 
   @override
   void initState() {
     super.initState();
+    SystemChrome.setEnabledSystemUIOverlays([]);
     _pageController = PageController(initialPage: widget.index);
     _derivative = "medium";
+    _page = widget.index;
+  }
+
+  @override
+  void dispose() {
+    SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
+    super.dispose();
   }
 
 
@@ -32,9 +41,15 @@ class _ImageViewPageState extends State<ImageViewPage> {
   Widget build(BuildContext context) {
     ThemeData _theme = Theme.of(context);
     return Scaffold(
+      primary: true,
       appBar: AppBar(
         iconTheme: IconThemeData(
           color: _theme.iconTheme.color, //change your color here
+        ),
+        centerTitle: true,
+        title: Text('${widget.images[_page]['name']}',
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(color: Colors.white),
         ),
         leading: IconButton(
           onPressed: () {
@@ -42,8 +57,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
           },
           icon: Icon(Icons.chevron_left),
         ),
-        backgroundColor: _theme.scaffoldBackgroundColor,
-
+        backgroundColor: Color(0x80000000),
         actions: [
           widget.isAdmin? IconButton(
             onPressed: () {
@@ -59,16 +73,20 @@ class _ImageViewPageState extends State<ImageViewPage> {
           ),
           */ Text(""),
         ],
-
-
       ),
       backgroundColor: Colors.black,
-      resizeToAvoidBottomInset: false,
+      resizeToAvoidBottomInset: true,
+      extendBodyBehindAppBar: true,
       body: Container(
         child: PhotoViewGallery.builder(
           scrollPhysics: const BouncingScrollPhysics(),
           itemCount: widget.images.length,
           pageController: _pageController,
+          onPageChanged: (newPage) {
+            setState(() {
+              _page = newPage;
+            });
+          },
           builder: (BuildContext context, int index) {
             return PhotoViewGalleryPageOptions(
               imageProvider: CachedNetworkImageProvider(widget.images[index]["derivatives"][_derivative]["url"]),
@@ -79,8 +97,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
             child: Container(
               child: CircularProgressIndicator(
                 value: event == null
-                  ? 0
-                  : event.cumulativeBytesLoaded / event.expectedTotalBytes,
+                  ? 0 : event.cumulativeBytesLoaded / event.expectedTotalBytes,
               ),
             ),
           ),

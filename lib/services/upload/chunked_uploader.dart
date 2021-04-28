@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:path/path.dart' as p;
 import 'package:universal_io/io.dart';
 import 'package:crypto/crypto.dart' as crypto;
@@ -12,6 +13,7 @@ class ChunkedUploader {
   ChunkedUploader(this._dio);
 
   Future<Response> upload({
+    BuildContext context,
     String filePath,
     String path,
     String contentType,
@@ -24,6 +26,7 @@ class ChunkedUploader {
     String fileKey = 'file',
   }) =>
       UploadRequest(_dio,
+              context: context,
               filePath: filePath,
               path: path,
               contentType: contentType,
@@ -48,10 +51,12 @@ class UploadRequest {
   final CancelToken cancelToken;
   final File _file;
   final Function(double) onUploadProgress;
+  final BuildContext context;
   int _maxChunkSize,_fileSize;
 
   UploadRequest(this.dio,
-      {this.filePath,
+      {this.context,
+      this.filePath,
       this.params,
       this.contentType,
       this.path,
@@ -97,11 +102,9 @@ class UploadRequest {
         finalResponse = dio.request(
           path,
           data: formData,
-          // cancelToken: cancelToken,
           queryParameters: params,
           options: Options(
               method: method,
-              // headers: _getHeaders(start, end),
               contentType: contentType
           ),
           onSendProgress: (current, total) => _updateProgress(i, current, total),

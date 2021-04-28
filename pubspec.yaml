@@ -33,16 +33,16 @@ dependencies:
   dio_cookie_manager:
   cookie_jar:
   shared_preferences:
-  flutter_uploader:
   photo_view:
   cached_network_image: ^3.0.0
   chunked_uploader:
   md5_plugin:
-  pull_to_refresh:
+  confirm_dialog:
 
   flutter_speed_dial:
   flutter_slidable:
   flutter_absolute_path:
+  flutter_uploader:
 
   multi_image_picker:
   provider:
@@ -64,9 +64,8 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  # assets:
-  #   - images/a_dot_burr.jpeg
-  #   - images/a_dot_ham.jpeg
+  assets:
+    - assets/logo/piwigo_logo.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
