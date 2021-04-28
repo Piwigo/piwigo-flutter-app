@@ -132,7 +132,7 @@ class _SettingsPageState extends State<SettingsPage> {
                               Center(
                                 child: Container(
                                   padding: EdgeInsets.all(5),
-                                  child: Text('This server handles these file types: ${prefs.getString("file_types")}', textAlign: TextAlign.center, style: TextStyle(color: Colors.black, fontSize: 12)),
+                                  child: Text('This server handles these file types: ${prefs.getString("file_types").replaceAll(",", ", ")}', textAlign: TextAlign.center, style: TextStyle(color: Colors.black, fontSize: 12)),
                                 ),
                               ),
                               // TODO: Implement albums options

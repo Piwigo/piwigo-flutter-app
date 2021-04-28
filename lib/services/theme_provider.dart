@@ -49,7 +49,6 @@ ThemeData light = ThemeData(
     bodyText2: TextStyle(fontSize: 11.0, color: Color(0xff000000)),
   ),
 );
-
 ThemeData dark = ThemeData(
   brightness: Brightness.dark,
 
@@ -115,7 +114,7 @@ class ThemeNotifier extends ChangeNotifier {
 
   _initPrefs() async {
     if(_pref == null)
-      _pref  = await SharedPreferences.getInstance();
+      _pref = await SharedPreferences.getInstance();
   }
   _loadFromPrefs() async {
     await _initPrefs();

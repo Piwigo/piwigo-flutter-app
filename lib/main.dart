@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:poc_piwigo/services/theme_provider.dart';
 import 'package:poc_piwigo/views/RootCategoryViewPage.dart';
 import 'package:provider/provider.dart';
@@ -6,6 +7,9 @@ import 'package:poc_piwigo/views/LoginViewPage.dart';
 
 
 void main() {
+  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+    statusBarColor: Colors.transparent,
+  ));
   runApp(MyApp());
 }
 

@@ -41,8 +41,7 @@ Future<dynamic> moveCategoryModalBottomSheet(context, String catId, String catNa
                                     context,
                                     title: Text('Confirm'),
                                     content: Text('Move $catName to Root Album ?', softWrap: true, maxLines: 3),
-                                    textOK: Text('Yes', style: TextStyle(color: Color(
-                                        0xff479900))),
+                                    textOK: Text('Yes', style: TextStyle(color: Color(0xff479900))),
                                     textCancel: Text('No', style: TextStyle(color: Theme.of(context).errorColor)),
                                   )) {
                                     print('Move $catId to ${root.id}');
@@ -61,7 +60,11 @@ Future<dynamic> moveCategoryModalBottomSheet(context, String catId, String catNa
                                       color: Theme.of(context).inputDecorationTheme.fillColor,
                                       borderRadius: BorderRadius.circular(5),
                                   ),
-                                  child: Text('${root.name}', overflow: TextOverflow.ellipsis, softWrap: false, style: TextStyle(fontSize: 16)),
+                                  child: Text('${root.name}',
+                                    overflow: TextOverflow.ellipsis,
+                                    softWrap: false,
+                                    style: TextStyle(fontSize: 16, color: root.children.map((e) => e.id).contains(catId)? Theme.of(context).disabledColor : Colors.black)
+                                  ),
                                 ),
                               ),
                               root.children.length > 0? categoryChildrenList(root.children, catId, catName) : Container(),
@@ -90,6 +93,9 @@ Widget categoryChildrenList(List<Category> nodes, String catId, String catName) 
       itemCount: nodes.length,
       itemBuilder: (context, index) {
         Category item = nodes[index];
+        if(item.id == catId) {
+          return Container();
+        }
         return openedList == index || openedList == -1? Column(
           children: [
             GestureDetector(
@@ -98,8 +104,7 @@ Widget categoryChildrenList(List<Category> nodes, String catId, String catName) 
                   context,
                   title: Text('Confirm'),
                   content: Text('Move $catName to ${item.name} ?', softWrap: true, maxLines: 3),
-                  textOK: Text('Yes', style: TextStyle(color: Color(
-                  0xff479900))),
+                  textOK: Text('Yes', style: TextStyle(color: Color(0xff479900))),
                   textCancel: Text('No', style: TextStyle(color: Theme.of(context).errorColor)),
                 )) {
                   print('Move $catId to ${item.id}');
@@ -110,7 +115,7 @@ Widget categoryChildrenList(List<Category> nodes, String catId, String catName) 
                 }
               },
               child: Container(
-                margin: EdgeInsets.all(openedList == index? 1 : 5),
+                margin: EdgeInsets.only(left: openedList == index? 0 : 10, top: openedList == index? 2 : 7),
                 padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                 decoration: BoxDecoration(
                     color: Theme.of(context).inputDecorationTheme.fillColor,
@@ -121,12 +126,14 @@ Widget categoryChildrenList(List<Category> nodes, String catId, String catName) 
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Expanded(
-                      child: Text('${item.name}', overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 16)),
-
+                      child: Text('${item.name}',
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(fontSize: 16, color: item.children.map((e) => e.id).contains(catId)? Theme.of(context).disabledColor : Colors.black)
+                      ),
                     ),
                     item.children.length > 0?
                     InkWell(
-                      onTap: item.id == catId || item.children.map((e) => e.id).contains(catId)? () {} : () {
+                      onTap: item.id == catId ? () {} : () {
                         setState(() {
                           if(openedList != index) {
                             openedList = index;
@@ -135,7 +142,7 @@ Widget categoryChildrenList(List<Category> nodes, String catId, String catName) 
                           }
                         });
                       },
-                      child: item.id != catId && !item.children.map((e) => e.id).contains(catId)? openedList == index? Icon(Icons.keyboard_arrow_up) : Icon(Icons.keyboard_arrow_down) : Icon(Icons.keyboard_arrow_down, color: Colors.grey,),
+                      child: item.id != catId ? openedList == index? Icon(Icons.keyboard_arrow_up) : Icon(Icons.keyboard_arrow_down) : Icon(Icons.keyboard_arrow_down, color: Colors.grey,),
                     ) : Text(''),
                   ],
                 ),

@@ -25,10 +25,10 @@ class Uploader {
           CircularProgressIndicator(),
         ],
       ),
-      duration: Duration(days: 365),
+      duration: Duration(days: 5),
     );
     endSnackBar = SnackBar(
-      content: Text('All images are uploaded'),
+      content: Text('All photos are uploaded'),
       duration: Duration(seconds: 10),
       action: SnackBarAction(
         label: 'Dismiss',
@@ -39,15 +39,18 @@ class Uploader {
     );
   }
 
-
-
-
   void uploadPhotos(List<Asset> photos, String category) async {
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
     for(var element in photos) {
       Response response = await uploadChunk(element, category);
+      API.dio.clear();
+      print("Request: ${response.data}");
       if(json.decode(response.data)["stat"] == "ok") {} else {
         print("Request failed: ${response.statusCode}");
+        ScaffoldMessenger.of(context).hideCurrentSnackBar();
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('${response.data}'),
+        ));
       }
     }
     print("Upload has ended");
@@ -92,8 +95,8 @@ class Uploader {
       "method": "pwg.images.uploadAsync"
     };
     Map<String, String> fields = {
-      'username': "remiflutter",
-      'password': "remimi",
+      'username': prefs.getString("username"),
+      'password': prefs.getString("password"),
       'filename': photo.name,
       'category': category,
     };
@@ -148,6 +151,8 @@ class UploadGalleryViewPage extends StatefulWidget {
 
 class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
 
+  bool _showImages = false;
+
   @override
   void initState() {
     super.initState();
@@ -156,6 +161,12 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
   @override
   void dispose() {
     super.dispose();
+  }
+
+  int getGridColumns(int nbElements) {
+    if(nbElements < 4) return nbElements;
+    if(nbElements < 10) return 3;
+    return 4;
   }
 
   @override
@@ -191,20 +202,47 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
               Center(
                 child: Padding(
                   padding: EdgeInsets.all(10),
-                  child: Text("${widget.imageData.length} photos", style: TextStyle(fontSize: 20, color: _theme.textTheme.bodyText2.color)),
+                  child: Text("${widget.imageData.length} ${widget.imageData.length == 1 ? 'photo' : 'photos'}", style: TextStyle(fontSize: 20, color: _theme.textTheme.bodyText2.color)),
                 ),
+              ),
+              Text('Show photos'),
+              IconButton(
+                onPressed: () {
+                  setState(() {
+                    _showImages = !_showImages;
+                  });
+                },
+                icon: Icon(Icons.more_horiz),
               ),
               Container(
                 padding: EdgeInsets.all(10),
-                child: GridView.builder( // Put images on a grid
+                child: _showImages ? GridView.builder( // Put images on a grid
                   physics: NeverScrollableScrollPhysics(),
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3
+                      crossAxisCount: getGridColumns(widget.imageData.length),
                   ),
                   itemCount: widget.imageData.length,
                   scrollDirection: Axis.vertical,
                   shrinkWrap: true,
                   itemBuilder: (BuildContext context, int index) {
+                    return Container(
+                      child: Card(
+                        elevation: 5,
+                        semanticContainer: true,
+                        child: GridTile(
+                          child: Container(
+                            child: AssetThumb(
+                              asset: widget.imageData[index],
+                              width: 300,
+                              height: 300,
+                              spinner: Text(""),
+                              quality: 50,
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                    /*
                     return FutureBuilder(
                       future: FlutterAbsolutePath.getAbsolutePath(widget.imageData[index].identifier),
                       builder: (context, snapshot) {
@@ -215,9 +253,11 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
                         }
                       }
                     ); // Custom grid cells
+                    */
                   }
-                ),
+                ) : Text(""),
               ),
+
               Container(
                 margin: EdgeInsets.all(10),
                 width: double.infinity,
@@ -240,7 +280,7 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
     );
   }
 
-
+  /*
   Widget createCardImage(BuildContext context, String imagePath) {
     return Container(
       child: Card(
@@ -257,4 +297,5 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
       ),
     );
   }
+  */
 }

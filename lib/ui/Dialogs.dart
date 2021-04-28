@@ -107,11 +107,19 @@ Widget createCategoryAlert(BuildContext context, String catId) {
                       onPressed: () async {
                         if (_formKey.currentState.validate()) {
                           _formKey.currentState.save();
-                          var result = await addCategory(_addAlbumNameController.text, _addAlbumDescController.text, catId);
-                          print('Created Album ${_addAlbumNameController.text} : $result');
-                          ScaffoldMessenger.of(context).showSnackBar(albumAddedSnackBar(_addAlbumNameController.text));
-                          _addAlbumNameController.text = "";
-                          Navigator.of(context).pop();
+                          try {
+                            var result = await addCategory(
+                                _addAlbumNameController.text,
+                                _addAlbumDescController.text, catId);
+                            print('Created Album ${_addAlbumNameController
+                                .text} : $result');
+                          } catch (e) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                albumAddedSnackBar(_addAlbumNameController.text)
+                            );
+                            _addAlbumNameController.text = "";
+                            Navigator.of(context).pop();
+                          }
                         }
                       },
                     ),

@@ -83,19 +83,6 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
               },
               icon: Icon(Icons.settings, color: _theme.iconTheme.color),
             ),
-            title: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                // Consumer<ThemeNotifier>(
-                //   builder: (context, notifier, child) => Switch(
-                //     onChanged:(value){
-                //       notifier.toggleTheme();
-                //     },
-                //     value: notifier.darkTheme,
-                //   ),
-                // ),
-              ],
-            ),
             /*
             actions: [
               IconButton(
@@ -153,8 +140,8 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
                   int nbPhotos = 0;
                   albums.data.forEach((cat) => nbPhotos+=cat["total_nb_images"]);
                   albums.data.removeWhere((category) => (
-                      category["id"].toString() == _rootCategory || _filterSearch(category["name"].toString()))
-                  );
+                      category["id"].toString() == _rootCategory
+                  ));
                   return RefreshIndicator(
                     displacement: 20,
                     onRefresh: () {
@@ -184,6 +171,7 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
                                       title: albums.data[index]["name"],
                                       category: albums.data[index]["id"].toString(),
                                       isAdmin: widget.isAdmin,
+                                      nbImages: albums.data[index]["total_nb_images"],
                                     )),
                                   );
                                 },
@@ -258,7 +246,7 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
                           Center(
                             child: Container(
                               padding: EdgeInsets.all(10),
-                              child: Text("$nbPhotos photos", style: TextStyle(fontSize: 20, color: _theme.textTheme.bodyText2.color, fontWeight: FontWeight.w300)),
+                              child: Text('$nbPhotos ${nbPhotos == 1 ? 'photo' : 'photos'}', style: TextStyle(fontSize: 20, color: _theme.textTheme.bodyText2.color, fontWeight: FontWeight.w300)),
                             ),
                           ),
                         ],
