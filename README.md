@@ -42,6 +42,7 @@ How to use Piwigo NG
  - Tap the **Log in** button :
 	 - If the given URL is empty, the Log in button will be disabled.
 	 - If the login is not successful, a dialog describing the error will appear. Tap outside the dialog to retry.
+
 ![Login Error Dialog](https://i.imgur.com/M1NgMtz.png)
 
 ## Logout | Change server
@@ -50,6 +51,7 @@ How to use Piwigo NG
 - Go to **Settings**.
 	- If you are logged in : Tap **Log out**.
 	- If you are a guest : Tap **Log in**.
+
 ![Settings Page](https://i.imgur.com/iPOjYRs.png)
 ## Upload
 With Piwigo NG, you can upload images from the phone.
