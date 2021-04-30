@@ -1,4 +1,4 @@
-# Piwigo Mobile (for Android)
+# Piwigo Next Generation (for Android)
 
 An android application for managing and uploading images to Piwigo servers.
 
@@ -14,27 +14,21 @@ For now, this application is in Beta. In order to try it, you will need to insta
 
 ## Download the APK
 
-Clone or download the project.
-
-## Copy the APK to your Android phone
-
- 1. Plug your phone into your PC.
- 2. Go into the **/apk** folder and copy the **app-release.apk** file into your phone (in **/Downloads** for example).
+In Github, Go to [piwigo-flutter-app releases](https://github.com/Piwigo/piwigo-flutter-app/releases), choose the version (latest is recommanded) and download the .apk file.
 
 ## Install the APK
 
 In your Android phone:
  1. Go to **Settings** > **security** > **install unknown apps**.
- 2. Go to **My files** and enable **Allow from this source**.
+ 2. Go to **files** and enable **Allow from this source**.
  *Don't forget to disable it when you have finished*
- 3. Exit **Settings** and go to **My Files**.
- 4. Go to **Installation files** or find the APK file where you placed it.
- 5. Select **app-release.apk** and click **install**.
+ 3. Exit **Settings** and go to **files**.
+ 4. Go to **Downloads**, select the **.apk** and click **install**.
  6. The app is now installed on your phone.
 
 # Usage
 
-How to use Piwigo²
+How to use Piwigo NG
 
 ## Login
 ![Piwigo's login screen](https://i.imgur.com/KIX3K2o.png)
@@ -58,7 +52,7 @@ How to use Piwigo²
 	- If you are a guest : Tap **Log in**.
 ![Settings Page](https://i.imgur.com/iPOjYRs.png)
 ## Upload
-With Piwigo², you can upload images from the phone.
+With Piwigo NG, you can upload images from the phone.
 1. **Enter** (or **create**) an album.
 2. Tap on the **menu button** at the bottom right corner.
 3. Tap the **image button** to select images for upload.
