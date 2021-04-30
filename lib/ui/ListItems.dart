@@ -35,7 +35,7 @@ Widget categoryListCard(BuildContext context, dynamic album, bool isAdmin) {
           borderRadius: BorderRadius.circular(7.0),
           child: Image.network(
             album["tn_url"],
-            fit: BoxFit.fill,
+            fit: BoxFit.cover,
           ),
         ),
       ),

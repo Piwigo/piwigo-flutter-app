@@ -13,7 +13,6 @@ Future<List<dynamic>> fetchAlbums(String albumID) async {
     "method": "pwg.categories.getList",
     "cat_id": albumID
   };
-
   Response response = await API.dio.get('ws.php', queryParameters: queries);
 
   if (response.statusCode == 200) {
@@ -74,7 +73,7 @@ Future<dynamic> addCategory(String catName, String catDesc, String parent) async
       return json.decode(response.data);
     }
   } catch(e) {
-    print(e);
+    print('Dio add category error $e');
     return e;
   }
 }
@@ -99,7 +98,7 @@ Future<dynamic> deleteCategory(String catId) async {
       return json.decode(response.data);
     }
   } catch (e) {
-    print(e);
+    print('Dio delete category error $e');
     return e;
   }
 }
@@ -125,7 +124,7 @@ Future<dynamic> moveCategory(String catId, String parentCatId) async {
       return json.decode(response.data);
     }
   } catch (e) {
-    print(e);
+    print('Dio move category error $e');
     return e;
   }
 }
