@@ -39,6 +39,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
   Map<int, bool> _selectedItems = Map();
   ScrollController _controller = ScrollController();
   List<dynamic> imageList = [];
+  bool refresh = false;
 
 
   @override
@@ -167,7 +168,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
           builder: (BuildContext context, AsyncSnapshot albums) {
             if (albums.hasData) {
               int nbImages = _nbImages;
-              if(albums.data[0]["id"].toString() == widget.category) {
+              if(albums.data.length > 0 && albums.data[0]["id"].toString() == widget.category) {
                 nbImages = albums.data[0]["total_nb_images"];
                 _nbImages = nbImages;
               }
@@ -178,14 +179,16 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
                   future: fetchImages(widget.category, _page), // Images of the list
                   builder: (BuildContext context, AsyncSnapshot images) {
                     if (images.hasData) {
-                      if (imageList.isEmpty) {
+                      if (imageList.isEmpty || refresh) {
                         imageList = images.data;
+                        refresh = false;
                       }
                       return RefreshIndicator(
                         displacement: 20,
                         onRefresh: () {
                           setState(() {
                             print("refresh");
+                            refresh = true;
                           });
                           return Future.delayed(Duration(milliseconds: 500));
                         },
@@ -261,7 +264,6 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
                                                   textOK: Text('Yes', style: TextStyle(color: Color(0xff479900))),
                                                   textCancel: Text('No', style: TextStyle(color: _theme.errorColor)),
                                                 )) {
-                                                  print("delete ${albums.data[index]["name"]}");
                                                   var result = await deleteCategory(albums.data[index]['id'].toString());
                                                   ScaffoldMessenger.of(context).showSnackBar(albumDeletedSnackBar(albums.data[index]["name"]));
                                                   setState(() {
@@ -452,7 +454,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
                   ));
                 }
               } catch (e) {
-                print(e.toString());
+                print('Dio error ${e.toString()}');
               }
             }
         )

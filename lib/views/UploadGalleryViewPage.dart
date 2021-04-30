@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/services.dart';
+import 'package:poc_piwigo/api/SessionAPI.dart';
 
 import '../services/upload/chunked_uploader.dart';
 import 'package:dio/dio.dart';
@@ -25,7 +26,7 @@ class Uploader {
           CircularProgressIndicator(),
         ],
       ),
-      duration: Duration(days: 5),
+      duration: Duration(seconds: 5),
     );
     endSnackBar = SnackBar(
       content: Text('All photos are uploaded'),
@@ -53,6 +54,7 @@ class Uploader {
         ));
       }
     }
+    saveStatus((await sessionStatus())['result']);
     print("Upload has ended");
     ScaffoldMessenger.of(context).hideCurrentSnackBar();
     ScaffoldMessenger.of(context).showSnackBar(endSnackBar);
@@ -82,7 +84,7 @@ class Uploader {
     );
 
     if (response.statusCode == 200) {
-      print(response.data);
+      print('Upload ${response.data}');
       if(json.decode(response.data)["stat"] == "ok") {}
     } else {
       print("Request failed: ${response.statusCode}");
@@ -113,11 +115,11 @@ class Uploader {
           data: fields,
           contentType: Headers.formUrlEncodedContentType,
           onUploadProgress: (progress) {
-            print(progress);
+            print('${photo.name} ${(progress*100).ceil()/100}');
           });
       return response;
     } on DioError catch (e) {
-      print(e);
+      print('Dio upload chunk error $e');
       return Future.value(null);
     }
   }

@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:confirm_dialog/confirm_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -15,9 +14,6 @@ import 'package:poc_piwigo/ui/SnackBars.dart';
 import 'package:poc_piwigo/views/SettingsPage.dart';
 import 'package:poc_piwigo/views/CategoryViewPage.dart';
 import 'package:poc_piwigo/views/UploadGalleryViewPage.dart';
-import 'package:poc_piwigo/ui/WeirdBorder.dart';
-
-
 
 class RootCategoryViewPage extends StatefulWidget {
   final bool isAdmin;
@@ -223,8 +219,7 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
                                               context,
                                               title: Text('Confirm'),
                                               content: Text('Delete ${albums.data[index]["name"]} ?', softWrap: true, maxLines: 3),
-                                              textOK: Text('Yes', style: TextStyle(color: Color(
-                                                  0xff479900))),
+                                              textOK: Text('Yes', style: TextStyle(color: Color(0xff479900))),
                                               textCancel: Text('No', style: TextStyle(color: _theme.errorColor)),
                                             )) {
                                               var result = await deleteCategory(albums.data[index]['id'].toString());

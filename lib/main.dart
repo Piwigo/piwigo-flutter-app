@@ -32,7 +32,6 @@ class MyApp extends StatelessWidget {
             //   '/root': (context) => RootCategoryViewPage()
             // },
             onGenerateRoute: (settings) {
-              print(settings.arguments);
               if(settings.name == '/') return MaterialPageRoute(builder: (context) => LoginViewPage());
               if(settings.name == '/root') return MaterialPageRoute(builder: (context) => RootCategoryViewPage(isAdmin: settings.arguments));
               return MaterialPageRoute(builder: (context) => Container());
