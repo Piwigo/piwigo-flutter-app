@@ -38,7 +38,6 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
   Map<int, bool> _selectedItems = Map();
   ScrollController _controller = ScrollController();
   List<dynamic> imageList = [];
-  bool refresh = false;
 
 
   @override
@@ -47,16 +46,14 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
     _page = 0;
     _nbImages = widget.nbImages;
     _isEditMode = false;
-    _controller.addListener(() async {
-      if (_controller.offset >= _controller.position.maxScrollExtent &&
-          !_controller.position.outOfRange && _nbImages > (_page+1)*100) {
-        _page++;
-        var newListPage = await fetchImages(widget.category, _page);
-        print('Fetch images of page $_page');
-        setState(() {
-          imageList.addAll(newListPage);
-        });
-      }
+  }
+
+  showMore() async {
+    _page++;
+    var newListPage = await fetchImages(widget.category, _page);
+    print('Fetch images of page $_page');
+    setState(() {
+      imageList.addAll(newListPage);
     });
   }
 
@@ -66,7 +63,6 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
   }
 
   Future<List<dynamic>> fetchImages(String albumID, int page) async {
-
     Map<String, String> queries = {
       "format":"json",
       "method": "pwg.categories.getImages",
@@ -175,24 +171,22 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
                 (category["id"].toString() == widget.category)
               );
               return FutureBuilder<List<dynamic>>(
-                  future: fetchImages(widget.category, _page), // Images of the list
+                  future: fetchImages(widget.category, 0), // Images of the list
                   builder: (BuildContext context, AsyncSnapshot images) {
                     if (images.hasData) {
-                      if (imageList.isEmpty || refresh) {
-                        imageList = images.data;
-                        refresh = false;
+                      if (imageList.isEmpty || _page == 0) {
+                        imageList.clear();
+                        imageList.addAll(images.data);
                       }
                       return RefreshIndicator(
                         displacement: 20,
                         onRefresh: () {
                           setState(() {
-                            print("refresh");
-                            refresh = true;
+                            _page = 0;
                           });
                           return Future.delayed(Duration(milliseconds: 500));
                         },
                         child: SingleChildScrollView(
-                          // controller: _controller,
                           child: Column(
                             children: [
                               ListView.builder(
@@ -331,10 +325,18 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
                                   );
                                 },
                               ),
-                              nbImages > (_page+1)*100 ? Center(
+                              nbImages > (_page+1)*100 ? GestureDetector(
+                                onTap: () {
+                                  showMore();
+                                },
                                 child: Padding(
-                                  padding: EdgeInsets.all(5),
-                                  child: Icon(Icons.more_horiz, color: _theme.disabledColor),
+                                  padding: EdgeInsets.all(10),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text('Show ${nbImages-(_page+1*100)} more ...', style: TextStyle(fontSize: 14, color: _theme.disabledColor)),
+                                    ],
+                                  ),
                                 ),
                               ) : Text(''),
                               Center(
