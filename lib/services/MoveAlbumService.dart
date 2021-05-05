@@ -1,9 +1,9 @@
 import 'package:confirm_dialog/confirm_dialog.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:poc_piwigo/api/CategoryAPI.dart';
-import 'package:poc_piwigo/model/Category.dart';
-import 'package:poc_piwigo/ui/SnackBars.dart';
+import 'package:piwigo_ng/api/CategoryAPI.dart';
+import 'package:piwigo_ng/model/Category.dart';
+import 'package:piwigo_ng/ui/SnackBars.dart';
 
 Future<dynamic> moveCategoryModalBottomSheet(context, String catId, String catName) async {
 

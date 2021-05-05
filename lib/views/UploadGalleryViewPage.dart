@@ -2,14 +2,14 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/services.dart';
-import 'package:poc_piwigo/api/SessionAPI.dart';
+import 'package:piwigo_ng/api/SessionAPI.dart';
 
 import '../services/upload/chunked_uploader.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
 import 'package:multi_image_picker/multi_image_picker.dart';
-import 'package:poc_piwigo/api/API.dart';
+import 'package:piwigo_ng/api/API.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Uploader {

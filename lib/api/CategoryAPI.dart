@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
-import 'package:poc_piwigo/model/Category.dart';
+import 'package:piwigo_ng/model/Category.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'API.dart';

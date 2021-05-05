@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.remi.poc_piwigo">
+    package="com.remi.piwigo_ng">
     <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
@@ -7,8 +7,7 @@
     <uses-permission android:name="android.permission.INTERNET"/>
 
    <application
-        android:label="piwigo²"
-        android:usesCleartextTraffic="true"
+        android:label="piwigo_ng"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"

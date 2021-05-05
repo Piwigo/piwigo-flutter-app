@@ -5,15 +5,15 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 
 import 'dart:async';
 
-import 'package:poc_piwigo/api/API.dart';
-import 'package:poc_piwigo/api/CategoryAPI.dart';
-import 'package:poc_piwigo/services/MoveAlbumService.dart';
-import 'package:poc_piwigo/ui/Dialogs.dart';
-import 'package:poc_piwigo/ui/ListItems.dart';
-import 'package:poc_piwigo/ui/SnackBars.dart';
-import 'package:poc_piwigo/views/SettingsPage.dart';
-import 'package:poc_piwigo/views/CategoryViewPage.dart';
-import 'package:poc_piwigo/views/UploadGalleryViewPage.dart';
+import 'package:piwigo_ng/api/API.dart';
+import 'package:piwigo_ng/api/CategoryAPI.dart';
+import 'package:piwigo_ng/services/MoveAlbumService.dart';
+import 'package:piwigo_ng/ui/Dialogs.dart';
+import 'package:piwigo_ng/ui/ListItems.dart';
+import 'package:piwigo_ng/ui/SnackBars.dart';
+import 'package:piwigo_ng/views/SettingsPage.dart';
+import 'package:piwigo_ng/views/CategoryViewPage.dart';
+import 'package:piwigo_ng/views/UploadGalleryViewPage.dart';
 
 class RootCategoryViewPage extends StatefulWidget {
   final bool isAdmin;

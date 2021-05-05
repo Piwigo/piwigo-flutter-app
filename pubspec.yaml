@@ -1,4 +1,4 @@
-name: poc_piwigo
+name: piwigo_ng
 description: Proof of concept for Piwigo
 
 # The following line prevents the package from being accidentally published to

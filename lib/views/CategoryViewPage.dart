@@ -8,12 +8,12 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:multi_image_picker/multi_image_picker.dart';
-import 'package:poc_piwigo/api/API.dart';
-import 'package:poc_piwigo/api/CategoryAPI.dart';
-import 'package:poc_piwigo/services/MoveAlbumService.dart';
-import 'package:poc_piwigo/ui/Dialogs.dart';
-import 'package:poc_piwigo/ui/ListItems.dart';
-import 'package:poc_piwigo/ui/SnackBars.dart';
+import 'package:piwigo_ng/api/API.dart';
+import 'package:piwigo_ng/api/CategoryAPI.dart';
+import 'package:piwigo_ng/services/MoveAlbumService.dart';
+import 'package:piwigo_ng/ui/Dialogs.dart';
+import 'package:piwigo_ng/ui/ListItems.dart';
+import 'package:piwigo_ng/ui/SnackBars.dart';
 
 import 'ImageViewPage.dart';
 import 'UploadGalleryViewPage.dart';

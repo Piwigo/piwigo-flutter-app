@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:poc_piwigo/services/theme_provider.dart';
-import 'package:poc_piwigo/views/RootCategoryViewPage.dart';
+import 'package:piwigo_ng/services/theme_provider.dart';
+import 'package:piwigo_ng/views/RootCategoryViewPage.dart';
 import 'package:provider/provider.dart';
-import 'package:poc_piwigo/views/LoginViewPage.dart';
+import 'package:piwigo_ng/views/LoginViewPage.dart';
 
 
 void main() {

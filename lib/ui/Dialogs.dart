@@ -1,7 +1,7 @@
 
 
 import 'package:flutter/material.dart';
-import 'package:poc_piwigo/api/CategoryAPI.dart';
+import 'package:piwigo_ng/api/CategoryAPI.dart';
 
 import 'SnackBars.dart';
 
@@ -26,11 +26,8 @@ Widget createCategoryAlert(BuildContext context, String catId) {
       ),
     ],
     title: Text("Album creation"),
-    content: Column(
-      mainAxisSize: MainAxisSize.min,
-      children: <Widget>[
-        Container(
-          width: 250,
+    content: Container(
+      child: SingleChildScrollView(
           child: Form(
             key: _formKey,
             child: Column(
@@ -130,7 +127,6 @@ Widget createCategoryAlert(BuildContext context, String catId) {
             ),
           ),
         ),
-      ],
     ),
   );
 }

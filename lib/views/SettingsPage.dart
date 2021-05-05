@@ -1,7 +1,7 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:poc_piwigo/views/LoginViewPage.dart';
+import 'package:piwigo_ng/views/LoginViewPage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 
