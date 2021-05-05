@@ -42,7 +42,6 @@ dependencies:
   flutter_speed_dial:
   flutter_slidable:
   flutter_absolute_path:
-  flutter_uploader:
 
   multi_image_picker:
   provider:

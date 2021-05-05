@@ -113,12 +113,13 @@ Widget createCategoryAlert(BuildContext context, String catId) {
                                 _addAlbumDescController.text, catId);
                             print('Created Album ${_addAlbumNameController
                                 .text} : $result');
-                          } catch (e) {
                             ScaffoldMessenger.of(context).showSnackBar(
                                 albumAddedSnackBar(_addAlbumNameController.text)
                             );
                             _addAlbumNameController.text = "";
                             Navigator.of(context).pop();
+                          } catch (e) {
+                            print(e);
                           }
                         }
                       },

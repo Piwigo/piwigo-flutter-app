@@ -129,12 +129,14 @@ class _SettingsPageState extends State<SettingsPage> {
                                   child: Text('${prefs.getBool('is_guest') ? 'Log in' : 'Log out' }', style: TextStyle(color: Color(0xffff7700), fontSize: 20),),
                                 ),
                               ),
-                              Center(
-                                child: Container(
-                                  padding: EdgeInsets.all(5),
-                                  child: Text('This server handles these file types: ${prefs.getString("file_types").replaceAll(",", ", ")}', textAlign: TextAlign.center, style: TextStyle(color: Colors.black, fontSize: 12)),
+                              prefs.getBool('is_guest') ?
+                                Text('') :
+                                Center(
+                                  child: Container(
+                                    padding: EdgeInsets.all(5),
+                                    child: Text('This server handles these file types: ${prefs.getString("file_types").replaceAll(",", ", ")}', textAlign: TextAlign.center, style: TextStyle(color: Colors.black, fontSize: 12)),
+                                  ),
                                 ),
-                              ),
                               // TODO: Implement albums options
                               /*
                               SizedBox(height: 20),

@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:path/path.dart' as p;
 import 'package:universal_io/io.dart';
 import 'package:crypto/crypto.dart' as crypto;
-import 'package:flutter_uploader/flutter_uploader.dart';
 
 class ChunkedUploader {
   final Dio _dio;
@@ -42,7 +41,6 @@ class ChunkedUploader {
 
 class UploadRequest {
   final Dio dio;
-  final uploader = FlutterUploader();
   final String filePath, fileName, path,fileKey;
   final Map<String, String> params;
   final String method;
