@@ -78,14 +78,13 @@ Future<dynamic> addCategory(String catName, String catDesc, String parent) async
   }
 }
 Future<dynamic> deleteCategory(String catId) async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
   Map<String, String> queries = {
     "format": "json",
     "method": "pwg.categories.delete",
   };
   FormData formData =  FormData.fromMap({
     "category_id": catId,
-    "pwg_token": prefs.getString("pwg_token"),
+    "pwg_token": API.prefs.getString("pwg_token"),
   });
   try {
     Response response = await API.dio.post(
@@ -103,7 +102,6 @@ Future<dynamic> deleteCategory(String catId) async {
   }
 }
 Future<dynamic> moveCategory(String catId, String parentCatId) async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
   Map<String, String> queries = {
     "format": "json",
     "method": "pwg.categories.move",
@@ -111,7 +109,33 @@ Future<dynamic> moveCategory(String catId, String parentCatId) async {
   FormData formData = FormData.fromMap({
     "category_id": catId,
     "parent": parentCatId,
-    "pwg_token": prefs.getString("pwg_token"),
+    "pwg_token": API.prefs.getString("pwg_token"),
+  });
+  try {
+    Response response = await API.dio.post(
+        'ws.php',
+        data: formData,
+        queryParameters: queries
+    );
+
+    if (response.statusCode == 200) {
+      return json.decode(response.data);
+    }
+  } catch (e) {
+    print('Dio move category error $e');
+    return e;
+  }
+}
+Future<dynamic> editCategory(int catId, String catName, String catDesc, bool private) async {
+  Map<String, String> queries = {
+    "format": "json",
+    "method": "pwg.categories.setInfo",
+  };
+  FormData formData = FormData.fromMap({
+    "category_id": catId,
+    "name": catName,
+    "comment": catDesc,
+    "status": private ? "private" : "public",
   });
   try {
     Response response = await API.dio.post(

@@ -34,12 +34,11 @@ class _LoginViewPageState extends State<LoginViewPage> {
     API.dio = Dio();
     API.cookieJar = CookieJar();
     API.dio.interceptors.add(CookieManager(API.cookieJar));
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    if(prefs.getBool("is_logged") != null && prefs.getBool("is_logged")) {
-      API.dio.options.baseUrl = prefs.getString("base_url");
+    if(API.prefs.getBool("is_logged") != null && API.prefs.getBool("is_logged")) {
+      API.dio.options.baseUrl = API.prefs.getString("base_url");
       String message;
-      if(prefs.getBool("is_guest") != null && !prefs.getBool("is_guest")) {
-        message = await loginUser(prefs.getString("base_url"), prefs.getString("username"), prefs.getString("password"));
+      if(API.prefs.getBool("is_guest") != null && !API.prefs.getBool("is_guest")) {
+        message = await loginUser(API.prefs.getString("base_url"), API.prefs.getString("username"), API.prefs.getString("password"));
         if(message == null) {
           Navigator.of(context).pushReplacementNamed("/root",
             arguments: true,
@@ -47,7 +46,7 @@ class _LoginViewPageState extends State<LoginViewPage> {
           return;
         }
       } else {
-        message = await loginGuest(prefs.getString("base_url"));
+        message = await loginGuest(API.prefs.getString("base_url"));
         if(message == null) {
           Navigator.of(context).pushReplacementNamed("/root",
             arguments: false,
@@ -66,15 +65,14 @@ class _LoginViewPageState extends State<LoginViewPage> {
   }
 
   Future<Null> getSharedPrefs() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    if(prefs.getString("base_url") != null) {
-      String url = prefs.getString("base_url");
+    if(API.prefs.getString("base_url") != null) {
+      String url = API.prefs.getString("base_url");
       url = url.split('//')[1];
       url = url.substring(0, url.lastIndexOf('/'));
       setState(() {
         urlController.text = url;
-        usernameController.text = prefs.getString("username") == null? '' : prefs.getString("username");
-        passwordController.text = prefs.getString("password") == null? '' : prefs.getString("password");
+        usernameController.text = API.prefs.getString("username") == null? '' : API.prefs.getString("username");
+        passwordController.text = API.prefs.getString("password") == null? '' : API.prefs.getString("password");
       });
     }
   }

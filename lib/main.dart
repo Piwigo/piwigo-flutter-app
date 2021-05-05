@@ -2,15 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:piwigo_ng/services/theme_provider.dart';
 import 'package:piwigo_ng/views/RootCategoryViewPage.dart';
+import 'package:piwigo_ng/api/API.dart';
 import 'package:provider/provider.dart';
 import 'package:piwigo_ng/views/LoginViewPage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
     statusBarColor: Colors.transparent,
   ));
+  await getSharedPreferences();
   runApp(MyApp());
+}
+
+Future<void> getSharedPreferences() async {
+  API.prefs = await SharedPreferences.getInstance();
 }
 
 

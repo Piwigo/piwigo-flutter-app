@@ -157,82 +157,11 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
                             shrinkWrap: true,
                             physics: NeverScrollableScrollPhysics(),
                             itemBuilder: (context, index) {
-                              return InkWell(
-                                onTap: () {
-                                  Navigator.of(context).push(
-                                    MaterialPageRoute(builder: (context) => CategoryViewPage(
-                                      title: albums.data[index]["name"],
-                                      category: albums.data[index]["id"].toString(),
-                                      isAdmin: widget.isAdmin,
-                                      nbImages: albums.data[index]["total_nb_images"],
-                                    )),
-                                  );
-                                },
-                                child: Container(
-                                  margin: EdgeInsets.only(top: 5, bottom: 5),
-                                  child: Slidable(
-                                    enabled: widget.isAdmin,
-                                    actionPane: SlidableDrawerActionPane(),
-                                    actionExtentRatio: 0.15,
-                                    child: categoryListCard(context, albums.data[index], widget.isAdmin),
-                                    secondaryActions: <Widget>[
-                                      /*
-                                      IconSlideAction(
-                                        color: _theme.iconTheme.color,
-                                        iconWidget: Icon(Icons.edit, size: 38, color: _theme.accentIconTheme.color),
-                                        onTap: () {
-                                          // TODO: Add edit album view
-                                          print('Edit');
-                                        },
-                                      ),
-                                       */
-                                      IconSlideAction(
-                                        color: Color(0xFF4B4B4B),
-                                        iconWidget: Icon(Icons.reply, size: 38, color: _theme.accentIconTheme.color),
-                                        onTap: () async {
-                                          var result = await moveCategoryModalBottomSheet(context,
-                                            albums.data[index]['id'].toString(),
-                                            albums.data[index]['name']
-                                          );
-                                          setState(() {
-                                            print('Moved album $result');
-                                          });
-                                        },
-                                      ),
-                                      Container(
-                                        height: 130,
-                                        decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.only(
-                                            bottomRight: Radius.circular(10),
-                                            topRight: Radius.circular(10),
-                                          ),
-                                          color: _theme.errorColor,
-                                        ),
-                                        child: IconSlideAction(
-                                          color: Colors.transparent,
-                                          iconWidget: Icon(Icons.delete, size: 38, color: _theme.accentIconTheme.color),
-                                          onTap: () async {
-                                            if (await confirm(
-                                              context,
-                                              title: Text('Confirm'),
-                                              content: Text('Delete ${albums.data[index]["name"]} ?', softWrap: true, maxLines: 3),
-                                              textOK: Text('Yes', style: TextStyle(color: Color(0xff479900))),
-                                              textCancel: Text('No', style: TextStyle(color: _theme.errorColor)),
-                                            )) {
-                                              var result = await deleteCategory(albums.data[index]['id'].toString());
-                                              ScaffoldMessenger.of(context).showSnackBar(albumDeletedSnackBar(albums.data[index]["name"]));
-                                              setState(() {
-                                                print('Delete album ${albums.data[index]["name"]} : $result');
-                                              });
-                                            }
-                                          },
-                                          closeOnTap: true,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              );
+                              return albumListItem(context, albums.data[index], widget.isAdmin, (message) {
+                                setState(() {
+                                  print('$message');
+                                });
+                              });
                             },
                           ),
                           Center(

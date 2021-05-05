@@ -58,20 +58,21 @@ class _ImageViewPageState extends State<ImageViewPage> {
           icon: Icon(Icons.chevron_left),
         ),
         backgroundColor: Color(0x80000000),
-        actions: [
+        actions: [/*
           widget.isAdmin? IconButton(
             onPressed: () {
               _settingModalBottomSheet(context, widget.images[_pageController.page.toInt()]);
             },
             icon: Icon(Icons.edit),
-          ) : /*IconButton(
+          ) : IconButton(
             onPressed: () {
               //TODO: Implement share image
               print("share");
             },
             icon: Icon(Icons.share),
           ),
-          */ Text(""),
+           Text(""),
+           */
         ],
       ),
       backgroundColor: Colors.black,

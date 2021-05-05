@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:piwigo_ng/api/API.dart';
 
 
 ThemeData light = ThemeData(
@@ -97,7 +96,6 @@ ThemeData dark = ThemeData(
 
 class ThemeNotifier extends ChangeNotifier {
   final String key = "theme";
-  SharedPreferences _pref;
   bool _darkTheme;
   bool get darkTheme => _darkTheme;
 
@@ -112,17 +110,11 @@ class ThemeNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
-  _initPrefs() async {
-    if(_pref == null)
-      _pref = await SharedPreferences.getInstance();
-  }
-  _loadFromPrefs() async {
-    await _initPrefs();
-    _darkTheme = _pref.getBool(key) ?? true;
+  _loadFromPrefs() {
+    _darkTheme = API.prefs.getBool(key) ?? true;
     notifyListeners();
   }
-  _saveToPrefs() async {
-    await _initPrefs();
-    _pref.setBool(key, _darkTheme);
+  _saveToPrefs() {
+    API.prefs.setBool(key, _darkTheme);
   }
 }

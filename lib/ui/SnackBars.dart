@@ -9,6 +9,10 @@ SnackBar albumAddedSnackBar(String addedCategory) {
   return SnackBar(
     content: Text("Created album $addedCategory", style: TextStyle(color: Color(0xff479900))),
   );
+}SnackBar albumEditedSnackBar(String editedCategory) {
+  return SnackBar(
+    content: Text("Edited album $editedCategory", style: TextStyle(color: Color(0xff479900))),
+  );
 }
 SnackBar albumDeletedSnackBar(String deletedCategory) {
   return SnackBar(

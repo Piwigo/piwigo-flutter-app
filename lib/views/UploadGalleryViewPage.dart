@@ -62,7 +62,6 @@ class Uploader {
   }
 
   void upload(Asset photo, String category) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
     Map<String, String> queries = {"format":"json", "method": "pwg.images.upload"};
 
     ByteData byteData = await photo.getByteData();
@@ -70,7 +69,7 @@ class Uploader {
 
     FormData formData =  FormData.fromMap({
       "category": category,
-      "pwg_token": prefs.getString("pwg_token"),
+      "pwg_token": API.prefs.getString("pwg_token"),
       "file": MultipartFile.fromBytes(
         imageData,
         filename: photo.name,
@@ -91,14 +90,13 @@ class Uploader {
     }
   }
   Future<Response> uploadChunk(Asset photo, String category) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
     Map<String, String> queries = {
       "format":"json",
       "method": "pwg.images.uploadAsync"
     };
     Map<String, String> fields = {
-      'username': prefs.getString("username"),
-      'password': prefs.getString("password"),
+      'username': API.prefs.getString("username"),
+      'password': API.prefs.getString("password"),
       'filename': photo.name,
       'category': category,
     };
@@ -109,7 +107,7 @@ class Uploader {
           context: context,
           path: "/ws.php",
           filePath: await FlutterAbsolutePath.getAbsolutePath(photo.identifier),
-          maxChunkSize: prefs.getInt("upload_form_chunk_size")*1000,
+          maxChunkSize: API.prefs.getInt("upload_form_chunk_size")*1000,
           params: queries,
           method: 'POST',
           data: fields,
