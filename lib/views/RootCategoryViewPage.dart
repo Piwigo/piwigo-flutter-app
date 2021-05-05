@@ -70,7 +70,7 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
             pinned: true,
             snap: false,
             floating: false,
-            expandedHeight: 180.0,
+            expandedHeight: 100.0,
             leading: IconButton(
               onPressed: () {
                 Navigator.of(context).push(
@@ -99,6 +99,7 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
                     child: Text("Albums", style: _theme.textTheme.headline1),
                   ),
                   // TODO: implement all image search
+                  /*
                   Container(
                     margin: EdgeInsets.all(20),
                     decoration: BoxDecoration(
@@ -120,6 +121,8 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
                       ),
                     ),
                   ),
+
+                   */
                 ],
               ),
             ),
