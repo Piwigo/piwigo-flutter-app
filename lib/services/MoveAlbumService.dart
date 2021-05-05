@@ -116,7 +116,6 @@ Widget categoryChildrenList(List<Category> nodes, String catId, String catName) 
               },
               child: Container(
                 margin: EdgeInsets.only(left: openedList == index? 0 : 10, top: openedList == index? 2 : 7),
-                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                 decoration: BoxDecoration(
                     color: Theme.of(context).inputDecorationTheme.fillColor,
                     borderRadius: BorderRadius.circular(5),
@@ -125,7 +124,8 @@ Widget categoryChildrenList(List<Category> nodes, String catId, String catName) 
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Expanded(
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                       child: Text('${item.name}',
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(fontSize: 16, color: item.children.map((e) => e.id).contains(catId)? Theme.of(context).disabledColor : Colors.black)
@@ -142,7 +142,14 @@ Widget categoryChildrenList(List<Category> nodes, String catId, String catName) 
                           }
                         });
                       },
-                      child: item.id != catId ? openedList == index? Icon(Icons.keyboard_arrow_up) : Icon(Icons.keyboard_arrow_down) : Icon(Icons.keyboard_arrow_down, color: Colors.grey,),
+                      child: Container(
+                        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                        child: item.id != catId ?
+                          openedList == index ?
+                            Icon(Icons.keyboard_arrow_up) :
+                            Icon(Icons.keyboard_arrow_down) :
+                          Icon(Icons.keyboard_arrow_down, color: Colors.grey,),
+                      ),
                     ) : Text(''),
                   ],
                 ),

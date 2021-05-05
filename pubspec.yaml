@@ -36,7 +36,6 @@ dependencies:
   photo_view:
   cached_network_image: ^3.0.0
   chunked_uploader:
-  md5_plugin:
   confirm_dialog:
 
   flutter_speed_dial:
