@@ -2,7 +2,6 @@ import 'package:confirm_dialog/confirm_dialog.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'dart:async';
@@ -197,7 +196,6 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
                           child: Column(
                             children: [
                               ListView.builder(
-                                padding: EdgeInsets.symmetric(horizontal: 5),
                                 itemCount: albums.data.length,
                                 shrinkWrap: true,
                                 physics: NeverScrollableScrollPhysics(),

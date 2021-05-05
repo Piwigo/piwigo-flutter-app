@@ -24,7 +24,6 @@ class RootCategoryViewPage extends StatefulWidget {
 }
 
 class _RootCategoryViewPageState extends State<RootCategoryViewPage> with SingleTickerProviderStateMixin {
-  Map<int, bool> _swipedItems = Map();
   String _rootCategory;
 
   TextEditingController _searchTextController = new TextEditingController();
@@ -158,11 +157,6 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
                             shrinkWrap: true,
                             physics: NeverScrollableScrollPhysics(),
                             itemBuilder: (context, index) {
-                              if(_swipedItems.isEmpty) {
-                                albums.data.forEach((item) {
-                                  _swipedItems[index] = false;
-                                });
-                              }
                               return InkWell(
                                 onTap: () {
                                   Navigator.of(context).push(
