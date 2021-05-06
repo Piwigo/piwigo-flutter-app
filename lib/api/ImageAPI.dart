@@ -68,15 +68,13 @@ Future<void> _showNotification(Map<String, dynamic> downloadStatus) async {
       importance: Importance.max
   );
   final platform = NotificationDetails(android: android);
-  final json = jsonEncode(downloadStatus);
   final isSuccess = downloadStatus['isSuccess'];
 
   await API.localNotification.show(
-      0,
-      isSuccess ? 'Success' : 'Failure',
-      isSuccess ? 'All files has been downloaded successfully!' : 'There was an error while downloading the file.',
-      platform,
-      payload: json
+    0,
+    isSuccess ? 'Success' : 'Failure',
+    isSuccess ? 'All files has been downloaded successfully!' : 'There was an error while downloading the file.',
+    platform,
   );
 }
 
@@ -151,29 +149,49 @@ Future<dynamic> deleteImage(int imageId) async {
     return e;
   }
 }
+
+Future<dynamic> moveImages(List<dynamic> images, int category) async {
+  for(var image in images) {
+    await moveImage(image['id'], [category]);
+  }
+}
 Future<dynamic> moveImage(int imageId, List<int> categories) async {
   Map<String, String> queries = {
     "format": "json",
     "method": "pwg.images.setInfo",
   };
+
   FormData formData = FormData.fromMap({
     "image_id": imageId,
     "categories": categories,
-    "multiple_value_mode": "append",
+    "multiple_value_mode": "replace",
   });
+
   try {
     Response response = await API.dio.post(
-        'ws.php',
-        data: formData,
-        queryParameters: queries
+      'ws.php',
+      data: formData,
+      queryParameters: queries
     );
 
     if (response.statusCode == 200) {
       return json.decode(response.data);
+    } else {
+      print('Error ${response.statusCode}');
     }
   } catch (e) {
     print('Dio move category error $e');
     return e;
+  }
+}
+
+Future<dynamic> copyImages(List<dynamic> images, int category) async {
+  for(var image in images) {
+    List<int> categories = image['categories'].map<int>((cat) {
+      return cat['id'] as int;
+    }).toList();
+    categories.add(category);
+    await copyImage(image['id'], categories);
   }
 }
 Future<dynamic> copyImage(int imageId, List<int> categories) async {
@@ -181,11 +199,13 @@ Future<dynamic> copyImage(int imageId, List<int> categories) async {
     "format": "json",
     "method": "pwg.images.setInfo",
   };
+
   FormData formData = FormData.fromMap({
     "image_id": imageId,
     "categories": categories,
-    "multiple_value_mode": "replace",
+    "multiple_value_mode": "append",
   });
+
   try {
     Response response = await API.dio.post(
         'ws.php',
@@ -201,6 +221,7 @@ Future<dynamic> copyImage(int imageId, List<int> categories) async {
     return e;
   }
 }
+
 Future<dynamic> editImage(int imageId, String name, String desc) async {
   Map<String, String> queries = {
     "format": "json",

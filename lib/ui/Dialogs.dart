@@ -131,6 +131,42 @@ Widget createCategoryAlert(BuildContext context, String catId) {
   );
 }
 
+Future<String> confirmMoveCopyImage(
+    BuildContext context, {
+      Widget title,
+      Widget content,
+    }) async {
+  final String confirm = await showDialog<String>(
+    context: context,
+    builder: (_) => WillPopScope(
+      child: AlertDialog(
+        title: title,
+        content: (content != null) ? content : Text('Are you sure continue?'),
+        actions: <Widget>[
+          TextButton(
+            child: Text('no', style: TextStyle(color: Theme.of(context).errorColor)),
+            onPressed: () => Navigator.pop(context, 'cancel'),
+          ),
+          TextButton(
+            child: Text('move', style: TextStyle(color: Theme.of(context).accentColor)),
+            onPressed: () => Navigator.pop(context, 'move'),
+          ),
+          TextButton(
+            child: Text('copy', style: TextStyle(color: Theme.of(context).accentColor)),
+            onPressed: () => Navigator.pop(context, 'copy'),
+          ),
+        ],
+      ),
+      onWillPop: () async {
+        Navigator.pop(context, 'cancel');
+        return true;
+      },
+    ),
+  );
+
+  return (confirm != null) ? confirm : 'cancel';
+}
+
 class EditCategoryDialog extends StatefulWidget {
   final int catId;
   final String catName;
@@ -142,7 +178,6 @@ class EditCategoryDialog extends StatefulWidget {
   @override
   _EditCategoryDialogState createState() => _EditCategoryDialogState();
 }
-
 class _EditCategoryDialogState extends State<EditCategoryDialog> {
   final _formKey = GlobalKey<FormState>();
   TextEditingController _addAlbumNameController;

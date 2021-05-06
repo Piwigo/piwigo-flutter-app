@@ -49,15 +49,13 @@ class Uploader {
         importance: Importance.max
     );
     final platform = NotificationDetails(android: android);
-    final json = jsonEncode(downloadStatus);
     final isSuccess = downloadStatus['isSuccess'];
 
     await API.localNotification.show(
-        1,
-        isSuccess ? 'Success' : 'Failure',
-        isSuccess ? 'All files has been uploaded successfully!' : 'There was an error while downloading the file.',
-        platform,
-        payload: json
+      1,
+      isSuccess ? 'Success' : 'Failure',
+      isSuccess ? 'All files has been uploaded successfully!' : 'There was an error while downloading the file.',
+      platform,
     );
   }
 

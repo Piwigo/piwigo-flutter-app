@@ -138,8 +138,6 @@ class _ImageViewPageState extends State<ImageViewPage> {
       ) : Text(""),
        */
     );
-
-
   }
 
   void _settingModalBottomSheet(context, dynamic image) async {

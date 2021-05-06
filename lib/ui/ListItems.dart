@@ -65,8 +65,24 @@ Widget albumListItem(BuildContext context, dynamic album, bool isAdmin, Function
             iconWidget: Icon(Icons.reply, size: 38, color: _theme.accentIconTheme.color),
             onTap: () async {
               var result = await moveCategoryModalBottomSheet(context,
-                  album['id'].toString(),
-                  album['name']
+                album['id'].toString(),
+                album['name'],
+                false,
+                (item) async {
+                  if (await confirm(
+                    context,
+                    title: Text('Confirm'),
+                    content: Text('Move ${album['name']} to ${item.name} ?', softWrap: true, maxLines: 3),
+                    textOK: Text('Yes', style: TextStyle(color: Color(0xff479900))),
+                    textCancel: Text('No', style: TextStyle(color: Theme.of(context).errorColor)),
+                  )) {
+                    print('Move ${album['id']} to ${item.id}');
+                    var result = await moveCategory(album['id'], item.id);
+                    print(result);
+                    ScaffoldMessenger.of(context).showSnackBar(albumMovedSnackBar(album['name'], item.name));
+                    Navigator.of(context).pop();
+                  }
+                },
               );
               onRefresh('Moved ${album['name']} : $result');
             },

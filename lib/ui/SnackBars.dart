@@ -19,3 +19,25 @@ SnackBar albumDeletedSnackBar(String deletedCategory) {
     content: Text("Deleted album $deletedCategory", style: TextStyle(color: Color(0xff479900))),
   );
 }
+
+
+SnackBar imageMovedSnackBar(String image, String parentCategory) {
+  return SnackBar(
+    content: Text("Moved image $image to $parentCategory", style: TextStyle(color: Color(0xff479900))),
+  );
+}
+SnackBar imagesMovedSnackBar(int images, String parentCategory) {
+  return SnackBar(
+    content: Text("Moved $images images to $parentCategory", style: TextStyle(color: Color(0xff479900))),
+  );
+}
+SnackBar imageCopiedSnackBar(String image, String parentCategory) {
+  return SnackBar(
+    content: Text("Copied image $image to $parentCategory", style: TextStyle(color: Color(0xff479900))),
+  );
+}
+SnackBar imagesCopiedSnackBar(int images, String parentCategory) {
+  return SnackBar(
+    content: Text("Copied $images images to $parentCategory", style: TextStyle(color: Color(0xff479900))),
+  );
+}

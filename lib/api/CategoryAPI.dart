@@ -100,7 +100,7 @@ Future<dynamic> deleteCategory(String catId) async {
     return e;
   }
 }
-Future<dynamic> moveCategory(String catId, String parentCatId) async {
+Future<dynamic> moveCategory(int catId, String parentCatId) async {
   Map<String, String> queries = {
     "format": "json",
     "method": "pwg.categories.move",
