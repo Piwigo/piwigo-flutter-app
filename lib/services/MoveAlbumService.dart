@@ -2,7 +2,7 @@ import 'package:confirm_dialog/confirm_dialog.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:piwigo_ng/api/CategoryAPI.dart';
-import 'package:piwigo_ng/model/Category.dart';
+import 'package:piwigo_ng/model/CategoryModel.dart';
 import 'package:piwigo_ng/ui/SnackBars.dart';
 
 Future<dynamic> moveCategoryModalBottomSheet(context, String catId, String catName) async {
@@ -20,7 +20,7 @@ Future<dynamic> moveCategoryModalBottomSheet(context, String catId, String catNa
                 future: getAlbumList(),
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
-                    Category root = snapshot.data;
+                    CategoryModel root = snapshot.data;
                     return Container(
                       height: 500,
                       padding: EdgeInsets.all(20),
@@ -83,7 +83,7 @@ Future<dynamic> moveCategoryModalBottomSheet(context, String catId, String catNa
   return catId;
 }
 
-Widget categoryChildrenList(List<Category> nodes, String catId, String catName) {
+Widget categoryChildrenList(List<CategoryModel> nodes, String catId, String catName) {
   int openedList = -1;
 
   return StatefulBuilder(
@@ -92,7 +92,7 @@ Widget categoryChildrenList(List<Category> nodes, String catId, String catName) 
       physics: NeverScrollableScrollPhysics(),
       itemCount: nodes.length,
       itemBuilder: (context, index) {
-        Category item = nodes[index];
+        CategoryModel item = nodes[index];
         if(item.id == catId) {
           return Container();
         }

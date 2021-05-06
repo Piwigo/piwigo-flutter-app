@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:piwigo_ng/services/theme_provider.dart';
 import 'package:piwigo_ng/views/RootCategoryViewPage.dart';
 import 'package:piwigo_ng/api/API.dart';
@@ -14,11 +15,19 @@ void main() async {
     statusBarColor: Colors.transparent,
   ));
   await getSharedPreferences();
+  initLocalNotifications();
   runApp(MyApp());
 }
 
 Future<void> getSharedPreferences() async {
   API.prefs = await SharedPreferences.getInstance();
+}
+
+void initLocalNotifications() {
+  API.localNotification = FlutterLocalNotificationsPlugin();
+  final android = AndroidInitializationSettings('@mipmap/ic_launcher');
+  final initSettings = InitializationSettings(android: android);
+  API.localNotification.initialize(initSettings);
 }
 
 
@@ -35,10 +44,6 @@ class MyApp extends StatelessWidget {
             // theme: notifier.darkTheme ? dark : light,
             theme: light,
             initialRoute: '/',
-            // routes: {
-            //   '/': (context) => LoginViewPage(),
-            //   '/root': (context) => RootCategoryViewPage()
-            // },
             onGenerateRoute: (settings) {
               if(settings.name == '/') return MaterialPageRoute(builder: (context) => LoginViewPage());
               if(settings.name == '/root') return MaterialPageRoute(builder: (context) => RootCategoryViewPage(isAdmin: settings.arguments));

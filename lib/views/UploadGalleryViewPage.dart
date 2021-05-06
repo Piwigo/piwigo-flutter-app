@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/services.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:piwigo_ng/api/SessionAPI.dart';
 
 import '../services/upload/chunked_uploader.dart';
@@ -10,7 +11,6 @@ import 'package:flutter/material.dart';
 
 import 'package:multi_image_picker/multi_image_picker.dart';
 import 'package:piwigo_ng/api/API.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class Uploader {
   BuildContext context;
@@ -40,14 +40,44 @@ class Uploader {
     );
   }
 
+  Future<void> _showUploadNotification(Map<String, dynamic> downloadStatus) async {
+    final android = AndroidNotificationDetails(
+        'channel id',
+        'channel name',
+        'channel description',
+        priority: Priority.high,
+        importance: Importance.max
+    );
+    final platform = NotificationDetails(android: android);
+    final json = jsonEncode(downloadStatus);
+    final isSuccess = downloadStatus['isSuccess'];
+
+    await API.localNotification.show(
+        1,
+        isSuccess ? 'Success' : 'Failure',
+        isSuccess ? 'All files has been uploaded successfully!' : 'There was an error while downloading the file.',
+        platform,
+        payload: json
+    );
+  }
+
   void uploadPhotos(List<Asset> photos, String category) async {
+    Map<String, dynamic> result = {
+      'isSuccess': true,
+      'filePath': null,
+      'error': null,
+    };
+
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
+
     for(var element in photos) {
       Response response = await uploadChunk(element, category);
       API.dio.clear();
       print("Request: ${response.data}");
+
       if(json.decode(response.data)["stat"] == "ok") {} else {
         print("Request failed: ${response.statusCode}");
+
         ScaffoldMessenger.of(context).hideCurrentSnackBar();
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text('${response.data}'),
@@ -55,10 +85,11 @@ class Uploader {
       }
     }
     saveStatus((await sessionStatus())['result']);
-    print("Upload has ended");
-    ScaffoldMessenger.of(context).hideCurrentSnackBar();
-    ScaffoldMessenger.of(context).showSnackBar(endSnackBar);
 
+    await _showUploadNotification(result);
+
+    // ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    // ScaffoldMessenger.of(context).showSnackBar(endSnackBar);
   }
 
   void upload(Asset photo, String category) async {
@@ -104,17 +135,17 @@ class Uploader {
 
     try {
       Future<Response> response = chunkedUploader.upload(
-          context: context,
-          path: "/ws.php",
-          filePath: await FlutterAbsolutePath.getAbsolutePath(photo.identifier),
-          maxChunkSize: API.prefs.getInt("upload_form_chunk_size")*1000,
-          params: queries,
-          method: 'POST',
-          data: fields,
-          contentType: Headers.formUrlEncodedContentType,
-          onUploadProgress: (progress) {
-            print('${photo.name} ${(progress*100).ceil()/100}');
-          });
+        context: context,
+        path: "/ws.php",
+        filePath: await FlutterAbsolutePath.getAbsolutePath(photo.identifier),
+        maxChunkSize: API.prefs.getInt("upload_form_chunk_size")*1000,
+        params: queries,
+        method: 'POST',
+        data: fields,
+        contentType: Headers.formUrlEncodedContentType,
+        onUploadProgress: (progress) {
+          print('${photo.name} ${(progress*100).ceil()/100}');
+        });
       return response;
     } on DioError catch (e) {
       print('Dio upload chunk error $e');

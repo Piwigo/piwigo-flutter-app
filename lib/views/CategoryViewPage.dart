@@ -1,20 +1,20 @@
-import 'package:confirm_dialog/confirm_dialog.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import 'package:image_downloader/image_downloader.dart';
 import 'dart:async';
 import 'dart:convert';
 
 import 'package:multi_image_picker/multi_image_picker.dart';
 import 'package:piwigo_ng/api/API.dart';
 import 'package:piwigo_ng/api/CategoryAPI.dart';
-import 'package:piwigo_ng/services/MoveAlbumService.dart';
+import 'package:piwigo_ng/api/ImageAPI.dart';
+import 'package:piwigo_ng/model/DerivativeModel.dart';
 import 'package:piwigo_ng/ui/Dialogs.dart';
 import 'package:piwigo_ng/ui/ListItems.dart';
-import 'package:piwigo_ng/ui/SnackBars.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:piwigo_ng/model/ImageModel.dart';
 
 import 'ImageViewPage.dart';
 import 'UploadGalleryViewPage.dart';
@@ -36,7 +36,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
   bool _isEditMode;
   int _page;
   int _nbImages;
-  Map<int, bool> _selectedItems = Map();
+  Map<int, dynamic> _selectedItems = Map();
   ScrollController _controller = ScrollController();
   List<dynamic> imageList = [];
 
@@ -63,31 +63,13 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
     super.dispose();
   }
 
-  Future<List<dynamic>> fetchImages(String albumID, int page) async {
-    Map<String, String> queries = {
-      "format":"json",
-      "method": "pwg.categories.getImages",
-      "cat_id": albumID,
-      "per_page": "100",
-      "page": page.toString(),
-    };
 
-    Response response = await API.dio.get('ws.php', queryParameters: queries);
 
-    if (response.statusCode == 200) {
-      return json.decode(response.data)["result"]["images"];
-    } else {
-      throw Exception("bad request: "+response.statusCode.toString());
-    }
-  }
-
-  bool _isSelected(int index) {
-    return _selectedItems[index] == null ? false : _selectedItems[index];
+  bool _isSelected(int id) {
+    return _selectedItems.keys.contains(id);
   }
   int _selectedPhotos() {
-    int n = 0;
-    _selectedItems.forEach((key, value) {if(value) n++;});
-    return n;
+    return _selectedItems.length;
   }
   String albumSubCount(dynamic album) {
     String displayString = '${album["total_nb_images"]} ${album["total_nb_images"] == 1 ? 'photo' : 'photos'}';
@@ -110,7 +92,6 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
             snap: false,
             floating: false,
             centerTitle: true,
-            // expandedHeight: 100.0,
             iconTheme: IconThemeData(
               color: _theme.iconTheme.color,//change your color here
             ),
@@ -119,11 +100,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
                 setState(() {
                   _isEditMode = false;
                 });
-                _selectedItems.forEach((key, value) {
-                  setState(() {
-                    _selectedItems[key] = false;
-                  });
-                });
+                _selectedItems.clear();
               },
               icon: Icon(Icons.cancel),
             ) : IconButton(
@@ -135,16 +112,10 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
             title: _isEditMode ?
               Text("${_selectedPhotos()}", overflow: TextOverflow.fade, softWrap: true) :
               Text(widget.title),
-            // TODO: Implement selection actions
-            /*
             actions: [
               _isEditMode ? IconButton(
                 onPressed: () {
-                  List<int> selection = [];
-                  _selectedItems.forEach((key, value) {
-                    if(value) selection.add(key);
-                  });
-                  print('Selected: $selection');
+                  print('Edit: ${_selectedItems.keys}');
                 },
                 icon: Icon(Icons.edit),
               ) : widget.isAdmin? IconButton(
@@ -156,7 +127,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
                 icon: Icon(Icons.touch_app),
               ) : Container(),
             ],
-             */
+
           ),
         ],
         body: FutureBuilder<List<dynamic>>(
@@ -213,18 +184,26 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
                                 shrinkWrap: true,
                                 physics: NeverScrollableScrollPhysics(),
                                 itemBuilder: (BuildContext context, int index) {
-                                  if(_selectedItems.isEmpty) {
-                                    imageList.forEach((item) {
-                                      _selectedItems[index] = false;
-                                    });
-                                  }
+                                  var image = imageList[index];
                                   return InkWell(
+                                    onLongPress: _isEditMode ? () {
+                                      setState(() {
+                                        _isSelected(image['id']) ?
+                                        _selectedItems.remove(image['id']) :
+                                        _selectedItems.putIfAbsent(image['id'], () => image);
+                                      });
+                                    } : () {
+                                      setState(() {
+                                        _isEditMode = true;
+                                        _selectedItems.putIfAbsent(image['id'], () => image);
+                                      });
+                                    },
                                     onTap: () {
                                       _isEditMode ?
                                       setState(() {
-                                        _isSelected(index) ?
-                                        _selectedItems[index] = false :
-                                        _selectedItems[index] = true;
+                                        _isSelected(image['id']) ?
+                                        _selectedItems.remove(image['id']) :
+                                        _selectedItems.putIfAbsent(image['id'], () => image);
                                       }) :
                                       Navigator.of(context).push(
                                         MaterialPageRoute(builder: (context) => ImageViewPage(
@@ -246,9 +225,9 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
                                         alignment: Alignment.topRight,
                                         child: Padding(
                                           padding: EdgeInsets.all(5),
-                                          child: _isSelected(index) ?
-                                          Icon(Icons.check_circle, color: Colors.orange) :
-                                          Icon(Icons.check_circle_outline, color: Colors.grey),
+                                          child: _isSelected(image['id']) ?
+                                          Icon(Icons.check_circle, color: _theme.floatingActionButtonTheme.backgroundColor) :
+                                          Icon(Icons.check_circle_outline, color: _theme.disabledColor),
                                         ),
                                       ) : Text(""),
                                     ),
@@ -395,9 +374,51 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
   Widget bottomBar() {
     ThemeData _theme = Theme.of(context);
     return BottomNavigationBar(
+      onTap: (index) async {
+        switch (index) {
+          case 0:
+            print('Download ${_selectedItems.keys.toList()}');
+
+            setState(() {
+              _isEditMode = false;
+              _selectedItems.clear();
+            });
+            ScaffoldMessenger.of(context).hideCurrentSnackBar();
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('Downloading selection'),
+                  CircularProgressIndicator(),
+                ],
+              ),
+            ));
+
+            await downloadImages(_selectedItems.values.toList());
+
+            break;
+          case 1:
+            print('Move ${_selectedItems.keys}');
+            break;
+          case 2:
+            print('Delete ${_selectedItems.keys}');
+            setState(() {
+              _isEditMode = false;
+              _selectedItems.clear();
+            });
+            await deleteImages(_selectedItems.keys.toList());
+            ScaffoldMessenger.of(context).hideCurrentSnackBar();
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text('Selection deleted'),
+            ));
+            break;
+          default:
+            break;
+        }
+      },
       items: <BottomNavigationBarItem>[
         BottomNavigationBarItem(
-          icon: Icon(Icons.file_upload, color: _theme.iconTheme.color),
+          icon: Icon(Icons.download_rounded, color: _theme.iconTheme.color),
           label: "upload",
         ),
         BottomNavigationBarItem(

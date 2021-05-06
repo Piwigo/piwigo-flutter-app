@@ -9,6 +9,7 @@
    <application
         android:label="piwigo_ng"
         android:usesCleartextTraffic="true"
+        android:requestLegacyExternalStorage="true"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"

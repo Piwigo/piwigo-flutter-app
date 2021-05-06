@@ -1,15 +1,15 @@
 
 
-class Category {
+class CategoryModel {
   String id;
   String name;
   String comment;
-  List<Category> children;
+  List<CategoryModel> children;
   String nbImages;
   String fullname;
   String status;
 
-  Category(this.id, this.name, {this.comment = "", this.nbImages = "0", this.fullname = "",
+  CategoryModel(this.id, this.name, {this.comment = "", this.nbImages = "0", this.fullname = "",
     this.status = "public"}) {
     children = [];
   }

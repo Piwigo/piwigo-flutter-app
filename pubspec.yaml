@@ -37,10 +37,15 @@ dependencies:
   cached_network_image: ^3.0.0
   chunked_uploader:
   confirm_dialog:
+  image_downloader:
 
   flutter_speed_dial:
   flutter_slidable:
   flutter_absolute_path:
+  path_provider:
+  permission_handler:
+  ext_storage:
+  flutter_local_notifications:
 
   multi_image_picker:
   provider:
