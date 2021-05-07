@@ -222,7 +222,12 @@ Future<dynamic> copyImage(int imageId, List<int> categories) async {
   }
 }
 
-Future<dynamic> editImage(int imageId, String name, String desc) async {
+Future<void> editImages(List<Map<String, dynamic>> images, List<int> tags, int level) async {
+  for(var image in images) {
+    await editImage(image['id'], image['name'], image['desc'], tags, level);
+  }
+}
+Future<dynamic> editImage(int imageId, String name, String desc, List<int> tags, int level) async {
   Map<String, String> queries = {
     "format": "json",
     "method": "pwg.images.setInfo",
@@ -231,7 +236,10 @@ Future<dynamic> editImage(int imageId, String name, String desc) async {
     "image_id": imageId,
     "name": name,
     "comment": desc,
+    "tag_ids": tags,
+    "level": level,
     "single_value_mode": "replace",
+    "multiple_value_mode": "append"
   });
   try {
     Response response = await API.dio.post(

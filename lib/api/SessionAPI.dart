@@ -101,14 +101,9 @@ void savePreferences(Map<String, dynamic> status, {
   API.prefs.setString("base_url", url);
 
   API.prefs.setString("default_album", "Root Album");
-  if(API.prefs.getInt("default_miniatures_size") == null) {
-    API.prefs.setInt("default_miniatures_size", 0);
-  }
-  if(API.prefs.getInt("sort") == null) {
-    API.prefs.setInt("sort", 0);
-  }
-  if(API.prefs.getInt("recent_albums") == null) {
-    API.prefs.setInt("recent_albums", 5);
-  }
+  if(API.prefs.getInt("default_miniatures_size") == null) API.prefs.setInt("default_miniatures_size", 0);
+  if(API.prefs.getInt("sort") == null) API.prefs.setInt("sort", 0);
+  if(API.prefs.getInt("recent_albums") == null) API.prefs.setInt("recent_albums", 5);
+  if(API.prefs.getBool("show_miniature_title") == null) API.prefs.setBool("show_miniature_title", false);
   saveStatus(status);
 }

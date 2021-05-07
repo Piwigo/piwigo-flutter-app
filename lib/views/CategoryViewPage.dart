@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:confirm_dialog/confirm_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -112,7 +113,24 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
             actions: [
               _isEditMode ? IconButton(
                 onPressed: () {
-                  print('Edit: ${_selectedItems.keys}');
+                  if(_selectedItems.length > 0) {
+                    print('Edit: ${_selectedItems.keys}');
+                    showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return EditImageSelectionDialog(
+                            catId: int.parse(widget.category),
+                            images: _selectedItems.values.toList(),
+                          );
+                        }
+                    ).whenComplete(() {
+                      print('Edited ${_selectedItems.length} images');
+                      setState(() {
+                        _selectedItems.clear();
+                        _isEditMode = false;
+                      });
+                    });
+                  }
                 },
                 icon: Icon(Icons.edit),
               ) : widget.isAdmin? IconButton(
@@ -124,7 +142,6 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
                 icon: Icon(Icons.touch_app),
               ) : Container(),
             ],
-
           ),
         ],
         body: FutureBuilder<List<dynamic>>(
@@ -219,15 +236,33 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
                                           fit: BoxFit.cover,
                                         ),
                                       ),
-                                      child: _isEditMode? Align(
-                                        alignment: Alignment.topRight,
-                                        child: Padding(
-                                          padding: EdgeInsets.all(5),
-                                          child: _isSelected(image['id']) ?
-                                          Icon(Icons.check_circle, color: _theme.floatingActionButtonTheme.backgroundColor) :
-                                          Icon(Icons.check_circle_outline, color: _theme.disabledColor),
-                                        ),
-                                      ) : Text(""),
+                                      child: Stack(
+                                        children: [
+                                          _isEditMode? Align(
+                                            alignment: Alignment.topRight,
+                                            child: Padding(
+                                              padding: EdgeInsets.all(5),
+                                              child: _isSelected(image['id']) ?
+                                              Icon(Icons.check_circle, color: _theme.floatingActionButtonTheme.backgroundColor) :
+                                              Icon(Icons.check_circle_outline, color: _theme.disabledColor),
+                                            ),
+                                          ) : Text(""),
+                                          API.prefs.getBool('show_miniature_title')? Align(
+                                            alignment: Alignment.bottomCenter,
+                                            child: Container(
+                                              width: double.infinity,
+                                              color: Color(0x80ffffff),
+                                              child: AutoSizeText('${image['name']}',
+                                                overflow: TextOverflow.ellipsis,
+                                                maxLines: 1,
+                                                style: TextStyle(fontSize: 12),
+                                                maxFontSize: 14, minFontSize: 7,
+                                                textAlign: TextAlign.center,
+                                              ),
+                                            ),
+                                          ) : Text(""),
+                                        ],
+                                      ),
                                     ),
                                   );
                                 },
@@ -376,27 +411,34 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
         switch (index) {
           case 0:
             if(_selectedItems.length > 0) {
-              print('Download ${_selectedItems.keys.toList()}');
+              if(await confirm(context,
+                title: Text('Confirm'),
+                content: Text('Download ${_selectedItems.keys.length} images ?', softWrap: true, maxLines: 3),
+                textOK: Text('Yes', style: TextStyle(color: Color(0xff479900))),
+                textCancel: Text('No', style: TextStyle(color: Theme.of(context).errorColor)),
+              )) {
+                print('Download ${_selectedItems.keys.toList()}');
 
-              List<dynamic> selection = [];
-              selection.addAll(_selectedItems.values.toList());
+                List<dynamic> selection = [];
+                selection.addAll(_selectedItems.values.toList());
 
-              setState(() {
-                _isEditMode = false;
-                _selectedItems.clear();
-              });
-              ScaffoldMessenger.of(context).hideCurrentSnackBar();
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                content: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text('Downloading selection'),
-                    CircularProgressIndicator(),
-                  ],
-                ),
-              ));
+                setState(() {
+                  _isEditMode = false;
+                  _selectedItems.clear();
+                });
+                ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('Downloading selection'),
+                      CircularProgressIndicator(),
+                    ],
+                  ),
+                ));
 
-              await downloadImages(selection);
+                await downloadImages(selection);
+              }
             }
             break;
           case 1:
@@ -406,13 +448,14 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
                 widget.category,
                 widget.title,
                 true,
-                    (item) async {
+                (item) async {
                   String result = await confirmMoveCopyImage(
                     context,
                     title: Text('Confirm'),
-                    content: Text(
-                        'Move selection to ${item.name} ?', softWrap: true,
-                        maxLines: 3),
+                    content: Text('Move selection to ${item.name} ?',
+                      softWrap: true,
+                      maxLines: 3
+                    ),
                   );
                   print(result);
                   if (result == 'move') {
@@ -440,23 +483,30 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
             break;
           case 2:
             if(_selectedItems.length > 0) {
-              print('Delete ${_selectedItems.keys}');
+              if(await confirm(context,
+                title: Text('Confirm'),
+                content: Text('Delete ${_selectedItems.keys.length} images ?', softWrap: true, maxLines: 3),
+                textOK: Text('Yes', style: TextStyle(color: Color(0xff479900))),
+                textCancel: Text('No', style: TextStyle(color: Theme.of(context).errorColor)),
+              )) {
+                print('Delete ${_selectedItems.keys}');
 
-              List<int> selection = [];
-              selection.addAll(_selectedItems.keys.toList());
+                List<int> selection = [];
+                selection.addAll(_selectedItems.keys.toList());
 
-              setState(() {
-                _isEditMode = false;
-                _selectedItems.clear();
-              });
+                setState(() {
+                  _isEditMode = false;
+                  _selectedItems.clear();
+                });
 
-              ScaffoldMessenger.of(context).hideCurrentSnackBar();
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                content: Text('Deleting selection'),
-              ));
+                ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: Text('Deleting selection'),
+                ));
 
-              await deleteImages(selection);
-              setState(() {});
+                await deleteImages(selection);
+                setState(() {});
+              }
             }
             break;
           default:

@@ -139,7 +139,6 @@ class _LoginViewPageState extends State<LoginViewPage> {
                   ),
                   Padding(
                     padding: EdgeInsets.all(5),
-
                     child: Container(
                       padding: EdgeInsets.symmetric(horizontal: 10),
                       decoration: BoxDecoration(
@@ -290,7 +289,7 @@ class _LoginViewPageState extends State<LoginViewPage> {
                           }
                         );
                       },
-                      child: _isLoading? CircularProgressIndicator(valueColor: new AlwaysStoppedAnimation<Color>(Colors.white)) : Text('Log in', style: TextStyle(fontSize: 16, color: Colors.white)),
+                      child: _isLoading? CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(Colors.white)) : Text('Log in', style: TextStyle(fontSize: 16, color: Colors.white)),
                     ),
                   ),
                 ],

@@ -134,7 +134,6 @@ class _SettingsPageState extends State<SettingsPage> {
                               child: Text('This server handles these file types: ${API.prefs.getString("file_types").replaceAll(",", ", ")}', textAlign: TextAlign.center, style: TextStyle(color: Colors.black, fontSize: 12)),
                             ),
                           ),
-
                         /*
                         // TODO: Implement albums options
                         SizedBox(height: 20),
@@ -257,7 +256,6 @@ class _SettingsPageState extends State<SettingsPage> {
                           ),
                         ),
                         */
-
                         SizedBox(height: 20),
                         Padding(
                           padding: EdgeInsets.only(left: 10, bottom: 3),
@@ -270,13 +268,24 @@ class _SettingsPageState extends State<SettingsPage> {
                           ),
                           child: Column(
                             children: [
+                              tableCell(
+                                Text('Show miniature title', style: TextStyle(color: Colors.black, fontSize: 16)),
+                                Switch(
+                                  value: API.prefs.getBool('show_miniature_title'),
+                                  onChanged: (bool) {
+                                    setState(() {
+                                      API.prefs.setBool('show_miniature_title', bool);
+                                    });
+                                  },
+                                ),
+                              ),
                               InkWell(
                                 onTap: () {
                                   // TODO: Implement change miniature size
                                   print('change image miniatures size');
                                 },
                                 child: tableCellEnd(
-                                  Text('Miniatures', style: TextStyle(color: Colors.black, fontSize: 16)),
+                                  Text('Miniature size', style: TextStyle(color: Colors.black, fontSize: 16)),
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.end,
                                     children: [

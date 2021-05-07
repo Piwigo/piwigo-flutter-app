@@ -46,6 +46,7 @@ dependencies:
   permission_handler:
   ext_storage:
   flutter_local_notifications:
+  auto_size_text:
 
   multi_image_picker:
   provider:
