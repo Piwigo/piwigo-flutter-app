@@ -31,13 +31,13 @@ SnackBar imagesMovedSnackBar(int images, String parentCategory) {
     content: Text("Moved $images images to $parentCategory", style: TextStyle(color: Color(0xff479900))),
   );
 }
-SnackBar imageCopiedSnackBar(String image, String parentCategory) {
+SnackBar imageAssignedSnackBar(String image, String parentCategory) {
   return SnackBar(
-    content: Text("Copied image $image to $parentCategory", style: TextStyle(color: Color(0xff479900))),
+    content: Text("Assigned image $image to $parentCategory", style: TextStyle(color: Color(0xff479900))),
   );
 }
-SnackBar imagesCopiedSnackBar(int images, String parentCategory) {
+SnackBar imagesAssignedSnackBar(int images, String parentCategory) {
   return SnackBar(
-    content: Text("Copied $images images to $parentCategory", style: TextStyle(color: Color(0xff479900))),
+    content: Text("Assigned $images images to $parentCategory", style: TextStyle(color: Color(0xff479900))),
   );
 }

@@ -104,6 +104,8 @@ void savePreferences(Map<String, dynamic> status, {
   if(API.prefs.getInt("default_miniatures_size") == null) API.prefs.setInt("default_miniatures_size", 0);
   if(API.prefs.getInt("sort") == null) API.prefs.setInt("sort", 0);
   if(API.prefs.getInt("recent_albums") == null) API.prefs.setInt("recent_albums", 5);
+  if(API.prefs.getDouble("portrait_image_count") == null) API.prefs.setDouble("portrait_image_count", 4);
+  if(API.prefs.getDouble("landscape_image_count") == null) API.prefs.setDouble("landscape_image_count", 6);
   if(API.prefs.getBool("show_miniature_title") == null) API.prefs.setBool("show_miniature_title", false);
   saveStatus(status);
 }

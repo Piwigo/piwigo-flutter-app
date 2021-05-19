@@ -96,9 +96,10 @@ class _SettingsPageState extends State<SettingsPage> {
                                 Text('Address', style: TextStyle(color: Colors.black, fontSize: 16)),
                                 Text('${API.prefs.getString('base_url')}', overflow: TextOverflow.ellipsis, softWrap: false, style: TextStyle(color: Colors.grey.shade600, fontSize: 14)),
                               ),
-                              tableCellEnd(
+                              tableCell(
                                 Text('Username', style: TextStyle(color: Colors.black, fontSize: 16)),
                                 Text('${API.prefs.getString('account_username')}', overflow: TextOverflow.ellipsis, softWrap: false, style: TextStyle(color: Colors.grey.shade600, fontSize: 14)),
+                                isEnd: true,
                               ),
                             ],
                           ),
@@ -279,38 +280,73 @@ class _SettingsPageState extends State<SettingsPage> {
                                   },
                                 ),
                               ),
-                              InkWell(
-                                onTap: () {
-                                  // TODO: Implement change miniature size
-                                  print('change image miniatures size');
-                                },
-                                child: tableCellEnd(
-                                  Text('Miniature size', style: TextStyle(color: Colors.black, fontSize: 16)),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    children: [
-                                      DropdownButton<String>(
-                                        value: _derivative == null ? API.prefs.getString('miniature_size') : _derivative,
-                                        style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
-                                        underline: Container(),
-                                        icon: Icon(Icons.chevron_right, color: Colors.grey.shade600, size: 20),
-                                        onChanged: (String newValue) {
-                                          setState(() {
-                                            _derivative = newValue;
-                                            API.prefs.setString('miniature_size', _derivative);
-                                          });
-                                        },
-                                        items: API.prefs.getStringList('available_sizes').map<DropdownMenuItem<String>>((
-                                            String value) {
-                                          return DropdownMenuItem<String>(
-                                            value: value,
-                                            child: Text(value),
-                                          );
-                                        }).toList(),
-                                      ),
-                                    ],
+                              tableCell(
+                                Text('Portrait image count', style: TextStyle(color: Colors.black, fontSize: 16)),
+                                Expanded(
+                                  child: Slider(
+                                    label: '${API.prefs.getDouble("portrait_image_count").ceil()}/6',
+                                    activeColor: Color(0xffff7700),
+                                    inactiveColor: Color(0xffeeeeee),
+                                    divisions: 5,
+                                    min: 1,
+                                    max: 6,
+                                    value: API.prefs.getDouble("portrait_image_count"),
+                                    onChanged: (i) {
+                                      setState(() {
+                                        print(i.ceilToDouble());
+                                        API.prefs.setDouble("portrait_image_count", i.ceilToDouble());
+                                      });
+                                    },
                                   ),
                                 ),
+                              ),
+                              tableCell(
+                                Text('Landscape image count', style: TextStyle(color: Colors.black, fontSize: 16)),
+                                Expanded(
+                                  child: Slider(
+                                    label: '${API.prefs.getDouble("landscape_image_count").ceil()}/10',
+                                    activeColor: Color(0xffff7700),
+                                    inactiveColor: Color(0xffeeeeee),
+                                    divisions: 6,
+                                    min: 4.0,
+                                    max: 10.0,
+                                    value: API.prefs.getDouble("landscape_image_count"),
+                                    onChanged: (i) {
+                                      setState(() {
+                                        print(i.ceilToDouble());
+                                        API.prefs.setDouble("landscape_image_count", i.ceilToDouble());
+                                      });
+                                    },
+                                  ),
+                                ),
+                              ),
+                              tableCell(
+                                Text('Miniature size', style: TextStyle(color: Colors.black, fontSize: 16)),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    DropdownButton<String>(
+                                      value: _derivative == null ? API.prefs.getString('miniature_size') : _derivative,
+                                      style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
+                                      underline: Container(),
+                                      icon: Icon(Icons.chevron_right, color: Colors.grey.shade600, size: 20),
+                                      onChanged: (String newValue) {
+                                        setState(() {
+                                          _derivative = newValue;
+                                          API.prefs.setString('miniature_size', _derivative);
+                                        });
+                                      },
+                                      items: API.prefs.getStringList('available_sizes').map<DropdownMenuItem<String>>((
+                                          String value) {
+                                        return DropdownMenuItem<String>(
+                                          value: value,
+                                          child: Text(value),
+                                        );
+                                      }).toList(),
+                                    ),
+                                  ],
+                                ),
+                                isEnd: true,
                               ),
                             ],
                           ),
@@ -328,13 +364,13 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  Widget tableCell(Widget left, Widget right) {
+  Widget tableCell(Widget left, Widget right, {List<Widget> options, bool isEnd = false}) {
     return Container(
       height: 40,
       margin: EdgeInsets.only(left: 10),
       padding: EdgeInsets.symmetric(horizontal: 10),
       decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(width: 0.5, color: Colors.grey)),
+        border: isEnd ? Border.all(width: 0, color: Colors.white) : Border(bottom: BorderSide(width: 0.5, color: Colors.grey)),
         color: Colors.white,
       ),
       child: Center(
@@ -343,26 +379,7 @@ class _SettingsPageState extends State<SettingsPage> {
           children: [
             left,
             right,
-          ],
-        ),
-      ),
-    );
-  }
-  Widget tableCellEnd(Widget left, Widget right) {
-    return Container(
-      height: 40,
-      margin: EdgeInsets.only(left: 10),
-      padding: EdgeInsets.symmetric(horizontal: 10),
-      decoration: BoxDecoration(
-        color: Colors.white,
-      ),
-      child: Center(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            left,
-            right,
-          ],
+          ] + (options ?? []),
         ),
       ),
     );

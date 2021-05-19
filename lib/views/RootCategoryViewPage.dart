@@ -1,18 +1,14 @@
-import 'package:confirm_dialog/confirm_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
 
 import 'dart:async';
 
 import 'package:piwigo_ng/api/API.dart';
 import 'package:piwigo_ng/api/CategoryAPI.dart';
-import 'package:piwigo_ng/services/MoveAlbumService.dart';
+import 'package:piwigo_ng/services/OrientationService.dart';
 import 'package:piwigo_ng/ui/Dialogs.dart';
 import 'package:piwigo_ng/ui/ListItems.dart';
-import 'package:piwigo_ng/ui/SnackBars.dart';
 import 'package:piwigo_ng/views/SettingsPage.dart';
-import 'package:piwigo_ng/views/CategoryViewPage.dart';
 import 'package:piwigo_ng/views/UploadGalleryViewPage.dart';
 
 class RootCategoryViewPage extends StatefulWidget {
@@ -152,12 +148,42 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
                     child: SingleChildScrollView(
                       child: Column(
                         children: [
+                          /*
                           ListView.builder(
                             itemCount: albums.data.length,
                             shrinkWrap: true,
                             physics: NeverScrollableScrollPhysics(),
                             itemBuilder: (context, index) {
                               return albumListItem(context, albums.data[index], widget.isAdmin, (message) {
+                                setState(() {
+                                  print('$message');
+                                });
+                              });
+                            },
+                          ),
+
+                           */
+                          GridView.builder(
+                            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: isPortrait(context)? 1 : 2,
+                              mainAxisSpacing: 3,
+                              crossAxisSpacing: 5,
+                              childAspectRatio: albumGridAspectRatio(context),
+                            ),
+                            padding: EdgeInsets.symmetric(horizontal: 5),
+                            itemCount: albums.data.length,
+                            shrinkWrap: true,
+                            physics: NeverScrollableScrollPhysics(),
+                            itemBuilder: (BuildContext context, int index) {
+                              var album = albums.data[index];
+                              if (isPortrait(context) || index%2 == 0) {
+                                return albumListItem(context, album, widget.isAdmin, (message) {
+                                  setState(() {
+                                    print('$message');
+                                  });
+                                });
+                              }
+                              return albumListItemRight(context, album, widget.isAdmin, (message) {
                                 setState(() {
                                   print('$message');
                                 });

@@ -10,6 +10,7 @@ import 'package:piwigo_ng/api/API.dart';
 import 'package:piwigo_ng/api/CategoryAPI.dart';
 import 'package:piwigo_ng/api/ImageAPI.dart';
 import 'package:piwigo_ng/services/MoveAlbumService.dart';
+import 'package:piwigo_ng/services/OrientationService.dart';
 import 'package:piwigo_ng/ui/Dialogs.dart';
 import 'package:piwigo_ng/ui/ListItems.dart';
 import 'package:piwigo_ng/ui/SnackBars.dart';
@@ -61,14 +62,14 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
     super.dispose();
   }
 
-
-
   bool _isSelected(int id) {
     return _selectedItems.keys.contains(id);
   }
+
   int _selectedPhotos() {
     return _selectedItems.length;
   }
+
   String albumSubCount(dynamic album) {
     String displayString = '${album["total_nb_images"]} ${album["total_nb_images"] == 1 ? 'photo' : 'photos'}';
     if(album["nb_categories"] > 0) {
@@ -76,6 +77,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
     }
     return displayString;
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -157,146 +159,201 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
                 (category["id"].toString() == widget.category)
               );
               return FutureBuilder<List<dynamic>>(
-                  future: fetchImages(widget.category, 0), // Images of the list
-                  builder: (BuildContext context, AsyncSnapshot images) {
-                    if (images.hasData) {
-                      if (imageList.isEmpty || _page == 0) {
-                        imageList.clear();
-                        imageList.addAll(images.data);
-                      }
-                      return RefreshIndicator(
-                        displacement: 20,
-                        onRefresh: () {
-                          setState(() {
-                            _page = 0;
-                          });
-                          return Future.delayed(Duration(milliseconds: 500));
-                        },
-                        child: SingleChildScrollView(
-                          child: Column(
-                            children: [
-                              ListView.builder(
-                                itemCount: albums.data.length,
-                                shrinkWrap: true,
-                                physics: NeverScrollableScrollPhysics(),
-                                itemBuilder: (BuildContext context, int index) {
-                                  return albumListItem(context, albums.data[index], widget.isAdmin, (message) {
+                future: fetchImages(widget.category, 0), // Images of the list
+                builder: (BuildContext context, AsyncSnapshot images) {
+                  if (images.hasData) {
+                    if (imageList.isEmpty || _page == 0) {
+                      imageList.clear();
+                      imageList.addAll(images.data);
+                    }
+                    return RefreshIndicator(
+                      displacement: 20,
+                      onRefresh: () {
+                        setState(() {
+                          _page = 0;
+                        });
+                        return Future.delayed(Duration(milliseconds: 500));
+                      },
+                      child: SingleChildScrollView(
+                        child: Column(
+                          children: [
+                            /*
+                            ListView.builder(
+                              itemCount: albums.data.length,
+                              shrinkWrap: true,
+                              physics: NeverScrollableScrollPhysics(),
+                              itemBuilder: (BuildContext context, int index) {
+                                return albumListItem(context, albums.data[index], widget.isAdmin, (message) {
+                                  setState(() {
+                                    print('$message');
+                                  });
+                                });
+                              },
+                            ),
+                             */
+                            albums.data.length > 0 ?
+                            GridView.builder(
+                              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: isPortrait(context)? 1 : 2,
+                                mainAxisSpacing: 3,
+                                crossAxisSpacing: 5,
+                                childAspectRatio: albumGridAspectRatio(context),
+                              ),
+                              padding: EdgeInsets.symmetric(horizontal: 5),
+                              itemCount: albums.data.length,
+                              shrinkWrap: true,
+                              physics: NeverScrollableScrollPhysics(),
+                              itemBuilder: (BuildContext context, int index) {
+                                var album = albums.data[index];
+                                if (isPortrait(context) || index%2 == 0) {
+                                  return albumListItem(context, album, widget.isAdmin, (message) {
                                     setState(() {
                                       print('$message');
                                     });
                                   });
-                                },
+                                }
+                                return albumListItemRight(context, album, widget.isAdmin, (message) {
+                                  setState(() {
+                                    print('$message');
+                                  });
+                                });
+                              },
+                            ) : Text(''),
+                            imageList.length > 0 ?
+                            GridView.builder(
+                              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: imageCrossAxisCount(context),
+                                mainAxisSpacing: 3.0,
+                                crossAxisSpacing: 3.0,
                               ),
-                              imageList.length > 0 ?
-                              GridView.builder(
-                                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 4,
-                                  mainAxisSpacing: 3.0,
-                                  crossAxisSpacing: 3.0,
-                                ),
-                                padding: EdgeInsets.symmetric(horizontal: 5),
-                                itemCount: imageList.length,
-                                shrinkWrap: true,
-                                physics: NeverScrollableScrollPhysics(),
-                                itemBuilder: (BuildContext context, int index) {
-                                  var image = imageList[index];
-                                  return InkWell(
-                                    onLongPress: _isEditMode ? () {
-                                      setState(() {
-                                        _isSelected(image['id']) ?
-                                        _selectedItems.remove(image['id']) :
-                                        _selectedItems.putIfAbsent(image['id'], () => image);
-                                      });
-                                    } : () {
-                                      setState(() {
-                                        _isEditMode = true;
-                                        _selectedItems.putIfAbsent(image['id'], () => image);
-                                      });
-                                    },
-                                    onTap: () {
-                                      _isEditMode ?
-                                      setState(() {
-                                        _isSelected(image['id']) ?
-                                        _selectedItems.remove(image['id']) :
-                                        _selectedItems.putIfAbsent(image['id'], () => image);
-                                      }) :
-                                      Navigator.of(context).push(
-                                        MaterialPageRoute(builder: (context) => ImageViewPage(
-                                          images: imageList,
-                                          index: index,
-                                          isAdmin: widget.isAdmin,
-                                        )),
-                                      );
-                                    },
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        image: DecorationImage(
-                                          image: Image.network(imageList[index]["derivatives"][API.prefs.getString('miniature_size')]["url"]).image,
-                                          fit: BoxFit.cover,
-                                        ),
+                              padding: EdgeInsets.symmetric(horizontal: 5),
+                              itemCount: imageList.length,
+                              shrinkWrap: true,
+                              physics: NeverScrollableScrollPhysics(),
+                              itemBuilder: (BuildContext context, int index) {
+                                var image = imageList[index];
+                                return InkWell(
+                                  onLongPress: _isEditMode ? () {
+                                    setState(() {
+                                      _isSelected(image['id']) ?
+                                      _selectedItems.remove(image['id']) :
+                                      _selectedItems.putIfAbsent(image['id'], () => image);
+                                    });
+                                  } : widget.isAdmin ? () {
+                                    setState(() {
+                                      _isEditMode = true;
+                                      _selectedItems.putIfAbsent(image['id'], () => image);
+                                    });
+                                  } : () {},
+                                  onTap: () {
+                                    _isEditMode ?
+                                    setState(() {
+                                      _isSelected(image['id']) ?
+                                      _selectedItems.remove(image['id']) :
+                                      _selectedItems.putIfAbsent(image['id'], () => image);
+                                    }) :
+                                    Navigator.of(context).push(
+                                      MaterialPageRoute(builder: (context) => ImageViewPage(
+                                        images: imageList,
+                                        index: index,
+                                        isAdmin: widget.isAdmin,
+                                        category: widget.category,
+                                      )),
+                                    ).whenComplete(() {
+                                      setState(() {});
+                                    });
+                                  },
+                                  child: AnimatedContainer(
+                                    duration: Duration(milliseconds: 200),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      border: _isSelected(image['id']) ?
+                                        Border.all(width: 5, color: _theme.accentColor) :
+                                        Border.all(width: 0, color: Colors.white),
+                                      /*
+                                      image: DecorationImage(
+                                        image: Image.network(imageList[index]["derivatives"][API.prefs.getString('miniature_size')]["url"]).image,
+                                        fit: BoxFit.cover,
                                       ),
-                                      child: Stack(
-                                        children: [
-                                          _isEditMode? Align(
-                                            alignment: Alignment.topRight,
-                                            child: Padding(
-                                              padding: EdgeInsets.all(5),
-                                              child: _isSelected(image['id']) ?
+                                       */
+                                    ),
+                                    child: Stack(
+                                      alignment: Alignment.center,
+                                      children: [
+                                        Container(
+                                          width: double.infinity,
+                                          height: double.infinity,
+                                          child: Image.network(imageList[index]["derivatives"][API.prefs.getString('miniature_size')]["url"],
+                                            fit: BoxFit.cover,
+                                          ),
+                                        ),
+                                        _isSelected(image['id']) ? Container(
+                                          width: double.infinity,
+                                          height: double.infinity,
+                                          color: Color(0x80000000),
+                                        ) : Text(""),
+                                        /*
+                                        _isEditMode? Align(
+                                          alignment: Alignment.topRight,
+                                          child: Padding(
+                                            padding: EdgeInsets.all(5),
+                                            child: _isSelected(image['id']) ?
                                               Icon(Icons.check_circle, color: _theme.floatingActionButtonTheme.backgroundColor) :
                                               Icon(Icons.check_circle_outline, color: _theme.disabledColor),
+                                          ),
+                                        ) : Text(""),
+
+                                         */
+                                        API.prefs.getBool('show_miniature_title')? Align(
+                                          alignment: Alignment.bottomCenter,
+                                          child: Container(
+                                            width: double.infinity,
+                                            color: Color(0x80ffffff),
+                                            child: AutoSizeText('${image['name']}',
+                                              overflow: TextOverflow.ellipsis,
+                                              maxLines: 1,
+                                              style: TextStyle(fontSize: 12),
+                                              maxFontSize: 14, minFontSize: 7,
+                                              textAlign: TextAlign.center,
                                             ),
-                                          ) : Text(""),
-                                          API.prefs.getBool('show_miniature_title')? Align(
-                                            alignment: Alignment.bottomCenter,
-                                            child: Container(
-                                              width: double.infinity,
-                                              color: Color(0x80ffffff),
-                                              child: AutoSizeText('${image['name']}',
-                                                overflow: TextOverflow.ellipsis,
-                                                maxLines: 1,
-                                                style: TextStyle(fontSize: 12),
-                                                maxFontSize: 14, minFontSize: 7,
-                                                textAlign: TextAlign.center,
-                                              ),
-                                            ),
-                                          ) : Text(""),
-                                        ],
-                                      ),
+                                          ),
+                                        ) : Text(""),
+                                      ],
                                     ),
-                                  );
-                                },
-                              ) : Text(''),
-                              nbImages > (_page+1)*100 ? GestureDetector(
-                                onTap: () {
-                                  showMore();
-                                },
-                                child: Padding(
-                                  padding: EdgeInsets.all(10),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text('Show ${nbImages-(_page+1*100)} more ...', style: TextStyle(fontSize: 14, color: _theme.disabledColor)),
-                                    ],
                                   ),
+                                );
+                              },
+                            ) : Text(''),
+                            nbImages > (_page+1)*100 ? GestureDetector(
+                              onTap: () {
+                                showMore();
+                              },
+                              child: Padding(
+                                padding: EdgeInsets.all(10),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text('Show ${nbImages-((_page+1)*100)} more ...', style: TextStyle(fontSize: 14, color: _theme.disabledColor)),
+                                  ],
                                 ),
-                              ) : Text(''),
-                              Center(
-                                child: Container(
-                                  padding: EdgeInsets.all(10),
-                                  child: Text('$nbImages ${nbImages == 1 ? 'photo' : 'photos'}', style: TextStyle(fontSize: 20, color: _theme.textTheme.bodyText2.color, fontWeight: FontWeight.w300)),
-                                ),
-                              )
-                            ],
-                          ),
+                              ),
+                            ) : Text(''),
+                            Center(
+                              child: Container(
+                                padding: EdgeInsets.all(10),
+                                child: Text('$nbImages ${nbImages == 1 ? 'photo' : 'photos'}', style: TextStyle(fontSize: 20, color: _theme.textTheme.bodyText2.color, fontWeight: FontWeight.w300)),
+                              ),
+                            )
+                          ],
                         ),
-                      );
-                    } else {
-                      return Center(
-                        child: CircularProgressIndicator(),
-                      );
-                    }
+                      ),
+                    );
+                  } else {
+                    return Center(
+                      child: CircularProgressIndicator(),
+                    );
                   }
+                }
               );
             } else {
               return Center(
@@ -352,6 +409,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
       shape: CircleBorder(),
       children: [
         SpeedDialChild(
+          labelWidget: Text('New Album', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: _theme.buttonColor)),
           child: Icon(Icons.create_new_folder),
           backgroundColor: _theme.floatingActionButtonTheme.backgroundColor,
           foregroundColor: _theme.floatingActionButtonTheme.foregroundColor,
@@ -369,36 +427,37 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
           },
         ),
         SpeedDialChild(
-            child: Icon(Icons.image),
-            backgroundColor: _theme.floatingActionButtonTheme.backgroundColor,
-            foregroundColor: _theme.floatingActionButtonTheme.foregroundColor,
-            onTap: () async {
-              try {
-                var imageList = await MultiImagePicker.pickImages(
-                  maxImages: 100,
-                  enableCamera: true,
-                  cupertinoOptions: CupertinoOptions(takePhotoIcon: "chat"),
-                  materialOptions: MaterialOptions(
-                    actionBarTitle: "Piwigo",
-                    allViewTitle: "All Photos",
-                    actionBarColor: "#ffff7700",
-                    actionBarTitleColor: "#ffeeeeee",
-                    lightStatusBar: false,
-                    statusBarColor: '#ffab40',
-                    startInAllView: false,
-                    selectCircleStrokeColor: "#ffffff",
-                    selectionLimitReachedText: "You can't select any more.",
-                  ),
-                );
-                if(imageList.isNotEmpty) {
-                  Navigator.push(context, MaterialPageRoute(
-                      builder: (context) => UploadGalleryViewPage(imageData: imageList, category: widget.category)
-                  ));
-                }
-              } catch (e) {
-                print('Dio error ${e.toString()}');
+          labelWidget: Text('Upload File', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: _theme.buttonColor)),
+          child: Icon(Icons.add_a_photo),
+          backgroundColor: _theme.floatingActionButtonTheme.backgroundColor,
+          foregroundColor: _theme.floatingActionButtonTheme.foregroundColor,
+          onTap: () async {
+            try {
+              var imageList = await MultiImagePicker.pickImages(
+                maxImages: 100,
+                enableCamera: true,
+                cupertinoOptions: CupertinoOptions(takePhotoIcon: "chat"),
+                materialOptions: MaterialOptions(
+                  actionBarTitle: "Piwigo",
+                  allViewTitle: "All Photos",
+                  actionBarColor: "#ffff7700",
+                  actionBarTitleColor: "#ffeeeeee",
+                  lightStatusBar: false,
+                  statusBarColor: '#ffab40',
+                  startInAllView: false,
+                  selectCircleStrokeColor: "#ffffff",
+                  selectionLimitReachedText: "You can't select any more.",
+                ),
+              );
+              if(imageList.isNotEmpty) {
+                Navigator.push(context, MaterialPageRoute(
+                    builder: (context) => UploadGalleryViewPage(imageData: imageList, category: widget.category)
+                ));
               }
+            } catch (e) {
+              print('Dio error ${e.toString()}');
             }
+          }
         )
       ],
     );
@@ -449,7 +508,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
                 widget.title,
                 true,
                 (item) async {
-                  String result = await confirmMoveCopyImage(
+                  String result = await confirmMoveAssignImage(
                     context,
                     title: Text('Confirm'),
                     content: Text('Move selection to ${item.name} ?',
@@ -465,12 +524,12 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
                     ScaffoldMessenger.of(context).showSnackBar(
                         imagesMovedSnackBar(_selectedItems.length, item.name));
                     Navigator.of(context).pop();
-                  } else if (result == 'copy') {
+                  } else if (result == 'assign') {
                     print('Move selection to ${item.id}');
                     await copyImages(
                         _selectedItems.values.toList(), int.parse(item.id));
                     ScaffoldMessenger.of(context).showSnackBar(
-                        imagesCopiedSnackBar(_selectedItems.length, item.name));
+                        imagesAssignedSnackBar(_selectedItems.length, item.name));
                     Navigator.of(context).pop();
                   }
                 },

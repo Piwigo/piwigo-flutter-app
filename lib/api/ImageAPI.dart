@@ -55,7 +55,7 @@ Future<bool> _requestPermissions() async {
 }
 Future<String> _getDownloadPath() async {
   if (Platform.isAndroid) {
-    return ExtStorage.getExternalStoragePublicDirectory(ExtStorage.DIRECTORY_DOWNLOADS);
+    return ExtStorage.getExternalStoragePublicDirectory(ExtStorage.DIRECTORY_PICTURES);
   }
   return (await getApplicationDocumentsDirectory()).path;
 }
@@ -78,6 +78,27 @@ Future<void> _showNotification(Map<String, dynamic> downloadStatus) async {
   );
 }
 
+Future<void> downloadSingleImage(dynamic image) async {
+  final isPermissionStatusGranted = await _requestPermissions();
+  final dirPath = await _getDownloadPath();
+
+  Map<String, dynamic> result = {
+    'isSuccess': true,
+    'filePath': null,
+    'error': null,
+  };
+
+  if (isPermissionStatusGranted) {
+    await downloadImage(
+      dirPath,
+      image['element_url'],
+      image['file'],
+    );
+    await _showNotification(result);
+  } else {
+    print('No storage Permission');
+  }
+}
 Future<void> downloadImages(List<dynamic> images) async {
   final isPermissionStatusGranted = await _requestPermissions();
   final dirPath = await _getDownloadPath();
@@ -94,7 +115,6 @@ Future<void> downloadImages(List<dynamic> images) async {
         dirPath,
         image['element_url'],
         image['file'],
-        images.indexOf(image)
       );
     });
     await _showNotification(result);
@@ -102,7 +122,7 @@ Future<void> downloadImages(List<dynamic> images) async {
     print('No storage Permission');
   }
 }
-Future<dynamic> downloadImage(String dirPath, String url, String file, int index) async {
+Future<dynamic> downloadImage(String dirPath, String url, String file) async {
 
   var localPath = path.join(dirPath, file);
   try {

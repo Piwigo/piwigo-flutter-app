@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:piwigo_ng/services/theme_provider.dart';
+import 'package:piwigo_ng/services/ThemeProvider.dart';
 import 'package:piwigo_ng/views/RootCategoryViewPage.dart';
 import 'package:piwigo_ng/api/API.dart';
 import 'package:provider/provider.dart';

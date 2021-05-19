@@ -6,6 +6,7 @@ import 'package:piwigo_ng/api/CategoryAPI.dart';
 import 'package:piwigo_ng/api/ImageAPI.dart';
 import 'package:piwigo_ng/api/TagAPI.dart';
 import 'package:piwigo_ng/constants/SettingsConstants.dart';
+import 'package:piwigo_ng/services/OrientationService.dart';
 
 import 'SnackBars.dart';
 
@@ -135,7 +136,7 @@ Widget createCategoryAlert(BuildContext context, String catId) {
   );
 }
 
-Future<String> confirmMoveCopyImage(
+Future<String> confirmMoveAssignImage(
     BuildContext context, {
       Widget title,
       Widget content,
@@ -156,8 +157,8 @@ Future<String> confirmMoveCopyImage(
             onPressed: () => Navigator.pop(context, 'move'),
           ),
           TextButton(
-            child: Text('copy', style: TextStyle(color: Theme.of(context).accentColor)),
-            onPressed: () => Navigator.pop(context, 'copy'),
+            child: Text('assign', style: TextStyle(color: Theme.of(context).accentColor)),
+            onPressed: () => Navigator.pop(context, 'assign'),
           ),
         ],
       ),
@@ -188,6 +189,7 @@ class _EditCategoryDialogState extends State<EditCategoryDialog> {
   TextEditingController _addAlbumDescController;
   bool _isPrivate = false;
 
+
   @override
   void initState() {
     super.initState();
@@ -201,79 +203,166 @@ class _EditCategoryDialogState extends State<EditCategoryDialog> {
     ThemeData _theme = Theme.of(context);
 
     return AlertDialog(
-      insetPadding: EdgeInsets.all(10),
-      actions: [
-        InkResponse(
-          onTap: () {
-            Navigator.of(context).pop();
-          },
-          child: CircleAvatar(
-            child: Icon(Icons.close, color: _theme.errorColor),
-            backgroundColor: Colors.transparent,
-          ),
-        ),
-      ],
-      title: Text("Album edition"),
+      contentPadding: EdgeInsets.all(5.0),
       content: Container(
         child: SingleChildScrollView(
           child: Form(
             key: _formKey,
-            child: Column(
+            child:  Column(
               children: <Widget>[
-                Padding(
-                  padding: EdgeInsets.all(5),
-                  child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 10),
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        color: _theme.inputDecorationTheme.fillColor
-                    ),
-                    child: TextFormField(
-                      maxLines: 1,
-                      controller: _addAlbumNameController,
-                      style: TextStyle(fontSize: 14, color: Color(0xff5c5c5c)),
-                      textAlignVertical: TextAlignVertical.top,
-                      decoration: InputDecoration(
-                        contentPadding: EdgeInsets.zero,
-                        border: InputBorder.none,
-                        hintText: 'album name',
-                        hintStyle: TextStyle(fontSize: 14,
-                            fontStyle: FontStyle.italic,
-                            color: _theme.disabledColor),
+                Stack(
+                  children: [
+                    Align(
+                      alignment: Alignment.topLeft,
+                      child: Tooltip(
+                        waitDuration: Duration.zero,
+                        message: 'Change the name, description and privacy of this album "${widget.catName}',
+                        child: CircleAvatar(
+                          child: Icon(Icons.info_outline, color: _theme.iconTheme.color),
+                          backgroundColor: Colors.transparent,
+                        ),
                       ),
-                      validator: (value) {
-                        if (value.isEmpty) {
-                          return 'Please enter a name';
-                        }
-                        return null;
-                      },
                     ),
-                  ),
+                    Container(
+                      padding: EdgeInsets.all(5.0),
+                      alignment: Alignment.center,
+                      child: Text("Album edition", style: _theme.textTheme.headline6),
+                    ),
+                    Align(
+                      alignment: Alignment.topRight,
+                      child: InkResponse(
+                        onTap: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: CircleAvatar(
+                          child: Icon(Icons.close, color: _theme.errorColor),
+                          backgroundColor: Colors.transparent,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                Padding(
-                  padding: EdgeInsets.all(5),
-                  child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 10),
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        color: _theme.inputDecorationTheme.fillColor
-                    ),
-                    child: TextFormField(
-                      minLines: 1,
-                      maxLines: 3,
-                      controller: _addAlbumDescController,
-                      style: TextStyle(fontSize: 14, color: Color(0xff5c5c5c)),
-                      textAlignVertical: TextAlignVertical.top,
-                      decoration: InputDecoration(
-                        contentPadding: EdgeInsets.zero,
-                        border: InputBorder.none,
-                        hintText: 'description (optional)',
-                        hintStyle: TextStyle(fontSize: 14,
-                            fontStyle: FontStyle.italic,
-                            color: _theme.disabledColor),
+                isPortrait(context) ?
+                Column(
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.all(5),
+                      child: Container(
+                        padding: EdgeInsets.symmetric(horizontal: 10),
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: _theme.inputDecorationTheme.fillColor
+                        ),
+                        child: TextFormField(
+                          maxLines: 1,
+                          controller: _addAlbumNameController,
+                          style: TextStyle(fontSize: 14, color: Color(0xff5c5c5c)),
+                          textAlignVertical: TextAlignVertical.top,
+                          decoration: InputDecoration(
+                            contentPadding: EdgeInsets.zero,
+                            border: InputBorder.none,
+                            hintText: 'album name',
+                            hintStyle: TextStyle(fontSize: 14,
+                                fontStyle: FontStyle.italic,
+                                color: _theme.disabledColor),
+                          ),
+                          validator: (value) {
+                            if (value.isEmpty) {
+                              return 'Please enter a name';
+                            }
+                            return null;
+                          },
+                        ),
                       ),
                     ),
-                  ),
+                    Padding(
+                      padding: EdgeInsets.all(5),
+                      child: Container(
+                        padding: EdgeInsets.symmetric(horizontal: 10),
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: _theme.inputDecorationTheme.fillColor
+                        ),
+                        child: TextFormField(
+                          minLines: 1,
+                          maxLines: 3,
+                          controller: _addAlbumDescController,
+                          style: TextStyle(fontSize: 14, color: Color(0xff5c5c5c)),
+                          textAlignVertical: TextAlignVertical.top,
+                          decoration: InputDecoration(
+                            contentPadding: EdgeInsets.zero,
+                            border: InputBorder.none,
+                            hintText: 'description (optional)',
+                            hintStyle: TextStyle(fontSize: 14,
+                                fontStyle: FontStyle.italic,
+                                color: _theme.disabledColor),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ) : Row(
+                  children: [
+                    Flexible(
+                      child: Padding(
+                        padding: EdgeInsets.all(5),
+                        child: Container(
+                          padding: EdgeInsets.symmetric(horizontal: 10),
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              color: _theme.inputDecorationTheme.fillColor
+                          ),
+                          child: TextFormField(
+                            maxLines: 1,
+                            controller: _addAlbumNameController,
+                            style: TextStyle(fontSize: 14, color: Color(0xff5c5c5c)),
+                            textAlignVertical: TextAlignVertical.top,
+                            decoration: InputDecoration(
+                              contentPadding: EdgeInsets.zero,
+                              border: InputBorder.none,
+                              hintText: 'album name',
+                              hintStyle: TextStyle(fontSize: 14,
+                                  fontStyle: FontStyle.italic,
+                                  color: _theme.disabledColor),
+                            ),
+                            validator: (value) {
+                              if (value.isEmpty) {
+                                return 'Please enter a name';
+                              }
+                              return null;
+                            },
+                          ),
+                        ),
+                      ),
+                    ),
+                    Flexible(
+                      child: Padding(
+                        padding: EdgeInsets.all(5),
+                        child: Container(
+                          padding: EdgeInsets.symmetric(horizontal: 10),
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              color: _theme.inputDecorationTheme.fillColor
+                          ),
+                          child: TextFormField(
+                            minLines: 1,
+                            maxLines: 3,
+                            controller: _addAlbumDescController,
+                            style: TextStyle(fontSize: 14, color: Color(0xff5c5c5c)),
+                            textAlignVertical: TextAlignVertical.top,
+                            decoration: InputDecoration(
+                              contentPadding: EdgeInsets.zero,
+                              border: InputBorder.none,
+                              hintText: 'description (optional)',
+                              hintStyle: TextStyle(fontSize: 14,
+                                  fontStyle: FontStyle.italic,
+                                  color: _theme.disabledColor),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
                 Padding(
                   padding: EdgeInsets.all(5),
@@ -365,6 +454,7 @@ class _EditImageSelectionDialogState extends State<EditImageSelectionDialog> {
   int _page = 0;
   int _privacyLevel = 0;
   bool _isLoading = false;
+  PageController _pageController = PageController();
 
   @override
   void initState() {
@@ -411,23 +501,14 @@ class _EditImageSelectionDialogState extends State<EditImageSelectionDialog> {
   Widget build(BuildContext context) {
     ThemeData _theme = Theme.of(context);
     Size screenSize = MediaQuery.of(context).size;
+    if(isPortrait(context)) {
+      _pageController = PageController();
+    } else {
+      print('land');
+      _pageController = PageController(viewportFraction: 2/3);
+    }
     return AlertDialog(
       insetPadding: EdgeInsets.all(10),
-      title: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text("Edit selection", overflow: TextOverflow.ellipsis),
-          InkResponse(
-            onTap: () {
-              Navigator.of(context).pop();
-            },
-            child: CircleAvatar(
-              child: Icon(Icons.close, color: _theme.errorColor),
-              backgroundColor: Colors.transparent,
-            ),
-          ),
-        ],
-      ),
       content: Container(
         width: screenSize.width*3/4,
         child: SingleChildScrollView(
@@ -435,9 +516,31 @@ class _EditImageSelectionDialogState extends State<EditImageSelectionDialog> {
             key: _formKey,
             child: Column(
               children: <Widget>[
+                Stack(
+                  children: [
+                    Align(
+                      alignment: Alignment.center,
+                      child: Text("Edit selection", overflow: TextOverflow.ellipsis, style: _theme.textTheme.headline6),
+                    ),
+                    Align(
+                      alignment: Alignment.topRight,
+                      child: InkResponse(
+                        onTap: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: CircleAvatar(
+                          child: Icon(Icons.close, color: _theme.errorColor),
+                          backgroundColor: Colors.transparent,
+                        ),
+                      ),
+                    ),
+                    
+                  ],
+                ),
                 Container(
                   height: 160,
                   child: PageView(
+                    controller: _pageController,
                     onPageChanged: (int) {
                       setState(() {
                         _page = int;
@@ -711,7 +814,7 @@ class _EditImageSelectionDialogState extends State<EditImageSelectionDialog> {
                                 blurRadius: 3.0,
                                 spreadRadius: -1.0,
                                 offset: Offset(0.0, 3.0),
-                              )
+                              ),
                             ],
                           ),
                           child: SingleChildScrollView(
