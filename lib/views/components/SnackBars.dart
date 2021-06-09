@@ -9,7 +9,8 @@ SnackBar albumAddedSnackBar(String addedCategory) {
   return SnackBar(
     content: Text("Created album $addedCategory", style: TextStyle(color: Color(0xff479900))),
   );
-}SnackBar albumEditedSnackBar(String editedCategory) {
+}
+SnackBar albumEditedSnackBar(String editedCategory) {
   return SnackBar(
     content: Text("Edited album $editedCategory", style: TextStyle(color: Color(0xff479900))),
   );
@@ -39,5 +40,21 @@ SnackBar imageAssignedSnackBar(String image, String parentCategory) {
 SnackBar imagesAssignedSnackBar(int images, String parentCategory) {
   return SnackBar(
     content: Text("Assigned $images images to $parentCategory", style: TextStyle(color: Color(0xff479900))),
+  );
+}
+SnackBar imageEditedSnackBar(String image) {
+  return SnackBar(
+    content: Text("Edited $image", style: TextStyle(color: Color(0xff479900))),
+  );
+}
+SnackBar imagesEditedSnackBar(int images) {
+  return SnackBar(
+    content: Text("Edited $images images", style: TextStyle(color: Color(0xff479900))),
+  );
+}
+
+SnackBar errorSnackBar(BuildContext context, String message) {
+  return SnackBar(
+    content: Text('$message', style: TextStyle(color: Theme.of(context).errorColor)),
   );
 }

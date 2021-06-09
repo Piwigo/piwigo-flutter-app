@@ -80,10 +80,17 @@ Widget albumListItem(BuildContext context, dynamic album, bool isAdmin, Function
                       textOK: Text('Yes', style: TextStyle(color: Color(0xff479900))),
                       textCancel: Text('No', style: TextStyle(color: Theme.of(context).errorColor)),
                     )) {
-                      print('Move ${album['id']} to ${item.id}');
                       var result = await moveCategory(album['id'], item.id);
                       print(result);
-                      ScaffoldMessenger.of(context).showSnackBar(albumMovedSnackBar(album['name'], item.name));
+                      if(result['stat'] == 'fail') {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                            errorSnackBar(context, result['result'])
+                        );
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                            albumMovedSnackBar(album['name'], item.name)
+                        );
+                      }
                       Navigator.of(context).pop();
                     }
                   },
@@ -112,8 +119,16 @@ Widget albumListItem(BuildContext context, dynamic album, bool isAdmin, Function
                   textCancel: Text('No', style: TextStyle(color: _theme.errorColor)),
                 )) {
                   var result = await deleteCategory(album['id'].toString());
-                  ScaffoldMessenger.of(context).showSnackBar(albumDeletedSnackBar(album["name"]));
-                  onRefresh('Deleted ${album['name']} : $result');
+                  if(result['stat'] == 'fail') {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                        errorSnackBar(context, result['result'])
+                    );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                        albumDeletedSnackBar(album["name"])
+                    );
+                    onRefresh('Deleted ${album['name']} : $result');
+                  }
                 }
               },
               closeOnTap: true,
@@ -209,8 +224,16 @@ Widget albumListItemRight(BuildContext context, dynamic album, bool isAdmin, Fun
                   textCancel: Text('No', style: TextStyle(color: _theme.errorColor)),
                 )) {
                   var result = await deleteCategory(album['id'].toString());
-                  ScaffoldMessenger.of(context).showSnackBar(albumDeletedSnackBar(album["name"]));
-                  onRefresh('Deleted ${album['name']} : $result');
+                  if(result['stat'] == 'fail') {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                        errorSnackBar(context, result['result'])
+                    );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                        albumDeletedSnackBar(album["name"])
+                    );
+                    onRefresh('Deleted ${album['name']} : $result');
+                  }
                 }
               },
               closeOnTap: true,
@@ -234,8 +257,15 @@ Widget albumListItemRight(BuildContext context, dynamic album, bool isAdmin, Fun
                   )) {
                     print('Move ${album['id']} to ${item.id}');
                     var result = await moveCategory(album['id'], item.id);
-                    print(result);
-                    ScaffoldMessenger.of(context).showSnackBar(albumMovedSnackBar(album['name'], item.name));
+                    if(result['stat'] == 'fail') {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                          errorSnackBar(context, result['result'])
+                      );
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                          albumMovedSnackBar(album['name'], item.name)
+                      );
+                    }
                     Navigator.of(context).pop();
                   }
                 },

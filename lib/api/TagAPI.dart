@@ -1,12 +1,9 @@
-
-
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
-
 import 'API.dart';
 
-Future<List<dynamic>> getAdminTags() async {
+Future<Map<String,dynamic>> getAdminTags() async {
   Map<String, String> queries = {
     "format":"json",
     "method": "pwg.tags.getAdminList",
@@ -14,10 +11,21 @@ Future<List<dynamic>> getAdminTags() async {
 
   Response response = await API.dio.get('ws.php', queryParameters: queries);
 
-  if (response.statusCode == 200) {
-    return json.decode(response.data)["result"]['tags'];
-  } else {
-    throw Exception("bad request: "+response.statusCode.toString());
+  try {
+    if (response.statusCode == 200) {
+      return json.decode(response.data);
+    } else {
+      return {
+        'stat': 'fail',
+        'result': response.statusMessage
+      };
+    }
+  } catch(e) {
+    var error = e as DioError;
+    return {
+      'stat': 'fail',
+      'result': error.message
+    };
   }
 }
 
@@ -28,11 +36,22 @@ Future<dynamic> createTag(String tagName) async {
     "name": tagName,
   };
 
-  Response response = await API.dio.get('ws.php', queryParameters: queries);
+  try {
+    Response response = await API.dio.get('ws.php', queryParameters: queries);
 
-  if (response.statusCode == 200) {
-    return json.decode(response.data)["result"];
-  } else {
-    throw Exception("bad request: "+response.statusCode.toString());
+    if (response.statusCode == 200) {
+      return json.decode(response.data)["result"];
+    } else {
+      return {
+        'stat': 'fail',
+        'result': response.statusMessage
+      };
+    }
+  } catch(e) {
+    var error = e as DioError;
+    return {
+      'stat': 'fail',
+      'result': error.message
+    };
   }
 }

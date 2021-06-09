@@ -115,9 +115,15 @@ Widget createCategoryAlert(BuildContext context, String catId) {
                               _addAlbumDescController.text, catId);
                           print('Created Album ${_addAlbumNameController
                               .text} : $result');
-                          ScaffoldMessenger.of(context).showSnackBar(
-                              albumAddedSnackBar(_addAlbumNameController.text)
-                          );
+                          if(result['stat'] == 'fail') {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                errorSnackBar(context, result['result'])
+                            );
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                albumAddedSnackBar(_addAlbumNameController.text)
+                            );
+                          }
                           _addAlbumNameController.text = "";
                           Navigator.of(context).pop();
                         } catch (e) {
@@ -187,13 +193,11 @@ class _EditCategoryDialogState extends State<EditCategoryDialog> {
   final _formKey = GlobalKey<FormState>();
   TextEditingController _addAlbumNameController;
   TextEditingController _addAlbumDescController;
-  bool _isPrivate = false;
 
 
   @override
   void initState() {
     super.initState();
-    _isPrivate = widget.privacy;
     _addAlbumNameController = TextEditingController(text: widget.catName);
     _addAlbumDescController = TextEditingController(text: widget.catDesc);
   }
@@ -364,22 +368,6 @@ class _EditCategoryDialogState extends State<EditCategoryDialog> {
                     ),
                   ],
                 ),
-                Padding(
-                  padding: EdgeInsets.all(5),
-                  child: Row(
-                    children: [
-                      Checkbox(
-                        value: _isPrivate,
-                        onChanged: (value) {
-                          setState(() {
-                            _isPrivate = value;
-                          });
-                        },
-                      ),
-                      Text('Private ?'),
-                    ],
-                  ),
-                ),
                 Divider(
                   thickness: 1,
                 ),
@@ -408,13 +396,18 @@ class _EditCategoryDialogState extends State<EditCategoryDialog> {
                             var result = await editCategory(
                               widget.catId,
                               _addAlbumNameController.text,
-                              _addAlbumDescController.text,
-                              _isPrivate
+                              _addAlbumDescController.text
                             );
                             print('Edited Album ${_addAlbumNameController.text} : $result');
-                            ScaffoldMessenger.of(context).showSnackBar(
-                                albumEditedSnackBar(_addAlbumNameController.text)
-                            );
+                            if(result['stat'] == 'fail') {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  errorSnackBar(context, result['result'])
+                              );
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  albumEditedSnackBar(_addAlbumNameController.text)
+                              );
+                            }
                             _addAlbumNameController.text = "";
                             _addAlbumDescController.text = "";
                             Navigator.of(context).pop();
@@ -447,8 +440,9 @@ class EditImageSelectionDialog extends StatefulWidget {
 }
 class _EditImageSelectionDialogState extends State<EditImageSelectionDialog> {
   final _formKey = GlobalKey<FormState>();
-  List<TextEditingController> _nameControllers = [];
-  List<TextEditingController> _descControllers = [];
+  final _listKey = GlobalKey<AnimatedListState>();
+  TextEditingController _nameController = TextEditingController();
+  TextEditingController _descController = TextEditingController();
   List<DropdownMenuItem<int>> _levelItems = [];
   List<dynamic> _tags = [];
   int _page = 0;
@@ -459,11 +453,6 @@ class _EditImageSelectionDialogState extends State<EditImageSelectionDialog> {
   @override
   void initState() {
     super.initState();
-
-    widget.images.forEach((image) {
-      _nameControllers.add(TextEditingController(text: image['name']));
-      _descControllers.add(TextEditingController(text: image['comment']));
-    });
 
     Constants.privacyLevels.forEach((key, value) {
       _levelItems.add(DropdownMenuItem<int>(
@@ -477,24 +466,10 @@ class _EditImageSelectionDialogState extends State<EditImageSelectionDialog> {
   }
 
   bool isNameEmpty() {
-    for(var controller in _nameControllers) {
-      if(controller.text == "" || controller.text == null) {
-        return true;
-      }
+    if(_nameController.text == "" || _nameController.text == null) {
+      return true;
     }
     return false;
-  }
-
-  void applyNameToAll(String name) {
-    for(var controller in _nameControllers) {
-      controller.text = name;
-    }
-  }
-
-  void applyDescToAll(String desc) {
-    for(var controller in _descControllers) {
-      controller.text = desc;
-    }
   }
 
   @override
@@ -608,8 +583,6 @@ class _EditImageSelectionDialogState extends State<EditImageSelectionDialog> {
                                     }
                                     setState(() {
                                       widget.images.removeAt(page);
-                                      _nameControllers.removeAt(page);
-                                      _descControllers.removeAt(page);
                                     });
                                   }
                                 },
@@ -654,104 +627,71 @@ class _EditImageSelectionDialogState extends State<EditImageSelectionDialog> {
                     }).toList(),
                   ),
                 ),
+                Divider(
+                  thickness: 1,
+                ),
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: Text('Title', style: _theme.textTheme.bodyText1),
+                ),
                 Padding(
                   padding: EdgeInsets.all(5),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Container(
-                          padding: EdgeInsets.symmetric(horizontal: 10),
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              color: _theme.inputDecorationTheme.fillColor
-                          ),
-                          child: TextFormField(
-                            maxLines: 1,
-                            controller: _nameControllers[_page],
-                            style: TextStyle(fontSize: 14, color: Color(0xff5c5c5c)),
-                            textAlignVertical: TextAlignVertical.top,
-                            decoration: InputDecoration(
-                              contentPadding: EdgeInsets.zero,
-                              border: InputBorder.none,
-                              hintText: 'image name',
-                              hintStyle: TextStyle(fontSize: 14,
-                                  fontStyle: FontStyle.italic,
-                                  color: _theme.disabledColor),
-                            ),
-                            validator: (value) {
-                              if (isNameEmpty()) {
-                                return 'An image name is empty';
-                              }
-                              return null;
-                            },
-                          ),
+                  child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 10),
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: _theme.inputDecorationTheme.fillColor
+                      ),
+                      child: TextFormField(
+                        maxLines: 1,
+                        controller: _nameController,
+                        style: TextStyle(fontSize: 14, color: Color(0xff5c5c5c)),
+                        textAlignVertical: TextAlignVertical.top,
+                        decoration: InputDecoration(
+                          contentPadding: EdgeInsets.zero,
+                          border: InputBorder.none,
+                          hintText: 'Images title',
+                          hintStyle: TextStyle(fontSize: 14,
+                              fontStyle: FontStyle.italic,
+                              color: _theme.disabledColor),
                         ),
-                      ),
-                      IconButton(
-                        tooltip: 'Apply all',
-                        onPressed: () async {
-                          if(await confirm(context,
-                            title: Text('Confirm'),
-                            content: Text('Apply name ${_nameControllers[_page].text} to all files ?', softWrap: true, maxLines: 3),
-                            textOK: Text('Yes', style: TextStyle(color: Color(0xff479900))),
-                            textCancel: Text('No', style: TextStyle(color: Theme.of(context).errorColor)),
-                          )) {
-                            setState(() {
-                              applyNameToAll(_nameControllers[_page].text);
-                            });
+                        validator: (value) {
+                          if (isNameEmpty()) {
+                            return 'An image name is empty';
                           }
+                          return null;
                         },
-                        icon: Icon(Icons.copy),
                       ),
-                    ],
-                  ),
+                    ),
+
                 ), // Name
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: Text('Description', style: _theme.textTheme.bodyText1),
+                ),
                 Padding(
                   padding: EdgeInsets.all(5),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Container(
-                          padding: EdgeInsets.symmetric(horizontal: 10),
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              color: _theme.inputDecorationTheme.fillColor
-                          ),
-                          child: TextFormField(
-                            minLines: 1,
-                            maxLines: 3,
-                            controller: _descControllers[_page],
-                            style: TextStyle(fontSize: 14, color: Color(0xff5c5c5c)),
-                            textAlignVertical: TextAlignVertical.top,
-                            decoration: InputDecoration(
-                              contentPadding: EdgeInsets.zero,
-                              border: InputBorder.none,
-                              hintText: 'description (optional)',
-                              hintStyle: TextStyle(fontSize: 14,
-                                  fontStyle: FontStyle.italic,
-                                  color: _theme.disabledColor),
-                            ),
-                          ),
+                  child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: _theme.inputDecorationTheme.fillColor
+                      ),
+                      child: TextFormField(
+                        minLines: 5,
+                        maxLines: 10,
+                        controller: _descController,
+                        style: TextStyle(fontSize: 14, color: Color(0xff5c5c5c)),
+                        textAlignVertical: TextAlignVertical.top,
+                        decoration: InputDecoration(
+                          contentPadding: EdgeInsets.zero,
+                          border: InputBorder.none,
+                          hintText: 'Images Description (optional)',
+                          hintStyle: TextStyle(fontSize: 14,
+                              fontStyle: FontStyle.italic,
+                              color: _theme.disabledColor),
                         ),
                       ),
-                      IconButton(
-                        tooltip: 'Apply all',
-                        onPressed: () async {
-                          if(await confirm(context,
-                            title: Text('Confirm'),
-                            content: Text('Apply description ${_descControllers[_page].text} to all files ?', softWrap: true, maxLines: 3),
-                            textOK: Text('Yes', style: TextStyle(color: Color(0xff479900))),
-                            textCancel: Text('No', style: TextStyle(color: Theme.of(context).errorColor)),
-                          )) {
-                            setState(() {
-                              applyDescToAll(_descControllers[_page].text);
-                            });
-                          }
-                        },
-                        icon: Icon(Icons.copy),
-                      ),
-                    ],
                   ),
                 ), // Description
                 Divider(
@@ -790,68 +730,96 @@ class _EditImageSelectionDialogState extends State<EditImageSelectionDialog> {
                   ),
                 ), // Privacy
                 SizedBox(height: 10),
-                Align(
-                  alignment: Alignment.topLeft,
-                  child: Text('Append Tags', style: _theme.textTheme.bodyText1),
-                ),
-                Padding(
-                  padding: EdgeInsets.all(5),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Container(
-                          constraints: BoxConstraints(
-                            minHeight: 50,
-                          ),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Color(0x60000000),
-                              ),
-                              BoxShadow(
-                                color: _theme.scaffoldBackgroundColor,
-                                blurRadius: 3.0,
-                                spreadRadius: -1.0,
-                                offset: Offset(0.0, 3.0),
-                              ),
-                            ],
-                          ),
-                          child: SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Padding(
-                              padding: EdgeInsets.all(5),
-                              child: Wrap(
-                                direction: Axis.horizontal,
-                                spacing: 5,
-                                runSpacing: 5,
-                                children: _tags.map<Widget>((tag) {
-                                  return tagItem(tag);
-                                }).toList(),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      IconButton(
-                        tooltip: 'Select tags',
-                        onPressed: () {
-                          showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return SelectTagDialog(
-                                  _tags,
-                                      (tags) {
-                                    setState(() {
-                                      _tags = tags;
-                                    });
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('Append Tags', style: _theme.textTheme.bodyText1),
+                    IconButton(
+                      tooltip: 'Select tags',
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return SelectTagDialog(
+                              _tags,
+                              (tags) {
+                                setState(() {
+                                  tags.forEach((tag) {
+                                    if(!_tags.contains(tag)) {
+                                      _tags.insert(tags.indexOf(tag), tag);
+                                      _listKey.currentState.insertItem(tags.indexOf(tag));
+                                    }
                                   });
-                            }
-                          );
-                        },
-                        icon: Icon(Icons.add_circle_outline),
-                      ),
-                    ],
+                                });
+                              }
+                            );
+                          }
+                        );
+                      },
+                      icon: Icon(Icons.add_circle_outline),
+                    ),
+                  ],
+                ),
+                /*
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 5.0),
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    itemCount: _tags.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      if(_tags.length == 1) {
+                        return tagItem(_tags[index],
+                          borderRadius: BorderRadius.circular(10),
+                        );
+                      }
+                      if(index == 0) {
+                        return tagItem(_tags[index],
+                          borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
+                          border: Border(bottom: BorderSide(color: _theme.scaffoldBackgroundColor)),
+                        );
+                      }
+                      if(index == _tags.length-1) {
+                        return tagItem(_tags[index],
+                          borderRadius: BorderRadius.vertical(bottom: Radius.circular(10)),
+                        );
+                      }
+                      return tagItem(_tags[index],
+                        border: Border(bottom: BorderSide(color: _theme.scaffoldBackgroundColor)),
+                      );
+                    },
+                  ),
+                ),
+                */
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 5.0),
+                  child: AnimatedList(
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    key: _listKey,
+                    initialItemCount: _tags.length,
+                    itemBuilder: (BuildContext context, int index, Animation<double> animation) {
+                      if(_tags.length == 0) return Container();
+                      if(_tags.length == 1) {
+                        return tagItem(_tags[index], animation,
+                          borderRadius: BorderRadius.circular(10),
+                        );
+                      }
+                      if(index == 0) {
+                        return tagItem(_tags[index], animation,
+                          borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
+                          border: Border(bottom: BorderSide(color: _theme.scaffoldBackgroundColor)),
+                        );
+                      }
+                      if(index == _tags.length-1) {
+                        return tagItem(_tags[index], animation,
+                          borderRadius: BorderRadius.vertical(bottom: Radius.circular(10)),
+                        );
+                      }
+                      return tagItem(_tags[index], animation,
+                        border: Border(bottom: BorderSide(color: _theme.scaffoldBackgroundColor)),
+                      );
+                    },
                   ),
                 ),
                 Divider(
@@ -882,13 +850,13 @@ class _EditImageSelectionDialogState extends State<EditImageSelectionDialog> {
                             _isLoading = true;
                           });
                           try {
-                            await editImages(
+                            int nbEdited = await editImages(context,
                               widget.images.map<Map<String,dynamic>>((image) {
                                 int index = widget.images.indexOf(image);
                                 return {
                                   'id': image['id'],
-                                  'name': _nameControllers[index].text,
-                                  'desc': _descControllers[index].text,
+                                  'name': _nameController.text,
+                                  'desc': _descController.text,
                                 };
                               }).toList(),
                               _tags.map<int>((tag) {
@@ -896,7 +864,9 @@ class _EditImageSelectionDialogState extends State<EditImageSelectionDialog> {
                               }).toList(),
                               _privacyLevel
                             );
-
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                imagesEditedSnackBar(nbEdited)
+                            );
                             Navigator.of(context).pop();
                           } catch (e) {
                             print(e);
@@ -916,43 +886,76 @@ class _EditImageSelectionDialogState extends State<EditImageSelectionDialog> {
       ),
     );
   }
-
-  Widget tagItem(dynamic tag) {
+  /*
+  Widget tagItem(dynamic tag, {BorderRadius borderRadius, Border border}) {
     return Container(
       height: 50,
-      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: borderRadius ?? BorderRadius.zero,
         color: Theme.of(context).cardColor,
-        boxShadow: [
-          BoxShadow(
-            color: Color(0x60000000),
-            blurRadius: 3.0,
-            spreadRadius: 0.0,
-            offset: Offset(0.0, 3.0),
-          ),
-        ],
       ),
-      child: Row(
-        children: [
-          Text('${tag['name']}'),
-          IconButton(
-            onPressed: () async {
-              if(await confirm(
-                context,
-                title: Text('Confirm'),
-                content: Text('Remove tag ${tag['name']} ?', softWrap: true, maxLines: 3),
-                textOK: Text('Yes', style: TextStyle(color: Color(0xff479900))),
-                textCancel: Text('No', style: TextStyle(color: Theme.of(context).errorColor)),
-              )) {
-                setState(() {
-                  _tags.remove(tag);
-                });
-              }
-            },
-            icon: Icon(Icons.remove_circle_outline, color: Theme.of(context).errorColor),
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 10),
+        decoration: BoxDecoration(
+          border: border ?? Border.fromBorderSide(BorderSide.none),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text('${tag['name']}'),
+            IconButton(
+              onPressed: () async {
+                if(await confirm(
+                  context,
+                  title: Text('Confirm'),
+                  content: Text('Remove tag ${tag['name']} ?', softWrap: true, maxLines: 3),
+                  textOK: Text('Yes', style: TextStyle(color: Color(0xff479900))),
+                  textCancel: Text('No', style: TextStyle(color: Theme.of(context).errorColor)),
+                )) {
+                  setState(() {
+                    _tags.remove(tag);
+                  });
+                }
+              },
+              icon: Icon(Icons.remove_circle_outline, color: Theme.of(context).errorColor),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+   */
+  Widget tagItem(dynamic tag, Animation<double> animation, {BorderRadius borderRadius, Border border}) {
+    return SizeTransition(
+      axis: Axis.vertical,
+      sizeFactor: animation,
+      child: Container(
+        height: 50,
+        decoration: BoxDecoration(
+          borderRadius: borderRadius ?? BorderRadius.zero,
+          color: Theme.of(context).cardColor,
+        ),
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 10),
+          decoration: BoxDecoration(
+            border: border ?? Border.fromBorderSide(BorderSide.none),
           ),
-        ],
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('${tag['name']}'),
+              IconButton(
+                onPressed: () async {
+                  _listKey.currentState.removeItem(_tags.indexOf(tag), (context, animation) => tagItem(tag, animation));
+                  setState(() {
+                    _tags.remove(tag);
+                  });
+                },
+                icon: Icon(Icons.remove_circle_outline, color: Theme.of(context).errorColor),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -974,7 +977,7 @@ class _SelectTagDialogState extends State<SelectTagDialog> {
   @override
   void initState() {
     super.initState();
-    _selectedTags = widget.selectedTags;
+    _selectedTags.addAll(widget.selectedTags);
   }
 
   bool isSelected(dynamic tag) {
@@ -1007,11 +1010,16 @@ class _SelectTagDialogState extends State<SelectTagDialog> {
           ),
         ],
       ),
-      content: FutureBuilder(
+      content: FutureBuilder<Map<String,dynamic>>(
         future: getAdminTags(),
         builder: (BuildContext context, AsyncSnapshot snapshot) {
           if(snapshot.hasData) {
-            var tags = snapshot.data;
+            if(snapshot.data['stat'] == 'fail') {
+              return Center(
+                child: Text('Failed to load tags'),
+              );
+            }
+            var tags = snapshot.data["result"]['tags'];
             tags.removeWhere((tag) {
               return isSelected(tag);
             });
@@ -1020,6 +1028,53 @@ class _SelectTagDialogState extends State<SelectTagDialog> {
               child: SingleChildScrollView(
                 child: Column(
                   children: [
+                    Container(
+                      alignment: Alignment.topLeft,
+                      padding: EdgeInsets.all(5),
+                      child: Text('Selected tags', style: _theme.textTheme.bodyText1),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 5.0),
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        physics: NeverScrollableScrollPhysics(),
+                        itemCount: _selectedTags.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          if(_selectedTags.length == 0) return Container();
+                          Icon icon = Icon(Icons.remove_circle_outline, color: Colors.red);
+                          Border border = Border(bottom: BorderSide(color: _theme.scaffoldBackgroundColor));
+                          Function() onTap = () {
+                            setState(() {
+                              if(isSelected(_selectedTags[index])) _selectedTags.remove(_selectedTags[index]);
+                            });
+                          };
+                          if(_selectedTags.length == 1) {
+                            return tagItem(_selectedTags[index], icon,
+                              borderRadius: BorderRadius.circular(10),
+                              onTap: onTap,
+                            );
+                          }
+                          if(index == 0) {
+                            return tagItem(_selectedTags[index], icon,
+                              borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
+                              border: border,
+                              onTap: onTap,
+                            );
+                          }
+                          if(index == _selectedTags.length-1) {
+                            return tagItem(_selectedTags[index], icon,
+                              borderRadius: BorderRadius.vertical(bottom: Radius.circular(10)),
+                              onTap: onTap,
+                            );
+                          }
+                          return tagItem(_selectedTags[index], icon,
+                            border: border,
+                            onTap: onTap,
+                          );
+                        },
+                      ),
+                    ),
+                    SizedBox(height: 10),
                     Padding(
                       padding: EdgeInsets.all(5),
                       child: Row(
@@ -1045,92 +1100,47 @@ class _SelectTagDialogState extends State<SelectTagDialog> {
                         ],
                       ),
                     ),
-                    Container(
-                      constraints: BoxConstraints(
-                        minHeight: 50,
-                        maxHeight: screenSize.width/2,
-                        minWidth: double.infinity,
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 5.0),
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        physics: NeverScrollableScrollPhysics(),
+                        itemCount: tags.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          if(tags.length == 0) return Container();
+                          Icon icon = Icon(Icons.add_circle_outline, color: Colors.green);
+                          Border border = Border(bottom: BorderSide(color: _theme.scaffoldBackgroundColor));
+                          Function() onTap = () {
+                            setState(() {
+                              if(!isSelected(tags[index])) _selectedTags.add(tags[index]);
+                            });
+                          };
+                          if(tags.length == 1) {
+                            return tagItem(tags[index], icon,
+                              borderRadius: BorderRadius.circular(10),
+                              onTap: onTap,
+                            );
+                          }
+                          if(index == 0) {
+                            return tagItem(tags[index], icon,
+                              borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
+                              border: border,
+                              onTap: onTap,
+                            );
+                          }
+                          if(index == tags.length-1) {
+                            return tagItem(tags[index], icon,
+                              borderRadius: BorderRadius.vertical(bottom: Radius.circular(10)),
+                              onTap: onTap,
+                            );
+                          }
+                          return tagItem(tags[index], icon,
+                            border: border,
+                            onTap: onTap,
+                          );
+                        },
                       ),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Color(0x60000000),
-                          ),
-                          BoxShadow(
-                            color: _theme.scaffoldBackgroundColor,
-                            blurRadius: 3.0,
-                            spreadRadius: -1.0,
-                            offset: Offset(0.0, 3.0),
-                          ),
-                        ],
-                      ),
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.vertical,
-                        child: Padding(
-                          padding: EdgeInsets.all(5),
-                          child: Wrap(
-                            spacing: 5,
-                            runSpacing: 5,
-                            direction: Axis.horizontal,
-                            children: tags.map<Widget>((tag) {
-                              return Wrap(
-                                direction: Axis.vertical,
-                                children: [tagItem(tag, Icon(Icons.add_circle_outline, color: Colors.green), onTap: () {
-                                  setState(() {
-                                    if(!isSelected(tag)) _selectedTags.add(tag);
-                                  });
-                                })],
-                              );
-                            }).toList(),
-                          ),
-                        ),
-                      ),
-                    ), // Tag list
-                    SizedBox(height: 10),
-                    Container(
-                      alignment: Alignment.topLeft,
-                      padding: EdgeInsets.all(5),
-                      child: Text('Selected tags', style: _theme.textTheme.bodyText1),
                     ),
-                    Container(
-                      constraints: BoxConstraints(
-                        minHeight: 50,
-                        minWidth: double.infinity,
-                      ),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Color(0x60000000),
-                          ),
-                          BoxShadow(
-                            color: _theme.scaffoldBackgroundColor,
-                            blurRadius: 3.0,
-                            spreadRadius: -1.0,
-                            offset: Offset(0.0, 3.0),
-                          ),
-                        ],
-                      ),
-                      padding: EdgeInsets.all(5),
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Padding(
-                          padding: EdgeInsets.all(5),
-                          child: Wrap(
-                            spacing: 5,
-                            direction: Axis.horizontal,
-                            children: _selectedTags.map<Widget>((tag) {
-                              return tagItem(tag, Icon(Icons.remove_circle_outline, color: _theme.errorColor), onTap: () {
-                                setState(() {
-                                  if(isSelected(tag)) _selectedTags.remove(tag);
-                                });
-                              });
-                            }).toList(),
-                          ),
-                        ),
-                      ),
-                    ), // Selected tags
                     Divider(
                       thickness: 1,
                     ),
@@ -1183,31 +1193,28 @@ class _SelectTagDialogState extends State<SelectTagDialog> {
     );
   }
 
-  Widget tagItem(dynamic tag, Icon icon, {Function() onTap}) {
+  Widget tagItem(dynamic tag, Icon icon, {Function() onTap, BorderRadius borderRadius, Border border}) {
     return Container(
-      padding: EdgeInsets.only(left: 10),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: borderRadius ?? BorderRadius.zero,
         color: Theme.of(context).cardColor,
-        boxShadow: [
-          BoxShadow(
-            color: Color(0x60000000),
-            blurRadius: 3.0,
-            spreadRadius: 0.0,
-            offset: Offset(0.0, 3.0),
-          ),
-        ],
       ),
-      child: Row(
-        children: [
-          Text('${tag['name']}'),
-          IconButton(
-            onPressed: () async {
-              onTap();
-            },
-            icon: icon,
-          ),
-        ],
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 10),
+        decoration: BoxDecoration(
+          border: border ?? Border.fromBorderSide(BorderSide.none),
+        ),
+        child: Row(
+          children: [
+            Text('${tag['name']}'),
+            IconButton(
+              onPressed: () async {
+                onTap();
+              },
+              icon: icon,
+            ),
+          ],
+        ),
       ),
     );
   }

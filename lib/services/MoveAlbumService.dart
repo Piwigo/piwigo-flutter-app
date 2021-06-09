@@ -1,9 +1,16 @@
-import 'package:confirm_dialog/confirm_dialog.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:piwigo_ng/api/CategoryAPI.dart';
 import 'package:piwigo_ng/model/CategoryModel.dart';
-import 'package:piwigo_ng/ui/SnackBars.dart';
+
+void addCatRecursive(List<int> rank, CategoryModel cat, CategoryModel inputCat) {
+  if(rank.length > 1) {
+    CategoryModel nextInputCat = inputCat.children.elementAt(rank.first-1);
+    rank.removeAt(0);
+    addCatRecursive(rank, cat, nextInputCat);
+  } else {
+    inputCat.children.add(cat);
+  }
+}
 
 Future<dynamic> moveCategoryModalBottomSheet(context, String catId, String catName, bool isImage, Function(CategoryModel) onSelected) async {
   await showModalBottomSheet(
@@ -15,11 +22,33 @@ Future<dynamic> moveCategoryModalBottomSheet(context, String catId, String catNa
     builder: (BuildContext bc) {
       return StatefulBuilder(
         builder: (BuildContext context, setState) =>
-          FutureBuilder(
+          FutureBuilder<Map<String,dynamic>>(
             future: getAlbumList(),
             builder: (context, snapshot) {
               if (snapshot.hasData) {
-                CategoryModel root = snapshot.data;
+                if(snapshot.data['stat'] == 'fail') {
+                  return Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Center(
+                        child: Text('Failed to load albums'),
+                      ),
+                      Text(snapshot.data['result']),
+                    ],
+                  );
+                }
+                CategoryModel root = CategoryModel("0", "root", fullname: "root");
+                snapshot.data['result']['categories'].forEach((cat) {
+                  List<int> rank = cat['global_rank'].split('.').map(int.parse).toList().cast<int>();
+                  CategoryModel newCat = CategoryModel(cat['id'], cat['name'], comment: cat['comment'], nbImages: cat['nb_images'].toString(), fullname: cat['fullname'], status: cat['status']);
+                  if(rank.length > 1) {
+                    CategoryModel nextInputCat = root.children.elementAt(rank.first-1);
+                    rank.removeAt(0);
+                    addCatRecursive(rank, newCat, nextInputCat);
+                  } else {
+                    root.children.add(newCat);
+                  }
+                });
                 return Container(
                   height: 500,
                   padding: EdgeInsets.all(20),

@@ -6,8 +6,8 @@ import 'dart:async';
 import 'package:piwigo_ng/api/API.dart';
 import 'package:piwigo_ng/api/CategoryAPI.dart';
 import 'package:piwigo_ng/services/OrientationService.dart';
-import 'package:piwigo_ng/ui/Dialogs.dart';
-import 'package:piwigo_ng/ui/ListItems.dart';
+import 'package:piwigo_ng/views/components/Dialogs.dart';
+import 'package:piwigo_ng/views/components/ListItems.dart';
 import 'package:piwigo_ng/views/SettingsPage.dart';
 import 'package:piwigo_ng/views/UploadGalleryViewPage.dart';
 
@@ -65,7 +65,8 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
             pinned: true,
             snap: false,
             floating: false,
-            expandedHeight: 100.0,
+            expandedHeight: 130.0,
+            centerTitle: true,
             leading: IconButton(
               onPressed: () {
                 Navigator.of(context).push(
@@ -85,16 +86,13 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
             ],
              */
             flexibleSpace: FlexibleSpaceBar(
+              title: Text("Albums", style: _theme.textTheme.headline1),
+              /*
               background: Column(
                 mainAxisAlignment: MainAxisAlignment.end,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    margin: EdgeInsets.only(left: 20),
-                    child: Text("Albums", style: _theme.textTheme.headline1),
-                  ),
                   // TODO: implement all image search
-                  /*
                   Container(
                     margin: EdgeInsets.all(20),
                     decoration: BoxDecoration(
@@ -116,10 +114,9 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
                       ),
                     ),
                   ),
-
-                   */
                 ],
               ),
+               */
             ),
           ),
         ],
@@ -127,22 +124,28 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
           onTap: () {
             FocusScope.of(context).unfocus();
           },
-          child: FutureBuilder<List<dynamic>>(
+          child: FutureBuilder<Map<String,dynamic>>(
               future: fetchAlbums(_rootCategory), // Albums of the list
-              builder: (BuildContext context, AsyncSnapshot albums) {
-                if(albums.hasData){
+              builder: (BuildContext context, AsyncSnapshot albumSnapshot) {
+                if(albumSnapshot.hasData){
+                  if(albumSnapshot.data['stat'] == 'fail') {
+                    return Center(child: Text('Failed to load albums'));
+                  }
+                  var albums = albumSnapshot.data['result']['categories'];
                   int nbPhotos = 0;
-                  albums.data.forEach((cat) => nbPhotos+=cat["total_nb_images"]);
-                  albums.data.removeWhere((category) => (
+                  albums.forEach((cat) => nbPhotos+=cat["total_nb_images"]);
+                  albums.removeWhere((category) => (
                       category["id"].toString() == _rootCategory
                   ));
                   return RefreshIndicator(
                     displacement: 20,
+                    notificationPredicate: (notification) {
+                      return notification.metrics.atEdge;
+                    },
                     onRefresh: () {
                       setState(() {
                         print("refresh");
                       });
-
                       return Future.delayed(Duration(milliseconds: 1000));
                     },
                     child: SingleChildScrollView(
@@ -150,11 +153,11 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
                         children: [
                           /*
                           ListView.builder(
-                            itemCount: albums.data.length,
+                            itemCount: albums.length,
                             shrinkWrap: true,
                             physics: NeverScrollableScrollPhysics(),
                             itemBuilder: (context, index) {
-                              return albumListItem(context, albums.data[index], widget.isAdmin, (message) {
+                              return albumListItem(context, albums[index], widget.isAdmin, (message) {
                                 setState(() {
                                   print('$message');
                                 });
@@ -171,11 +174,11 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
                               childAspectRatio: albumGridAspectRatio(context),
                             ),
                             padding: EdgeInsets.symmetric(horizontal: 5),
-                            itemCount: albums.data.length,
+                            itemCount: albums.length,
                             shrinkWrap: true,
                             physics: NeverScrollableScrollPhysics(),
                             itemBuilder: (BuildContext context, int index) {
-                              var album = albums.data[index];
+                              var album = albums[index];
                               if (isPortrait(context) || index%2 == 0) {
                                 return albumListItem(context, album, widget.isAdmin, (message) {
                                   setState(() {

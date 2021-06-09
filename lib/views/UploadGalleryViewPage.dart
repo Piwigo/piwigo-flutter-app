@@ -1,9 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:cookie_jar/cookie_jar.dart';
+import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:piwigo_ng/api/SessionAPI.dart';
+import 'package:piwigo_ng/views/components/SnackBars.dart';
 
 import '../services/upload/chunked_uploader.dart';
 import 'package:dio/dio.dart';
@@ -19,14 +22,8 @@ class Uploader {
 
   Uploader(this.context) {
     snackBar = SnackBar(
-      content: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text("Uploading"),
-          CircularProgressIndicator(),
-        ],
-      ),
-      duration: Duration(seconds: 5),
+      content: Text('Uploading'),
+      duration: Duration(seconds: 2),
     );
     endSnackBar = SnackBar(
       content: Text('All photos are uploaded'),
@@ -73,21 +70,35 @@ class Uploader {
       API.dio.clear();
       print("Request: ${response.data}");
 
-      if(json.decode(response.data)["stat"] == "ok") {} else {
+      if(json.decode(response.data)["stat"] == "fail") {
         print("Request failed: ${response.statusCode}");
 
         ScaffoldMessenger.of(context).hideCurrentSnackBar();
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text('${response.data}'),
-        ));
+        ScaffoldMessenger.of(context).showSnackBar(errorSnackBar(context, response.data));
       }
     }
-    saveStatus((await sessionStatus())['result']);
+    print('new status');
+    // saveStatus((await sessionStatus())['result']);
+    createDio();
 
     await _showUploadNotification(result);
 
     // ScaffoldMessenger.of(context).hideCurrentSnackBar();
     // ScaffoldMessenger.of(context).showSnackBar(endSnackBar);
+  }
+
+  void createDio() async {
+    API.dio = Dio();
+    API.cookieJar = CookieJar();
+    API.dio.interceptors.add(CookieManager(API.cookieJar));
+    if(API.prefs.getBool("is_logged") != null && API.prefs.getBool("is_logged")) {
+      API.dio.options.baseUrl = API.prefs.getString("base_url");
+      if(API.prefs.getBool("is_guest") != null && !API.prefs.getBool("is_guest")) {
+        await loginUser(API.prefs.getString("base_url"), API.prefs.getString("username"), API.prefs.getString("password"));
+      } else {
+        await loginGuest(API.prefs.getString("base_url"));
+      }
+    }
   }
 
   void upload(Asset photo, String category) async {
@@ -177,7 +188,6 @@ class UploadGalleryViewPage extends StatefulWidget {
   @override
   _UploadGalleryViewPage createState() => _UploadGalleryViewPage();
 }
-
 class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
 
   bool _showImages = false;

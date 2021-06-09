@@ -3,14 +3,17 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:ext_storage/ext_storage.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:path/path.dart' as path;
+import 'package:piwigo_ng/views/components/SnackBars.dart';
 
 import 'API.dart';
 
-Future<List<dynamic>> fetchImages(String albumID, int page) async {
+Future<Map<String,dynamic>> fetchImages(String albumID, int page) async {
   Map<String, String> queries = {
     "format":"json",
     "method": "pwg.categories.getImages",
@@ -19,27 +22,23 @@ Future<List<dynamic>> fetchImages(String albumID, int page) async {
     "page": page.toString(),
   };
 
-  Response response = await API.dio.get('ws.php', queryParameters: queries);
+  try {
+    Response response = await API.dio.get('ws.php', queryParameters: queries);
 
-  if (response.statusCode == 200) {
-    // TODO : Use model class instead of a map
-    /*
-      json.decode(response.data)["result"].map<ImageModel>((image) {
-        Map<String, DerivativeModel> derivs = Map();
-        image['derivatives'].forEach((deriv) {
-          derivs.putIfAbsent(deriv.key, () =>
-              DerivativeModel(deriv['url'], deriv['width'], deriv['height']));
-        });
-        return ImageModel(image['id'], image['file'], image['name'],
-            image['comment'], image['element_url'], derivs,
-            width: image['width'], height: image['height'],
-            availableDate: image['date_available'], creationDate: image['date_creation'],
-            hit: image['hit'], pageUrl: image['page_url']);
-      }).toList();
-       */
-    return json.decode(response.data)["result"]["images"];
-  } else {
-    throw Exception("bad request: "+response.statusCode.toString());
+    if (response.statusCode == 200) {
+      return json.decode(response.data);
+    } else {
+      return {
+        'stat': 'fail',
+        'result': response.statusMessage
+      };
+    }
+  } catch(e) {
+    var error = e as DioError;
+    return {
+      'stat': 'fail',
+      'result': error.message
+    };
   }
 }
 
@@ -126,7 +125,7 @@ Future<dynamic> downloadImage(String dirPath, String url, String file) async {
 
   var localPath = path.join(dirPath, file);
   try {
-    await API.dio.download(
+    Response response = await API.dio.download(
       url,
       localPath,
     );
@@ -140,10 +139,20 @@ Future<dynamic> downloadImage(String dirPath, String url, String file) async {
   }
 }
 
-Future<void> deleteImages(List<int> imageIdList) async {
+Future<int> deleteImages(BuildContext context, List<int> imageIdList) async {
+  int nbSuccess = 0;
   for(int id in imageIdList) {
-    await deleteImage(id);
+    var response = await deleteImage(id);
+    if(response['stat'] == 'fail') {
+      print(response);
+      ScaffoldMessenger.of(context).showSnackBar(
+        errorSnackBar(context, '${response['result']}'),
+      );
+    } else {
+      nbSuccess++;
+    }
   }
+  return nbSuccess;
 }
 Future<dynamic> deleteImage(int imageId) async {
   Map<String, String> queries = {
@@ -155,25 +164,41 @@ Future<dynamic> deleteImage(int imageId) async {
     "pwg_token": API.prefs.getString("pwg_token"),
   });
   try {
-    Response response = await API.dio.post(
-        'ws.php',
+    Response response = await API.dio.post('ws.php',
         data: formData,
         queryParameters: queries
     );
 
     if (response.statusCode == 200) {
       return json.decode(response.data);
+    } else {
+      return {
+        'stat': 'fail',
+        'result': response.statusMessage
+      };
     }
   } catch (e) {
-    print('Dio delete category error $e');
-    return e;
+    var error = e as DioError;
+    return {
+      'stat': 'fail',
+      'result': error.message
+    };
   }
 }
 
-Future<dynamic> moveImages(List<dynamic> images, int category) async {
+Future<int> moveImages(BuildContext context, List<dynamic> images, int category) async {
+  int nbMoved = 0;
   for(var image in images) {
-    await moveImage(image['id'], [category]);
+    var response = await moveImage(image['id'], [category]);
+    if(response['stat'] == 'fail') {
+      ScaffoldMessenger.of(context).showSnackBar(
+          errorSnackBar(context, '${response['result']}')
+      );
+    } else {
+      nbMoved++;
+    }
   }
+  return nbMoved;
 }
 Future<dynamic> moveImage(int imageId, List<int> categories) async {
   Map<String, String> queries = {
@@ -197,24 +222,39 @@ Future<dynamic> moveImage(int imageId, List<int> categories) async {
     if (response.statusCode == 200) {
       return json.decode(response.data);
     } else {
-      print('Error ${response.statusCode}');
+      return {
+        'stat': 'fail',
+        'result': response.statusMessage
+      };
     }
   } catch (e) {
-    print('Dio move category error $e');
-    return e;
+    var error = e as DioError;
+    return {
+      'stat': 'fail',
+      'result': error.message
+    };
   }
 }
 
-Future<dynamic> copyImages(List<dynamic> images, int category) async {
+Future<int> assignImages(BuildContext context, List<dynamic> images, int category) async {
+  int nbAssigned = 0;
   for(var image in images) {
     List<int> categories = image['categories'].map<int>((cat) {
       return cat['id'] as int;
     }).toList();
     categories.add(category);
-    await copyImage(image['id'], categories);
+    var response = await assignImage(image['id'], categories);
+    if(response['stat'] == 'fail') {
+      ScaffoldMessenger.of(context).showSnackBar(
+          errorSnackBar(context, '${response['result']}')
+      );
+    } else {
+      nbAssigned++;
+    }
   }
+  return nbAssigned;
 }
-Future<dynamic> copyImage(int imageId, List<int> categories) async {
+Future<dynamic> assignImage(int imageId, List<int> categories) async {
   Map<String, String> queries = {
     "format": "json",
     "method": "pwg.images.setInfo",
@@ -235,17 +275,34 @@ Future<dynamic> copyImage(int imageId, List<int> categories) async {
 
     if (response.statusCode == 200) {
       return json.decode(response.data);
+    } else {
+      return {
+        'stat': 'fail',
+        'result': response.statusMessage
+      };
     }
   } catch (e) {
-    print('Dio move category error $e');
-    return e;
+    var error = e as DioError;
+    return {
+      'stat': 'fail',
+      'result': error.message
+    };
   }
 }
 
-Future<void> editImages(List<Map<String, dynamic>> images, List<int> tags, int level) async {
+Future<int> editImages(BuildContext context, List<Map<String, dynamic>> images, List<int> tags, int level) async {
+  int nbEdited = 0;
   for(var image in images) {
-    await editImage(image['id'], image['name'], image['desc'], tags, level);
+    var response = await editImage(image['id'], image['name'], image['desc'], tags, level);
+    if(response['stat'] == 'fail') {
+      ScaffoldMessenger.of(context).showSnackBar(
+          errorSnackBar(context, '${response['result']}')
+      );
+    } else {
+      nbEdited++;
+    }
   }
+  return nbEdited;
 }
 Future<dynamic> editImage(int imageId, String name, String desc, List<int> tags, int level) async {
   Map<String, String> queries = {
@@ -261,18 +318,26 @@ Future<dynamic> editImage(int imageId, String name, String desc, List<int> tags,
     "single_value_mode": "replace",
     "multiple_value_mode": "append"
   });
+
   try {
-    Response response = await API.dio.post(
-        'ws.php',
+    Response response = await API.dio.post('ws.php',
         data: formData,
         queryParameters: queries
     );
 
     if (response.statusCode == 200) {
       return json.decode(response.data);
+    } else {
+      return {
+        'stat': 'fail',
+        'result': response.statusMessage
+      };
     }
   } catch (e) {
-    print('Dio move category error $e');
-    return e;
+    var error = e as DioError;
+    return {
+      'stat': 'fail',
+      'result': error.message
+    };
   }
 }

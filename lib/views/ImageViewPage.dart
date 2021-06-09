@@ -6,8 +6,8 @@ import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
 import 'package:piwigo_ng/api/ImageAPI.dart';
 import 'package:piwigo_ng/services/MoveAlbumService.dart';
-import 'package:piwigo_ng/ui/Dialogs.dart';
-import 'package:piwigo_ng/ui/SnackBars.dart';
+import 'package:piwigo_ng/views/components/Dialogs.dart';
+import 'package:piwigo_ng/views/components/SnackBars.dart';
 
 
 class ImageViewPage extends StatefulWidget {
@@ -58,7 +58,14 @@ class _ImageViewPageState extends State<ImageViewPage> {
 
   Future<void> nextPage() async {
     _imagePage++;
-    await images.addAll(await fetchImages(widget.category, _imagePage));
+    var response = await fetchImages(widget.category, _imagePage);
+    if(response['stat'] == 'fail') {
+      ScaffoldMessenger.of(context).showSnackBar(
+          errorSnackBar(context, response['result'])
+      );
+    } else {
+      images.addAll(response['result']['images']);
+    }
   }
 
   @override
@@ -176,16 +183,28 @@ class _ImageViewPageState extends State<ImageViewPage> {
 
                   if (result == 'move') {
                     print('Move $_page to ${item.id}');
-                    await moveImage(images[_page]['id'], [int.parse(item.id)]);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                        imageMovedSnackBar(images[_page]['name'], item.name));
-                    Navigator.of(context).pop();
+                    var response = await moveImage(images[_page]['id'], [int.parse(item.id)]);
+                    if(response['stat'] == 'fail') {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                          errorSnackBar(context, response['result']));
+                      Navigator.of(context).pop();
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                          imageMovedSnackBar(images[_page]['name'], item.name));
+                      Navigator.of(context).pop();
+                    }
                   } else if (result == 'assign') {
                     print('Assign $_page to ${item.id}');
-                    await copyImage(images[_page]['id'], [int.parse(item.id)]);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                        imageAssignedSnackBar(images[_page]['name'], item.name));
-                    Navigator.of(context).pop();
+                    var response = await assignImage(images[_page]['id'], [int.parse(item.id)]);
+                    if(response['stat'] == 'fail') {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                          errorSnackBar(context, response['result']));
+                      Navigator.of(context).pop();
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                          imageAssignedSnackBar(images[_page]['name'], item.name));
+                      Navigator.of(context).pop();
+                    }
                   }
                 },
               );
@@ -212,12 +231,16 @@ class _ImageViewPageState extends State<ImageViewPage> {
               )) {
                 print('Delete $_page');
 
-                ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                  content: Text('Deleting ${images[_page]['name']}'),
-                ));
-
-                await deleteImage(images[_page]['id']);
+                var response = await deleteImage(images[_page]['id']);
+                if(response['stat'] == 'fail') {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    errorSnackBar(context, '${response['result']}')
+                  );
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text('Deleting ${images[_page]['name']}'),
+                  ));
+                }
                 int page = _page;
                 if(page == images.length-1) {
                   if (page == 0) {

@@ -11,9 +11,9 @@ import 'package:piwigo_ng/api/CategoryAPI.dart';
 import 'package:piwigo_ng/api/ImageAPI.dart';
 import 'package:piwigo_ng/services/MoveAlbumService.dart';
 import 'package:piwigo_ng/services/OrientationService.dart';
-import 'package:piwigo_ng/ui/Dialogs.dart';
-import 'package:piwigo_ng/ui/ListItems.dart';
-import 'package:piwigo_ng/ui/SnackBars.dart';
+import 'package:piwigo_ng/views/components/Dialogs.dart';
+import 'package:piwigo_ng/views/components/ListItems.dart';
+import 'package:piwigo_ng/views/components/SnackBars.dart';
 
 import 'ImageViewPage.dart';
 import 'UploadGalleryViewPage.dart';
@@ -50,10 +50,17 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
 
   showMore() async {
     _page++;
-    var newListPage = await fetchImages(widget.category, _page);
-    print('Fetch images of page $_page');
-    setState(() {
+    var response = await fetchImages(widget.category, _page);
+    if(response['stat'] == 'fail') {
+      ScaffoldMessenger.of(context).showSnackBar(
+          errorSnackBar(context, response['result'])
+      );
+    } else {
+      var newListPage = response['result']['images'];
       imageList.addAll(newListPage);
+    }
+    setState(() {
+      print('Fetch images of page $_page');
     });
   }
 
@@ -146,28 +153,38 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
             ],
           ),
         ],
-        body: FutureBuilder<List<dynamic>>(
+        body: FutureBuilder<Map<String,dynamic>>(
           future: fetchAlbums(widget.category), // Albums of the list
-          builder: (BuildContext context, AsyncSnapshot albums) {
-            if (albums.hasData) {
+          builder: (BuildContext context, AsyncSnapshot albumSnapshot) {
+            if (albumSnapshot.hasData) {
+              if(albumSnapshot.data['stat'] == 'fail') {
+                return Center(child: Text('Failed to load albums'));
+              }
+              var albums = albumSnapshot.data['result']['categories'];
               int nbImages = _nbImages;
-              if(albums.data.length > 0 && albums.data[0]["id"].toString() == widget.category) {
-                nbImages = albums.data[0]["total_nb_images"];
+              if(albums.length > 0 && albums[0]["id"].toString() == widget.category) {
+                nbImages = albums[0]["total_nb_images"];
                 _nbImages = nbImages;
               }
-              albums.data.removeWhere((category) =>
+              albums.removeWhere((category) =>
                 (category["id"].toString() == widget.category)
               );
-              return FutureBuilder<List<dynamic>>(
+              return FutureBuilder<Map<String,dynamic>>(
                 future: fetchImages(widget.category, 0), // Images of the list
-                builder: (BuildContext context, AsyncSnapshot images) {
-                  if (images.hasData) {
+                builder: (BuildContext context, AsyncSnapshot imagesSnapshot) {
+                  if (imagesSnapshot.hasData) {
                     if (imageList.isEmpty || _page == 0) {
+                      if(imagesSnapshot.data['stat'] == 'fail') {
+                        return Center(child: Text('Failed to load images'));
+                      }
                       imageList.clear();
-                      imageList.addAll(images.data);
+                      imageList.addAll(imagesSnapshot.data['result']['images']);
                     }
                     return RefreshIndicator(
                       displacement: 20,
+                      notificationPredicate: (notification) {
+                        return notification.metrics.atEdge;
+                      },
                       onRefresh: () {
                         setState(() {
                           _page = 0;
@@ -179,11 +196,11 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
                           children: [
                             /*
                             ListView.builder(
-                              itemCount: albums.data.length,
+                              itemCount: albums.length,
                               shrinkWrap: true,
                               physics: NeverScrollableScrollPhysics(),
                               itemBuilder: (BuildContext context, int index) {
-                                return albumListItem(context, albums.data[index], widget.isAdmin, (message) {
+                                return albumListItem(context, albums[index], widget.isAdmin, (message) {
                                   setState(() {
                                     print('$message');
                                   });
@@ -191,7 +208,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
                               },
                             ),
                              */
-                            albums.data.length > 0 ?
+                            albums.length > 0 ?
                             GridView.builder(
                               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                                 crossAxisCount: isPortrait(context)? 1 : 2,
@@ -200,11 +217,11 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
                                 childAspectRatio: albumGridAspectRatio(context),
                               ),
                               padding: EdgeInsets.symmetric(horizontal: 5),
-                              itemCount: albums.data.length,
+                              itemCount: albums.length,
                               shrinkWrap: true,
                               physics: NeverScrollableScrollPhysics(),
                               itemBuilder: (BuildContext context, int index) {
-                                var album = albums.data[index];
+                                var album = albums[index];
                                 if (isPortrait(context) || index%2 == 0) {
                                   return albumListItem(context, album, widget.isAdmin, (message) {
                                     setState(() {
@@ -519,17 +536,23 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
                   print(result);
                   if (result == 'move') {
                     print('Move selection to ${item.id}');
-                    await moveImages(
-                        _selectedItems.values.toList(), int.parse(item.id));
+                    int nbMoved = await moveImages(context,
+                      _selectedItems.values.toList(),
+                      int.parse(item.id)
+                    );
                     ScaffoldMessenger.of(context).showSnackBar(
-                        imagesMovedSnackBar(_selectedItems.length, item.name));
+                      imagesMovedSnackBar(nbMoved, item.name)
+                    );
                     Navigator.of(context).pop();
                   } else if (result == 'assign') {
-                    print('Move selection to ${item.id}');
-                    await copyImages(
-                        _selectedItems.values.toList(), int.parse(item.id));
+                    print('Assign selection to ${item.id}');
+                    int nbAssigned = await assignImages(context,
+                      _selectedItems.values.toList(),
+                      int.parse(item.id)
+                    );
                     ScaffoldMessenger.of(context).showSnackBar(
-                        imagesAssignedSnackBar(_selectedItems.length, item.name));
+                      imagesAssignedSnackBar(nbAssigned, item.name)
+                    );
                     Navigator.of(context).pop();
                   }
                 },
@@ -558,12 +581,11 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
                   _selectedItems.clear();
                 });
 
-                ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                  content: Text('Deleting selection'),
-                ));
+                int nbSuccess = await deleteImages(context, selection);
 
-                await deleteImages(selection);
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: Text('Deleted ${selection.length} images'),
+                ));
                 setState(() {});
               }
             }
