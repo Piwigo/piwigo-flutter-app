@@ -10,15 +10,26 @@ If you face trouble please [create tickets](https://github.com/Piwigo/piwigo-flu
 
 # Installation
 
-For now, this application is in Beta. In order to try it, you will need to install the APK:
+For now, this application is in Beta. You can download the latest version either from Github or from Google Play Store:
 
-## Download the APK
+## Download from Play Store
+
+On your Android phone:
+ 1. Go to **Play Store**.
+ 2. Search for **Piwigo NG** on search-bar.
+ 3. Find the listing with the name **Piwigo NG (Early Access)** and click **Install**.
+
+Alternatively, you can directly go to the [Play Store page of Piwigo NG app](https://play.google.com/store/apps/details?id=com.piwigo.piwigo_ng).
+
+## Download from Github
+
+### Download the APK
 
 In Github, Go to [piwigo-flutter-app releases](https://github.com/Piwigo/piwigo-flutter-app/releases), choose the version (latest is recommanded) and download the .apk file.
 
-## Install the APK
+### Install the APK
 
-In your Android phone:
+On your Android phone:
  1. Go to **Settings** > **security** > **install unknown apps**.
  2. Go to **files** and enable **Allow from this source**.
  *Don't forget to disable it when you have finished*
