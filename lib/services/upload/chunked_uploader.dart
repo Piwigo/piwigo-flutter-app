@@ -83,7 +83,7 @@ class UploadRequest {
     }
 
     for (int i = 0; i < _chunksCount; i++) {
-      print("${i+1} | $_chunksCount");
+      // print("${i+1} | $_chunksCount");
       final start = _getChunkStart(i);
       final end = _getChunkEnd(i);
       final chunkStream = _getChunkStream(start, end);

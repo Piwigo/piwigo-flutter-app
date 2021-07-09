@@ -3,6 +3,7 @@ import 'package:confirm_dialog/confirm_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import 'package:images_picker/images_picker.dart';
 import 'dart:async';
 
 import 'package:multi_image_picker/multi_image_picker.dart';
@@ -17,7 +18,6 @@ import 'package:piwigo_ng/views/components/SnackBars.dart';
 
 import 'ImageViewPage.dart';
 import 'UploadGalleryViewPage.dart';
-
 
 
 class CategoryViewPage extends StatefulWidget {
@@ -444,38 +444,62 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
           },
         ),
         SpeedDialChild(
-          labelWidget: Text('Upload File', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: _theme.buttonColor)),
-          child: Icon(Icons.add_a_photo),
-          backgroundColor: _theme.floatingActionButtonTheme.backgroundColor,
-          foregroundColor: _theme.floatingActionButtonTheme.foregroundColor,
-          onTap: () async {
-            try {
-              var imageList = await MultiImagePicker.pickImages(
-                maxImages: 100,
-                enableCamera: true,
-                cupertinoOptions: CupertinoOptions(takePhotoIcon: "chat"),
-                materialOptions: MaterialOptions(
-                  actionBarTitle: "Piwigo",
-                  allViewTitle: "All Photos",
-                  actionBarColor: "#ffff7700",
-                  actionBarTitleColor: "#ffeeeeee",
-                  lightStatusBar: false,
-                  statusBarColor: '#ffab40',
-                  startInAllView: false,
-                  selectCircleStrokeColor: "#ffffff",
-                  selectionLimitReachedText: "You can't select any more.",
-                ),
-              );
-              if(imageList.isNotEmpty) {
-                Navigator.push(context, MaterialPageRoute(
-                    builder: (context) => UploadGalleryViewPage(imageData: imageList, category: widget.category)
-                ));
+            labelWidget: Text('Upload Photo', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: _theme.buttonColor)),
+            child: Icon(Icons.add_a_photo),
+            backgroundColor: _theme.floatingActionButtonTheme.backgroundColor,
+            foregroundColor: _theme.floatingActionButtonTheme.foregroundColor,
+            onTap: () async {
+              try {
+                List<Asset> imageList = await MultiImagePicker.pickImages(
+                  maxImages: 100,
+                  enableCamera: true,
+                  cupertinoOptions: CupertinoOptions(takePhotoIcon: "chat"),
+                  materialOptions: MaterialOptions(
+                    actionBarTitle: "Piwigo",
+                    allViewTitle: "All Photos",
+                    actionBarColor: "#ffff7700",
+                    actionBarTitleColor: "#ffeeeeee",
+                    lightStatusBar: false,
+                    statusBarColor: '#ffab40',
+                    startInAllView: false,
+                    selectCircleStrokeColor: "#ffffff",
+                    selectionLimitReachedText: "You can't select any more.",
+                  ),
+                );
+                if(imageList.isNotEmpty) {
+                  Navigator.push(context, MaterialPageRoute(
+                      builder: (context) => UploadGalleryViewPage(imageData: imageList, category: widget.category)
+                  ));
+                }
+              } catch (e) {
+                print('Dio error ${e.toString()}');
               }
-            } catch (e) {
-              print('Dio error ${e.toString()}');
             }
-          }
-        )
+        ),
+        SpeedDialChild(
+            labelWidget: Text('Upload Video', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: _theme.buttonColor)),
+            child: Icon(Icons.video_collection_rounded),
+            backgroundColor: _theme.floatingActionButtonTheme.backgroundColor,
+            foregroundColor: _theme.floatingActionButtonTheme.foregroundColor,
+            onTap: () async {
+              try {
+                List<Media> res = await ImagesPicker.pick(
+                  count: 100,
+                  pickType: PickType.video,
+                  quality: 0.8,
+                );
+                print(res[0].path);
+                List<Asset> imageList = res.map((media) => Asset(media.path, media.path.split('/').last, media.size.ceil(), media.size.ceil())).toList();
+                if(imageList.isNotEmpty) {
+                  Navigator.push(context, MaterialPageRoute(
+                      builder: (context) => UploadGalleryViewPage(imageData: imageList, category: widget.category)
+                  ));
+                }
+              } catch (e) {
+                print('Dio error ${e.toString()}');
+              }
+            }
+        ),
       ],
     );
   }

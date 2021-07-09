@@ -23,6 +23,9 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  intl:
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -38,6 +41,8 @@ dependencies:
   chunked_uploader:
   confirm_dialog:
   image_downloader:
+  video_player:
+  better_player:
 
   flutter_speed_dial:
   flutter_slidable:
@@ -49,6 +54,7 @@ dependencies:
   auto_size_text:
 
   multi_image_picker:
+  images_picker:
   provider:
   camera:
 
@@ -62,20 +68,12 @@ dev_dependencies:
 # The following section is specific to Flutter.
 flutter:
 
-  # The following line ensures that the Material Icons font is
-  # included with your application, so that you can use the icons in
-  # the material Icons class.
+  generate: true
+
   uses-material-design: true
 
-  # To add assets to your application, add an assets section, like this:
   assets:
     - assets/logo/piwigo_logo.png
-
-  # An image asset can refer to one or more resolution-specific "variants", see
-  # https://flutter.dev/assets-and-images/#resolution-aware.
-
-  # For details regarding adding assets from package dependencies, see
-  # https://flutter.dev/assets-and-images/#from-packages
 
   # To add custom fonts to your application, add a fonts section here,
   # in this "flutter" section. Each entry in this list should have a

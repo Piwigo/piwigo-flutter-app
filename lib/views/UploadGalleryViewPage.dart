@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -17,23 +18,12 @@ import 'package:piwigo_ng/api/API.dart';
 
 class Uploader {
   BuildContext context;
-  SnackBar endSnackBar;
   SnackBar snackBar;
 
   Uploader(this.context) {
     snackBar = SnackBar(
       content: Text('Uploading'),
       duration: Duration(seconds: 2),
-    );
-    endSnackBar = SnackBar(
-      content: Text('All photos are uploaded'),
-      duration: Duration(seconds: 10),
-      action: SnackBarAction(
-        label: 'Dismiss',
-        onPressed: () {
-          ScaffoldMessenger.of(context).hideCurrentSnackBar();
-        },
-      ),
     );
   }
 
@@ -66,10 +56,11 @@ class Uploader {
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
 
     for(var element in photos) {
-      Response response = await uploadChunk(element, category);
-      API.dio.clear();
-      print("Request: ${response.data}");
+      var index = photos.indexOf(element);
 
+      Response response = await uploadChunk(element, category);
+
+      API.dio.clear();
       if(json.decode(response.data)["stat"] == "fail") {
         print("Request failed: ${response.statusCode}");
 
@@ -77,14 +68,11 @@ class Uploader {
         ScaffoldMessenger.of(context).showSnackBar(errorSnackBar(context, response.data));
       }
     }
+
     print('new status');
-    // saveStatus((await sessionStatus())['result']);
     createDio();
 
     await _showUploadNotification(result);
-
-    // ScaffoldMessenger.of(context).hideCurrentSnackBar();
-    // ScaffoldMessenger.of(context).showSnackBar(endSnackBar);
   }
 
   void createDio() async {
@@ -141,7 +129,7 @@ class Uploader {
       'category': category,
     };
     ChunkedUploader chunkedUploader = ChunkedUploader(API.dio);
-
+    print(await FlutterAbsolutePath.getAbsolutePath(photo.identifier));
     try {
       Future<Response> response = chunkedUploader.upload(
         context: context,
@@ -152,8 +140,8 @@ class Uploader {
         method: 'POST',
         data: fields,
         contentType: Headers.formUrlEncodedContentType,
-        onUploadProgress: (progress) {
-          print('${photo.name} ${(progress*100).ceil()/100}');
+        onUploadProgress: (value) {
+          // print('${photo.name} $progress');
         });
       return response;
     } on DioError catch (e) {

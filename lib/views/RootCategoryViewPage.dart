@@ -10,6 +10,7 @@ import 'package:piwigo_ng/views/components/Dialogs.dart';
 import 'package:piwigo_ng/views/components/ListItems.dart';
 import 'package:piwigo_ng/views/SettingsPage.dart';
 import 'package:piwigo_ng/views/UploadGalleryViewPage.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class RootCategoryViewPage extends StatefulWidget {
   final bool isAdmin;
@@ -86,7 +87,7 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
             ],
              */
             flexibleSpace: FlexibleSpaceBar(
-              title: Text("Albums", style: _theme.textTheme.headline1),
+              title: Text(/*AppLocalizations.of(context).rootTitle*/'Albums', style: _theme.textTheme.headline1),
               /*
               background: Column(
                 mainAxisAlignment: MainAxisAlignment.end,

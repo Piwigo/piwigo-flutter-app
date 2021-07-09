@@ -145,6 +145,7 @@ Future<int> deleteImages(BuildContext context, List<int> imageIdList) async {
     var response = await deleteImage(id);
     if(response['stat'] == 'fail') {
       print(response);
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
       ScaffoldMessenger.of(context).showSnackBar(
         errorSnackBar(context, '${response['result']}'),
       );
@@ -191,6 +192,7 @@ Future<int> moveImages(BuildContext context, List<dynamic> images, int category)
   for(var image in images) {
     var response = await moveImage(image['id'], [category]);
     if(response['stat'] == 'fail') {
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
       ScaffoldMessenger.of(context).showSnackBar(
           errorSnackBar(context, '${response['result']}')
       );
@@ -245,6 +247,7 @@ Future<int> assignImages(BuildContext context, List<dynamic> images, int categor
     categories.add(category);
     var response = await assignImage(image['id'], categories);
     if(response['stat'] == 'fail') {
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
       ScaffoldMessenger.of(context).showSnackBar(
           errorSnackBar(context, '${response['result']}')
       );
@@ -295,6 +298,7 @@ Future<int> editImages(BuildContext context, List<Map<String, dynamic>> images, 
   for(var image in images) {
     var response = await editImage(image['id'], image['name'], image['desc'], tags, level);
     if(response['stat'] == 'fail') {
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
       ScaffoldMessenger.of(context).showSnackBar(
           errorSnackBar(context, '${response['result']}')
       );

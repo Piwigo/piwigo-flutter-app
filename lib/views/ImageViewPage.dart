@@ -1,3 +1,4 @@
+import 'package:better_player/better_player.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:confirm_dialog/confirm_dialog.dart';
 import 'package:flutter/material.dart';
@@ -8,6 +9,8 @@ import 'package:piwigo_ng/api/ImageAPI.dart';
 import 'package:piwigo_ng/services/MoveAlbumService.dart';
 import 'package:piwigo_ng/views/components/Dialogs.dart';
 import 'package:piwigo_ng/views/components/SnackBars.dart';
+import 'package:path/path.dart' as Path;
+import 'package:video_player/video_player.dart';
 
 
 class ImageViewPage extends StatefulWidget {
@@ -109,9 +112,43 @@ class _ImageViewPageState extends State<ImageViewPage> {
       backgroundColor: Colors.black,
       resizeToAvoidBottomInset: true,
       extendBodyBehindAppBar: true,
-      extendBody: true,
+      // extendBody: true,
       body: Container(
-        child: PhotoViewGallery.builder(
+        child: PageView.builder(
+          physics: const BouncingScrollPhysics(),
+          itemCount: images.length,
+          controller: _pageController,
+          onPageChanged: (newPage) async {
+            if(newPage == images.length-1) {
+              await nextPage();
+            }
+            setState(() {
+              _page = newPage;
+            });
+          },
+          itemBuilder: (context, index) {
+            if(Path.extension(images[index]['element_url']) == '.mp4') {
+              return BetterPlayer.network(
+                images[index]['element_url'],
+                betterPlayerConfiguration: BetterPlayerConfiguration(
+                  aspectRatio: images[index]['width']/images[index]['height'],
+                  fullScreenAspectRatio: images[index]['width']/images[index]['height'],
+                  controlsConfiguration: BetterPlayerControlsConfiguration(
+                    enableSkips: false,
+                    enableFullscreen: false,
+                    unMuteIcon: Icons.volume_off,
+                  )
+                ),
+              );
+            }
+            return PhotoView(
+              imageProvider: CachedNetworkImageProvider(images[index]["derivatives"][_derivative]["url"]),
+              minScale: PhotoViewComputedScale.contained,
+            );
+          }
+        ),
+        /*
+        PhotoViewGallery.builder(
           scrollPhysics: const BouncingScrollPhysics(),
           itemCount: images.length,
           pageController: _pageController,
@@ -138,6 +175,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
             ),
           ),
         ),
+        */
       ),
       bottomNavigationBar: widget.isAdmin? BottomNavigationBar(
         onTap: (index) async {

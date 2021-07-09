@@ -7,12 +7,25 @@ import 'package:piwigo_ng/services/OrientationService.dart';
 import 'package:piwigo_ng/views/CategoryViewPage.dart';
 import 'package:piwigo_ng/services/MoveAlbumService.dart';
 import 'package:piwigo_ng/api/CategoryAPI.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 
 import 'Dialogs.dart';
 import 'SnackBars.dart';
 import 'WeirdBorder.dart';
 
-String albumSubCount(dynamic album) {
+/*
+String albumSubCount(dynamic album, context) {
+  String displayString = AppLocalizations.of(context).photoCount(album["total_nb_images"]);
+  if(album["nb_categories"] > 0) {
+    displayString += ', ${AppLocalizations.of(context).subAlbumCount(album["nb_categories"])}';
+  }
+  return displayString;
+}
+
+ */
+
+String albumSubCount(dynamic album, context) {
   String displayString = '${album["total_nb_images"]} ${album["total_nb_images"] == 1 ? 'photo' : 'photos'}';
   if(album["nb_categories"] > 0) {
     displayString += ', ${album["nb_categories"]} ${album["nb_categories"] == 1 ? 'sub-album' : 'sub-albums'}';
@@ -32,6 +45,7 @@ Widget albumListItem(BuildContext context, dynamic album, bool isAdmin, Function
           title: album["name"],
           category: album["id"].toString(),
           isAdmin: isAdmin,
+          nbImages: album["nb_images"],
         )),
       ).whenComplete(() {
         onRefresh('Closed children category');
@@ -190,6 +204,7 @@ Widget albumListItemRight(BuildContext context, dynamic album, bool isAdmin, Fun
           title: album["name"],
           category: album["id"].toString(),
           isAdmin: isAdmin,
+          nbImages: album["nb_images"],
         )),
       ).whenComplete(() {
         onRefresh('Closed children category');
@@ -372,7 +387,7 @@ Widget albumInfo(BuildContext context, album) {
                 ),
                 Container(
                   padding: EdgeInsets.all(5),
-                  child: Text(albumSubCount(album),
+                  child: Text(albumSubCount(album, context),
                     style: Theme.of(context).textTheme.bodyText2,
                     overflow: TextOverflow.fade,
                   ),
