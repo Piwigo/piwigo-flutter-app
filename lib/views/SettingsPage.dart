@@ -127,14 +127,14 @@ class _SettingsPageState extends State<SettingsPage> {
                             child: Text('${API.prefs.getBool('is_guest') ? 'Log in' : 'Log out' }', style: TextStyle(color: Color(0xffff7700), fontSize: 20)),
                           ),
                         ),
-                        API.prefs.getBool('is_guest') ?
-                          Text('') :
+                        API.prefs.getString('user_status') == 'admin' || API.prefs.getString('user_status') == 'webmaster' ?
                           Center(
                             child: Container(
                               padding: EdgeInsets.all(5),
                               child: Text('This server handles these file types: ${API.prefs.getString("file_types").replaceAll(",", ", ")}', textAlign: TextAlign.center, style: TextStyle(color: Colors.black, fontSize: 12)),
                             ),
-                          ),
+                          ) :
+                          Text(''),
                         /*
                         // TODO: Implement albums options
                         SizedBox(height: 20),
