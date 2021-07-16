@@ -98,6 +98,7 @@ void savePreferences(Map<String, dynamic> status, {
   API.prefs.setString('password', password);
   API.prefs.setBool("is_logged", isLogged);
   API.prefs.setBool("is_guest", isGuest);
+  API.prefs.setString("user_status", status["status"]);
   API.prefs.setString("base_url", url);
 
   API.prefs.setString("default_album", "Root Album");
