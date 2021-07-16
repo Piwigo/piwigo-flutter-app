@@ -77,7 +77,7 @@ void saveStatus(Map<String, dynamic> status) async {
   API.prefs.setString("status", status["status"]);
   API.prefs.setString("version", status["version"]);
   API.prefs.setStringList("available_sizes", status["available_sizes"].cast<String>());
-  if(API.prefs.getBool("is_logged") && !API.prefs.getBool("is_guest")) {
+  if(API.prefs.getString("user_status") == "admin" || API.prefs.getString("user_status") == "webmaster") {
     API.prefs.setInt('upload_form_chunk_size', status['upload_form_chunk_size']);
     API.prefs.setString("file_types", status["upload_file_types"]);
   }
