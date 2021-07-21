@@ -81,9 +81,9 @@ void saveStatus(Map<String, dynamic> status) async {
     API.prefs.setInt('upload_form_chunk_size', status['upload_form_chunk_size']);
     API.prefs.setString("file_types", status["upload_file_types"]);
   }
-  if(API.prefs.getString('miniature_size') == null) {
-    API.prefs.setString('miniature_size', 'medium');
-  }
+  if(API.prefs.getString('miniature_size') == null) API.prefs.setString('miniature_size', 'medium');
+  if(API.prefs.getString('full_screen_image_size') == null) API.prefs.setString('full_screen_image_size', 'medium');
+  if(API.prefs.getString('album_miniature_size') == null) API.prefs.setString('album_miniature_size', 'medium');
 }
 
 void savePreferences(Map<String, dynamic> status, {

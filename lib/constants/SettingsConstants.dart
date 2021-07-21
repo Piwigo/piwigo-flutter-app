@@ -15,7 +15,6 @@ class Constants {
     12: "Manual Sort",
     13: "Random Sort"
   };
-
   static Map<int, String> privacyLevels = {
     0: 'Everyone',
     1: 'Admins, Family, Friends, Contacts',

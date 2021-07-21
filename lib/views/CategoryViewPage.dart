@@ -157,6 +157,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
           future: fetchAlbums(widget.category), // Albums of the list
           builder: (BuildContext context, AsyncSnapshot albumSnapshot) {
             if (albumSnapshot.hasData) {
+
               if(albumSnapshot.data['stat'] == 'fail') {
                 return Center(child: Text('Failed to load albums'));
               }
@@ -169,6 +170,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
               albums.removeWhere((category) =>
                 (category["id"].toString() == widget.category)
               );
+              // print(albums);
               return FutureBuilder<Map<String,dynamic>>(
                 future: fetchImages(widget.category, 0), // Images of the list
                 builder: (BuildContext context, AsyncSnapshot imagesSnapshot) {
@@ -413,8 +415,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
   Widget createUploadActionButton() {
     ThemeData _theme = Theme.of(context);
     return SpeedDial(
-      marginEnd: 10,
-      marginBottom: 17,
+      childMargin: EdgeInsets.only(bottom: 17, right: 10),
       animatedIcon: AnimatedIcons.menu_close,
       animatedIconTheme: IconThemeData(size: 22.0),
       closeManually: false,

@@ -12,13 +12,15 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   double _currentSliderValue = 5;
-  String _derivative;
+  String _albumDerivative;
+  String _miniatureDerivative;
+  String _fsDerivative;
 
   @override
   void initState() {
     super.initState();
     _currentSliderValue = API.prefs.getInt("recent_albums").toDouble();
-    _derivative = API.prefs.getString('miniature_size');
+    _miniatureDerivative = API.prefs.getString('miniature_size');
   }
 
   @override
@@ -326,14 +328,41 @@ class _SettingsPageState extends State<SettingsPage> {
                                   mainAxisAlignment: MainAxisAlignment.end,
                                   children: [
                                     DropdownButton<String>(
-                                      value: _derivative == null ? API.prefs.getString('miniature_size') : _derivative,
+                                      value: _miniatureDerivative == null ? API.prefs.getString('miniature_size') : _miniatureDerivative,
                                       style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
                                       underline: Container(),
                                       icon: Icon(Icons.chevron_right, color: Colors.grey.shade600, size: 20),
                                       onChanged: (String newValue) {
                                         setState(() {
-                                          _derivative = newValue;
-                                          API.prefs.setString('miniature_size', _derivative);
+                                          _miniatureDerivative = newValue;
+                                          API.prefs.setString('miniature_size', _miniatureDerivative);
+                                        });
+                                      },
+                                      items: API.prefs.getStringList('available_sizes').map<DropdownMenuItem<String>>((
+                                          String value) {
+                                        return DropdownMenuItem<String>(
+                                          value: value,
+                                          child: Text(value),
+                                        );
+                                      }).toList(),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              tableCell(
+                                Text('Full screen image size', style: TextStyle(color: Colors.black, fontSize: 16)),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    DropdownButton<String>(
+                                      value: _fsDerivative == null ? API.prefs.getString('full_screen_image_size') : _fsDerivative,
+                                      style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
+                                      underline: Container(),
+                                      icon: Icon(Icons.chevron_right, color: Colors.grey.shade600, size: 20),
+                                      onChanged: (String newValue) {
+                                        setState(() {
+                                          _fsDerivative = newValue;
+                                          API.prefs.setString('full_screen_image_size', _fsDerivative);
                                         });
                                       },
                                       items: API.prefs.getStringList('available_sizes').map<DropdownMenuItem<String>>((

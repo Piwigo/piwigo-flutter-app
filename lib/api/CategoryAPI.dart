@@ -8,7 +8,8 @@ Future<Map<String,dynamic>> fetchAlbums(String albumID) async {
   Map<String, String> queries = {
     "format": "json",
     "method": "pwg.categories.getList",
-    "cat_id": albumID
+    "cat_id": albumID,
+    "thumbnail_size": API.prefs.getString('miniature_size'),
   };
 
   try {

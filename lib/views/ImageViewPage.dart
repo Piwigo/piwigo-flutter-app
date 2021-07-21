@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
+import 'package:piwigo_ng/api/API.dart';
 import 'package:piwigo_ng/api/ImageAPI.dart';
 import 'package:piwigo_ng/services/MoveAlbumService.dart';
 import 'package:piwigo_ng/views/components/Dialogs.dart';
@@ -39,7 +40,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
     super.initState();
     SystemChrome.setEnabledSystemUIOverlays([SystemUiOverlay.bottom]);
     _pageController = PageController(initialPage: widget.index);
-    _derivative = "medium";
+    _derivative = API.prefs.getString('full_screen_image_size');
     _page = widget.index;
     _imagePage = (widget.images.length/100).ceil()-1;
     images.addAll(widget.images);
