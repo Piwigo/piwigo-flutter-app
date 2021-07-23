@@ -1,10 +1,20 @@
 {
-  "rootTitle": "Albums",
-
-  "subAlbumCount" : "{count, plural, zero{0 sous-albums} one{1 sous-album} other{{count} sous-albums}}",
-  "@subAlbumCount" : {
-    "placeholders": {
-      "count": {}
+    "rootTitle": "Albums",
+    "@rootTitle": {
+        "description": "Root album title"
+    },
+    "subAlbumCount": "{count, plural, zero{0 sous-albums} one{1 sous-album} other{{count} sous-albums}}",
+    "@subAlbumCount": {
+        "description": "Count the number of sub albums",
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "photoCount": "{count, plural, zero{0 photos} one{1 photo} other{{count} photos}}",
+    "@photoCount": {
+        "description": "Count the number of photos",
+        "placeholders": {
+            "count": {}
+        }
     }
-  }
 }
