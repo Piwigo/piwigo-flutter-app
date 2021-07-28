@@ -13,14 +13,14 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
   double _currentSliderValue = 5;
   String _albumDerivative;
-  String _miniatureDerivative;
+  String _thumbnailDerivative;
   String _fsDerivative;
 
   @override
   void initState() {
     super.initState();
     _currentSliderValue = API.prefs.getInt("recent_albums").toDouble();
-    _miniatureDerivative = API.prefs.getString('miniature_size');
+    _thumbnailDerivative = API.prefs.getString('thumbnail_size');
   }
 
   @override
@@ -172,23 +172,23 @@ class _SettingsPageState extends State<SettingsPage> {
                                */
                               InkWell(
                                 onTap: () {
-                                  // TODO: Implement change miniature size
-                                  print('change image miniatures size');
+                                  // TODO: Implement change thumbnail size
+                                  print('change image thumbnail size');
                                 },
                                 child: tableCellEnd(
-                                  Text('Miniatures', style: TextStyle(color: Colors.black, fontSize: 16)),
+                                  Text('thumbnails', style: TextStyle(color: Colors.black, fontSize: 16)),
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.end,
                                     children: [
                                       DropdownButton<String>(
-                                        value: _derivative == null ? API.prefs.getString('miniature_size') : _derivative,
+                                        value: _derivative == null ? API.prefs.getString('thumbnail_size') : _derivative,
                                         style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
                                         underline: Container(),
                                         icon: Icon(Icons.chevron_right, color: Colors.grey.shade600, size: 20),
                                         onChanged: (String newValue) {
                                           setState(() {
                                             _derivative = newValue;
-                                            API.prefs.setString('miniature_size', _derivative);
+                                            API.prefs.setString('thumbnail_size', _derivative);
                                           });
                                         },
                                         items: API.prefs.getStringList('available_sizes').map<DropdownMenuItem<String>>((
@@ -272,12 +272,12 @@ class _SettingsPageState extends State<SettingsPage> {
                           child: Column(
                             children: [
                               tableCell(
-                                Text('Show miniature title', style: TextStyle(color: Colors.black, fontSize: 16)),
+                                Text('Show thumbnail title', style: TextStyle(color: Colors.black, fontSize: 16)),
                                 Switch(
-                                  value: API.prefs.getBool('show_miniature_title'),
+                                  value: API.prefs.getBool('show_thumbnail_title'),
                                   onChanged: (bool) {
                                     setState(() {
-                                      API.prefs.setBool('show_miniature_title', bool);
+                                      API.prefs.setBool('show_thumbnail_title', bool);
                                     });
                                   },
                                 ),
@@ -323,19 +323,19 @@ class _SettingsPageState extends State<SettingsPage> {
                                 ),
                               ),
                               tableCell(
-                                Text('Miniature size', style: TextStyle(color: Colors.black, fontSize: 16)),
+                                Text('Thumbnail size', style: TextStyle(color: Colors.black, fontSize: 16)),
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.end,
                                   children: [
                                     DropdownButton<String>(
-                                      value: _miniatureDerivative == null ? API.prefs.getString('miniature_size') : _miniatureDerivative,
+                                      value: _thumbnailDerivative == null ? API.prefs.getString('thumbnail_size') : _thumbnailDerivative,
                                       style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
                                       underline: Container(),
                                       icon: Icon(Icons.chevron_right, color: Colors.grey.shade600, size: 20),
                                       onChanged: (String newValue) {
                                         setState(() {
-                                          _miniatureDerivative = newValue;
-                                          API.prefs.setString('miniature_size', _miniatureDerivative);
+                                          _thumbnailDerivative = newValue;
+                                          API.prefs.setString('thumbnail_size', _thumbnailDerivative);
                                         });
                                       },
                                       items: API.prefs.getStringList('available_sizes').map<DropdownMenuItem<String>>((

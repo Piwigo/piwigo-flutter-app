@@ -102,15 +102,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
             iconTheme: IconThemeData(
               color: _theme.iconTheme.color,//change your color here
             ),
-            leading: _isEditMode ? IconButton(
-              onPressed: () {
-                setState(() {
-                  _isEditMode = false;
-                });
-                _selectedItems.clear();
-              },
-              icon: Icon(Icons.cancel),
-            ) : IconButton(
+            leading: IconButton(
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -122,26 +114,12 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
             actions: [
               _isEditMode ? IconButton(
                 onPressed: () {
-                  if(_selectedItems.length > 0) {
-                    print('Edit: ${_selectedItems.keys}');
-                    showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return EditImageSelectionDialog(
-                            catId: int.parse(widget.category),
-                            images: _selectedItems.values.toList(),
-                          );
-                        }
-                    ).whenComplete(() {
-                      print('Edited ${_selectedItems.length} images');
-                      setState(() {
-                        _selectedItems.clear();
-                        _isEditMode = false;
-                      });
-                    });
-                  }
+                  setState(() {
+                    _isEditMode = false;
+                  });
+                  _selectedItems.clear();
                 },
-                icon: Icon(Icons.edit),
+                icon: Icon(Icons.cancel),
               ) : widget.isAdmin? IconButton(
                 onPressed: () {
                   setState(() {
@@ -291,7 +269,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
                                         Border.all(width: 0, color: Colors.white),
                                       /*
                                       image: DecorationImage(
-                                        image: Image.network(imageList[index]["derivatives"][API.prefs.getString('miniature_size')]["url"]).image,
+                                        image: Image.network(imageList[index]["derivatives"][API.prefs.getString('thumbnail_size')]["url"]).image,
                                         fit: BoxFit.cover,
                                       ),
                                        */
@@ -302,7 +280,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
                                         Container(
                                           width: double.infinity,
                                           height: double.infinity,
-                                          child: Image.network(imageList[index]["derivatives"][API.prefs.getString('miniature_size')]["url"],
+                                          child: Image.network(imageList[index]["derivatives"][API.prefs.getString('thumbnail_size')]["url"],
                                             fit: BoxFit.cover,
                                           ),
                                         ),
@@ -323,7 +301,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
                                         ) : Text(""),
 
                                          */
-                                        API.prefs.getBool('show_miniature_title')? Align(
+                                        API.prefs.getBool('show_thumbnail_title')? Align(
                                           alignment: Alignment.bottomCenter,
                                           child: Container(
                                             width: double.infinity,
@@ -512,11 +490,28 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
         switch (index) {
           case 0:
             if(_selectedItems.length > 0) {
-              if(await confirm(context,
-                title: Text('Confirm'),
-                content: Text('Download ${_selectedItems.keys.length} images ?', softWrap: true, maxLines: 3),
-                textOK: Text('Yes', style: TextStyle(color: Color(0xff479900))),
-                textCancel: Text('No', style: TextStyle(color: Theme.of(context).errorColor)),
+              print('Edit: ${_selectedItems.keys}');
+              showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return EditImageSelectionDialog(
+                      catId: int.parse(widget.category),
+                      images: _selectedItems.values.toList(),
+                    );
+                  }
+              ).whenComplete(() {
+                print('Edited ${_selectedItems.length} images');
+                setState(() {
+                  _selectedItems.clear();
+                  _isEditMode = false;
+                });
+              });
+            }
+            break;
+          case 1:
+            if(_selectedItems.length > 0) {
+              if(await confirmDialog(context,
+                content: 'Download ${_selectedItems.keys.length} images ?',
               )) {
                 print('Download ${_selectedItems.keys.toList()}');
 
@@ -542,7 +537,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
               }
             }
             break;
-          case 1:
+          case 2:
             if(_selectedItems.length > 0) {
               print('Move ${_selectedItems.keys}');
               await moveCategoryModalBottomSheet(context,
@@ -588,13 +583,10 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
               });
             }
             break;
-          case 2:
+          case 3:
             if(_selectedItems.length > 0) {
-              if(await confirm(context,
-                title: Text('Confirm'),
-                content: Text('Delete ${_selectedItems.keys.length} images ?', softWrap: true, maxLines: 3),
-                textOK: Text('Yes', style: TextStyle(color: Color(0xff479900))),
-                textCancel: Text('No', style: TextStyle(color: Theme.of(context).errorColor)),
+              if(await confirmDialog(context,
+                content: 'Delete ${_selectedItems.keys.length} images ?',
               )) {
                 print('Delete ${_selectedItems.keys}');
 
@@ -620,6 +612,10 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
         }
       },
       items: <BottomNavigationBarItem>[
+        BottomNavigationBarItem(
+          icon: Icon(Icons.edit, color: _theme.iconTheme.color),
+          label: "Edit",
+        ),
         BottomNavigationBarItem(
           icon: Icon(Icons.download_rounded, color: _theme.iconTheme.color),
           label: "upload",

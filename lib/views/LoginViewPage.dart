@@ -4,6 +4,7 @@ import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:piwigo_ng/api/API.dart';
 import 'package:piwigo_ng/api/SessionAPI.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 
 class LoginViewPage extends StatefulWidget {
@@ -323,7 +324,7 @@ class _LoginViewPageState extends State<LoginViewPage> {
                               child: Container(
                                 padding: EdgeInsets.only(top: 20),
                                 alignment: Alignment.bottomCenter,
-                                child: Text('v0.0.1-beta', style: TextStyle(fontSize: 14)),
+                                child: Text(dotenv.env['app_version'], style: TextStyle(fontSize: 14)),
                               ),
                             ),
                           ],

@@ -182,11 +182,8 @@ class _ImageViewPageState extends State<ImageViewPage> {
         onTap: (index) async {
           switch (index) {
             case 0:
-              if(await confirm(context,
-                title: Text('Confirm'),
-                content: Text('Download ${images[_page]['name']} ?', softWrap: true, maxLines: 3),
-                textOK: Text('Yes', style: TextStyle(color: Color(0xff479900))),
-                textCancel: Text('No', style: TextStyle(color: Theme.of(context).errorColor)),
+              if(await confirmDialog(context,
+                content: 'Download ${images[_page]['name']} ?',
               )) {
                 print('Download $_page');
 
@@ -262,11 +259,8 @@ class _ImageViewPageState extends State<ImageViewPage> {
               break;
                */
             case 2: // TODO: change to 3 if implemented Attach function
-              if(await confirm(context,
-                title: Text('Confirm'),
-                content: Text('Delete ${images[_page]['name']} ?', softWrap: true, maxLines: 3),
-                textOK: Text('Yes', style: TextStyle(color: Color(0xff479900))),
-                textCancel: Text('No', style: TextStyle(color: Theme.of(context).errorColor)),
+              if(await confirmDialog(context,
+                content: 'Delete ${images[_page]['name']} ?',
               )) {
                 print('Delete $_page');
 
@@ -314,7 +308,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
           BottomNavigationBarItem(
             icon: Icon(Icons.attach_file, color: _theme.iconTheme.color),
             label: "Attach",
-            // TODO: implement attach miniature
+            // TODO: implement attach thumbnail
           ),
           */
           BottomNavigationBarItem(

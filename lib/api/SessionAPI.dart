@@ -81,9 +81,9 @@ void saveStatus(Map<String, dynamic> status) async {
     API.prefs.setInt('upload_form_chunk_size', status['upload_form_chunk_size']);
     API.prefs.setString("file_types", status["upload_file_types"]);
   }
-  if(API.prefs.getString('miniature_size') == null) API.prefs.setString('miniature_size', 'medium');
+  if(API.prefs.getString('thumbnail_size') == null) API.prefs.setString('thumbnail_size', 'medium');
   if(API.prefs.getString('full_screen_image_size') == null) API.prefs.setString('full_screen_image_size', 'medium');
-  if(API.prefs.getString('album_miniature_size') == null) API.prefs.setString('album_miniature_size', 'medium');
+  if(API.prefs.getString('album_thumbnail_size') == null) API.prefs.setString('album_thumbnail_size', 'medium');
 }
 
 void savePreferences(Map<String, dynamic> status, {
@@ -101,11 +101,11 @@ void savePreferences(Map<String, dynamic> status, {
   API.prefs.setString("base_url", url);
 
   API.prefs.setString("default_album", "Root Album");
-  if(API.prefs.getInt("default_miniatures_size") == null) API.prefs.setInt("default_miniatures_size", 0);
+  if(API.prefs.getInt("default_thumbnails_size") == null) API.prefs.setInt("default_thumbnails_size", 0);
   if(API.prefs.getInt("sort") == null) API.prefs.setInt("sort", 0);
   if(API.prefs.getInt("recent_albums") == null) API.prefs.setInt("recent_albums", 5);
   if(API.prefs.getDouble("portrait_image_count") == null) API.prefs.setDouble("portrait_image_count", 4);
   if(API.prefs.getDouble("landscape_image_count") == null) API.prefs.setDouble("landscape_image_count", 6);
-  if(API.prefs.getBool("show_miniature_title") == null) API.prefs.setBool("show_miniature_title", false);
+  if(API.prefs.getBool("show_thumbnail_title") == null) API.prefs.setBool("show_thumbnail_title", false);
   saveStatus(status);
 }

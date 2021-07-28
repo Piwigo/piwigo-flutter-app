@@ -12,7 +12,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'Dialogs.dart';
 import 'SnackBars.dart';
-import 'WeirdBorder.dart';
+import 'CustomShapes.dart';
 
 /*
 String albumSubCount(dynamic album, context) {
@@ -87,12 +87,8 @@ Widget albumListItem(BuildContext context, dynamic album, bool isAdmin, Function
                   album['name'],
                   false,
                       (item) async {
-                    if (await confirm(
-                      context,
-                      title: Text('Confirm'),
-                      content: Text('Move ${album['name']} to ${item.name} ?', softWrap: true, maxLines: 3),
-                      textOK: Text('Yes', style: TextStyle(color: Color(0xff479900))),
-                      textCancel: Text('No', style: TextStyle(color: Theme.of(context).errorColor)),
+                    if (await confirmDialog(context,
+                      content: 'Move ${album['name']} to ${item.name} ?',
                     )) {
                       var result = await moveCategory(album['id'], item.id);
                       print(result);
@@ -125,12 +121,9 @@ Widget albumListItem(BuildContext context, dynamic album, bool isAdmin, Function
               color: Colors.transparent,
               iconWidget: Icon(Icons.delete, size: 38, color: _theme.accentIconTheme.color),
               onTap: () async {
-                if (await confirm(
+                if (await confirmDialog(
                   context,
-                  title: Text('Confirm'),
-                  content: Text('Delete ${album["name"]} ?', softWrap: true, maxLines: 3),
-                  textOK: Text('Yes', style: TextStyle(color: Color(0xff479900))),
-                  textCancel: Text('No', style: TextStyle(color: _theme.errorColor)),
+                  content: 'Delete album ${album["name"]} ?',
                 )) {
                   var result = await deleteCategory(album['id'].toString());
                   if(result['stat'] == 'fail') {
@@ -231,12 +224,8 @@ Widget albumListItemRight(BuildContext context, dynamic album, bool isAdmin, Fun
               color: Colors.transparent,
               iconWidget: Icon(Icons.delete, size: 38, color: _theme.accentIconTheme.color),
               onTap: () async {
-                if (await confirm(
-                  context,
-                  title: Text('Confirm'),
-                  content: Text('Delete ${album["name"]} ?', softWrap: true, maxLines: 3),
-                  textOK: Text('Yes', style: TextStyle(color: Color(0xff479900))),
-                  textCancel: Text('No', style: TextStyle(color: _theme.errorColor)),
+                if (await confirmDialog(context,
+                  content: 'Delete ${album["name"]} ?',
                 )) {
                   var result = await deleteCategory(album['id'].toString());
                   if(result['stat'] == 'fail') {
@@ -263,12 +252,8 @@ Widget albumListItemRight(BuildContext context, dynamic album, bool isAdmin, Fun
                 album['name'],
                 false,
                     (item) async {
-                  if (await confirm(
-                    context,
-                    title: Text('Confirm'),
-                    content: Text('Move ${album['name']} to ${item.name} ?', softWrap: true, maxLines: 3),
-                    textOK: Text('Yes', style: TextStyle(color: Color(0xff479900))),
-                    textCancel: Text('No', style: TextStyle(color: Theme.of(context).errorColor)),
+                  if (await confirmDialog(context,
+                    content: 'Move ${album['name']} to ${item.name} ?',
                   )) {
                     print('Move ${album['id']} to ${item.id}');
                     var result = await moveCategory(album['id'], item.id);
@@ -426,7 +411,7 @@ Widget albumThumbnail(BuildContext context, album, {BorderRadius borderRadius = 
 Widget albumItemSeparator(BuildContext context) {
   return Container(
     decoration: ShapeDecoration(
-      shape: WeirdBorder(radius: 7),
+      shape: AlbumCardSeparatorShape(radius: 7),
       color: Theme.of(context).backgroundColor,
     ),
     width: 14,
