@@ -131,8 +131,7 @@ class _SettingsPageState extends State<SettingsPage> {
                             child: Text('${API.prefs.getBool('is_guest') ? appStrings(context).login : appStrings(context).logout }', style: TextStyle(color: Color(0xffff7700), fontSize: 20)),
                           ),
                         ),
-                        API.prefs.getBool('is_guest') ?
-                          Text('') :
+                        API.prefs.getString('user_status') == 'admin' || API.prefs.getString('user_status') == 'webmaster' ?
                           Center(
                             child: Container(
                               padding: EdgeInsets.all(5),
@@ -140,8 +139,8 @@ class _SettingsPageState extends State<SettingsPage> {
                                   textAlign: TextAlign.center,
                                   style: TextStyle(color: Colors.black, fontSize: 12)),
                             ),
-                          ),
-                        ),
+                          )) :
+                          Text(''),
                         SizedBox(height: 20),
                         Padding(
                           padding: EdgeInsets.only(left: 10, bottom: 3),
