@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:piwigo_ng/services/ThemeProvider.dart';
 import 'package:piwigo_ng/views/RootCategoryViewPage.dart';
 import 'package:piwigo_ng/api/API.dart';
@@ -47,8 +46,8 @@ class MyApp extends StatelessWidget {
           return MaterialApp(
             title: 'Piwigo',
             // theme: notifier.darkTheme ? dark : light,
-            // localizationsDelegates: AppLocalizations.localizationsDelegates,
-            // supportedLocales: AppLocalizations.supportedLocales,
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
             /*
             localizationsDelegates: [
               AppLocalizations.delegate,

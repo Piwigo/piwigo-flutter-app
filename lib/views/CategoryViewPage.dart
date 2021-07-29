@@ -1,5 +1,4 @@
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:confirm_dialog/confirm_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
@@ -10,6 +9,7 @@ import 'package:multi_image_picker/multi_image_picker.dart';
 import 'package:piwigo_ng/api/API.dart';
 import 'package:piwigo_ng/api/CategoryAPI.dart';
 import 'package:piwigo_ng/api/ImageAPI.dart';
+import 'package:piwigo_ng/constants/SettingsConstants.dart';
 import 'package:piwigo_ng/services/MoveAlbumService.dart';
 import 'package:piwigo_ng/services/OrientationService.dart';
 import 'package:piwigo_ng/views/components/Dialogs.dart';
@@ -77,14 +77,6 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
     return _selectedItems.length;
   }
 
-  String albumSubCount(dynamic album) {
-    String displayString = '${album["total_nb_images"]} ${album["total_nb_images"] == 1 ? 'photo' : 'photos'}';
-    if(album["nb_categories"] > 0) {
-      displayString += ', ${album["nb_categories"]} ${album["nb_categories"] == 1 ? 'sub-album' : 'sub-albums'}';
-    }
-    return displayString;
-  }
-
 
   @override
   Widget build(BuildContext context) {
@@ -137,7 +129,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
             if (albumSnapshot.hasData) {
 
               if(albumSnapshot.data['stat'] == 'fail') {
-                return Center(child: Text('Failed to load albums'));
+                return Center(child: Text(appStrings(context).albumsLoadFailure));
               }
               var albums = albumSnapshot.data['result']['categories'];
               int nbImages = _nbImages;
@@ -155,7 +147,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
                   if (imagesSnapshot.hasData) {
                     if (imageList.isEmpty || _page == 0) {
                       if(imagesSnapshot.data['stat'] == 'fail') {
-                        return Center(child: Text('Failed to load images'));
+                        return Center(child: Text(appStrings(context).imagesLoadFailure));
                       }
                       imageList.clear();
                       imageList.addAll(imagesSnapshot.data['result']['images']);
@@ -174,20 +166,6 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
                       child: SingleChildScrollView(
                         child: Column(
                           children: [
-                            /*
-                            ListView.builder(
-                              itemCount: albums.length,
-                              shrinkWrap: true,
-                              physics: NeverScrollableScrollPhysics(),
-                              itemBuilder: (BuildContext context, int index) {
-                                return albumListItem(context, albums[index], widget.isAdmin, (message) {
-                                  setState(() {
-                                    print('$message');
-                                  });
-                                });
-                              },
-                            ),
-                             */
                             albums.length > 0 ?
                             GridView.builder(
                               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -215,7 +193,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
                                   });
                                 });
                               },
-                            ) : Text(''),
+                            ) : Center(),
                             imageList.length > 0 ?
                             GridView.builder(
                               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -288,7 +266,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
                                           width: double.infinity,
                                           height: double.infinity,
                                           color: Color(0x80000000),
-                                        ) : Text(""),
+                                        ) : Center(),
                                         /*
                                         _isEditMode? Align(
                                           alignment: Alignment.topRight,
@@ -298,7 +276,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
                                               Icon(Icons.check_circle, color: _theme.floatingActionButtonTheme.backgroundColor) :
                                               Icon(Icons.check_circle_outline, color: _theme.disabledColor),
                                           ),
-                                        ) : Text(""),
+                                        ) : Center(),
 
                                          */
                                         API.prefs.getBool('show_thumbnail_title')? Align(
@@ -314,13 +292,13 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
                                               textAlign: TextAlign.center,
                                             ),
                                           ),
-                                        ) : Text(""),
+                                        ) : Center(),
                                       ],
                                     ),
                                   ),
                                 );
                               },
-                            ) : Text(''),
+                            ) : Center(),
                             nbImages > (_page+1)*100 ? GestureDetector(
                               onTap: () {
                                 showMore();
@@ -330,15 +308,15 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    Text('Show ${nbImages-((_page+1)*100)} more ...', style: TextStyle(fontSize: 14, color: _theme.disabledColor)),
+                                    Text(appStrings(context).showMoreCount(nbImages-((_page+1)*100)), style: TextStyle(fontSize: 14, color: _theme.disabledColor)),
                                   ],
                                 ),
                               ),
-                            ) : Text(''),
+                            ) : Center(),
                             Center(
                               child: Container(
                                 padding: EdgeInsets.all(10),
-                                child: Text('$nbImages ${nbImages == 1 ? 'photo' : 'photos'}', style: TextStyle(fontSize: 20, color: _theme.textTheme.bodyText2.color, fontWeight: FontWeight.w300)),
+                                child: Text(appStrings(context).photoCount(nbImages), style: TextStyle(fontSize: 20, color: _theme.textTheme.bodyText2.color, fontWeight: FontWeight.w300)),
                               ),
                             )
                           ],
@@ -361,7 +339,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
         ),
       ),
       floatingActionButton: _isEditMode ?
-        Text("") :
+        Center() :
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: Stack(
@@ -405,7 +383,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
       shape: CircleBorder(),
       children: [
         SpeedDialChild(
-          labelWidget: Text('New Album', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: _theme.buttonColor)),
+          labelWidget: Text(appStrings(context).newAlbum, style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: _theme.buttonColor)),
           child: Icon(Icons.create_new_folder),
           backgroundColor: _theme.floatingActionButtonTheme.backgroundColor,
           foregroundColor: _theme.floatingActionButtonTheme.foregroundColor,
@@ -423,7 +401,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
           },
         ),
         SpeedDialChild(
-            labelWidget: Text('Upload Photo', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: _theme.buttonColor)),
+            labelWidget: Text(appStrings(context).uploadPhoto, style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: _theme.buttonColor)),
             child: Icon(Icons.add_a_photo),
             backgroundColor: _theme.floatingActionButtonTheme.backgroundColor,
             foregroundColor: _theme.floatingActionButtonTheme.foregroundColor,
@@ -432,17 +410,17 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
                 List<Asset> imageList = await MultiImagePicker.pickImages(
                   maxImages: 100,
                   enableCamera: true,
-                  cupertinoOptions: CupertinoOptions(takePhotoIcon: "chat"),
+                  cupertinoOptions: CupertinoOptions(takePhotoIcon: 'chat'),
                   materialOptions: MaterialOptions(
-                    actionBarTitle: "Piwigo",
-                    allViewTitle: "All Photos",
-                    actionBarColor: "#ffff7700",
-                    actionBarTitleColor: "#ffeeeeee",
+                    actionBarTitle: 'Piwigo',
+                    allViewTitle: appStrings(context).allPhotos,
+                    actionBarColor: '#ffff7700',
+                    actionBarTitleColor: '#ffeeeeee',
                     lightStatusBar: false,
                     statusBarColor: '#ffab40',
                     startInAllView: false,
-                    selectCircleStrokeColor: "#ffffff",
-                    selectionLimitReachedText: "You can't select any more.",
+                    selectCircleStrokeColor: '#ffffff',
+                    selectionLimitReachedText: appStrings(context).maxSelection,
                   ),
                 );
                 if(imageList.isNotEmpty) {
@@ -456,7 +434,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
             }
         ),
         SpeedDialChild(
-            labelWidget: Text('Upload Video', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: _theme.buttonColor)),
+            labelWidget: Text(appStrings(context).uploadVideo, style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: _theme.buttonColor)),
             child: Icon(Icons.video_collection_rounded),
             backgroundColor: _theme.floatingActionButtonTheme.backgroundColor,
             foregroundColor: _theme.floatingActionButtonTheme.foregroundColor,
@@ -510,8 +488,8 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
             break;
           case 1:
             if(_selectedItems.length > 0) {
-              if(await confirmDialog(context,
-                content: 'Download ${_selectedItems.keys.length} images ?',
+              if(await confirmDownloadDialog(context,
+                content: appStrings(context).downloadImagesCount(_selectedItems.length),
               )) {
                 print('Download ${_selectedItems.keys.toList()}');
 
@@ -527,7 +505,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
                   content: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('Downloading selection'),
+                      Text(appStrings(context).downloading),
                       CircularProgressIndicator(),
                     ],
                   ),
@@ -545,16 +523,11 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
                 widget.title,
                 true,
                 (item) async {
-                  String result = await confirmMoveAssignImage(
-                    context,
-                    title: Text('Confirm'),
-                    content: Text('Move selection to ${item.name} ?',
-                      softWrap: true,
-                      maxLines: 3
-                    ),
+                  int result = await confirmMoveAssignImage(context,
+                    content: appStrings(context).moveSelection(item.name),
                   );
                   print(result);
-                  if (result == 'move') {
+                  if (result == 0) {
                     print('Move selection to ${item.id}');
                     int nbMoved = await moveImages(context,
                       _selectedItems.values.toList(),
@@ -564,7 +537,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
                       imagesMovedSnackBar(nbMoved, item.name)
                     );
                     Navigator.of(context).pop();
-                  } else if (result == 'assign') {
+                  } else if (result == 1) {
                     print('Assign selection to ${item.id}');
                     int nbAssigned = await assignImages(context,
                       _selectedItems.values.toList(),
@@ -585,8 +558,8 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
             break;
           case 3:
             if(_selectedItems.length > 0) {
-              if(await confirmDialog(context,
-                content: 'Delete ${_selectedItems.keys.length} images ?',
+              if(await confirmDeleteDialog(context,
+                content: appStrings(context).deleteImagesCount(_selectedItems.length),
               )) {
                 print('Delete ${_selectedItems.keys}');
 
@@ -601,7 +574,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
                 int nbSuccess = await deleteImages(context, selection);
 
                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                  content: Text('Deleted ${selection.length} images'),
+                  content: Text(appStrings(context).deletedImagesCount(nbSuccess)),
                 ));
                 setState(() {});
               }
@@ -614,25 +587,25 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
       items: <BottomNavigationBarItem>[
         BottomNavigationBarItem(
           icon: Icon(Icons.edit, color: _theme.iconTheme.color),
-          label: "Edit",
+          label: appStrings(context).edit,
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.download_rounded, color: _theme.iconTheme.color),
-          label: "upload",
+          label: appStrings(context).download,
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.reply_outlined, color: _theme.iconTheme.color),
-          label: "share",
+          label: appStrings(context).move,
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.delete_outline, color: _theme.errorColor),
-          label: "delete",
+          label: appStrings(context).delete,
         ),
       ],
       backgroundColor: _theme.scaffoldBackgroundColor,
       type: BottomNavigationBarType.fixed,
-      selectedFontSize: 16,
-      unselectedFontSize: 16,
+      selectedFontSize: 14,
+      unselectedFontSize: 14,
       showSelectedLabels: false,
       showUnselectedLabels: false,
       currentIndex: 0,

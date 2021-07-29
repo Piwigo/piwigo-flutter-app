@@ -1,17 +1,15 @@
 import 'package:better_player/better_player.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:confirm_dialog/confirm_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:photo_view/photo_view.dart';
-import 'package:photo_view/photo_view_gallery.dart';
 import 'package:piwigo_ng/api/API.dart';
 import 'package:piwigo_ng/api/ImageAPI.dart';
+import 'package:piwigo_ng/constants/SettingsConstants.dart';
 import 'package:piwigo_ng/services/MoveAlbumService.dart';
 import 'package:piwigo_ng/views/components/Dialogs.dart';
 import 'package:piwigo_ng/views/components/SnackBars.dart';
 import 'package:path/path.dart' as Path;
-import 'package:video_player/video_player.dart';
 
 
 class ImageViewPage extends StatefulWidget {
@@ -106,7 +104,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
             },
             icon: Icon(Icons.share),
           ),
-           Text(""),
+           Center(),
            */
         ],
       ),
@@ -182,8 +180,8 @@ class _ImageViewPageState extends State<ImageViewPage> {
         onTap: (index) async {
           switch (index) {
             case 0:
-              if(await confirmDialog(context,
-                content: 'Download ${images[_page]['name']} ?',
+              if(await confirmDownloadDialog(context,
+                content: appStrings(context).downloadImage(images[_page]['name']),
               )) {
                 print('Download $_page');
 
@@ -192,7 +190,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
                   content: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('Downloading ${images[_page]['name']}'),
+                      Text(appStrings(context).downloading),
                       CircularProgressIndicator(),
                     ],
                   ),
@@ -208,16 +206,12 @@ class _ImageViewPageState extends State<ImageViewPage> {
                 widget.title,
                 true,
                 (item) async {
-                  String result = await confirmMoveAssignImage(
+                  int result = await confirmMoveAssignImage(
                     context,
-                    title: Text('Confirm'),
-                    content: Text('Move ${images[_page]} to ${item.name} ?',
-                        softWrap: true,
-                        maxLines: 3
-                    ),
+                    content: appStrings(context).moveImage(images[_page],item.name),
                   );
 
-                  if (result == 'move') {
+                  if (result == 0) {
                     print('Move $_page to ${item.id}');
                     var response = await moveImage(images[_page]['id'], [int.parse(item.id)]);
                     if(response['stat'] == 'fail') {
@@ -229,7 +223,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
                           imageMovedSnackBar(images[_page]['name'], item.name));
                       Navigator.of(context).pop();
                     }
-                  } else if (result == 'assign') {
+                  } else if (result == 1) {
                     print('Assign $_page to ${item.id}');
                     var response = await assignImage(images[_page]['id'], [int.parse(item.id)]);
                     if(response['stat'] == 'fail') {
@@ -259,8 +253,8 @@ class _ImageViewPageState extends State<ImageViewPage> {
               break;
                */
             case 2: // TODO: change to 3 if implemented Attach function
-              if(await confirmDialog(context,
-                content: 'Delete ${images[_page]['name']} ?',
+              if(await confirmDeleteDialog(context,
+                content: appStrings(context).deleteImage(images[_page]['name']),
               )) {
                 print('Delete $_page');
 
@@ -271,7 +265,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
                   );
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text('Deleting ${images[_page]['name']}'),
+                    content: Text(appStrings(context).deleting),
                   ));
                 }
                 int page = _page;
@@ -298,11 +292,11 @@ class _ImageViewPageState extends State<ImageViewPage> {
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.download_rounded, color: _theme.iconTheme.color),
-            label: "Download",
+            label: appStrings(context).download,
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.reply_outlined, color: _theme.iconTheme.color),
-            label: "Move",
+            label: appStrings(context).move,
           ),
           /*
           BottomNavigationBarItem(
@@ -313,7 +307,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
           */
           BottomNavigationBarItem(
             icon: Icon(Icons.delete_outline, color: _theme.errorColor),
-            label: "Delete",
+            label: appStrings(context).delete,
           ),
         ],
         backgroundColor: Color(0x80000000),
@@ -324,7 +318,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
         showUnselectedLabels: true,
         selectedItemColor: _theme.primaryColorLight,
         unselectedItemColor: _theme.primaryColorLight,
-      ) : Text(""),
+      ) : Center(),
     );
   }
 }

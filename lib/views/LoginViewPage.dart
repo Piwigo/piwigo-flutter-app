@@ -324,7 +324,7 @@ class _LoginViewPageState extends State<LoginViewPage> {
                               child: Container(
                                 padding: EdgeInsets.only(top: 20),
                                 alignment: Alignment.bottomCenter,
-                                child: Text(dotenv.env['app_version'], style: TextStyle(fontSize: 14)),
+                                child: Text(dotenv.env['APP_VERSION'], style: TextStyle(fontSize: 14)),
                               ),
                             ),
                           ],

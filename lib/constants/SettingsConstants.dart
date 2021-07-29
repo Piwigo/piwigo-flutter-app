@@ -1,3 +1,5 @@
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 class Constants {
   static Map<int, String> albumSort = {
     0: "Photo Title, A > Z",
@@ -22,4 +24,9 @@ class Constants {
     4: 'Admins, Family',
     8: 'Admins',
   };
+
+}
+
+AppLocalizations appStrings(context) {
+  return AppLocalizations.of(context);
 }

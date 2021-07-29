@@ -5,12 +5,12 @@ import 'dart:async';
 
 import 'package:piwigo_ng/api/API.dart';
 import 'package:piwigo_ng/api/CategoryAPI.dart';
+import 'package:piwigo_ng/constants/SettingsConstants.dart';
 import 'package:piwigo_ng/services/OrientationService.dart';
 import 'package:piwigo_ng/views/components/Dialogs.dart';
 import 'package:piwigo_ng/views/components/ListItems.dart';
 import 'package:piwigo_ng/views/SettingsPage.dart';
 import 'package:piwigo_ng/views/UploadGalleryViewPage.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class RootCategoryViewPage extends StatefulWidget {
   final bool isAdmin;
@@ -23,36 +23,15 @@ class RootCategoryViewPage extends StatefulWidget {
 class _RootCategoryViewPageState extends State<RootCategoryViewPage> with SingleTickerProviderStateMixin {
   String _rootCategory;
 
-  TextEditingController _searchTextController = new TextEditingController();
-  String _filter;
-
   @override
   void initState() {
     super.initState();
     API.uploader = Uploader(context);
     _rootCategory = "0";
-    _filter = "";
   }
   @override
   void dispose() {
     super.dispose();
-  }
-
-  bool _filterSearch(String name) {
-    if(_filter != null) {
-      if(!name.toLowerCase().contains(_filter.toLowerCase())) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  String albumSubCount(dynamic album) {
-    String displayString = '${album["total_nb_images"]} ${album["total_nb_images"] == 1 ? 'photo' : 'photos'}';
-    if(album["nb_categories"] > 0) {
-      displayString += ', ${album["nb_categories"]} ${album["nb_categories"] == 1 ? 'sub-album' : 'sub-albums'}';
-    }
-    return displayString;
   }
 
   @override
@@ -87,7 +66,7 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
             ],
              */
             flexibleSpace: FlexibleSpaceBar(
-              title: Text(/*AppLocalizations.of(context).rootTitle*/'Albums', style: _theme.textTheme.headline1),
+              title: Text(appStrings(context).rootTitle, style: _theme.textTheme.headline1),
               /*
               background: Column(
                 mainAxisAlignment: MainAxisAlignment.end,
@@ -110,7 +89,7 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
                       decoration: InputDecoration(
                         border: InputBorder.none,
                         prefixIcon: Icon(Icons.search, color: _theme.inputDecorationTheme.prefixStyle.color),
-                        hintText: "Search album",
+                        hintText: appStrings(context)(context).search,
                         hintStyle: _theme.inputDecorationTheme.hintStyle,
                       ),
                     ),
@@ -130,7 +109,7 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
               builder: (BuildContext context, AsyncSnapshot albumSnapshot) {
                 if(albumSnapshot.hasData){
                   if(albumSnapshot.data['stat'] == 'fail') {
-                    return Center(child: Text('Failed to load albums'));
+                    return Center(child: Text(appStrings(context).albumsLoadFailure));
                   }
                   var albums = albumSnapshot.data['result']['categories'];
                   int nbPhotos = 0;
@@ -197,7 +176,7 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
                           Center(
                             child: Container(
                               padding: EdgeInsets.all(10),
-                              child: Text('$nbPhotos ${nbPhotos == 1 ? 'photo' : 'photos'}', style: TextStyle(fontSize: 20, color: _theme.textTheme.bodyText2.color, fontWeight: FontWeight.w300)),
+                              child: Text(appStrings(context).photoCount(nbPhotos), style: TextStyle(fontSize: 20, color: _theme.textTheme.bodyText2.color, fontWeight: FontWeight.w300)),
                             ),
                           ),
                         ],

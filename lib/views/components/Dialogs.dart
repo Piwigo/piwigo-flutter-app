@@ -105,7 +105,7 @@ class DialogHeader extends StatelessWidget {
   }
 }
 
-Future<bool> confirmDialog(
+Future<bool> confirmDeleteDialog(
     BuildContext context, {
       String content,
     }) async {
@@ -113,6 +113,56 @@ Future<bool> confirmDialog(
     context: context,
     builder: (_) => ConfirmDialog(
       content: content,
+      yes: Text('Delete', style: TextStyle(color: Colors.red)),
+      no: Text('Cancel', style: TextStyle(color: Colors.grey)),
+    ),
+  );
+
+  return (isConfirm != null) ? isConfirm : false;
+}
+
+Future<bool> confirmMoveDialog(
+    BuildContext context, {
+      String content,
+    }) async {
+  final bool isConfirm = await showDialog<bool>(
+    context: context,
+    builder: (_) => ConfirmDialog(
+      content: content,
+      yes: Text('Move', style: TextStyle(color: Colors.green)),
+      no: Text('Cancel', style: TextStyle(color: Colors.grey)),
+    ),
+  );
+
+  return (isConfirm != null) ? isConfirm : false;
+}
+
+Future<bool> confirmAssignDialog(
+    BuildContext context, {
+      String content,
+    }) async {
+  final bool isConfirm = await showDialog<bool>(
+    context: context,
+    builder: (_) => ConfirmDialog(
+      content: content,
+      yes: Text('Assign', style: TextStyle(color: Colors.green)),
+      no: Text('Cancel', style: TextStyle(color: Colors.grey)),
+    ),
+  );
+
+  return (isConfirm != null) ? isConfirm : false;
+}
+
+Future<bool> confirmDownloadDialog(
+    BuildContext context, {
+      String content,
+    }) async {
+  final bool isConfirm = await showDialog<bool>(
+    context: context,
+    builder: (_) => ConfirmDialog(
+      content: content,
+      yes: Text('Download', style: TextStyle(color: Colors.blue)),
+      no: Text('Cancel', style: TextStyle(color: Colors.grey)),
     ),
   );
 
@@ -120,8 +170,10 @@ Future<bool> confirmDialog(
 }
 
 class ConfirmDialog extends StatelessWidget {
-  const ConfirmDialog({Key key, this.content}) : super(key: key);
+  const ConfirmDialog({Key key, this.content, this.yes, this.no}) : super(key: key);
   final String content;
+  final Text yes;
+  final Text no;
 
   @override
   Widget build(BuildContext context) {
@@ -129,7 +181,7 @@ class ConfirmDialog extends StatelessWidget {
 
     return WillPopScope(
       child: AlertDialog(
-        // contentPadding: EdgeInsets.all(10.0),
+        contentPadding: EdgeInsets.all(10.0),
         backgroundColor: Colors.transparent,
         content: Container(
           // padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -148,7 +200,7 @@ class ConfirmDialog extends StatelessWidget {
                     softWrap: true,
                     maxLines: 3,
                     textAlign: TextAlign.center,
-                    style: _theme.textTheme.headline6
+                    style: TextStyle(color: Colors.black),
                   ),
                 ),
                 Divider(thickness: 1, height: 0, endIndent: 5, indent: 5),
@@ -162,7 +214,7 @@ class ConfirmDialog extends StatelessWidget {
                             // color: Colors.red,
                           ),
                           child: TextButton(
-                            child: Text('No', style: TextStyle(color: Colors.grey)),
+                            child: no,
                             onPressed: () => Navigator.pop(context, false),
                           ),
                         ),
@@ -175,7 +227,7 @@ class ConfirmDialog extends StatelessWidget {
                             // color: Colors.green,
                           ),
                           child: TextButton(
-                            child: Text('Yes', style: TextStyle(color: Colors.green)),
+                            child: yes,
                             onPressed: () => Navigator.pop(context, true),
                           ),
                         ),
@@ -190,6 +242,84 @@ class ConfirmDialog extends StatelessWidget {
       ),
       onWillPop: () async {
         Navigator.pop(context, false);
+        return true;
+      },
+    );
+  }
+}
+
+class MultiConfirmDialog extends StatelessWidget {
+  const MultiConfirmDialog({Key key, this.content, this.actions, this.no}) : super(key: key);
+  final String content;
+  final List<Widget> actions;
+  final Text no;
+
+  @override
+  Widget build(BuildContext context) {
+    ThemeData _theme = Theme.of(context);
+
+    List<Widget> actionsRow = [];
+
+    actions.forEach((action) {
+      actionsRow.add(Expanded(
+        child: Container(
+          child: TextButton(
+            child: action,
+            onPressed: () => Navigator.pop(context, actions.indexOf(action)),
+          ),
+        ),
+      ));
+      if(actions.last != action) actionsRow.add(VerticalDivider(width: 1, thickness: 1));
+    });
+
+    return WillPopScope(
+      child: AlertDialog(
+        contentPadding: EdgeInsets.all(10.0),
+        backgroundColor: Colors.transparent,
+        content: Container(
+          // padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            color: _theme.scaffoldBackgroundColor,
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  alignment: Alignment.center,
+                  child: Text(
+                    (content != null) ? '$content' : 'Are you sure continue?',
+                    softWrap: true,
+                    maxLines: 3,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.black),
+                  ),
+                ),
+                Divider(thickness: 1, height: 0, endIndent: 5, indent: 5),
+                IntrinsicHeight(
+                  child: Row(
+                    children: actionsRow,
+                  ),
+                ),
+                Divider(thickness: 1, height: 0, endIndent: 5, indent: 5),
+                Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.vertical(bottom: Radius.circular(20)),
+                    // color: Colors.red,
+                  ),
+                  child: TextButton(
+                    child: no,
+                    onPressed: () => Navigator.pop(context, -1),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+      onWillPop: () async {
+        Navigator.pop(context, -1);
         return true;
       },
     );
@@ -372,40 +502,23 @@ Widget createCategoryAlert(BuildContext context, String catId) {
   );
 }
 
-Future<String> confirmMoveAssignImage(
+Future<int> confirmMoveAssignImage(
     BuildContext context, {
-      Widget title,
-      Widget content,
+      String content,
     }) async {
-  final String confirm = await showDialog<String>(
+  final int confirm = await showDialog<int>(
     context: context,
-    builder: (_) => WillPopScope(
-      child: AlertDialog(
-        title: title,
-        content: (content != null) ? content : Text('Are you sure continue?'),
-        actions: <Widget>[
-          TextButton(
-            child: Text('no', style: TextStyle(color: Theme.of(context).errorColor)),
-            onPressed: () => Navigator.pop(context, 'cancel'),
-          ),
-          TextButton(
-            child: Text('move', style: TextStyle(color: Theme.of(context).accentColor)),
-            onPressed: () => Navigator.pop(context, 'move'),
-          ),
-          TextButton(
-            child: Text('assign', style: TextStyle(color: Theme.of(context).accentColor)),
-            onPressed: () => Navigator.pop(context, 'assign'),
-          ),
-        ],
-      ),
-      onWillPop: () async {
-        Navigator.pop(context, 'cancel');
-        return true;
-      },
+    builder: (_) => MultiConfirmDialog(
+      content: content,
+      no: Text('Cancel', style: TextStyle(color: Colors.grey)),
+      actions: <Widget>[
+        Text('Move', style: TextStyle(color: Theme.of(context).accentColor)),
+        Text('Assign', style: TextStyle(color: Theme.of(context).accentColor)),
+      ],
     ),
   );
 
-  return (confirm != null) ? confirm : 'cancel';
+  return (confirm != null) ? confirm : -1;
 }
 
 class EditCategoryDialog extends StatefulWidget {
@@ -435,7 +548,6 @@ class _EditCategoryDialogState extends State<EditCategoryDialog> {
   @override
   Widget build(BuildContext context) {
     ThemeData _theme = Theme.of(context);
-    Size _screenSize = MediaQuery.of(context).size;
 
     return PiwigoDialog(
       title: "Edit Album",
@@ -979,7 +1091,6 @@ class _EditImageSelectionDialogState extends State<EditImageSelectionDialog> {
                       try {
                         int nbEdited = await editImages(context,
                             widget.images.map<Map<String,dynamic>>((image) {
-                              int index = widget.images.indexOf(image);
                               return {
                                 'id': image['id'],
                                 'name': _nameController.text,

@@ -1,6 +1,8 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:piwigo_ng/constants/SettingsConstants.dart';
 import 'package:piwigo_ng/views/LoginViewPage.dart';
 import 'package:piwigo_ng/api/API.dart';
 
@@ -63,7 +65,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 children: [
                   Container(
                     margin: EdgeInsets.only(left: 20),
-                    child: Text("Settings", style: TextStyle(fontSize: 26.0, fontWeight: FontWeight.w900, color: Color(0xff000000))),
+                    child: Text(appStrings(context).settings, style: TextStyle(fontSize: 26.0, fontWeight: FontWeight.w900, color: Color(0xff000000))),
                   ),
                 ],
               ),
@@ -81,11 +83,11 @@ class _SettingsPageState extends State<SettingsPage> {
                       children: [
                         Padding(
                           padding: EdgeInsets.only(left: 10),
-                          child: Text('Piwigo Server ${API.prefs.getString('version')}', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 18)),
+                          child: Text(appStrings(context).serverVersion(API.prefs.getString('version')), style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 18)),
                         ),
                         API.prefs.getString('base_url').substring(0, 4) != 'https' ? Text('') : Padding(
                           padding: EdgeInsets.only(left: 10, bottom: 3),
-                          child: Text('Unsecured Website !', style: TextStyle(color: Colors.black, fontSize: 12)),
+                          child: Text(appStrings(context).unsecured, style: TextStyle(color: Colors.black, fontSize: 12)),
                         ),
                         Container(
                           decoration: BoxDecoration(
@@ -95,11 +97,11 @@ class _SettingsPageState extends State<SettingsPage> {
                           child: Column(
                             children: [
                               tableCell(
-                                Text('Address', style: TextStyle(color: Colors.black, fontSize: 16)),
+                                Text(appStrings(context).address, style: TextStyle(color: Colors.black, fontSize: 16)),
                                 Text('${API.prefs.getString('base_url')}', overflow: TextOverflow.ellipsis, softWrap: false, style: TextStyle(color: Colors.grey.shade600, fontSize: 14)),
                               ),
                               tableCell(
-                                Text('Username', style: TextStyle(color: Colors.black, fontSize: 16)),
+                                Text(appStrings(context).username, style: TextStyle(color: Colors.black, fontSize: 16)),
                                 Text('${API.prefs.getString('account_username')}', overflow: TextOverflow.ellipsis, softWrap: false, style: TextStyle(color: Colors.grey.shade600, fontSize: 14)),
                                 isEnd: true,
                               ),
@@ -126,7 +128,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                 (Route route) => false,
                               );
                             },
-                            child: Text('${API.prefs.getBool('is_guest') ? 'Log in' : 'Log out' }', style: TextStyle(color: Color(0xffff7700), fontSize: 20)),
+                            child: Text('${API.prefs.getBool('is_guest') ? appStrings(context).login : appStrings(context).logout }', style: TextStyle(color: Color(0xffff7700), fontSize: 20)),
                           ),
                         ),
                         API.prefs.getBool('is_guest') ?
@@ -134,135 +136,16 @@ class _SettingsPageState extends State<SettingsPage> {
                           Center(
                             child: Container(
                               padding: EdgeInsets.all(5),
-                              child: Text('This server handles these file types: ${API.prefs.getString("file_types").replaceAll(",", ", ")}', textAlign: TextAlign.center, style: TextStyle(color: Colors.black, fontSize: 12)),
+                              child: Text(appStrings(context).handleFileTypes(API.prefs.getString("file_types").replaceAll(",", ", "),
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(color: Colors.black, fontSize: 12)),
                             ),
                           ),
-                        /*
-                        // TODO: Implement albums options
+                        ),
                         SizedBox(height: 20),
                         Padding(
                           padding: EdgeInsets.only(left: 10, bottom: 3),
-                          child: Text('Albums', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 18)),
-                        ),
-                        Container(
-                          decoration: BoxDecoration(
-                            border: Border.symmetric(horizontal: BorderSide(width: 0.5, color: Colors.grey)),
-                            color: Colors.white,
-                          ),
-                          child: Column(
-                            children: [
-                              /*
-                              InkWell(
-                                onTap: () {
-                                  // TODO: Implement change root album
-                                  print('change root album');
-                                },
-                                child: tableCell(
-                                  Text('Default Album', style: TextStyle(color: Colors.black, fontSize: 16)),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    children: [
-                                      Text('${prefs.getString('default_album')}', overflow: TextOverflow.ellipsis, softWrap: false, style: TextStyle(color: Colors.grey.shade600, fontSize: 14)),
-                                      SizedBox(width: 10),
-                                      Icon(Icons.chevron_right, color: Colors.grey.shade600, size: 20),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                               */
-                              InkWell(
-                                onTap: () {
-                                  // TODO: Implement change thumbnail size
-                                  print('change image thumbnail size');
-                                },
-                                child: tableCellEnd(
-                                  Text('thumbnails', style: TextStyle(color: Colors.black, fontSize: 16)),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    children: [
-                                      DropdownButton<String>(
-                                        value: _derivative == null ? API.prefs.getString('thumbnail_size') : _derivative,
-                                        style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
-                                        underline: Container(),
-                                        icon: Icon(Icons.chevron_right, color: Colors.grey.shade600, size: 20),
-                                        onChanged: (String newValue) {
-                                          setState(() {
-                                            _derivative = newValue;
-                                            API.prefs.setString('thumbnail_size', _derivative);
-                                          });
-                                        },
-                                        items: API.prefs.getStringList('available_sizes').map<DropdownMenuItem<String>>((
-                                            String value) {
-                                          return DropdownMenuItem<String>(
-                                            value: value,
-                                            child: Text(value),
-                                          );
-                                        }).toList(),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              /*
-                              InkWell(
-                                onTap: () {
-                                  // TODO: implement change sort method
-                                  print('change sort');
-                                },
-                                child: tableCell(
-                                  Text('Sort', style: TextStyle(color: Colors.black, fontSize: 16)),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    children: [
-                                      Text('${albumSort[prefs.getInt('sort')]}', overflow: TextOverflow.ellipsis, softWrap: false, style: TextStyle(color: Colors.grey.shade600, fontSize: 14)),
-                                      SizedBox(width: 10),
-                                      Icon(Icons.chevron_right, color: Colors.grey.shade600, size: 20),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                               */
-                              /*
-                              tableCellEnd(
-                                Text('Recent Albums', style: TextStyle(color: Colors.black, fontSize: 16)),
-                                Expanded(
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Expanded(
-                                        child: Slider(
-                                            activeColor: Color(0xffff7700),
-                                            inactiveColor: Color(0xffeeeeee),
-                                            min: 3,
-                                            max: 10,
-                                            divisions: 7,
-                                            value: _currentSliderValue,
-                                            onChanged: (value) {
-                                              // TODO: implement change number of recent albums
-                                              setState(() {
-                                                _currentSliderValue = value;
-                                              });
-                                              prefs.setInt('recent_albums', value.ceil());
-                                            }
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        width: 40,
-                                        child: Text("${_currentSliderValue.toInt()}/10", style: TextStyle(color: Colors.grey.shade600, fontSize: 14), textAlign: TextAlign.end,),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                               */
-                            ],
-                          ),
-                        ),
-                        */
-                        SizedBox(height: 20),
-                        Padding(
-                          padding: EdgeInsets.only(left: 10, bottom: 3),
-                          child: Text('Images', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 18)),
+                          child: Text(appStrings(context).images, style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 18)),
                         ),
                         Container(
                           decoration: BoxDecoration(
@@ -272,7 +155,7 @@ class _SettingsPageState extends State<SettingsPage> {
                           child: Column(
                             children: [
                               tableCell(
-                                Text('Show thumbnail title', style: TextStyle(color: Colors.black, fontSize: 16)),
+                                Text(appStrings(context).settingsThumbnailTitle, style: TextStyle(color: Colors.black, fontSize: 16)),
                                 Switch(
                                   value: API.prefs.getBool('show_thumbnail_title'),
                                   onChanged: (bool) {
@@ -283,7 +166,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                 ),
                               ),
                               tableCell(
-                                Text('Portrait image count', style: TextStyle(color: Colors.black, fontSize: 16)),
+                                Text(appStrings(context).settingsPortraitImageCount, style: TextStyle(color: Colors.black, fontSize: 16)),
                                 Expanded(
                                   child: Slider(
                                     label: '${API.prefs.getDouble("portrait_image_count").ceil()}/6',
@@ -303,7 +186,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                 ),
                               ),
                               tableCell(
-                                Text('Landscape image count', style: TextStyle(color: Colors.black, fontSize: 16)),
+                                Text(appStrings(context).settingsLandscapeImageCount, style: TextStyle(color: Colors.black, fontSize: 16)),
                                 Expanded(
                                   child: Slider(
                                     label: '${API.prefs.getDouble("landscape_image_count").ceil()}/10',
@@ -323,7 +206,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                 ),
                               ),
                               tableCell(
-                                Text('Thumbnail size', style: TextStyle(color: Colors.black, fontSize: 16)),
+                                Text(appStrings(context).settingsThumbnailSize, style: TextStyle(color: Colors.black, fontSize: 16)),
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.end,
                                   children: [
@@ -350,7 +233,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                 ),
                               ),
                               tableCell(
-                                Text('Full screen image size', style: TextStyle(color: Colors.black, fontSize: 16)),
+                                Text(appStrings(context).settingsFSImageSize, style: TextStyle(color: Colors.black, fontSize: 16)),
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.end,
                                   children: [
@@ -375,6 +258,26 @@ class _SettingsPageState extends State<SettingsPage> {
                                     ),
                                   ],
                                 ),
+                                isEnd: true,
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(height: 20),
+                        Padding(
+                          padding: EdgeInsets.only(left: 10, bottom: 3),
+                          child: Text(appStrings(context).about, style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 18)),
+                        ),
+                        Container(
+                          decoration: BoxDecoration(
+                            border: Border.symmetric(horizontal: BorderSide(width: 0.5, color: Colors.grey)),
+                            color: Colors.white,
+                          ),
+                          child: Column(
+                            children: [
+                              tableCell(
+                                Text(appStrings(context).appRelease, style: TextStyle(color: Colors.black, fontSize: 16)),
+                                Text(dotenv.env['APP_VERSION'], overflow: TextOverflow.ellipsis, softWrap: false, style: TextStyle(color: Colors.grey.shade600, fontSize: 14)),
                                 isEnd: true,
                               ),
                             ],

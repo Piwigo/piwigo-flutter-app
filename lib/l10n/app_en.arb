@@ -1,20 +1,118 @@
 {
   "rootTitle": "Albums",
-  "@rootTitle": {
-    "description": "Root album title"
+  "images": "Images",
+  "serverVersion": "Piwigo server {version}",
+  "@serverVersion" : {
+    "type": "text",
+    "placeholders": {
+      "version": {}
+    }
   },
+  "unsecured": "Unsecured Website !",
+  "login": "Log in",
+  "logout": "Log out",
+  "handleFileTypes": "This server handles these file types: {types}",
+  "@handleFileTypes" : {
+    "type": "text",
+    "placeholders": {
+      "types": {}
+    }
+  },
+  "about": "about",
+  "appRelease": "App Release",
+
+
+  "albumsLoadFailure": "Failed to load albums",
+  "imagesLoadFailure": "Failed to load images",
+
+  "newAlbum": "New Album",
+  "uploadPhoto": "Upload Photo",
+  "uploadVideo": "Upload Video",
+  "allPhotos": "All Photos",
+  "maxSelection": "You can't select any more",
+  "downloading": "Downloading ...",
+  "deleting": "Deleting ...",
+
+  "address": "Address",
+  "username": "Username",
+  "password": "Password",
+  "optional": "Optional",
+
+  "settingsThumbnailTitle": "Show thumbnail title",
+  "settingsPortraitImageCount": "Portrait image count",
+  "settingsLandscapeImageCount": "Landscape image count",
+  "settingsThumbnailSize": "Thumbnail size",
+  "settingsFSImageSize": "Full screen image size",
+
+  "moveSelection": "Move selected images to {album} ?",
+  "@moveSelection" : {
+    "type": "text",
+    "placeholders": {
+      "album": {}
+    }
+  },
+  "moveImage": "Move {image} to {album} ?",
+  "@moveImage" : {
+    "type": "text",
+    "placeholders": {
+      "image": {},
+      "album": {}
+    }
+  },
+  "downloadImage": "Download {image} ?",
+  "@downloadImage" : {
+    "type": "text",
+    "placeholders": {
+      "image": {}
+    }
+  },
+  "deleteImage": "Delete {image} ?",
+  "@deleteImage" : {
+    "type": "text",
+    "placeholders": {
+      "image": {}
+    }
+  },
+
+  "edit": "Edit",
+  "download": "Download",
+  "move": "Move",
+  "delete": "Delete",
+  "search": "Search",
+  "settings": "Settings",
 
   "subAlbumCount" : "{count, plural, zero{0 sub-albums} one{1 sub-album} other{{count} sub-albums}}",
   "@subAlbumCount" : {
-    "description" : "Count the number of sub albums",
     "placeholders": {
       "count": {}
     }
   },
-
   "photoCount" : "{count, plural, zero{0 photos} one{1 photo} other{{count} photos}}",
   "@photoCount" : {
-    "description" : "Count the number of photos",
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "showMoreCount" : "{count, plural, other{Show {count} more ...}}",
+  "@showMoreCount" : {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "downloadImagesCount" : "{count, plural, one{Download 1 image ?} other{Download {count} images ?}}",
+  "@downloadImagesCount" : {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "deleteImagesCount" : "{count, plural, one{Delete 1 image ?} other{Delete {count} images ?}}",
+  "@deleteImagesCount" : {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "deletedImagesCount" : "{count, plural, one{Successfully deleted 1 image} other{Successfully deleted {count} images}}",
+  "@deletedImagesCount" : {
     "placeholders": {
       "count": {}
     }

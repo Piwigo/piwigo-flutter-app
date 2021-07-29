@@ -56,7 +56,6 @@ class Uploader {
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
 
     for(var element in photos) {
-      var index = photos.indexOf(element);
 
       Response response = await uploadChunk(element, category);
 
