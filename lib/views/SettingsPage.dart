@@ -135,11 +135,11 @@ class _SettingsPageState extends State<SettingsPage> {
                           Center(
                             child: Container(
                               padding: EdgeInsets.all(5),
-                              child: Text(appStrings(context).handleFileTypes(API.prefs.getString("file_types").replaceAll(",", ", "),
+                              child: Text(appStrings(context).handleFileTypes(API.prefs.getString("file_types").replaceAll(",", ", ")),
                                   textAlign: TextAlign.center,
                                   style: TextStyle(color: Colors.black, fontSize: 12)),
                             ),
-                          )) :
+                          ) :
                           Text(''),
                         SizedBox(height: 20),
                         Padding(
