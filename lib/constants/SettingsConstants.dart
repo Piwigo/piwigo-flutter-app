@@ -25,8 +25,14 @@ class Constants {
     8: 'Admins',
   };
 
+  static double PORTRAIT_IMAGE_COUNT_MIN = 1;
+  static double PORTRAIT_IMAGE_COUNT_MAX = 6;
+  static double LANDSCAPE_IMAGE_COUNT_MIN = 4.0;
+  static double LANDSCAPE_IMAGE_COUNT_MAX = 10.0;
+
 }
 
 AppLocalizations appStrings(context) {
   return AppLocalizations.of(context);
 }
+

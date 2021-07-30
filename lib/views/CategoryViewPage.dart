@@ -39,6 +39,8 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
   ScrollController _controller = ScrollController();
   List<dynamic> imageList = [];
 
+  double _scaleFactor = 1.0;
+  double _baseScaleFactor = 1.0;
 
   @override
   void initState() {
@@ -46,6 +48,18 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
     _page = 0;
     _nbImages = widget.nbImages;
     _isEditMode = false;
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  bool _isSelected(int id) {
+    return _selectedItems.keys.contains(id);
+  }
+  int _selectedPhotos() {
+    return _selectedItems.length;
   }
 
   showMore() async {
@@ -64,84 +78,120 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
     });
   }
 
-  @override
-  void dispose() {
-    super.dispose();
+  Future<void> onRefresh() {
+    setState(() {
+      _page = 0;
+    });
+    return Future.delayed(Duration(milliseconds: 500));
   }
 
-  bool _isSelected(int id) {
-    return _selectedItems.keys.contains(id);
+  handleAlbumSnapshot(AsyncSnapshot albumSnapshot, int nbImages) {
+    if(albumSnapshot.data['stat'] == 'fail') {
+      return Center(child: Text(appStrings(context).albumsLoadFailure));
+    }
+    var albums = albumSnapshot.data['result']['categories'];
+    int nbImages = _nbImages;
+    if(albums.length > 0 && albums[0]["id"].toString() == widget.category) {
+      nbImages = albums[0]["total_nb_images"];
+      _nbImages = nbImages;
+    }
+    albums.removeWhere((category) =>
+    (category["id"].toString() == widget.category)
+    );
+    return albums;
   }
-
-  int _selectedPhotos() {
-    return _selectedItems.length;
+  handleImagesSnapshot(AsyncSnapshot imagesSnapshot) {
+    imageList.clear();
+    imageList.addAll(imagesSnapshot.data['result']['images']);
   }
-
 
   @override
   Widget build(BuildContext context) {
     ThemeData _theme = Theme.of(context);
+
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      body: NestedScrollView(
-        controller: _controller,
-        headerSliverBuilder: (context, innerBoxScrolled) => [
-          SliverAppBar(
-            pinned: true,
-            snap: false,
-            floating: false,
-            centerTitle: true,
-            iconTheme: IconThemeData(
-              color: _theme.iconTheme.color,//change your color here
-            ),
-            leading: IconButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              icon: Icon(Icons.chevron_left),
-            ),
-            title: _isEditMode ?
-              Text("${_selectedPhotos()}", overflow: TextOverflow.fade, softWrap: true) :
-              Text(widget.title),
-            actions: [
-              _isEditMode ? IconButton(
-                onPressed: () {
-                  setState(() {
-                    _isEditMode = false;
-                  });
-                  _selectedItems.clear();
-                },
-                icon: Icon(Icons.cancel),
-              ) : widget.isAdmin? IconButton(
-                onPressed: () {
-                  setState(() {
-                    _isEditMode = true;
-                  });
-                },
-                icon: Icon(Icons.touch_app),
-              ) : Container(),
-            ],
-          ),
-        ],
-        body: FutureBuilder<Map<String,dynamic>>(
-          future: fetchAlbums(widget.category), // Albums of the list
-          builder: (BuildContext context, AsyncSnapshot albumSnapshot) {
-            if (albumSnapshot.hasData) {
+      body: createListeners(
+        NestedScrollView(
+          controller: _controller,
+          headerSliverBuilder: (context, innerBoxScrolled) => [
+            createAppBar(),
+          ],
+          body: createFutureBuilders(),
+        ),
+      ),
+      floatingActionButton: _isEditMode ?
+        Center() : createFloatingActionButton(),
+      bottomNavigationBar: _isEditMode ?
+        createBottomBar() : Container(height: 0),
+    );
+  }
 
-              if(albumSnapshot.data['stat'] == 'fail') {
-                return Center(child: Text(appStrings(context).albumsLoadFailure));
-              }
-              var albums = albumSnapshot.data['result']['categories'];
-              int nbImages = _nbImages;
-              if(albums.length > 0 && albums[0]["id"].toString() == widget.category) {
-                nbImages = albums[0]["total_nb_images"];
-                _nbImages = nbImages;
-              }
-              albums.removeWhere((category) =>
-                (category["id"].toString() == widget.category)
-              );
-              // print(albums);
-              return FutureBuilder<Map<String,dynamic>>(
+  Widget createAppBar() {
+    ThemeData _theme = Theme.of(context);
+    return SliverAppBar(
+      pinned: true,
+      snap: false,
+      floating: false,
+      centerTitle: true,
+      iconTheme: IconThemeData(
+        color: _theme.iconTheme.color,//change your color here
+      ),
+      leading: IconButton(
+        onPressed: () {
+          Navigator.of(context).pop();
+        },
+        icon: Icon(Icons.chevron_left),
+      ),
+      title: _isEditMode ?
+      Text("${_selectedPhotos()}", overflow: TextOverflow.fade, softWrap: true) :
+      Text(widget.title),
+      actions: [
+        _isEditMode ? IconButton(
+          onPressed: () {
+            setState(() {
+              _isEditMode = false;
+            });
+            _selectedItems.clear();
+          },
+          icon: Icon(Icons.cancel),
+        ) : widget.isAdmin? IconButton(
+          onPressed: () {
+            setState(() {
+              _isEditMode = true;
+            });
+          },
+          icon: Icon(Icons.touch_app),
+        ) : Container(),
+      ],
+    );
+  }
+
+  Widget createListeners(Widget child) {
+    return GestureDetector(
+      onScaleStart: (details) {
+        _scaleFactor = getImageCrossAxisCount(context).toDouble();
+        _baseScaleFactor = _scaleFactor;
+      },
+      onScaleUpdate: (details) {
+        setState(() {
+          _scaleFactor = _baseScaleFactor / details.scale;
+          setImageCrossAxisCount(context, _scaleFactor.ceil().toDouble());
+        });
+      },
+      child: child,
+    );
+  }
+
+  Widget createFutureBuilders() {
+    return FutureBuilder<Map<String,dynamic>>(
+        future: fetchAlbums(widget.category), // Albums of the list
+        builder: (BuildContext context, AsyncSnapshot albumSnapshot) {
+          if (albumSnapshot.hasData) {
+            int nbImages = _nbImages;
+            var albums = handleAlbumSnapshot(albumSnapshot, nbImages);
+            // print(albums);
+            return FutureBuilder<Map<String,dynamic>>(
                 future: fetchImages(widget.category, 0), // Images of the list
                 builder: (BuildContext context, AsyncSnapshot imagesSnapshot) {
                   if (imagesSnapshot.hasData) {
@@ -149,222 +199,22 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
                       if(imagesSnapshot.data['stat'] == 'fail') {
                         return Center(child: Text(appStrings(context).imagesLoadFailure));
                       }
-                      imageList.clear();
-                      imageList.addAll(imagesSnapshot.data['result']['images']);
+                      handleImagesSnapshot(imagesSnapshot);
                     }
-                    return RefreshIndicator(
-                      displacement: 20,
-                      notificationPredicate: (notification) {
-                        return notification.metrics.atEdge;
-                      },
-                      onRefresh: () {
-                        setState(() {
-                          _page = 0;
-                        });
-                        return Future.delayed(Duration(milliseconds: 500));
-                      },
-                      child: SingleChildScrollView(
-                        child: Column(
-                          children: [
-                            albums.length > 0 ?
-                            GridView.builder(
-                              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: isPortrait(context)? 1 : 2,
-                                mainAxisSpacing: 3,
-                                crossAxisSpacing: 5,
-                                childAspectRatio: albumGridAspectRatio(context),
-                              ),
-                              padding: EdgeInsets.symmetric(horizontal: 5),
-                              itemCount: albums.length,
-                              shrinkWrap: true,
-                              physics: NeverScrollableScrollPhysics(),
-                              itemBuilder: (BuildContext context, int index) {
-                                var album = albums[index];
-                                if (isPortrait(context) || index%2 == 0) {
-                                  return albumListItem(context, album, widget.isAdmin, (message) {
-                                    setState(() {
-                                      print('$message');
-                                    });
-                                  });
-                                }
-                                return albumListItemRight(context, album, widget.isAdmin, (message) {
-                                  setState(() {
-                                    print('$message');
-                                  });
-                                });
-                              },
-                            ) : Center(),
-                            imageList.length > 0 ?
-                            GridView.builder(
-                              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: imageCrossAxisCount(context),
-                                mainAxisSpacing: 3.0,
-                                crossAxisSpacing: 3.0,
-                              ),
-                              padding: EdgeInsets.symmetric(horizontal: 5),
-                              itemCount: imageList.length,
-                              shrinkWrap: true,
-                              physics: NeverScrollableScrollPhysics(),
-                              itemBuilder: (BuildContext context, int index) {
-                                var image = imageList[index];
-                                return InkWell(
-                                  onLongPress: _isEditMode ? () {
-                                    setState(() {
-                                      _isSelected(image['id']) ?
-                                      _selectedItems.remove(image['id']) :
-                                      _selectedItems.putIfAbsent(image['id'], () => image);
-                                    });
-                                  } : widget.isAdmin ? () {
-                                    setState(() {
-                                      _isEditMode = true;
-                                      _selectedItems.putIfAbsent(image['id'], () => image);
-                                    });
-                                  } : () {},
-                                  onTap: () {
-                                    _isEditMode ?
-                                    setState(() {
-                                      _isSelected(image['id']) ?
-                                      _selectedItems.remove(image['id']) :
-                                      _selectedItems.putIfAbsent(image['id'], () => image);
-                                    }) :
-                                    Navigator.of(context).push(
-                                      MaterialPageRoute(builder: (context) => ImageViewPage(
-                                        images: imageList,
-                                        index: index,
-                                        isAdmin: widget.isAdmin,
-                                        category: widget.category,
-                                      )),
-                                    ).whenComplete(() {
-                                      setState(() {});
-                                    });
-                                  },
-                                  child: AnimatedContainer(
-                                    duration: Duration(milliseconds: 200),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      border: _isSelected(image['id']) ?
-                                        Border.all(width: 5, color: _theme.accentColor) :
-                                        Border.all(width: 0, color: Colors.white),
-                                      /*
-                                      image: DecorationImage(
-                                        image: Image.network(imageList[index]["derivatives"][API.prefs.getString('thumbnail_size')]["url"]).image,
-                                        fit: BoxFit.cover,
-                                      ),
-                                       */
-                                    ),
-                                    child: Stack(
-                                      alignment: Alignment.center,
-                                      children: [
-                                        Container(
-                                          width: double.infinity,
-                                          height: double.infinity,
-                                          child: Image.network(imageList[index]["derivatives"][API.prefs.getString('thumbnail_size')]["url"],
-                                            fit: BoxFit.cover,
-                                          ),
-                                        ),
-                                        _isSelected(image['id']) ? Container(
-                                          width: double.infinity,
-                                          height: double.infinity,
-                                          color: Color(0x80000000),
-                                        ) : Center(),
-                                        /*
-                                        _isEditMode? Align(
-                                          alignment: Alignment.topRight,
-                                          child: Padding(
-                                            padding: EdgeInsets.all(5),
-                                            child: _isSelected(image['id']) ?
-                                              Icon(Icons.check_circle, color: _theme.floatingActionButtonTheme.backgroundColor) :
-                                              Icon(Icons.check_circle_outline, color: _theme.disabledColor),
-                                          ),
-                                        ) : Center(),
-
-                                         */
-                                        API.prefs.getBool('show_thumbnail_title')? Align(
-                                          alignment: Alignment.bottomCenter,
-                                          child: Container(
-                                            width: double.infinity,
-                                            color: Color(0x80ffffff),
-                                            child: AutoSizeText('${image['name']}',
-                                              overflow: TextOverflow.ellipsis,
-                                              maxLines: 1,
-                                              style: TextStyle(fontSize: 12),
-                                              maxFontSize: 14, minFontSize: 7,
-                                              textAlign: TextAlign.center,
-                                            ),
-                                          ),
-                                        ) : Center(),
-                                      ],
-                                    ),
-                                  ),
-                                );
-                              },
-                            ) : Center(),
-                            nbImages > (_page+1)*100 ? GestureDetector(
-                              onTap: () {
-                                showMore();
-                              },
-                              child: Padding(
-                                padding: EdgeInsets.all(10),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(appStrings(context).showMoreCount(nbImages-((_page+1)*100)), style: TextStyle(fontSize: 14, color: _theme.disabledColor)),
-                                  ],
-                                ),
-                              ),
-                            ) : Center(),
-                            Center(
-                              child: Container(
-                                padding: EdgeInsets.all(10),
-                                child: Text(appStrings(context).photoCount(nbImages), style: TextStyle(fontSize: 20, color: _theme.textTheme.bodyText2.color, fontWeight: FontWeight.w300)),
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                    );
+                    return createPageContent(albums, nbImages);
                   } else {
                     return Center(
                       child: CircularProgressIndicator(),
                     );
                   }
                 }
-              );
-            } else {
-              return Center(
-                child: CircularProgressIndicator(),
-              );
-            }
+            );
+          } else {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
           }
-        ),
-      ),
-      floatingActionButton: _isEditMode ?
-        Center() :
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Stack(
-            children: <Widget>[
-              widget.isAdmin? Align(
-                alignment: Alignment.bottomRight,
-                child: createUploadActionButton(),
-              ) : Container(),
-              Align(
-                alignment: Alignment.bottomRight,
-                child: Container(
-                  margin: EdgeInsets.only(bottom: 0, right: widget.isAdmin? 70 : 0),
-                  child: FloatingActionButton(
-                    backgroundColor: Color(0xaa868686),
-                    onPressed: () {
-                      Navigator.of(context).popUntil((route) => route.isFirst);
-                    },
-                    child: Icon(Icons.home, color: Colors.grey.shade200, size: 30),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      bottomNavigationBar: _isEditMode ? bottomBar() : Container(height: 0),
+        }
     );
   }
 
@@ -461,7 +311,171 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
     );
   }
 
-  Widget bottomBar() {
+  Widget createPageContent(dynamic albums, int nbImages) {
+    ThemeData _theme = Theme.of(context);
+    return RefreshIndicator(
+      displacement: 20,
+      notificationPredicate: (notification) {
+        return notification.metrics.atEdge;
+      },
+      onRefresh: onRefresh,
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            albums.length > 0 ?
+            GridView.builder(
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: isPortrait(context)? 1 : 2,
+                mainAxisSpacing: 3,
+                crossAxisSpacing: 5,
+                childAspectRatio: albumGridAspectRatio(context),
+              ),
+              padding: EdgeInsets.symmetric(horizontal: 5),
+              itemCount: albums.length,
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
+              itemBuilder: (BuildContext context, int index) {
+                var album = albums[index];
+                if (isPortrait(context) || index%2 == 0) {
+                  return albumListItem(context, album, widget.isAdmin, (message) {
+                    setState(() {
+                      print('$message');
+                    });
+                  });
+                }
+                return albumListItemRight(context, album, widget.isAdmin, (message) {
+                  setState(() {
+                    print('$message');
+                  });
+                });
+              },
+            ) : Center(),
+            imageList.length > 0 ?
+            GridView.builder(
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: getImageCrossAxisCount(context),
+                mainAxisSpacing: 3.0,
+                crossAxisSpacing: 3.0,
+              ),
+              padding: EdgeInsets.symmetric(horizontal: 5),
+              itemCount: imageList.length,
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
+              itemBuilder: (BuildContext context, int index) {
+                var image = imageList[index];
+                return InkWell(
+                  onLongPress: _isEditMode ? () {
+                    setState(() {
+                      _isSelected(image['id']) ?
+                      _selectedItems.remove(image['id']) :
+                      _selectedItems.putIfAbsent(image['id'], () => image);
+                    });
+                  } : widget.isAdmin ? () {
+                    setState(() {
+                      _isEditMode = true;
+                      _selectedItems.putIfAbsent(image['id'], () => image);
+                    });
+                  } : () {},
+                  onTap: () {
+                    _isEditMode ?
+                    setState(() {
+                      _isSelected(image['id']) ?
+                      _selectedItems.remove(image['id']) :
+                      _selectedItems.putIfAbsent(image['id'], () => image);
+                    }) :
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (context) => ImageViewPage(
+                        images: imageList,
+                        index: index,
+                        isAdmin: widget.isAdmin,
+                        category: widget.category,
+                      )),
+                    ).whenComplete(() {
+                      setState(() {});
+                    });
+                  },
+                  child: AnimatedContainer(
+                    duration: Duration(milliseconds: 200),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      border: _isSelected(image['id']) ?
+                      Border.all(width: 5, color: _theme.accentColor) :
+                      Border.all(width: 0, color: Colors.white),
+                    ),
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        Container(
+                          width: double.infinity,
+                          height: double.infinity,
+                          child: Image.network(imageList[index]["derivatives"][API.prefs.getString('thumbnail_size')]["url"],
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        _isSelected(image['id']) ? Container(
+                          width: double.infinity,
+                          height: double.infinity,
+                          color: Color(0x80000000),
+                        ) : Center(),
+                        /*
+                        _isEditMode? Align(
+                          alignment: Alignment.topRight,
+                          child: Padding(
+                            padding: EdgeInsets.all(5),
+                            child: _isSelected(image['id']) ?
+                              Icon(Icons.check_circle, color: _theme.floatingActionButtonTheme.backgroundColor) :
+                              Icon(Icons.check_circle_outline, color: _theme.disabledColor),
+                          ),
+                        ) : Center(),
+
+                         */
+                        API.prefs.getBool('show_thumbnail_title')? Align(
+                          alignment: Alignment.bottomCenter,
+                          child: Container(
+                            width: double.infinity,
+                            color: Color(0x80ffffff),
+                            child: AutoSizeText('${image['name']}',
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              style: TextStyle(fontSize: 12),
+                              maxFontSize: 14, minFontSize: 7,
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ) : Center(),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ) : Center(),
+            nbImages > (_page+1)*100 ? GestureDetector(
+              onTap: () {
+                showMore();
+              },
+              child: Padding(
+                padding: EdgeInsets.all(10),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(appStrings(context).showMoreCount(nbImages-((_page+1)*100)), style: TextStyle(fontSize: 14, color: _theme.disabledColor)),
+                  ],
+                ),
+              ),
+            ) : Center(),
+            Center(
+              child: Container(
+                padding: EdgeInsets.all(10),
+                child: Text(appStrings(context).photoCount(nbImages), style: TextStyle(fontSize: 20, color: _theme.textTheme.bodyText2.color, fontWeight: FontWeight.w300)),
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget createBottomBar() {
     ThemeData _theme = Theme.of(context);
     return BottomNavigationBar(
       onTap: (index) async {
@@ -609,6 +623,33 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
       showSelectedLabels: false,
       showUnselectedLabels: false,
       currentIndex: 0,
+    );
+  }
+
+  Widget createFloatingActionButton() {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Stack(
+        children: <Widget>[
+          widget.isAdmin? Align(
+            alignment: Alignment.bottomRight,
+            child: createUploadActionButton(),
+          ) : Container(),
+          Align(
+            alignment: Alignment.bottomRight,
+            child: Container(
+              margin: EdgeInsets.only(bottom: 0, right: widget.isAdmin? 70 : 0),
+              child: FloatingActionButton(
+                backgroundColor: Color(0xaa868686),
+                onPressed: () {
+                  Navigator.of(context).popUntil((route) => route.isFirst);
+                },
+                child: Icon(Icons.home, color: Colors.grey.shade200, size: 30),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -135,11 +135,11 @@ class _SettingsPageState extends State<SettingsPage> {
                           Center(
                             child: Container(
                               padding: EdgeInsets.all(5),
-                              child: Text(appStrings(context).handleFileTypes(API.prefs.getString("file_types").replaceAll(",", ", "),
+                              child: Text(appStrings(context).handleFileTypes(API.prefs.getString("file_types").replaceAll(",", ", ")),
                                   textAlign: TextAlign.center,
                                   style: TextStyle(color: Colors.black, fontSize: 12)),
                             ),
-                          )) :
+                          ) :
                           Text(''),
                         SizedBox(height: 20),
                         Padding(
@@ -172,8 +172,8 @@ class _SettingsPageState extends State<SettingsPage> {
                                     activeColor: Color(0xffff7700),
                                     inactiveColor: Color(0xffeeeeee),
                                     divisions: 5,
-                                    min: 1,
-                                    max: 6,
+                                    min: Constants.PORTRAIT_IMAGE_COUNT_MIN,
+                                    max: Constants.PORTRAIT_IMAGE_COUNT_MAX,
                                     value: API.prefs.getDouble("portrait_image_count"),
                                     onChanged: (i) {
                                       setState(() {
@@ -192,8 +192,8 @@ class _SettingsPageState extends State<SettingsPage> {
                                     activeColor: Color(0xffff7700),
                                     inactiveColor: Color(0xffeeeeee),
                                     divisions: 6,
-                                    min: 4.0,
-                                    max: 10.0,
+                                    min: Constants.LANDSCAPE_IMAGE_COUNT_MIN,
+                                    max: Constants.LANDSCAPE_IMAGE_COUNT_MAX,
                                     value: API.prefs.getDouble("landscape_image_count"),
                                     onChanged: (i) {
                                       setState(() {
