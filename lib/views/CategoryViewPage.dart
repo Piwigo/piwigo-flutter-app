@@ -77,6 +77,18 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
       print('Fetch images of page $_page');
     });
   }
+  openEditMode() {
+    setState(() {
+      _isEditMode = true;
+    });
+  }
+  closeEditMode() {
+    setState(() {
+      _isEditMode = false;
+    });
+    _selectedItems.clear();
+  }
+
 
   Future<void> onRefresh() {
     setState(() {
@@ -148,19 +160,10 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
       Text(widget.title),
       actions: [
         _isEditMode ? IconButton(
-          onPressed: () {
-            setState(() {
-              _isEditMode = false;
-            });
-            _selectedItems.clear();
-          },
+          onPressed: closeEditMode,
           icon: Icon(Icons.cancel),
         ) : widget.isAdmin? IconButton(
-          onPressed: () {
-            setState(() {
-              _isEditMode = true;
-            });
-          },
+          onPressed: openEditMode,
           icon: Icon(Icons.touch_app),
         ) : Container(),
       ],
@@ -168,18 +171,27 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
   }
 
   Widget createListeners(Widget child) {
-    return GestureDetector(
-      onScaleStart: (details) {
-        _scaleFactor = getImageCrossAxisCount(context).toDouble();
-        _baseScaleFactor = _scaleFactor;
+    return WillPopScope(
+      onWillPop: () async {
+        if(_isEditMode) {
+          closeEditMode();
+          return false;
+        }
+        return true;
       },
-      onScaleUpdate: (details) {
-        setState(() {
-          _scaleFactor = _baseScaleFactor / details.scale;
-          setImageCrossAxisCount(context, _scaleFactor.ceil().toDouble());
-        });
-      },
-      child: child,
+      child: GestureDetector(
+        onScaleStart: (details) {
+          _scaleFactor = getImageCrossAxisCount(context).toDouble();
+          _baseScaleFactor = _scaleFactor;
+        },
+        onScaleUpdate: (details) {
+          setState(() {
+            _scaleFactor = _baseScaleFactor / details.scale;
+            setImageCrossAxisCount(context, _scaleFactor.ceil().toDouble());
+          });
+        },
+        child: child,
+      ),
     );
   }
 
