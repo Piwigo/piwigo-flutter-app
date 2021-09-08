@@ -99,7 +99,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
 
   handleAlbumSnapshot(AsyncSnapshot albumSnapshot, int nbImages) {
     if(albumSnapshot.data['stat'] == 'fail') {
-      return Center(child: Text(appStrings(context).albumsLoadFailure));
+      return Center(child: Text(appStrings(context).categoryMainEmtpy));
     }
     var albums = albumSnapshot.data['result']['categories'];
     int nbImages = _nbImages;
@@ -209,7 +209,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
                   if (imagesSnapshot.hasData) {
                     if (imageList.isEmpty || _page == 0) {
                       if(imagesSnapshot.data['stat'] == 'fail') {
-                        return Center(child: Text(appStrings(context).imagesLoadFailure));
+                        return Center(child: Text(appStrings(context).categoryImageList_noDataError));
                       }
                       handleImagesSnapshot(imagesSnapshot);
                     }
@@ -245,7 +245,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
       shape: CircleBorder(),
       children: [
         SpeedDialChild(
-          labelWidget: Text(appStrings(context).newAlbum, style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: _theme.buttonColor)),
+          labelWidget: Text(appStrings(context).createNewAlbum_title, style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: _theme.buttonColor)),
           child: Icon(Icons.create_new_folder),
           backgroundColor: _theme.floatingActionButtonTheme.backgroundColor,
           foregroundColor: _theme.floatingActionButtonTheme.foregroundColor,
@@ -263,7 +263,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
           },
         ),
         SpeedDialChild(
-            labelWidget: Text(appStrings(context).uploadPhoto, style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: _theme.buttonColor)),
+            labelWidget: Text(appStrings(context).categoryUpload_images, style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: _theme.buttonColor)),
             child: Icon(Icons.add_a_photo),
             backgroundColor: _theme.floatingActionButtonTheme.backgroundColor,
             foregroundColor: _theme.floatingActionButtonTheme.foregroundColor,
@@ -275,14 +275,14 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
                   cupertinoOptions: CupertinoOptions(takePhotoIcon: 'chat'),
                   materialOptions: MaterialOptions(
                     actionBarTitle: 'Piwigo',
-                    allViewTitle: appStrings(context).allPhotos,
+                    allViewTitle: appStrings(context).all_Photos,
                     actionBarColor: '#ffff7700',
                     actionBarTitleColor: '#ffeeeeee',
                     lightStatusBar: false,
                     statusBarColor: '#ffab40',
                     startInAllView: false,
                     selectCircleStrokeColor: '#ffffff',
-                    selectionLimitReachedText: appStrings(context).maxSelection,
+                    selectionLimitReachedText: appStrings(context).selectLimit,
                   ),
                 );
                 if(imageList.isNotEmpty) {
@@ -296,7 +296,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
             }
         ),
         SpeedDialChild(
-            labelWidget: Text(appStrings(context).uploadVideo, style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: _theme.buttonColor)),
+            labelWidget: Text(appStrings(context).categoryUpload_videos, style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: _theme.buttonColor)),
             child: Icon(Icons.video_collection_rounded),
             backgroundColor: _theme.floatingActionButtonTheme.backgroundColor,
             foregroundColor: _theme.floatingActionButtonTheme.foregroundColor,
@@ -470,7 +470,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(appStrings(context).showMoreCount(nbImages-((_page+1)*100)), style: TextStyle(fontSize: 14, color: _theme.disabledColor)),
+                    Text(appStrings(context).showMore(nbImages-((_page+1)*100)), style: TextStyle(fontSize: 14, color: _theme.disabledColor)),
                   ],
                 ),
               ),
@@ -478,7 +478,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
             Center(
               child: Container(
                 padding: EdgeInsets.all(10),
-                child: Text(appStrings(context).photoCount(nbImages), style: TextStyle(fontSize: 20, color: _theme.textTheme.bodyText2.color, fontWeight: FontWeight.w300)),
+                child: Text(appStrings(context).imageCount(nbImages), style: TextStyle(fontSize: 20, color: _theme.textTheme.bodyText2.color, fontWeight: FontWeight.w300)),
               ),
             )
           ],
@@ -515,7 +515,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
           case 1:
             if(_selectedItems.length > 0) {
               if(await confirmDownloadDialog(context,
-                content: appStrings(context).downloadImagesCount(_selectedItems.length),
+                content: appStrings(context).downloadImage_title(_selectedItems.length),
               )) {
                 print('Download ${_selectedItems.keys.toList()}');
 
@@ -531,7 +531,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
                   content: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(appStrings(context).downloading),
+                      Text(appStrings(context).downloadingImages(selection.length)),
                       CircularProgressIndicator(),
                     ],
                   ),
@@ -550,7 +550,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
                 true,
                 (item) async {
                   int result = await confirmMoveAssignImage(context,
-                    content: appStrings(context).moveSelection(item.name),
+                    content: appStrings(context).moveImage_message(_selectedItems.length, "", item.name),
                   );
                   print(result);
                   if (result == 0) {
@@ -560,7 +560,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
                       int.parse(item.id)
                     );
                     ScaffoldMessenger.of(context).showSnackBar(
-                      imagesMovedSnackBar(nbMoved, item.name)
+                      imagesMovedSnackBar(context, nbMoved)
                     );
                     Navigator.of(context).pop();
                   } else if (result == 1) {
@@ -570,7 +570,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
                       int.parse(item.id)
                     );
                     ScaffoldMessenger.of(context).showSnackBar(
-                      imagesAssignedSnackBar(nbAssigned, item.name)
+                      imagesAssignedSnackBar(context, nbAssigned)
                     );
                     Navigator.of(context).pop();
                   }
@@ -585,7 +585,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
           case 3:
             if(_selectedItems.length > 0) {
               if(await confirmDeleteDialog(context,
-                content: appStrings(context).deleteImagesCount(_selectedItems.length),
+                content: appStrings(context).deleteImageCount_title(_selectedItems.length),
               )) {
                 print('Delete ${_selectedItems.keys}');
 
@@ -600,7 +600,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
                 int nbSuccess = await deleteImages(context, selection);
 
                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                  content: Text(appStrings(context).deletedImagesCount(nbSuccess)),
+                  content: Text(appStrings(context).deleteImageSuccess_message(nbSuccess)),
                 ));
                 setState(() {});
               }
@@ -613,19 +613,19 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
       items: <BottomNavigationBarItem>[
         BottomNavigationBarItem(
           icon: Icon(Icons.edit, color: _theme.iconTheme.color),
-          label: appStrings(context).edit,
+          label: appStrings(context).imageOptions_edit,
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.download_rounded, color: _theme.iconTheme.color),
-          label: appStrings(context).download,
+          label: appStrings(context).imageOptions_download,
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.reply_outlined, color: _theme.iconTheme.color),
-          label: appStrings(context).move,
+          label: appStrings(context).moveImage_title,
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.delete_outline, color: _theme.errorColor),
-          label: appStrings(context).delete,
+          label: appStrings(context).deleteImage_delete,
         ),
       ],
       backgroundColor: _theme.scaffoldBackgroundColor,

@@ -181,7 +181,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
           switch (index) {
             case 0:
               if(await confirmDownloadDialog(context,
-                content: appStrings(context).downloadImage(images[_page]['name']),
+                content: appStrings(context).downloadImage_confirmation(1),
               )) {
                 print('Download $_page');
 
@@ -190,7 +190,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
                   content: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(appStrings(context).downloading),
+                      Text(appStrings(context).downloadingImages(1)),
                       CircularProgressIndicator(),
                     ],
                   ),
@@ -208,7 +208,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
                 (item) async {
                   int result = await confirmMoveAssignImage(
                     context,
-                    content: appStrings(context).moveImage(images[_page],item.name),
+                    content: appStrings(context).moveImage_message(1, images[_page],item.name),
                   );
 
                   if (result == 0) {
@@ -220,7 +220,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
                       Navigator.of(context).pop();
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
-                          imageMovedSnackBar(images[_page]['name'], item.name));
+                          imagesMovedSnackBar(context, 1));
                       Navigator.of(context).pop();
                     }
                   } else if (result == 1) {
@@ -232,7 +232,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
                       Navigator.of(context).pop();
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
-                          imageAssignedSnackBar(images[_page]['name'], item.name));
+                          imagesAssignedSnackBar(context, 1));
                       Navigator.of(context).pop();
                     }
                   }
@@ -254,7 +254,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
                */
             case 2: // TODO: change to 3 if implemented Attach function
               if(await confirmDeleteDialog(context,
-                content: appStrings(context).deleteImage(images[_page]['name']),
+                content: appStrings(context).deleteImage_message(1),
               )) {
                 print('Delete $_page');
 
@@ -265,7 +265,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
                   );
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text(appStrings(context).deleting),
+                    content: Text(appStrings(context).deleteImageHUD_deleting(1)),
                   ));
                 }
                 int page = _page;
@@ -292,11 +292,11 @@ class _ImageViewPageState extends State<ImageViewPage> {
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.download_rounded, color: _theme.iconTheme.color),
-            label: appStrings(context).download,
+            label: appStrings(context).imageOptions_download,
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.reply_outlined, color: _theme.iconTheme.color),
-            label: appStrings(context).move,
+            label: appStrings(context).moveImage_title,
           ),
           /*
           BottomNavigationBarItem(
@@ -307,7 +307,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
           */
           BottomNavigationBarItem(
             icon: Icon(Icons.delete_outline, color: _theme.errorColor),
-            label: appStrings(context).delete,
+            label: appStrings(context).deleteImage_delete,
           ),
         ],
         backgroundColor: Color(0x80000000),

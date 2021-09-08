@@ -26,8 +26,10 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
   @override
   void initState() {
     super.initState();
-    API.uploader = Uploader(context);
     _rootCategory = "0";
+    WidgetsBinding.instance.addPostFrameCallback((_) => {
+      API.uploader = Uploader(context)
+    });
   }
   @override
   void dispose() {
@@ -66,7 +68,7 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
             ],
              */
             flexibleSpace: FlexibleSpaceBar(
-              title: Text(appStrings(context).rootTitle, style: _theme.textTheme.headline1),
+              title: Text(appStrings(context).tabBar_albums, style: _theme.textTheme.headline1),
               /*
               background: Column(
                 mainAxisAlignment: MainAxisAlignment.end,
@@ -109,7 +111,7 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
               builder: (BuildContext context, AsyncSnapshot albumSnapshot) {
                 if(albumSnapshot.hasData){
                   if(albumSnapshot.data['stat'] == 'fail') {
-                    return Center(child: Text(appStrings(context).albumsLoadFailure));
+                    return Center(child: Text(appStrings(context).categoryMainEmtpy));
                   }
                   var albums = albumSnapshot.data['result']['categories'];
                   int nbPhotos = 0;
@@ -176,7 +178,7 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
                           Center(
                             child: Container(
                               padding: EdgeInsets.all(10),
-                              child: Text(appStrings(context).photoCount(nbPhotos), style: TextStyle(fontSize: 20, color: _theme.textTheme.bodyText2.color, fontWeight: FontWeight.w300)),
+                              child: Text(appStrings(context).imageCount(nbPhotos), style: TextStyle(fontSize: 20, color: _theme.textTheme.bodyText2.color, fontWeight: FontWeight.w300)),
                             ),
                           ),
                         ],

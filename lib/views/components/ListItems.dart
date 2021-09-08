@@ -14,8 +14,7 @@ import 'CustomShapes.dart';
 
 
 String albumSubCount(dynamic album, context) {
-  appStrings(context).subAlbumCount(album["nb_categories"]);
-  String displayString = appStrings(context).photoCount(album["total_nb_images"]);
+  String displayString = appStrings(context).imageCount(album["total_nb_images"]);
   if(album["nb_categories"] > 0) {
     displayString += ', ${appStrings(context).subAlbumCount(album["nb_categories"])}';
   }
@@ -89,7 +88,7 @@ Widget albumListItem(BuildContext context, dynamic album, bool isAdmin, Function
                   false,
                       (item) async {
                     if (await confirmMoveDialog(context,
-                      content: 'Move ${album['name']} to ${item.name} ?',
+                      content: appStrings(context).moveCategory_message(album['name'],item.name),
                     )) {
                       var result = await moveCategory(album['id'], item.id);
                       print(result);
@@ -99,7 +98,7 @@ Widget albumListItem(BuildContext context, dynamic album, bool isAdmin, Function
                         );
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
-                            albumMovedSnackBar(album['name'], item.name)
+                            albumMovedSnackBar(context)
                         );
                       }
                       Navigator.of(context).pop();
@@ -123,7 +122,7 @@ Widget albumListItem(BuildContext context, dynamic album, bool isAdmin, Function
               iconWidget: Icon(Icons.delete, size: 38, color: _theme.accentIconTheme.color),
               onTap: () async {
                 if (await confirmDeleteDialog(context,
-                  content: 'Delete album ${album["name"]} ?',
+                  content: appStrings(context).deleteCategory_message(album["total_nb_images"], album["name"]),
                 )) {
                   var result = await deleteCategory(album['id'].toString());
                   if(result['stat'] == 'fail') {
@@ -132,7 +131,7 @@ Widget albumListItem(BuildContext context, dynamic album, bool isAdmin, Function
                     );
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
-                        albumDeletedSnackBar(album["name"])
+                        albumDeletedSnackBar(context)
                     );
                     onRefresh('Deleted ${album['name']} : $result');
                   }
@@ -225,7 +224,7 @@ Widget albumListItemRight(BuildContext context, dynamic album, bool isAdmin, Fun
               iconWidget: Icon(Icons.delete, size: 38, color: _theme.accentIconTheme.color),
               onTap: () async {
                 if (await confirmDeleteDialog(context,
-                  content: 'Delete ${album["name"]} ?',
+                  content: appStrings(context).deleteCategory_message(album["total_nb_images"], album['name']),
                 )) {
                   var result = await deleteCategory(album['id'].toString());
                   if(result['stat'] == 'fail') {
@@ -234,7 +233,7 @@ Widget albumListItemRight(BuildContext context, dynamic album, bool isAdmin, Fun
                     );
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
-                        albumDeletedSnackBar(album["name"])
+                        albumDeletedSnackBar(context)
                     );
                     onRefresh('Deleted ${album['name']} : $result');
                   }
@@ -253,7 +252,7 @@ Widget albumListItemRight(BuildContext context, dynamic album, bool isAdmin, Fun
                 false,
                     (item) async {
                   if (await confirmMoveDialog(context,
-                    content: 'Move ${album['name']} to ${item.name} ?',
+                    content: appStrings(context).moveCategory_message(album['name'],item.name),
                   )) {
                     print('Move ${album['id']} to ${item.id}');
                     var result = await moveCategory(album['id'], item.id);
@@ -263,7 +262,7 @@ Widget albumListItemRight(BuildContext context, dynamic album, bool isAdmin, Fun
                       );
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
-                          albumMovedSnackBar(album['name'], item.name)
+                          albumMovedSnackBar(context)
                       );
                     }
                     Navigator.of(context).pop();
@@ -352,23 +351,20 @@ Widget albumInfo(BuildContext context, album) {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text('${album["name"]}',
-                style: Theme.of(context).textTheme.headline6,
-                textAlign: TextAlign.center,
-                overflow: TextOverflow.ellipsis,
-                softWrap: false,
-                maxLines: 1
+              style: Theme.of(context).textTheme.headline6,
+              textAlign: TextAlign.center,
+              overflow: TextOverflow.ellipsis,
+              softWrap: false,
+              maxLines: 1
             ),
             Column(
               children: [
-                Text('${album["comment"] == "" ?
-                "(no description)" :
-                album["comment"]
-                }',
-                    style: Theme.of(context).textTheme.subtitle1,
-                    textAlign: TextAlign.center,
-                    overflow: TextOverflow.fade,
-                    softWrap: true,
-                    maxLines: 2
+                Text('${album["comment"]}',
+                  style: Theme.of(context).textTheme.subtitle1,
+                  textAlign: TextAlign.center,
+                  overflow: TextOverflow.fade,
+                  softWrap: true,
+                  maxLines: 2
                 ),
                 Container(
                   padding: EdgeInsets.all(5),

@@ -1,10 +1,10 @@
 {
   "rootTitle": "Albums",
 
-  "subAlbumCount" : "{count, plural, zero{0 sous-albums} one{1 sous-album} other{{count} sous-albums}}",
+  "subAlbumCount" : "{count, plural, =1{1 sous-album} other{{count} sous-albums}}",
   "@subAlbumCount" : {
     "placeholders": {
-      "count": {}
+      "count": 0
     }
   }
 }

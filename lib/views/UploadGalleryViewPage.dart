@@ -7,6 +7,7 @@ import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:piwigo_ng/api/SessionAPI.dart';
+import 'package:piwigo_ng/constants/SettingsConstants.dart';
 import 'package:piwigo_ng/views/components/SnackBars.dart';
 
 import '../services/upload/chunked_uploader.dart';
@@ -22,7 +23,7 @@ class Uploader {
 
   Uploader(this.context) {
     snackBar = SnackBar(
-      content: Text('Uploading'),
+      content: Text(appStrings(context).imageUploadTableCell_uploading),
       duration: Duration(seconds: 2),
     );
   }
@@ -41,7 +42,7 @@ class Uploader {
     await API.localNotification.show(
       1,
       isSuccess ? 'Success' : 'Failure',
-      isSuccess ? 'All files has been uploaded successfully!' : 'There was an error while downloading the file.',
+      isSuccess ? appStrings(context).imageUploadCompleted_message : appStrings(context).uploadError_message,
       platform,
     );
   }
@@ -208,7 +209,7 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
           icon: Icon(Icons.chevron_left),
         ),
         centerTitle: true,
-        title: Text("Upload Photos"),
+        title: Text(appStrings(context).categoryUpload_images),
         actions: [
           IconButton(
             onPressed: () {
@@ -228,10 +229,10 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
               Center(
                 child: Padding(
                   padding: EdgeInsets.all(10),
-                  child: Text("${widget.imageData.length} ${widget.imageData.length == 1 ? 'photo' : 'photos'}", style: TextStyle(fontSize: 20, color: _theme.textTheme.bodyText2.color)),
+                  child: Text(appStrings(context).imageCount(widget.imageData.length), style: TextStyle(fontSize: 20, color: _theme.textTheme.bodyText2.color)),
                 ),
               ),
-              Text('Show photos'),
+              Text(appStrings(context).showPhotos),
               IconButton(
                 onPressed: () {
                   setState(() {
@@ -295,7 +296,7 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
                   style: ButtonStyle(
                     backgroundColor: MaterialStateProperty.all<Color>(Color(0xffff7700)),
                   ),
-                  child: Text("Upload",
+                  child: Text(appStrings(context).imageUploadDetailsButton_title,
                       style: TextStyle(fontSize: 16)),
                 ),
               ),
