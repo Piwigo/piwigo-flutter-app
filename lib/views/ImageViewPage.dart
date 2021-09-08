@@ -2,6 +2,7 @@ import 'package:better_player/better_player.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:icon_shadow/icon_shadow.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:piwigo_ng/api/API.dart';
 import 'package:piwigo_ng/api/ImageAPI.dart';
@@ -10,6 +11,8 @@ import 'package:piwigo_ng/services/MoveAlbumService.dart';
 import 'package:piwigo_ng/views/components/Dialogs.dart';
 import 'package:piwigo_ng/views/components/SnackBars.dart';
 import 'package:path/path.dart' as Path;
+
+import 'VideoPlayerViewPage.dart';
 
 
 class ImageViewPage extends StatefulWidget {
@@ -29,9 +32,12 @@ class ImageViewPage extends StatefulWidget {
 class _ImageViewPageState extends State<ImageViewPage> {
   String _derivative;
   PageController _pageController;
+  PhotoViewController _photoScaleController = PhotoViewController(initialScale: 1);
+  ScrollPhysics _pageViewPhysic = BouncingScrollPhysics();
   int _page;
   int _imagePage;
   List<dynamic> images = [];
+  bool showToolBar = true;
 
   @override
   void initState() {
@@ -75,7 +81,10 @@ class _ImageViewPageState extends State<ImageViewPage> {
     ThemeData _theme = Theme.of(context);
     return Scaffold(
       primary: true,
-      appBar: AppBar(
+      backgroundColor: Colors.black,
+      resizeToAvoidBottomInset: true,
+      extendBodyBehindAppBar: true,
+      appBar: showToolBar ? AppBar(
         iconTheme: IconThemeData(
           color: _theme.iconTheme.color, //change your color here
         ),
@@ -107,14 +116,14 @@ class _ImageViewPageState extends State<ImageViewPage> {
            Center(),
            */
         ],
+      ) : AppBar(
+        elevation: 0,
+        leading: Text(""),
+        backgroundColor: Colors.transparent
       ),
-      backgroundColor: Colors.black,
-      resizeToAvoidBottomInset: true,
-      extendBodyBehindAppBar: true,
-      // extendBody: true,
       body: Container(
         child: PageView.builder(
-          physics: const BouncingScrollPhysics(),
+          physics: _pageViewPhysic,
           itemCount: images.length,
           controller: _pageController,
           onPageChanged: (newPage) async {
@@ -127,22 +136,61 @@ class _ImageViewPageState extends State<ImageViewPage> {
           },
           itemBuilder: (context, index) {
             if(Path.extension(images[index]['element_url']) == '.mp4') {
-              return BetterPlayer.network(
-                images[index]['element_url'],
-                betterPlayerConfiguration: BetterPlayerConfiguration(
-                  aspectRatio: images[index]['width']/images[index]['height'],
-                  fullScreenAspectRatio: images[index]['width']/images[index]['height'],
-                  controlsConfiguration: BetterPlayerControlsConfiguration(
-                    enableSkips: false,
-                    enableFullscreen: false,
-                    unMuteIcon: Icons.volume_off,
-                  )
+              return GestureDetector(
+                onTap: () {
+                  Navigator.of(context).push(MaterialPageRoute(builder: (_) => VideoPlayerViewPage(images[index]['element_url'], ratio:images[index]['width']/images[index]['height'])));
+                },
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    Image.network(images[index]["derivatives"][_derivative]["url"]),
+                    IconShadowWidget(
+                      Icon(Icons.play_arrow_rounded, size: 100, color: Color(0xFFFFFFFF)),
+                      shadowColor: Colors.black45,
+                    ),
+                  ],
                 ),
               );
             }
-            return PhotoView(
-              imageProvider: CachedNetworkImageProvider(images[index]["derivatives"][_derivative]["url"]),
-              minScale: PhotoViewComputedScale.contained,
+            return GestureDetector(
+              onScaleStart: (details) {
+                setState(() {
+                  showToolBar = false;
+                });
+              },
+              child: PhotoView(
+                controller: _photoScaleController,
+                imageProvider: CachedNetworkImageProvider(images[index]["derivatives"][_derivative]["url"]),
+                minScale: PhotoViewComputedScale.contained,
+                scaleStateChangedCallback: (scale) {
+                  print("scale cb ${scale.isScaleStateZooming}");
+                  if(scale.isScaleStateZooming && _photoScaleController.scale > 0.5) {
+                    setState(() {
+                      _pageViewPhysic = NeverScrollableScrollPhysics();
+                      showToolBar = false;
+                    });
+                  } else {
+                    setState(() {
+                      _pageViewPhysic = BouncingScrollPhysics();
+                      showToolBar = true;
+                    });
+                  }
+                },
+                /* onScaleEnd: (context, details, value) {
+                  print("scale ${_photoScaleController.scale}");
+                  if(_photoScaleController.scale > 0.5) {
+                    setState(() {
+                      _pageViewPhysic = NeverScrollableScrollPhysics();
+                      showToolBar = false;
+                    });
+                  } else {
+                    setState(() {
+                      _pageViewPhysic = BouncingScrollPhysics();
+                      showToolBar = true;
+                    });
+                  }
+                }, */
+              ),
             );
           }
         ),
@@ -176,7 +224,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
         ),
         */
       ),
-      bottomNavigationBar: widget.isAdmin? BottomNavigationBar(
+      bottomNavigationBar: widget.isAdmin && showToolBar? BottomNavigationBar(
         onTap: (index) async {
           switch (index) {
             case 0:
@@ -318,7 +366,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
         showUnselectedLabels: true,
         selectedItemColor: _theme.primaryColorLight,
         unselectedItemColor: _theme.primaryColorLight,
-      ) : Center(),
+      ) : Text(""),
     );
   }
 }

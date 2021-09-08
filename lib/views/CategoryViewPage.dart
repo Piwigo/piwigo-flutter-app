@@ -180,6 +180,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
         return true;
       },
       child: GestureDetector(
+        /*
         onScaleStart: (details) {
           _scaleFactor = getImageCrossAxisCount(context).toDouble();
           _baseScaleFactor = _scaleFactor;
@@ -190,6 +191,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
             setImageCrossAxisCount(context, _scaleFactor.ceil().toDouble());
           });
         },
+        */
         child: child,
       ),
     );

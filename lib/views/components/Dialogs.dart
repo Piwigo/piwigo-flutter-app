@@ -760,15 +760,19 @@ class _EditImageSelectionDialogState extends State<EditImageSelectionDialog> {
   void initState() {
     super.initState();
 
-    Constants.privacyLevels.forEach((key, value) {
-      _levelItems.add(DropdownMenuItem<int>(
-        value: key,
-        child: Tooltip(
-          message: value,
-          child: Text(value, overflow: TextOverflow.fade),
-        ),
-      ));
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      privacyLevels(context).forEach((key, value) {
+        _levelItems.add(DropdownMenuItem<int>(
+          value: key,
+          child: Tooltip(
+            message: value,
+            child: Text(value, overflow: TextOverflow.fade),
+          ),
+        ));
+      });
+      setState(() {});
     });
+
   }
 
   bool isNameEmpty() {

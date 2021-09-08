@@ -711,7 +711,7 @@
 
 
 
-  "settingsHeader_server" : "Serveur Piwigo {server}",
+  "settingsHeader_server" : "Serveur Piwigo {version}",
   "@settingsHeader_server": {
     "placeholders": {
       "version": {}
@@ -722,7 +722,7 @@
   "settings_username" : "Identifiant",
   "settings_notLoggedIn" : " - Non Connecté - ",
   "settings_logout" : "Déconnexion",
-  "settingsFooter_formats" : "Le serveur accepte les types de fichiers suivants: {types}",
+  "settingsFooter_formats" : "Le serveur accepte les types de fichiers suivants: {types}.",
   "@settingsFooter_formats": {
     "placeholders": {
       "types": {}

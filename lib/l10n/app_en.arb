@@ -722,7 +722,7 @@
     "settings_username": "Username",
     "settings_notLoggedIn": " - Not Logged In - ",
     "settings_logout": "Logout",
-    "settingsFooter_formats": "The server accepts the following file types: {types}",
+    "settingsFooter_formats": "The server accepts the following file types: {types}.",
     "@settingsFooter_formats": {
         "placeholders": {
             "types": {}

@@ -48,6 +48,7 @@ dependencies:
   url_launcher:
 
   flutter_speed_dial:
+  icon_shadow:
   flutter_slidable:
   flutter_absolute_path:
   path_provider:

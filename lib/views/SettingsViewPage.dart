@@ -226,7 +226,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                           String value) {
                                         return DropdownMenuItem<String>(
                                           value: value,
-                                          child: Text(value),
+                                          child: Text(thumbnailSize(context, value)),
                                         );
                                       }).toList(),
                                     ),
@@ -253,7 +253,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                           String value) {
                                         return DropdownMenuItem<String>(
                                           value: value,
-                                          child: Text(value),
+                                          child: Text(photoSize(context, value)),
                                         );
                                       }).toList(),
                                     ),

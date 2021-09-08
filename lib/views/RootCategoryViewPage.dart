@@ -9,7 +9,7 @@ import 'package:piwigo_ng/constants/SettingsConstants.dart';
 import 'package:piwigo_ng/services/OrientationService.dart';
 import 'package:piwigo_ng/views/components/Dialogs.dart';
 import 'package:piwigo_ng/views/components/ListItems.dart';
-import 'package:piwigo_ng/views/SettingsPage.dart';
+import 'package:piwigo_ng/views/SettingsViewPage.dart';
 import 'package:piwigo_ng/views/UploadGalleryViewPage.dart';
 
 class RootCategoryViewPage extends StatefulWidget {
@@ -27,8 +27,8 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
   void initState() {
     super.initState();
     _rootCategory = "0";
-    WidgetsBinding.instance.addPostFrameCallback((_) => {
-      API.uploader = Uploader(context)
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      API.uploader = Uploader(context);
     });
   }
   @override
