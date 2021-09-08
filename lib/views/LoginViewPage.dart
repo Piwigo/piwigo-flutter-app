@@ -5,6 +5,7 @@ import 'package:piwigo_ng/api/API.dart';
 import 'package:piwigo_ng/api/SessionAPI.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:piwigo_ng/constants/SettingsConstants.dart';
 
 
 class LoginViewPage extends StatefulWidget {
@@ -29,6 +30,9 @@ class _LoginViewPageState extends State<LoginViewPage> {
     API.cookieJar = CookieJar();
     API.dio.interceptors.add(CookieManager(API.cookieJar));
     if(API.prefs.getBool("is_logged") != null && API.prefs.getBool("is_logged")) {
+      setState(() {
+        _isLoading = true;
+      });
       API.dio.options.baseUrl = API.prefs.getString("base_url");
       String message;
       if(API.prefs.getBool("is_guest") != null && !API.prefs.getBool("is_guest")) {
@@ -48,6 +52,9 @@ class _LoginViewPageState extends State<LoginViewPage> {
           return;
         }
       }
+      setState(() {
+        _isLoading = false;
+      });
       showDialog(
         barrierDismissible: true,
         context: context,
@@ -83,7 +90,7 @@ class _LoginViewPageState extends State<LoginViewPage> {
   @override
   void initState() {
     super.initState();
-    createDio();
+    //createDio();
     isLoggedIn = false;
     _isLoading = false;
     _validUrl = false;
@@ -103,6 +110,7 @@ class _LoginViewPageState extends State<LoginViewPage> {
       });
     });
     getSharedPrefs();
+    WidgetsBinding.instance.addPostFrameCallback((_) => createDio());
   }
 
   @override
@@ -147,41 +155,40 @@ class _LoginViewPageState extends State<LoginViewPage> {
                                 Padding(
                                   padding: EdgeInsets.all(5),
                                   child: Container(
-                                          padding: EdgeInsets.symmetric(horizontal: 10),
-                                          decoration: BoxDecoration(
-                                              borderRadius: BorderRadius.circular(10),
-                                              border: _validUrl? Border.all(width: 0, color: Colors.transparent) : Border.all(color: _theme.errorColor),
-                                              color: _theme.inputDecorationTheme.fillColor
+                                    padding: EdgeInsets.symmetric(horizontal: 10),
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(10),
+                                        border: _validUrl? Border.all(width: 0, color: Colors.transparent) : Border.all(color: _theme.errorColor),
+                                        color: _theme.inputDecorationTheme.fillColor
+                                    ),
+                                    child: TextFormField(
+                                      controller: urlController,
+                                      style: TextStyle(fontSize: 14, color: Color(0xff5c5c5c)),
+                                      focusNode: urlFieldFocus,
+                                      decoration: InputDecoration(
+                                        icon: _validUrl? Icon(Icons.public, color: _theme.disabledColor) : Icon(Icons.error_outline, color: _theme.errorColor),
+                                        border: InputBorder.none,
+                                        hintText: appStrings(context).login_serverPlaceholder,
+                                        hintStyle: TextStyle(fontStyle: FontStyle.italic, color: _theme.disabledColor),
+                                        prefix: urlFieldFocus.hasFocus? InkWell(
+                                          onTap: () {
+                                            setState(() {
+                                              _httpProtocol = !_httpProtocol;
+                                            });
+                                          },
+                                          child: Column(
+                                            children: [
+                                              Text(protocol(_httpProtocol), style: TextStyle(fontSize: 14, color: Color(0xff5c5c5c))),
+                                              Text(protocol(!_httpProtocol), style: TextStyle(fontSize: 9, color: Color(0xff5c5c5c))),
+                                            ],
                                           ),
-
-                                          child: TextFormField(
-                                            controller: urlController,
-                                            style: TextStyle(fontSize: 14, color: Color(0xff5c5c5c)),
-                                            focusNode: urlFieldFocus,
-                                            decoration: InputDecoration(
-                                              icon: _validUrl? Icon(Icons.public, color: _theme.disabledColor) : Icon(Icons.error_outline, color: _theme.errorColor),
-                                              border: InputBorder.none,
-                                              hintText: 'example.com',
-                                              hintStyle: TextStyle(fontStyle: FontStyle.italic, color: _theme.disabledColor),
-                                              prefix: urlFieldFocus.hasFocus? InkWell(
-                                                onTap: () {
-                                                  setState(() {
-                                                    _httpProtocol = !_httpProtocol;
-                                                  });
-                                                },
-                                                child: Column(
-                                                  children: [
-                                                    Text(protocol(_httpProtocol), style: TextStyle(fontSize: 14, color: Color(0xff5c5c5c))),
-                                                    Text(protocol(!_httpProtocol), style: TextStyle(fontSize: 9, color: Color(0xff5c5c5c))),
-                                                  ],
-                                                ),
-                                              ) : urlController.text == null || urlController.text == "" ?
-                                              Text("") : Text(protocol(_httpProtocol), style: TextStyle(fontSize: 14, color: Color(0xff5c5c5c))),
-                                              suffixText: '/',
-                                              suffixStyle: TextStyle(fontSize: 14, color: Color(0xff5c5c5c)),
-                                            ),
-                                          ),
-                                        ),
+                                        ) : urlController.text == null || urlController.text == "" ?
+                                        Text("") : Text(protocol(_httpProtocol), style: TextStyle(fontSize: 14, color: Color(0xff5c5c5c))),
+                                        suffixText: '/',
+                                        suffixStyle: TextStyle(fontSize: 14, color: Color(0xff5c5c5c)),
+                                      ),
+                                    ),
+                                  ),
                                 ),
                                 Row(
                                   children: [
@@ -201,7 +208,7 @@ class _LoginViewPageState extends State<LoginViewPage> {
                                             decoration: InputDecoration(
                                               icon: Icon(Icons.person, color: _theme.disabledColor),
                                               border: InputBorder.none,
-                                              hintText: 'username (optional)',
+                                              hintText: appStrings(context).login_userPlaceholder,
                                               hintStyle: TextStyle(fontStyle: FontStyle.italic, color: _theme.disabledColor),
                                             ),
                                           ),
@@ -245,7 +252,7 @@ class _LoginViewPageState extends State<LoginViewPage> {
                                                   Icon(Icons.lock_open, color: _theme.disabledColor),
                                               ),
                                               border: InputBorder.none,
-                                              hintText: 'password (optional)',
+                                              hintText: appStrings(context).login_passwordPlaceholder,
                                               hintStyle: TextStyle(fontStyle: FontStyle.italic, color: _theme.disabledColor),
                                             ),
                                           ),
@@ -315,7 +322,7 @@ class _LoginViewPageState extends State<LoginViewPage> {
                                           }
                                       );
                                     },
-                                    child: _isLoading? CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(Colors.white)) : Text('Log in', style: TextStyle(fontSize: 16, color: Colors.white)),
+                                    child: _isLoading? CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(Colors.white)) : Text(appStrings(context).login, style: TextStyle(fontSize: 16, color: Colors.white)),
                                   ),
                                 ),
                               ],

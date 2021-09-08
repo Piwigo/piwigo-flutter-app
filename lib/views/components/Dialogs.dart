@@ -113,8 +113,8 @@ Future<bool> confirmDeleteDialog(
     context: context,
     builder: (_) => ConfirmDialog(
       content: content,
-      yes: Text('Delete', style: TextStyle(color: Colors.red)),
-      no: Text('Cancel', style: TextStyle(color: Colors.grey)),
+      yes: Text(appStrings(context).deleteCategoryConfirm_deleteButton, style: TextStyle(color: Colors.red)),
+      no: Text(appStrings(context).alertCancelButton, style: TextStyle(color: Colors.grey)),
     ),
   );
 
@@ -129,8 +129,8 @@ Future<bool> confirmMoveDialog(
     context: context,
     builder: (_) => ConfirmDialog(
       content: content,
-      yes: Text('Move', style: TextStyle(color: Colors.green)),
-      no: Text('Cancel', style: TextStyle(color: Colors.grey)),
+      yes: Text(appStrings(context).moveImage_title, style: TextStyle(color: Colors.green)),
+      no: Text(appStrings(context).alertCancelButton, style: TextStyle(color: Colors.grey)),
     ),
   );
 
@@ -145,8 +145,8 @@ Future<bool> confirmAssignDialog(
     context: context,
     builder: (_) => ConfirmDialog(
       content: content,
-      yes: Text('Assign', style: TextStyle(color: Colors.green)),
-      no: Text('Cancel', style: TextStyle(color: Colors.grey)),
+      yes: Text(appStrings(context).copyImage_title, style: TextStyle(color: Colors.green)),
+      no: Text(appStrings(context).alertCancelButton, style: TextStyle(color: Colors.grey)),
     ),
   );
 
@@ -161,8 +161,8 @@ Future<bool> confirmDownloadDialog(
     context: context,
     builder: (_) => ConfirmDialog(
       content: content,
-      yes: Text('Download', style: TextStyle(color: Colors.blue)),
-      no: Text('Cancel', style: TextStyle(color: Colors.grey)),
+      yes: Text(appStrings(context).imageOptions_download, style: TextStyle(color: Colors.blue)),
+      no: Text(appStrings(context).alertCancelButton, style: TextStyle(color: Colors.grey)),
     ),
   );
 
@@ -196,7 +196,7 @@ class ConfirmDialog extends StatelessWidget {
                   padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                   alignment: Alignment.center,
                   child: Text(
-                    (content != null) ? '$content' : 'Are you sure continue?',
+                    (content != null) ? '$content' : appStrings(context).deleteCategoryConfirm_title,
                     softWrap: true,
                     maxLines: 3,
                     textAlign: TextAlign.center,
@@ -289,7 +289,7 @@ class MultiConfirmDialog extends StatelessWidget {
                   padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                   alignment: Alignment.center,
                   child: Text(
-                    (content != null) ? '$content' : 'Are you sure continue?',
+                    (content != null) ? '$content' : appStrings(context).deleteCategoryConfirm_title,
                     softWrap: true,
                     maxLines: 3,
                     textAlign: TextAlign.center,
@@ -334,7 +334,7 @@ Widget createCategoryAlert(BuildContext context, String catId) {
   final _addAlbumDescController = TextEditingController();
 
   return PiwigoDialog(
-    title: "Create Album",
+    title: appStrings(context).createNewAlbum_title,
     content: Form(
       key: _formKey,
       child: Column(
@@ -358,12 +358,12 @@ Widget createCategoryAlert(BuildContext context, String catId) {
                     decoration: InputDecoration(
                       contentPadding: EdgeInsets.zero,
                       border: InputBorder.none,
-                      hintText: 'album name',
+                      hintText: appStrings(context).createNewAlbum_placeholder,
                       hintStyle: TextStyle(fontSize: 14, fontStyle: FontStyle.italic, color: _theme.disabledColor),
                     ),
                     validator: (value) {
                       if(value.isEmpty) {
-                        return 'Please enter a name';
+                        return '';
                       }
                       return null;
                     },
@@ -387,7 +387,7 @@ Widget createCategoryAlert(BuildContext context, String catId) {
                     decoration: InputDecoration(
                       contentPadding: EdgeInsets.zero,
                       border: InputBorder.none,
-                      hintText: 'description (optional)',
+                      hintText: appStrings(context).createNewAlbumDescription_placeholder,
                       hintStyle: TextStyle(fontSize: 14, fontStyle: FontStyle.italic, color: _theme.disabledColor),
                     ),
                   ),
@@ -413,12 +413,12 @@ Widget createCategoryAlert(BuildContext context, String catId) {
                       decoration: InputDecoration(
                         contentPadding: EdgeInsets.zero,
                         border: InputBorder.none,
-                        hintText: 'album name',
+                        hintText: appStrings(context).createNewAlbum_placeholder,
                         hintStyle: TextStyle(fontSize: 14, fontStyle: FontStyle.italic, color: _theme.disabledColor),
                       ),
                       validator: (value) {
                         if(value.isEmpty) {
-                          return 'Please enter a name';
+                          return '';
                         }
                         return null;
                       },
@@ -444,7 +444,7 @@ Widget createCategoryAlert(BuildContext context, String catId) {
                       decoration: InputDecoration(
                         contentPadding: EdgeInsets.zero,
                         border: InputBorder.none,
-                        hintText: 'description (optional)',
+                        hintText: appStrings(context).createNewAlbumDescription_placeholder,
                         hintStyle: TextStyle(fontSize: 14, fontStyle: FontStyle.italic, color: _theme.disabledColor),
                       ),
                     ),
@@ -467,7 +467,7 @@ Widget createCategoryAlert(BuildContext context, String catId) {
                   ),
                   backgroundColor: MaterialStateProperty.all(_theme.accentColor),
                 ),
-                child: Text('Create album', style: TextStyle(fontSize: 16, color: Colors.white)),
+                child: Text(appStrings(context).alertAddButton, style: TextStyle(fontSize: 16, color: Colors.white)),
                 onPressed: () async {
                   if (_formKey.currentState.validate()) {
                     _formKey.currentState.save();
@@ -483,7 +483,7 @@ Widget createCategoryAlert(BuildContext context, String catId) {
                         );
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
-                            albumAddedSnackBar(_addAlbumNameController.text)
+                            albumAddedSnackBar(context)
                         );
                       }
                       _addAlbumNameController.text = "";
@@ -510,10 +510,10 @@ Future<int> confirmMoveAssignImage(
     context: context,
     builder: (_) => MultiConfirmDialog(
       content: content,
-      no: Text('Cancel', style: TextStyle(color: Colors.grey)),
+      no: Text(appStrings(context).alertCancelButton, style: TextStyle(color: Colors.grey)),
       actions: <Widget>[
-        Text('Move', style: TextStyle(color: Theme.of(context).accentColor)),
-        Text('Assign', style: TextStyle(color: Theme.of(context).accentColor)),
+        Text(appStrings(context).moveImage_title, style: TextStyle(color: Theme.of(context).accentColor)),
+        Text(appStrings(context).copyImage_title, style: TextStyle(color: Theme.of(context).accentColor)),
       ],
     ),
   );
@@ -550,11 +550,14 @@ class _EditCategoryDialogState extends State<EditCategoryDialog> {
     ThemeData _theme = Theme.of(context);
 
     return PiwigoDialog(
-      title: "Edit Album",
+      title: appStrings(context).renameCategory_title,
       content: Form(
         key: _formKey,
         child:  Column(
           children: <Widget>[
+            Center(
+              child: Text(appStrings(context).renameCategory_message),
+            ),
             isPortrait(context) ?
             Column(
               children: [
@@ -574,14 +577,14 @@ class _EditCategoryDialogState extends State<EditCategoryDialog> {
                       decoration: InputDecoration(
                         contentPadding: EdgeInsets.zero,
                         border: InputBorder.none,
-                        hintText: 'album name',
+                        hintText: appStrings(context).createNewAlbum_placeholder,
                         hintStyle: TextStyle(fontSize: 14,
                             fontStyle: FontStyle.italic,
                             color: _theme.disabledColor),
                       ),
                       validator: (value) {
                         if (value.isEmpty) {
-                          return 'Please enter a name';
+                          return '';
                         }
                         return null;
                       },
@@ -605,7 +608,7 @@ class _EditCategoryDialogState extends State<EditCategoryDialog> {
                       decoration: InputDecoration(
                         contentPadding: EdgeInsets.zero,
                         border: InputBorder.none,
-                        hintText: 'description (optional)',
+                        hintText: appStrings(context).createNewAlbumDescription_placeholder,
                         hintStyle: TextStyle(fontSize: 14,
                             fontStyle: FontStyle.italic,
                             color: _theme.disabledColor),
@@ -633,7 +636,7 @@ class _EditCategoryDialogState extends State<EditCategoryDialog> {
                         decoration: InputDecoration(
                           contentPadding: EdgeInsets.zero,
                           border: InputBorder.none,
-                          hintText: 'album name',
+                          hintText: appStrings(context).createNewAlbum_placeholder,
                           hintStyle: TextStyle(fontSize: 14,
                               fontStyle: FontStyle.italic,
                               color: _theme.disabledColor),
@@ -666,7 +669,7 @@ class _EditCategoryDialogState extends State<EditCategoryDialog> {
                         decoration: InputDecoration(
                           contentPadding: EdgeInsets.zero,
                           border: InputBorder.none,
-                          hintText: 'description (optional)',
+                          hintText: appStrings(context).createNewAlbumDescription_placeholder,
                           hintStyle: TextStyle(fontSize: 14,
                               fontStyle: FontStyle.italic,
                               color: _theme.disabledColor),
@@ -693,7 +696,7 @@ class _EditCategoryDialogState extends State<EditCategoryDialog> {
                     backgroundColor: MaterialStateProperty.all(
                         _theme.accentColor),
                   ),
-                  child: Text('Save',
+                  child: Text(appStrings(context).categoryCellOption_rename,
                       style: TextStyle(fontSize: 16, color: Colors.white)),
                   onPressed: () async {
                     if (_formKey.currentState.validate()) {
@@ -711,7 +714,7 @@ class _EditCategoryDialogState extends State<EditCategoryDialog> {
                           );
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
-                              albumEditedSnackBar(_addAlbumNameController.text)
+                              albumEditedSnackBar(context)
                           );
                         }
                         _addAlbumNameController.text = "";
@@ -731,7 +734,6 @@ class _EditCategoryDialogState extends State<EditCategoryDialog> {
     );
   }
 }
-
 
 class EditImageSelectionDialog extends StatefulWidget {
   final int catId;
@@ -758,15 +760,19 @@ class _EditImageSelectionDialogState extends State<EditImageSelectionDialog> {
   void initState() {
     super.initState();
 
-    Constants.privacyLevels.forEach((key, value) {
-      _levelItems.add(DropdownMenuItem<int>(
-        value: key,
-        child: Tooltip(
-          message: value,
-          child: Text(value, overflow: TextOverflow.fade),
-        ),
-      ));
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      privacyLevels(context).forEach((key, value) {
+        _levelItems.add(DropdownMenuItem<int>(
+          value: key,
+          child: Tooltip(
+            message: value,
+            child: Text(value, overflow: TextOverflow.fade),
+          ),
+        ));
+      });
+      setState(() {});
     });
+
   }
 
   bool isNameEmpty() {
@@ -788,7 +794,7 @@ class _EditImageSelectionDialogState extends State<EditImageSelectionDialog> {
     }
 
     return PiwigoDialog(
-      title: "Edit Images",
+      title: appStrings(context).imageOptions_edit,
       width: _screenSize.width*7/8,
       content: Form(
         key: _formKey,
@@ -914,7 +920,7 @@ class _EditImageSelectionDialogState extends State<EditImageSelectionDialog> {
             ),
             Align(
               alignment: Alignment.topLeft,
-              child: Text('Title', style: _theme.textTheme.bodyText1),
+              child: Text(appStrings(context).editImageDetails_title, style: _theme.textTheme.bodyText1),
             ),
             Padding(
               padding: EdgeInsets.all(5),
@@ -932,7 +938,7 @@ class _EditImageSelectionDialogState extends State<EditImageSelectionDialog> {
                   decoration: InputDecoration(
                     contentPadding: EdgeInsets.zero,
                     border: InputBorder.none,
-                    hintText: 'Images title',
+                    hintText: appStrings(context).editImageDetails_titlePlaceholder,
                     hintStyle: TextStyle(fontSize: 14,
                         fontStyle: FontStyle.italic,
                         color: _theme.disabledColor),
@@ -943,7 +949,7 @@ class _EditImageSelectionDialogState extends State<EditImageSelectionDialog> {
             ), // Name
             Align(
               alignment: Alignment.topLeft,
-              child: Text('Description', style: _theme.textTheme.bodyText1),
+              child: Text(appStrings(context).editImageDetails_description, style: _theme.textTheme.bodyText1),
             ),
             Padding(
               padding: EdgeInsets.all(5),
@@ -962,7 +968,7 @@ class _EditImageSelectionDialogState extends State<EditImageSelectionDialog> {
                   decoration: InputDecoration(
                     contentPadding: EdgeInsets.zero,
                     border: InputBorder.none,
-                    hintText: 'Images Description',
+                    hintText: appStrings(context).editImageDetails_descriptionPlaceholder,
                     hintStyle: TextStyle(fontSize: 14,
                         fontStyle: FontStyle.italic,
                         color: _theme.disabledColor),
@@ -973,9 +979,9 @@ class _EditImageSelectionDialogState extends State<EditImageSelectionDialog> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('Append Tags', style: _theme.textTheme.bodyText1),
+                Text(appStrings(context).tagsAdd_title, style: _theme.textTheme.bodyText1),
                 IconButton(
-                  tooltip: 'Select tags',
+                  tooltip: appStrings(context).tagsTitle_selectOne,
                   onPressed: () {
                     showDialog(
                         context: context,
@@ -1034,7 +1040,7 @@ class _EditImageSelectionDialogState extends State<EditImageSelectionDialog> {
             SizedBox(height: 10),
             Align(
               alignment: Alignment.topLeft,
-              child: Text('Who can see this photo', style: _theme.textTheme.bodyText1),
+              child: Text(appStrings(context).editImageDetails_privacyLevel, style: _theme.textTheme.bodyText1),
             ),
             Padding(
               padding: EdgeInsets.all(5),
@@ -1103,7 +1109,7 @@ class _EditImageSelectionDialogState extends State<EditImageSelectionDialog> {
                             _privacyLevel
                         );
                         ScaffoldMessenger.of(context).showSnackBar(
-                            imagesEditedSnackBar(nbEdited)
+                            imagesEditedSnackBar(context, nbEdited)
                         );
                         Navigator.of(context).pop();
                       } catch (e) {
@@ -1192,7 +1198,7 @@ class _SelectTagDialogState extends State<SelectTagDialog> {
     ThemeData _theme = Theme.of(context);
     Size _screenSize = MediaQuery.of(context).size;
     return PiwigoDialog(
-      title: "Select Tags",
+      title: appStrings(context).tags,
       content: FutureBuilder<Map<String,dynamic>>(
         future: getAdminTags(),
         builder: (BuildContext context, AsyncSnapshot snapshot) {
@@ -1214,7 +1220,7 @@ class _SelectTagDialogState extends State<SelectTagDialog> {
                     Container(
                       alignment: Alignment.topLeft,
                       padding: EdgeInsets.all(5),
-                      child: Text('Selected tags', style: _theme.textTheme.bodyText1),
+                      child: Text(appStrings(context).tagsHeader_selected, style: _theme.textTheme.bodyText1),
                     ),
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: 5.0),
@@ -1263,7 +1269,7 @@ class _SelectTagDialogState extends State<SelectTagDialog> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text('All tags', style: _theme.textTheme.bodyText1),
+                          Text(appStrings(context).tagsHeader_notSelected, style: _theme.textTheme.bodyText1),
                           SizedBox(width: 5),
                           InkWell(
                             onTap: () {
@@ -1342,7 +1348,7 @@ class _SelectTagDialogState extends State<SelectTagDialog> {
                           ),
                           child: _isLoading?
                             CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(Colors.white)) :
-                            Text('Confirm', style: TextStyle(fontSize: 16, color: Colors.white)),
+                            Text(appStrings(context).alertConfirmButton, style: TextStyle(fontSize: 16, color: Colors.white)),
                           onPressed: () {
                             setState(() {
                               _isLoading = true;
@@ -1406,11 +1412,14 @@ Widget createTagAlert(BuildContext context) {
   final _addTagNameController = TextEditingController();
 
   return PiwigoDialog(
-    title: "Create a new tag",
+    title: appStrings(context).tagsAdd_title,
     content: Form(
       key: _formKey,
       child: Column(
         children: <Widget>[
+          Center(
+            child: Text(appStrings(context).tagsAdd_message),
+          ),
           Padding(
             padding: EdgeInsets.all(5),
             child: Container(
@@ -1427,12 +1436,12 @@ Widget createTagAlert(BuildContext context) {
                 decoration: InputDecoration(
                   contentPadding: EdgeInsets.zero,
                   border: InputBorder.none,
-                  hintText: 'tag name',
+                  hintText: appStrings(context).tagsAdd_placeholder,
                   hintStyle: TextStyle(fontSize: 14, fontStyle: FontStyle.italic, color: _theme.disabledColor),
                 ),
                 validator: (value) {
                   if(value.isEmpty) {
-                    return 'Please enter a name';
+                    return '';
                   }
                   return null;
                 },
@@ -1453,7 +1462,7 @@ Widget createTagAlert(BuildContext context) {
                   ),
                   backgroundColor: MaterialStateProperty.all(_theme.accentColor),
                 ),
-                child: Text('Create tag', style: TextStyle(fontSize: 16, color: Colors.white)),
+                child: Text(appStrings(context).alertAddButton, style: TextStyle(fontSize: 16, color: Colors.white)),
                 onPressed: () async {
                   if (_formKey.currentState.validate()) {
                     _formKey.currentState.save();

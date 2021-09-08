@@ -44,7 +44,7 @@ class MyApp extends StatelessWidget {
       child: Consumer<ThemeNotifier>(
         builder: (context, ThemeNotifier notifier, child) {
           return MaterialApp(
-            title: 'Piwigo',
+            title: "Piwigo NG",
             // theme: notifier.darkTheme ? dark : light,
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,

@@ -2,6 +2,7 @@ import 'package:better_player/better_player.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:icon_shadow/icon_shadow.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:piwigo_ng/api/API.dart';
 import 'package:piwigo_ng/api/ImageAPI.dart';
@@ -10,6 +11,8 @@ import 'package:piwigo_ng/services/MoveAlbumService.dart';
 import 'package:piwigo_ng/views/components/Dialogs.dart';
 import 'package:piwigo_ng/views/components/SnackBars.dart';
 import 'package:path/path.dart' as Path;
+
+import 'VideoPlayerViewPage.dart';
 
 
 class ImageViewPage extends StatefulWidget {
@@ -29,9 +32,12 @@ class ImageViewPage extends StatefulWidget {
 class _ImageViewPageState extends State<ImageViewPage> {
   String _derivative;
   PageController _pageController;
+  PhotoViewController _photoScaleController = PhotoViewController(initialScale: 1);
+  ScrollPhysics _pageViewPhysic = BouncingScrollPhysics();
   int _page;
   int _imagePage;
   List<dynamic> images = [];
+  bool showToolBar = true;
 
   @override
   void initState() {
@@ -75,7 +81,10 @@ class _ImageViewPageState extends State<ImageViewPage> {
     ThemeData _theme = Theme.of(context);
     return Scaffold(
       primary: true,
-      appBar: AppBar(
+      backgroundColor: Colors.black,
+      resizeToAvoidBottomInset: true,
+      extendBodyBehindAppBar: true,
+      appBar: showToolBar ? AppBar(
         iconTheme: IconThemeData(
           color: _theme.iconTheme.color, //change your color here
         ),
@@ -107,14 +116,14 @@ class _ImageViewPageState extends State<ImageViewPage> {
            Center(),
            */
         ],
+      ) : AppBar(
+        elevation: 0,
+        leading: Text(""),
+        backgroundColor: Colors.transparent
       ),
-      backgroundColor: Colors.black,
-      resizeToAvoidBottomInset: true,
-      extendBodyBehindAppBar: true,
-      // extendBody: true,
       body: Container(
         child: PageView.builder(
-          physics: const BouncingScrollPhysics(),
+          physics: _pageViewPhysic,
           itemCount: images.length,
           controller: _pageController,
           onPageChanged: (newPage) async {
@@ -127,22 +136,61 @@ class _ImageViewPageState extends State<ImageViewPage> {
           },
           itemBuilder: (context, index) {
             if(Path.extension(images[index]['element_url']) == '.mp4') {
-              return BetterPlayer.network(
-                images[index]['element_url'],
-                betterPlayerConfiguration: BetterPlayerConfiguration(
-                  aspectRatio: images[index]['width']/images[index]['height'],
-                  fullScreenAspectRatio: images[index]['width']/images[index]['height'],
-                  controlsConfiguration: BetterPlayerControlsConfiguration(
-                    enableSkips: false,
-                    enableFullscreen: false,
-                    unMuteIcon: Icons.volume_off,
-                  )
+              return GestureDetector(
+                onTap: () {
+                  Navigator.of(context).push(MaterialPageRoute(builder: (_) => VideoPlayerViewPage(images[index]['element_url'], ratio:images[index]['width']/images[index]['height'])));
+                },
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    Image.network(images[index]["derivatives"][_derivative]["url"]),
+                    IconShadowWidget(
+                      Icon(Icons.play_arrow_rounded, size: 100, color: Color(0xFFFFFFFF)),
+                      shadowColor: Colors.black45,
+                    ),
+                  ],
                 ),
               );
             }
-            return PhotoView(
-              imageProvider: CachedNetworkImageProvider(images[index]["derivatives"][_derivative]["url"]),
-              minScale: PhotoViewComputedScale.contained,
+            return GestureDetector(
+              onScaleStart: (details) {
+                setState(() {
+                  showToolBar = false;
+                });
+              },
+              child: PhotoView(
+                controller: _photoScaleController,
+                imageProvider: CachedNetworkImageProvider(images[index]["derivatives"][_derivative]["url"]),
+                minScale: PhotoViewComputedScale.contained,
+                scaleStateChangedCallback: (scale) {
+                  print("scale cb ${scale.isScaleStateZooming}");
+                  if(scale.isScaleStateZooming && _photoScaleController.scale > 0.5) {
+                    setState(() {
+                      _pageViewPhysic = NeverScrollableScrollPhysics();
+                      showToolBar = false;
+                    });
+                  } else {
+                    setState(() {
+                      _pageViewPhysic = BouncingScrollPhysics();
+                      showToolBar = true;
+                    });
+                  }
+                },
+                /* onScaleEnd: (context, details, value) {
+                  print("scale ${_photoScaleController.scale}");
+                  if(_photoScaleController.scale > 0.5) {
+                    setState(() {
+                      _pageViewPhysic = NeverScrollableScrollPhysics();
+                      showToolBar = false;
+                    });
+                  } else {
+                    setState(() {
+                      _pageViewPhysic = BouncingScrollPhysics();
+                      showToolBar = true;
+                    });
+                  }
+                }, */
+              ),
             );
           }
         ),
@@ -176,12 +224,12 @@ class _ImageViewPageState extends State<ImageViewPage> {
         ),
         */
       ),
-      bottomNavigationBar: widget.isAdmin? BottomNavigationBar(
+      bottomNavigationBar: widget.isAdmin && showToolBar? BottomNavigationBar(
         onTap: (index) async {
           switch (index) {
             case 0:
               if(await confirmDownloadDialog(context,
-                content: appStrings(context).downloadImage(images[_page]['name']),
+                content: appStrings(context).downloadImage_confirmation(1),
               )) {
                 print('Download $_page');
 
@@ -190,7 +238,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
                   content: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(appStrings(context).downloading),
+                      Text(appStrings(context).downloadingImages(1)),
                       CircularProgressIndicator(),
                     ],
                   ),
@@ -208,7 +256,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
                 (item) async {
                   int result = await confirmMoveAssignImage(
                     context,
-                    content: appStrings(context).moveImage(images[_page],item.name),
+                    content: appStrings(context).moveImage_message(1, images[_page],item.name),
                   );
 
                   if (result == 0) {
@@ -220,7 +268,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
                       Navigator.of(context).pop();
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
-                          imageMovedSnackBar(images[_page]['name'], item.name));
+                          imagesMovedSnackBar(context, 1));
                       Navigator.of(context).pop();
                     }
                   } else if (result == 1) {
@@ -232,7 +280,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
                       Navigator.of(context).pop();
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
-                          imageAssignedSnackBar(images[_page]['name'], item.name));
+                          imagesAssignedSnackBar(context, 1));
                       Navigator.of(context).pop();
                     }
                   }
@@ -254,7 +302,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
                */
             case 2: // TODO: change to 3 if implemented Attach function
               if(await confirmDeleteDialog(context,
-                content: appStrings(context).deleteImage(images[_page]['name']),
+                content: appStrings(context).deleteImage_message(1),
               )) {
                 print('Delete $_page');
 
@@ -265,7 +313,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
                   );
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text(appStrings(context).deleting),
+                    content: Text(appStrings(context).deleteImageHUD_deleting(1)),
                   ));
                 }
                 int page = _page;
@@ -292,11 +340,11 @@ class _ImageViewPageState extends State<ImageViewPage> {
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.download_rounded, color: _theme.iconTheme.color),
-            label: appStrings(context).download,
+            label: appStrings(context).imageOptions_download,
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.reply_outlined, color: _theme.iconTheme.color),
-            label: appStrings(context).move,
+            label: appStrings(context).moveImage_title,
           ),
           /*
           BottomNavigationBarItem(
@@ -307,7 +355,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
           */
           BottomNavigationBarItem(
             icon: Icon(Icons.delete_outline, color: _theme.errorColor),
-            label: appStrings(context).delete,
+            label: appStrings(context).deleteImage_delete,
           ),
         ],
         backgroundColor: Color(0x80000000),
@@ -318,7 +366,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
         showUnselectedLabels: true,
         selectedItemColor: _theme.primaryColorLight,
         unselectedItemColor: _theme.primaryColorLight,
-      ) : Center(),
+      ) : Text(""),
     );
   }
 }
