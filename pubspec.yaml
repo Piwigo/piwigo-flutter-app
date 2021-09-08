@@ -43,9 +43,9 @@ dependencies:
   confirm_dialog:
   image_downloader:
   video_player:
-  better_player:
   flutter_dotenv:
   url_launcher:
+
 
   flutter_speed_dial:
   icon_shadow:
@@ -61,6 +61,8 @@ dependencies:
   images_picker:
   provider:
   camera:
+  wakelock:
+  better_player:
 
 dev_dependencies:
   flutter_test:
