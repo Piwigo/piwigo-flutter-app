@@ -1,55 +1,41 @@
 import 'package:flutter/material.dart';
+import 'package:piwigo_ng/constants/SettingsConstants.dart';
 
-SnackBar albumMovedSnackBar(String movedCategory, String parentCategory) {
+SnackBar albumMovedSnackBar(BuildContext context) {
   return SnackBar(
-    content: Text("Moved album $movedCategory to $parentCategory", style: TextStyle(color: Color(0xff479900))),
+    content: Text(appStrings(context).moveCategoryHUD_moved, style: TextStyle(color: Color(0xff479900))),
   );
 }
-SnackBar albumAddedSnackBar(String addedCategory) {
+SnackBar albumAddedSnackBar(BuildContext context) {
   return SnackBar(
-    content: Text("Created album $addedCategory", style: TextStyle(color: Color(0xff479900))),
+    content: Text(appStrings(context).createNewAlbumHUD_created, style: TextStyle(color: Color(0xff479900))),
   );
 }
-SnackBar albumEditedSnackBar(String editedCategory) {
+SnackBar albumEditedSnackBar(BuildContext context) {
   return SnackBar(
-    content: Text("Edited album $editedCategory", style: TextStyle(color: Color(0xff479900))),
+    content: Text(appStrings(context).renameCategoryHUD_renamed, style: TextStyle(color: Color(0xff479900))),
   );
 }
-SnackBar albumDeletedSnackBar(String deletedCategory) {
+SnackBar albumDeletedSnackBar(BuildContext context) {
   return SnackBar(
-    content: Text("Deleted album $deletedCategory", style: TextStyle(color: Color(0xff479900))),
+    content: Text(appStrings(context).deleteCategoryHUD_deleted, style: TextStyle(color: Color(0xff479900))),
   );
 }
 
 
-SnackBar imageMovedSnackBar(String image, String parentCategory) {
+SnackBar imagesMovedSnackBar(BuildContext context, int images) {
   return SnackBar(
-    content: Text("Moved image $image to $parentCategory", style: TextStyle(color: Color(0xff479900))),
+    content: Text(appStrings(context).moveImageHUD_moved(images), style: TextStyle(color: Color(0xff479900))),
   );
 }
-SnackBar imagesMovedSnackBar(int images, String parentCategory) {
+SnackBar imagesAssignedSnackBar(BuildContext context, int images) {
   return SnackBar(
-    content: Text("Moved $images images to $parentCategory", style: TextStyle(color: Color(0xff479900))),
+    content: Text(appStrings(context).copyImageHUD_copied(images), style: TextStyle(color: Color(0xff479900))),
   );
 }
-SnackBar imageAssignedSnackBar(String image, String parentCategory) {
+SnackBar imagesEditedSnackBar(BuildContext context, int images) {
   return SnackBar(
-    content: Text("Assigned image $image to $parentCategory", style: TextStyle(color: Color(0xff479900))),
-  );
-}
-SnackBar imagesAssignedSnackBar(int images, String parentCategory) {
-  return SnackBar(
-    content: Text("Assigned $images images to $parentCategory", style: TextStyle(color: Color(0xff479900))),
-  );
-}
-SnackBar imageEditedSnackBar(String image) {
-  return SnackBar(
-    content: Text("Edited $image", style: TextStyle(color: Color(0xff479900))),
-  );
-}
-SnackBar imagesEditedSnackBar(int images) {
-  return SnackBar(
-    content: Text("Edited $images images", style: TextStyle(color: Color(0xff479900))),
+    content: Text(appStrings(context).renameImageHUD_renamed(images), style: TextStyle(color: Color(0xff479900))),
   );
 }
 

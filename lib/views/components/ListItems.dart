@@ -1,30 +1,28 @@
 
-import 'package:confirm_dialog/confirm_dialog.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:piwigo_ng/constants/SettingsConstants.dart';
 import 'package:piwigo_ng/services/OrientationService.dart';
 import 'package:piwigo_ng/views/CategoryViewPage.dart';
 import 'package:piwigo_ng/services/MoveAlbumService.dart';
 import 'package:piwigo_ng/api/CategoryAPI.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-
 
 import 'Dialogs.dart';
 import 'SnackBars.dart';
-import 'WeirdBorder.dart';
+import 'CustomShapes.dart';
 
-/*
+
 String albumSubCount(dynamic album, context) {
-  String displayString = AppLocalizations.of(context).photoCount(album["total_nb_images"]);
+  String displayString = appStrings(context).imageCount(album["total_nb_images"]);
   if(album["nb_categories"] > 0) {
-    displayString += ', ${AppLocalizations.of(context).subAlbumCount(album["nb_categories"])}';
+    displayString += ', ${appStrings(context).subAlbumCount(album["nb_categories"])}';
   }
   return displayString;
 }
 
- */
 
+/*
 String albumSubCount(dynamic album, context) {
   String displayString = '${album["total_nb_images"]} ${album["total_nb_images"] == 1 ? 'photo' : 'photos'}';
   if(album["nb_categories"] > 0) {
@@ -32,6 +30,8 @@ String albumSubCount(dynamic album, context) {
   }
   return displayString;
 }
+
+ */
 
 
 
@@ -87,12 +87,8 @@ Widget albumListItem(BuildContext context, dynamic album, bool isAdmin, Function
                   album['name'],
                   false,
                       (item) async {
-                    if (await confirm(
-                      context,
-                      title: Text('Confirm'),
-                      content: Text('Move ${album['name']} to ${item.name} ?', softWrap: true, maxLines: 3),
-                      textOK: Text('Yes', style: TextStyle(color: Color(0xff479900))),
-                      textCancel: Text('No', style: TextStyle(color: Theme.of(context).errorColor)),
+                    if (await confirmMoveDialog(context,
+                      content: appStrings(context).moveCategory_message(album['name'],item.name),
                     )) {
                       var result = await moveCategory(album['id'], item.id);
                       print(result);
@@ -102,7 +98,7 @@ Widget albumListItem(BuildContext context, dynamic album, bool isAdmin, Function
                         );
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
-                            albumMovedSnackBar(album['name'], item.name)
+                            albumMovedSnackBar(context)
                         );
                       }
                       Navigator.of(context).pop();
@@ -125,12 +121,8 @@ Widget albumListItem(BuildContext context, dynamic album, bool isAdmin, Function
               color: Colors.transparent,
               iconWidget: Icon(Icons.delete, size: 38, color: _theme.accentIconTheme.color),
               onTap: () async {
-                if (await confirm(
-                  context,
-                  title: Text('Confirm'),
-                  content: Text('Delete ${album["name"]} ?', softWrap: true, maxLines: 3),
-                  textOK: Text('Yes', style: TextStyle(color: Color(0xff479900))),
-                  textCancel: Text('No', style: TextStyle(color: _theme.errorColor)),
+                if (await confirmDeleteDialog(context,
+                  content: appStrings(context).deleteCategory_message(album["total_nb_images"], album["name"]),
                 )) {
                   var result = await deleteCategory(album['id'].toString());
                   if(result['stat'] == 'fail') {
@@ -139,7 +131,7 @@ Widget albumListItem(BuildContext context, dynamic album, bool isAdmin, Function
                     );
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
-                        albumDeletedSnackBar(album["name"])
+                        albumDeletedSnackBar(context)
                     );
                     onRefresh('Deleted ${album['name']} : $result');
                   }
@@ -231,12 +223,8 @@ Widget albumListItemRight(BuildContext context, dynamic album, bool isAdmin, Fun
               color: Colors.transparent,
               iconWidget: Icon(Icons.delete, size: 38, color: _theme.accentIconTheme.color),
               onTap: () async {
-                if (await confirm(
-                  context,
-                  title: Text('Confirm'),
-                  content: Text('Delete ${album["name"]} ?', softWrap: true, maxLines: 3),
-                  textOK: Text('Yes', style: TextStyle(color: Color(0xff479900))),
-                  textCancel: Text('No', style: TextStyle(color: _theme.errorColor)),
+                if (await confirmDeleteDialog(context,
+                  content: appStrings(context).deleteCategory_message(album["total_nb_images"], album['name']),
                 )) {
                   var result = await deleteCategory(album['id'].toString());
                   if(result['stat'] == 'fail') {
@@ -245,7 +233,7 @@ Widget albumListItemRight(BuildContext context, dynamic album, bool isAdmin, Fun
                     );
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
-                        albumDeletedSnackBar(album["name"])
+                        albumDeletedSnackBar(context)
                     );
                     onRefresh('Deleted ${album['name']} : $result');
                   }
@@ -263,12 +251,8 @@ Widget albumListItemRight(BuildContext context, dynamic album, bool isAdmin, Fun
                 album['name'],
                 false,
                     (item) async {
-                  if (await confirm(
-                    context,
-                    title: Text('Confirm'),
-                    content: Text('Move ${album['name']} to ${item.name} ?', softWrap: true, maxLines: 3),
-                    textOK: Text('Yes', style: TextStyle(color: Color(0xff479900))),
-                    textCancel: Text('No', style: TextStyle(color: Theme.of(context).errorColor)),
+                  if (await confirmMoveDialog(context,
+                    content: appStrings(context).moveCategory_message(album['name'],item.name),
                   )) {
                     print('Move ${album['id']} to ${item.id}');
                     var result = await moveCategory(album['id'], item.id);
@@ -278,7 +262,7 @@ Widget albumListItemRight(BuildContext context, dynamic album, bool isAdmin, Fun
                       );
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
-                          albumMovedSnackBar(album['name'], item.name)
+                          albumMovedSnackBar(context)
                       );
                     }
                     Navigator.of(context).pop();
@@ -367,23 +351,20 @@ Widget albumInfo(BuildContext context, album) {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text('${album["name"]}',
-                style: Theme.of(context).textTheme.headline6,
-                textAlign: TextAlign.center,
-                overflow: TextOverflow.ellipsis,
-                softWrap: false,
-                maxLines: 1
+              style: Theme.of(context).textTheme.headline6,
+              textAlign: TextAlign.center,
+              overflow: TextOverflow.ellipsis,
+              softWrap: false,
+              maxLines: 1
             ),
             Column(
               children: [
-                Text('${album["comment"] == "" ?
-                "(no description)" :
-                album["comment"]
-                }',
-                    style: Theme.of(context).textTheme.subtitle1,
-                    textAlign: TextAlign.center,
-                    overflow: TextOverflow.fade,
-                    softWrap: true,
-                    maxLines: 2
+                Text('${album["comment"]}',
+                  style: Theme.of(context).textTheme.subtitle1,
+                  textAlign: TextAlign.center,
+                  overflow: TextOverflow.fade,
+                  softWrap: true,
+                  maxLines: 2
                 ),
                 Container(
                   padding: EdgeInsets.all(5),
@@ -426,7 +407,7 @@ Widget albumThumbnail(BuildContext context, album, {BorderRadius borderRadius = 
 Widget albumItemSeparator(BuildContext context) {
   return Container(
     decoration: ShapeDecoration(
-      shape: WeirdBorder(radius: 7),
+      shape: AlbumCardSeparatorShape(radius: 7),
       color: Theme.of(context).backgroundColor,
     ),
     width: 14,

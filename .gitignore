@@ -7,3 +7,4 @@
 /.flutter-plugins-dependencies
 /.packages
 
+*.env
