@@ -35,6 +35,8 @@
     "piwigoServer_emptyJSONobject": "Piwigo server did return an empty JSON object.",
 
 
+
+
     "coreDataStore_WarningTitle": "Warning",
     "coreDataStore_WarningMessage": "A serious application error occurred while Piwigo tried to read the data cache. A new cache has therefore been created.",
     "coreDataFetch_DigestError": "Could not digest the fetched data.",
@@ -47,6 +49,8 @@
 
     "coreDataFetch_UploadCreateFailed": "Failed to create a new Upload object.",
     "coreDataFetch_UploadMissingAsset": "Failed to retrieve photo.",
+
+
 
 
     "login": "Login",
@@ -87,7 +91,7 @@
     "serverConnectionError_message": "A secured HTTPS connection could not be established. Please check the address or try in unencrypted HTTP mode?",
 
     "serverVersionNotCompatible_title": "Server Incompatible",
-    "serverVersionNotCompatible_message": "Your Piwigo server version is {version}. Piwigo Mobile only supports a version of at least 2.8. Please update your server to use Piwigo Mobile. Do you still want to continue?",
+    "serverVersionNotCompatible_message": "Your Piwigo server version is {version}. Piwigo NG only supports a version of at least 2.8. Please update your server to use Piwigo NG. Do you still want to continue?",
     "@serverVersionNotCompatible_message": {
         "placeholders": {
             "version": {}
@@ -104,6 +108,8 @@
     "logoutConfirmation_title": "Logout",
     "logoutConfirmation_message": "Are you sure you want to logout?",
     "logoutFail_title": "Logout Failed",
+
+
 
 
     "albumCount" : "{count, plural, =1{1 album} other{{count} albums}}",
@@ -126,7 +132,6 @@
         }
     },
     "showPhotos": "Show Photos",
-
 
 
     "categoryMainEmtpy": "No albums in your Piwigo yet.\rYou may pull down to refresh or re-login.",
@@ -176,11 +181,6 @@
     "categoryUpload_LocalAlbums": "Local Albums",
     "categoryUpload_chooseLocalAlbum": "Select an album to get photos from",
     "categoryUpload_sharedAlbums": "Shared Albums",
-    "categoryUpload_iCloudAlbums": "iCloud Albums",
-    "categoryUpload_chooseiCloudAlbum": "Select an iCloud album to get photos from",
-    "categoryUpload_syncedEvents": "iPhoto Events",
-    "categoryUpload_syncedAlbums": "iPhoto Albums",
-    "categoryUpload_syncedFaces": "iPhoto Faces",
     "categoryUpload_mediaTypes": "Media Types",
     "categoryUpload_otherAlbums": "Other Albums",
     "categoryUpload_pasteboard": "Clipboard",
@@ -316,6 +316,8 @@
     "categoryImageSetError_message": "Failed to set the album photo",
 
 
+
+
     "singleImage": "Photo",
     "imageCount": "{count, plural, =1{1 photo} other{{count} photos}}",
     "@imageCount": {
@@ -411,6 +413,7 @@
     "tagsAdd_message": "Enter a name for this new tag",
     "tagsAdd_placeholder": "New tag",
     "tagsAddHUD_label": "Creating Tag…",
+    "tagsAddHUD_created": "Tag Created",
 
 
     "tagsAddError_message": "Failed to create new tag",
@@ -425,7 +428,7 @@
         }
     },
     "selectAll": "Select All",
-    "selectLimit": "Selection Limit Reached",
+    "selectLimit": "Selection limit reached",
 
 
     "renameImage_title": "Original File",
@@ -591,7 +594,6 @@
     },
 
 
-
     "copyImageError_title": "Copy Fail",
     "copyImageError_message": "{count, plural, =1{Failed to copy your photo} other{Failed to copy some photos}}",
     "@copyImageError_message": {
@@ -661,7 +663,6 @@
     "imageUploadCompleted_message1": "photos uploaded to your Piwigo server.",
 
 
-
     "uploadError_title": "Upload Error",
     "uploadError_message": "Could not upload your photo.",
     "uploadCancelled_title": "Upload Cancelled",
@@ -679,63 +680,19 @@
     "imageUploadError_iCloud": "Could not retrieve photo.",
 
     "audioUploadError_title": "Audio Upload Error",
-    "audioUploadError_format": "Sorry, audio files are not supported by Piwigo Mobile yet.",
+    "audioUploadError_format": "Sorry, audio files are not supported by Piwigo NG yet.",
 
     "videoUploadError_title": "Video Upload Error",
-    "videoUploadError_format": "Sorry, video files with extension {extension} are not accepted by the Piwigo server.",
+    "videoUploadError_format": "Sorry, video files with extension .{extension} are not accepted by the Piwigo server.",
     "@videoUploadError_format": {
         "placeholders": {
             "extension": {}
         }
     },
-    "videoUploadError_iCloud": "Could not retrieve video.",
     "videoUploadError_export": "Sorry, the video could not be retrieved for the upload.",
     "videoUploadError_unknown": "Sorry, the upload of the video has failed for an unknown error during the MP4 conversion.",
     "videoUploadCancelled_message": "The upload of the video has been cancelled.",
 
-
-    "shareImageMetadata_Title": "Share Metadata",
-    "shareImageMetadata_subTitle1": "Actions sharing photos with private metadata",
-    "shareImageMetadata_subTitle2": "Actions sharing photos without private metadata",
-    "shareActivityCode_AirDrop": "Transfer with AirDrop",
-    "shareActivityCode_AirDrop375px": "Transfer photos with AirDrop",
-    "shareActivityCode_AssignToContact": "Assign to Contact",
-    "shareActivityCode_AssignToContact375px": "Assign photo to Contact",
-    "shareActivityCode_CopyToPasteboard": "Copy to Pasteboard",
-    "shareActivityCode_CopyToPasteboard375px": "Copy photos to Pasteboard",
-    "shareActivityCode_Mail": "Post by Email",
-    "shareActivityCode_Mail375px": "Post photos by Email",
-    "shareActivityCode_Message": "Post with Message",
-    "shareActivityCode_Message375px": "Post photos with the Message app",
-    "shareActivityCode_Facebook": "Post to Facebook",
-    "shareActivityCode_Facebook375px": "Post photos to Facebook",
-    "shareActivityCode_Messenger": "Post with Messenger",
-    "shareActivityCode_Messenger375px": "Post photos with the Messenger app",
-    "shareActivityCode_Flickr": "Post to Flickr",
-    "shareActivityCode_Flickr375px": "Post photos to Flickr",
-    "shareActivityCode_Instagram": "Post to Instagram",
-    "shareActivityCode_Instagram375px": "Post photos to Instagram",
-    "shareActivityCode_Signal": "Post with Signal",
-    "shareActivityCode_Signal375px": "Post photos with the Signal app",
-    "shareActivityCode_Snapchat": "Post to Snapchat",
-    "shareActivityCode_Snapchat375px": "Post photos to Snapchat app",
-    "shareActivityCode_TencentWeibo": "Post to TencentWeibo",
-    "shareActivityCode_TencentWeibo375px": "Post photos to TencentWeibo",
-    "shareActivityCode_Twitter": "Post to Twitter",
-    "shareActivityCode_Twitter375px": "Post photos to Twitter",
-    "shareActivityCode_Vimeo": "Post to Vimeo",
-    "shareActivityCode_Vimeo375px": "Post videos to Vimeo",
-    "shareActivityCode_Weibo": "Post to Weibo",
-    "shareActivityCode_Weibo375px": "Post photos to Weibo",
-    "shareActivityCode_WhatsApp": "Post with WhatsApp",
-    "shareActivityCode_WhatsApp375px": "Post photos with the WhatsApp app",
-    "shareActivityCode_CameraRoll": "Save to Camera Roll",
-    "shareActivityCode_CameraRoll375px": "Save photos to Camera Roll",
-    "shareActivityCode_Other": "Share with other apps",
-    "shareActivityCode_Other375px": "Share photos with other apps",
-
-    "shareFailError_title": "Share Fail",
-    "shareMetadataError_message": "Cannot strip private metadata",
 
 
 
@@ -750,6 +707,7 @@
 
     "localImages_deleteTitle": "Remove from Camera Roll",
     "localImages_deleteMessage": "Do you wish to delete the uploaded photos or videos from the camera roll? The deleted photos or videos will still be available in the iOS Photos Trash for 30 days.",
+
 
 
 
@@ -940,6 +898,7 @@
     "settings_releaseNotes": "Release Notes",
     "settings_rateInAppStore": "Rate Piwigo NG",
     "settings_translateWithCrowdin": "Translate Piwigo NG",
+    "settings_crowdinURL": "https://crowdin.com/project/piwigo-ng",
     "settings_pwgForumURL": "http://piwigo.org/forum",
     "settings_acknowledgements": "Acknowledgements",
     "settings_privacy": "Privacy Policy"

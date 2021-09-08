@@ -2,9 +2,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:piwigo_ng/constants/SettingsConstants.dart';
 import 'package:piwigo_ng/views/LoginViewPage.dart';
 import 'package:piwigo_ng/api/API.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 
 class SettingsPage extends StatefulWidget {
@@ -96,11 +98,11 @@ class _SettingsPageState extends State<SettingsPage> {
                           ),
                           child: Column(
                             children: [
-                              tableCell(
+                              TableCell(
                                 Text(appStrings(context).settings_server, style: TextStyle(color: Colors.black, fontSize: 16)),
                                 Text('${API.prefs.getString('base_url')}', overflow: TextOverflow.ellipsis, softWrap: false, style: TextStyle(color: Colors.grey.shade600, fontSize: 14)),
                               ),
-                              tableCell(
+                              TableCell(
                                 Text(appStrings(context).settings_username, style: TextStyle(color: Colors.black, fontSize: 16)),
                                 Text('${API.prefs.getString('account_username')}', overflow: TextOverflow.ellipsis, softWrap: false, style: TextStyle(color: Colors.grey.shade600, fontSize: 14)),
                                 isEnd: true,
@@ -153,7 +155,7 @@ class _SettingsPageState extends State<SettingsPage> {
                           ),
                           child: Column(
                             children: [
-                              tableCell(
+                              TableCell(
                                 Text(appStrings(context).settings_displayTitles, style: TextStyle(color: Colors.black, fontSize: 16)),
                                 Switch(
                                   value: API.prefs.getBool('show_thumbnail_title'),
@@ -164,7 +166,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                   },
                                 ),
                               ),
-                              tableCell(
+                              TableCell(
                                 Text(appStrings(context).settings_portraitNberOfThumbnails, style: TextStyle(color: Colors.black, fontSize: 16)),
                                 Expanded(
                                   child: Slider(
@@ -184,7 +186,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                   ),
                                 ),
                               ),
-                              tableCell(
+                              TableCell(
                                 Text(appStrings(context).settings_landscapeNberOfThumbnails, style: TextStyle(color: Colors.black, fontSize: 16)),
                                 Expanded(
                                   child: Slider(
@@ -204,7 +206,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                   ),
                                 ),
                               ),
-                              tableCell(
+                              TableCell(
                                 Text(appStrings(context).defaultThumbnailSize320px, style: TextStyle(color: Colors.black, fontSize: 16)),
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.end,
@@ -231,7 +233,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                   ],
                                 ),
                               ),
-                              tableCell(
+                              TableCell(
                                 Text(appStrings(context).defaultImageSize320px, style: TextStyle(color: Colors.black, fontSize: 16)),
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.end,
@@ -274,7 +276,49 @@ class _SettingsPageState extends State<SettingsPage> {
                           ),
                           child: Column(
                             children: [
-                              tableCell(
+                              GestureDetector(
+                                onTap: () async {
+                                  var url = appStrings(context).settings_twitterURL;
+                                  if (await canLaunch(url)) {
+                                    await launch(url);
+                                  } else {
+                                    throw 'Could not launch $url';
+                                  }
+                                },
+                                child: TableCell(
+                                  Text(appStrings(context).settings_twitter, style: TextStyle(color: Colors.black, fontSize: 16)),
+                                  FaIcon(FontAwesomeIcons.twitter, color: Colors.grey.shade600, size: 20),
+                                ),
+                              ),
+                              GestureDetector(
+                                onTap: () async {
+                                  var url = appStrings(context).settings_pwgForumURL;
+                                  if (await canLaunch(url)) {
+                                    await launch(url);
+                                  } else {
+                                    throw 'Could not launch $url';
+                                  }
+                                },
+                                child: TableCell(
+                                  Text(appStrings(context).settings_supportForum, style: TextStyle(color: Colors.black, fontSize: 16)),
+                                  FaIcon(FontAwesomeIcons.globe, color: Colors.grey.shade600, size: 20),
+                                ),
+                              ),
+                              GestureDetector(
+                                onTap: () async {
+                                  var url = appStrings(context).settings_crowdinURL;
+                                  if (await canLaunch(url)) {
+                                    await launch(url);
+                                  } else {
+                                    throw 'Could not launch $url';
+                                  }
+                                },
+                                child: TableCell(
+                                  Text(appStrings(context).settings_translateWithCrowdin, style: TextStyle(color: Colors.black, fontSize: 16)),
+                                  FaIcon(FontAwesomeIcons.language, color: Colors.grey.shade600, size: 20),
+                                ),
+                              ),
+                              TableCell(
                                 Text(appStrings(context).settings_appName, style: TextStyle(color: Colors.black, fontSize: 16)),
                                 Text(dotenv.env['APP_VERSION'], overflow: TextOverflow.ellipsis, softWrap: false, style: TextStyle(color: Colors.grey.shade600, fontSize: 14)),
                                 isEnd: true,
@@ -294,8 +338,18 @@ class _SettingsPageState extends State<SettingsPage> {
       ),
     );
   }
+}
 
-  Widget tableCell(Widget left, Widget right, {List<Widget> options, bool isEnd = false}) {
+class TableCell extends StatelessWidget {
+  const TableCell(this.left, this.right, {Key key, this.options, this.isEnd = false}) : super(key: key);
+
+  final Widget left;
+  final Widget right;
+  final List<Widget> options;
+  final bool isEnd;
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       height: 40,
       margin: EdgeInsets.only(left: 10),
