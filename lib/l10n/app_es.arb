@@ -141,7 +141,7 @@
     "categoryUpload_mediaTypes": "Media Types",
     "categoryUpload_otherAlbums": "Other Albums",
     "categoryUpload_pasteboard": "Clipboard",
-    "categoyUpload_loadSubCategories": "load",
+    "categoryUpload_loadSubCategories": "load",
     "categoryUpload_images": "Upload Photos",
     "categoryUpload_videos": "Upload Videos",
     "setDefaultCategory_select": "Please select an album or sub-album which will become the new root album.",

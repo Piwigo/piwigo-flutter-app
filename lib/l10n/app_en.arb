@@ -124,7 +124,6 @@
             "count": {}
         }
     },
-
     "showMore": "Show more… ({count})",
     "@showMore" : {
         "placeholders": {
@@ -132,22 +131,16 @@
         }
     },
     "showPhotos": "Show Photos",
-
-
     "categoryMainEmtpy": "No albums in your Piwigo yet.\rYou may pull down to refresh or re-login.",
     "categoryImageList_selectButton": "Select",
     "categoryImageList_deselectButton": "Deselect",
     "categoryImageList_noDataError": "Error No Data",
-
-
     "categoryDiscover_title": "Discover",
     "categoryDiscoverVisits_title": "Most visited",
     "categoryDiscoverVisits_legend": "hits",
     "categoryDiscoverBest_title": "Best rated",
     "categoryDiscoverRecent_title": "Recent photos",
     "categoryDiscoverFavorites_title": "Your favorites",
-
-
     "categorySort_nameAscending": "Photo Title, A → Z",
     "categorySort_nameDescending": "Photo Title, Z → A",
     "categorySort_fileNameAscending": "File Name, A → Z",
@@ -162,11 +155,8 @@
     "categorySort_visitsAscending": "Visits, low → high",
     "categorySort_manual": "Manual Order",
     "categorySort_random": "Random Order",
-
     "categorySort_videosOnly": "Videos Only",
     "categorySort_imagesOnly": "Photos Only",
-
-
     "categorySelection_title": "Album",
     "categorySelection_titleSub": "Sub-Albums",
     "categorySelection_root": "Root Album",
@@ -174,8 +164,6 @@
     "categorySelection_action": "Select an action for this album",
     "categorySelectionHUD_label": "Retrieving Albums Data…",
     "categorySelection_allAlbums": "All Albums",
-
-
     "categoryUpload_noSubAlbum": "There is no sub-album to upload photos to",
     "categoryUpload_chooseAlbum": "Select a sub-album to upload photos to",
     "categoryUpload_LocalAlbums": "Local Albums",
@@ -184,12 +172,9 @@
     "categoryUpload_mediaTypes": "Media Types",
     "categoryUpload_otherAlbums": "Other Albums",
     "categoryUpload_pasteboard": "Clipboard",
-
-    "categoyUpload_loadSubCategories": "load",
+    "categoryUpload_loadSubCategories": "load",
     "categoryUpload_images": "Upload Photos",
     "categoryUpload_videos": "Upload Videos",
-
-
     "setDefaultCategory_select": "Please select an album or sub-album which will become the new root album.",
     "setDefaultCategory_title": "Default Album",
     "setDefaultCategory_message": "Are you sure you want to set the album {album} as default album?",
@@ -198,8 +183,6 @@
             "album": {}
         }
     },
-
-
     "createNewAlbum_title": "New Album",
     "createNewAlbum_message": "Enter a name for this album:",
     "createNewAlbum_placeholder": "Album Name",
@@ -207,24 +190,16 @@
     "createNewAlbumDescription_noDescription": "no description",
     "createNewAlbumHUD_label": "Creating Album…",
     "createNewAlbumHUD_created": "Album Created",
-
-
     "createAlbumError_title": "Create Album Error",
     "createAlbumError_message": "Failed to create a new album",
-
-
     "categoryCellOption_rename": "Rename",
     "categoryCellOption_move": "Move",
     "categoryCellOption_delete": "Delete",
-
-
     "renameCategory_title": "Rename Album",
     "renameCategory_message": "Enter a new name for this album",
     "renameCategory_button": "Rename",
     "renameCategoryHUD_label": "Renaming Album…",
     "renameCategoryHUD_renamed": "Album Renamed",
-
-
     "renameCategoyError_title": "Rename Fail",
     "renameCategoyError_message": "Failed to rename your album",
 
