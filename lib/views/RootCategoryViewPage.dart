@@ -11,7 +11,6 @@ import 'package:piwigo_ng/services/upload/Uploader.dart';
 import 'package:piwigo_ng/views/components/Dialogs.dart';
 import 'package:piwigo_ng/views/components/ListItems.dart';
 import 'package:piwigo_ng/views/SettingsViewPage.dart';
-import 'package:piwigo_ng/views/UploadGalleryViewPage.dart';
 
 class RootCategoryViewPage extends StatefulWidget {
   final bool isAdmin;

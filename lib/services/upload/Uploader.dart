@@ -6,6 +6,7 @@ import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:images_picker/images_picker.dart';
 import 'package:multi_image_picker/multi_image_picker.dart';
 import 'package:piwigo_ng/api/API.dart';
 import 'package:piwigo_ng/api/SessionAPI.dart';
@@ -44,7 +45,7 @@ class Uploader {
     );
   }
 
-  Future<void> uploadPhotos(List<Asset> photos, String category, Map<String, dynamic> info) async {
+  Future<void> uploadPhotos(List<Media> photos, String category, Map<String, dynamic> info) async {
     Map<String, dynamic> result = {
       'isSuccess': true,
       'filePath': null,
@@ -86,10 +87,12 @@ class Uploader {
     }
   }
 
-  void upload(Asset photo, String category) async {
+  void upload(Media photo, String category) async {
     Map<String, String> queries = {"format":"json", "method": "pwg.images.upload"};
 
-    ByteData byteData = await photo.getByteData();
+    var asset = Asset(photo.path, photo.path.split('/').last, photo.size.ceil(), photo.size.ceil());
+
+    ByteData byteData = await asset.getByteData();
     List<int> imageData = byteData.buffer.asUint8List();
 
     FormData formData =  FormData.fromMap({
@@ -97,9 +100,9 @@ class Uploader {
       "pwg_token": API.prefs.getString("pwg_token"),
       "file": MultipartFile.fromBytes(
         imageData,
-        filename: photo.name,
+        filename: photo.path.split('/').last,
       ),
-      "name": photo.name,
+      "name": photo.path.split('/').last,
     });
 
     Response response = await API.dio.post("ws.php",
@@ -114,29 +117,29 @@ class Uploader {
       print("Request failed: ${response.statusCode}");
     }
   }
-  Future<Response> uploadChunk(Asset photo, String category, Map<String, dynamic> info) async {
+  Future<Response> uploadChunk(Media photo, String category, Map<String, dynamic> info) async {
     Map<String, String> queries = {
       "format":"json",
       "method": "pwg.images.uploadAsync"
     };
-    Map<String, String> fields = {
+    Map<String, dynamic> fields = {
       'username': API.prefs.getString("username"),
       'password': API.prefs.getString("password"),
-      'filename': photo.name,
+      'filename': photo.path.split('/').last,
       'category': category,
     };
     if(info['name'] != '' && info['name'] != null) fields['name'] = info['name'];
     if(info['comment'] != '' && info['comment'] != null) fields['comment'] = info['comment'];
-    if(info['tag_ids'].isNotEmpty()) fields['tag_ids'] = info['tag_ids'];
+    if(info['tag_ids'].isNotEmpty) fields['tag_ids'] = info['tag_ids'];
     if(info['level'] != -1) fields['level'] = info['level'];
 
     ChunkedUploader chunkedUploader = ChunkedUploader(API.dio);
-    print(await FlutterAbsolutePath.getAbsolutePath(photo.identifier));
+    print(await FlutterAbsolutePath.getAbsolutePath(photo.path));
     try {
       Future<Response> response = chunkedUploader.upload(
           context: context,
           path: "/ws.php",
-          filePath: await FlutterAbsolutePath.getAbsolutePath(photo.identifier),
+          filePath: await FlutterAbsolutePath.getAbsolutePath(photo.path),
           maxChunkSize: API.prefs.getInt("upload_form_chunk_size")*1000,
           params: queries,
           method: 'POST',

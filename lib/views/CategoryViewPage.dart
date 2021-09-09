@@ -5,7 +5,6 @@ import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:images_picker/images_picker.dart';
 import 'dart:async';
 
-import 'package:multi_image_picker/multi_image_picker.dart';
 import 'package:piwigo_ng/api/API.dart';
 import 'package:piwigo_ng/api/CategoryAPI.dart';
 import 'package:piwigo_ng/api/ImageAPI.dart';
@@ -119,8 +118,6 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
 
   @override
   Widget build(BuildContext context) {
-    ThemeData _theme = Theme.of(context);
-
     return Scaffold(
       resizeToAvoidBottomInset: true,
       body: createListeners(
@@ -235,6 +232,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
   Widget createUploadActionButton() {
     ThemeData _theme = Theme.of(context);
     return SpeedDial(
+      spaceBetweenChildren: 10,
       childMargin: EdgeInsets.only(bottom: 17, right: 10),
       animatedIcon: AnimatedIcons.menu_close,
       animatedIconTheme: IconThemeData(size: 22.0),
@@ -242,12 +240,14 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
       curve: Curves.bounceIn,
       backgroundColor: _theme.floatingActionButtonTheme.backgroundColor,
       foregroundColor: _theme.floatingActionButtonTheme.foregroundColor,
-      elevation: 8.0,
-      overlayOpacity: 0.1,
+      overlayColor: Colors.black,
+      elevation: 5.0,
+      overlayOpacity: 0.3,
       shape: CircleBorder(),
       children: [
         SpeedDialChild(
-          labelWidget: Text(appStrings(context).createNewAlbum_title, style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: _theme.buttonColor)),
+          elevation: 5,
+          labelWidget: Text(appStrings(context).createNewAlbum_title, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white)),
           child: Icon(Icons.create_new_folder),
           backgroundColor: _theme.floatingActionButtonTheme.backgroundColor,
           foregroundColor: _theme.floatingActionButtonTheme.foregroundColor,
@@ -265,61 +265,33 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
           },
         ),
         SpeedDialChild(
-            labelWidget: Text(appStrings(context).categoryUpload_images, style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: _theme.buttonColor)),
-            child: Icon(Icons.add_a_photo),
-            backgroundColor: _theme.floatingActionButtonTheme.backgroundColor,
-            foregroundColor: _theme.floatingActionButtonTheme.foregroundColor,
-            onTap: () async {
-              try {
-                List<Asset> imageList = await MultiImagePicker.pickImages(
-                  maxImages: 100,
-                  enableCamera: true,
-                  cupertinoOptions: CupertinoOptions(takePhotoIcon: 'chat'),
-                  materialOptions: MaterialOptions(
-                    actionBarTitle: 'Piwigo',
-                    allViewTitle: appStrings(context).all_Photos,
-                    actionBarColor: '#ffff7700',
-                    actionBarTitleColor: '#ffeeeeee',
-                    lightStatusBar: false,
-                    statusBarColor: '#ffab40',
-                    startInAllView: false,
-                    selectCircleStrokeColor: '#ffffff',
-                    selectionLimitReachedText: appStrings(context).selectLimit,
-                  ),
-                );
-                if(imageList.isNotEmpty) {
-                  Navigator.push(context, MaterialPageRoute(
-                      builder: (context) => UploadGalleryViewPage(imageData: imageList, category: widget.category)
-                  ));
-                }
-              } catch (e) {
-                print('Dio error ${e.toString()}');
+          elevation: 5,
+          labelWidget: Text(appStrings(context).categoryUpload_images, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white)),
+          child: Icon(Icons.add_to_photos),
+          backgroundColor: _theme.floatingActionButtonTheme.backgroundColor,
+          foregroundColor: _theme.floatingActionButtonTheme.foregroundColor,
+          onTap: () async {
+            try {
+              List<Media> mediaList = await ImagesPicker.pick(
+                count: 100,
+                pickType: PickType.all,
+                quality: 0.5,
+              );
+              print(mediaList[0].path);
+              // List<Asset> imageList = res.map((media) => Asset(media.thumbPath, media.path.split('/').last, media.size.ceil(), media.size.ceil())).toList();
+              if(mediaList.isNotEmpty) {
+                Navigator.push(context, MaterialPageRoute(
+                    builder: (context) => UploadGalleryViewPage(imageData: mediaList, category: widget.category)
+                )).whenComplete(() {
+                  setState(() {
+                    // refresh
+                  });
+                });
               }
+            } catch (e) {
+              print('Dio error ${e.toString()}');
             }
-        ),
-        SpeedDialChild(
-            labelWidget: Text(appStrings(context).categoryUpload_videos, style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: _theme.buttonColor)),
-            child: Icon(Icons.video_collection_rounded),
-            backgroundColor: _theme.floatingActionButtonTheme.backgroundColor,
-            foregroundColor: _theme.floatingActionButtonTheme.foregroundColor,
-            onTap: () async {
-              try {
-                List<Media> res = await ImagesPicker.pick(
-                  count: 100,
-                  pickType: PickType.video,
-                  quality: 0.8,
-                );
-                print(res[0].path);
-                List<Asset> imageList = res.map((media) => Asset(media.path, media.path.split('/').last, media.size.ceil(), media.size.ceil())).toList();
-                if(imageList.isNotEmpty) {
-                  Navigator.push(context, MaterialPageRoute(
-                      builder: (context) => UploadGalleryViewPage(imageData: imageList, category: widget.category)
-                  ));
-                }
-              } catch (e) {
-                print('Dio error ${e.toString()}');
-              }
-            }
+          }
         ),
       ],
     );
