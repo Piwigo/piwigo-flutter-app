@@ -1,171 +1,12 @@
-import 'dart:async';
-import 'dart:convert';
-import 'dart:io';
-
-import 'package:cookie_jar/cookie_jar.dart';
-import 'package:dio_cookie_manager/dio_cookie_manager.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:piwigo_ng/api/SessionAPI.dart';
 import 'package:piwigo_ng/constants/SettingsConstants.dart';
-import 'package:piwigo_ng/views/components/SnackBars.dart';
-
-import '../services/upload/chunked_uploader.dart';
-import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
-
-import 'package:multi_image_picker/multi_image_picker.dart';
+import 'package:piwigo_ng/services/OrientationService.dart';
 import 'package:piwigo_ng/api/API.dart';
 
-class Uploader {
-  BuildContext context;
-  SnackBar snackBar;
+import 'package:flutter/material.dart';
+import 'package:multi_image_picker/multi_image_picker.dart';
 
-  Uploader(this.context) {
-    snackBar = SnackBar(
-      content: Text(appStrings(context).imageUploadTableCell_uploading),
-      duration: Duration(seconds: 2),
-    );
-  }
-
-  Future<void> _showUploadNotification(Map<String, dynamic> downloadStatus) async {
-    final android = AndroidNotificationDetails(
-        'channel id',
-        'channel name',
-        'channel description',
-        priority: Priority.high,
-        importance: Importance.max
-    );
-    final platform = NotificationDetails(android: android);
-    final isSuccess = downloadStatus['isSuccess'];
-
-    await API.localNotification.show(
-      1,
-      isSuccess ? 'Success' : 'Failure',
-      isSuccess ? appStrings(context).imageUploadCompleted_message : appStrings(context).uploadError_message,
-      platform,
-    );
-  }
-
-  void uploadPhotos(List<Asset> photos, String category) async {
-    Map<String, dynamic> result = {
-      'isSuccess': true,
-      'filePath': null,
-      'error': null,
-    };
-
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-
-    for(var element in photos) {
-
-      Response response = await uploadChunk(element, category);
-
-      API.dio.clear();
-      if(json.decode(response.data)["stat"] == "fail") {
-        print("Request failed: ${response.statusCode}");
-
-        ScaffoldMessenger.of(context).hideCurrentSnackBar();
-        ScaffoldMessenger.of(context).showSnackBar(errorSnackBar(context, response.data));
-      }
-    }
-
-    print('new status');
-    createDio();
-
-    await _showUploadNotification(result);
-  }
-
-  void createDio() async {
-    API.dio = Dio();
-    API.cookieJar = CookieJar();
-    API.dio.interceptors.add(CookieManager(API.cookieJar));
-    if(API.prefs.getBool("is_logged") != null && API.prefs.getBool("is_logged")) {
-      API.dio.options.baseUrl = API.prefs.getString("base_url");
-      if(API.prefs.getBool("is_guest") != null && !API.prefs.getBool("is_guest")) {
-        await loginUser(API.prefs.getString("base_url"), API.prefs.getString("username"), API.prefs.getString("password"));
-      } else {
-        await loginGuest(API.prefs.getString("base_url"));
-      }
-    }
-  }
-
-  void upload(Asset photo, String category) async {
-    Map<String, String> queries = {"format":"json", "method": "pwg.images.upload"};
-
-    ByteData byteData = await photo.getByteData();
-    List<int> imageData = byteData.buffer.asUint8List();
-
-    FormData formData =  FormData.fromMap({
-      "category": category,
-      "pwg_token": API.prefs.getString("pwg_token"),
-      "file": MultipartFile.fromBytes(
-        imageData,
-        filename: photo.name,
-      ),
-      "name": photo.name,
-    });
-
-    Response response = await API.dio.post("ws.php",
-      data: formData,
-      queryParameters: queries,
-    );
-
-    if (response.statusCode == 200) {
-      print('Upload ${response.data}');
-      if(json.decode(response.data)["stat"] == "ok") {}
-    } else {
-      print("Request failed: ${response.statusCode}");
-    }
-  }
-  Future<Response> uploadChunk(Asset photo, String category) async {
-    Map<String, String> queries = {
-      "format":"json",
-      "method": "pwg.images.uploadAsync"
-    };
-    Map<String, String> fields = {
-      'username': API.prefs.getString("username"),
-      'password': API.prefs.getString("password"),
-      'filename': photo.name,
-      'category': category,
-    };
-    ChunkedUploader chunkedUploader = ChunkedUploader(API.dio);
-    print(await FlutterAbsolutePath.getAbsolutePath(photo.identifier));
-    try {
-      Future<Response> response = chunkedUploader.upload(
-        context: context,
-        path: "/ws.php",
-        filePath: await FlutterAbsolutePath.getAbsolutePath(photo.identifier),
-        maxChunkSize: API.prefs.getInt("upload_form_chunk_size")*1000,
-        params: queries,
-        method: 'POST',
-        data: fields,
-        contentType: Headers.formUrlEncodedContentType,
-        onUploadProgress: (value) {
-          // print('${photo.name} $progress');
-        });
-      return response;
-    } on DioError catch (e) {
-      print('Dio upload chunk error $e');
-      return Future.value(null);
-    }
-  }
-}
-
-
-class FlutterAbsolutePath {
-  static const MethodChannel _channel =
-  const MethodChannel('flutter_absolute_path');
-
-  /// Gets absolute path of the file from android URI or iOS PHAsset identifier
-  /// The return of this method can be used directly with flutter [File] class
-  static Future<String> getAbsolutePath(String uri) async {
-    final Map<String, dynamic> params = <String, dynamic>{
-      'uri': uri,
-    };
-    final String path = await _channel.invokeMethod('getAbsolutePath', params);
-    return path;
-  }
-}
+import 'components/Dialogs.dart';
+import 'components/TextFields.dart';
 
 class UploadGalleryViewPage extends StatefulWidget {
   final List<Asset> imageData;
@@ -177,8 +18,19 @@ class UploadGalleryViewPage extends StatefulWidget {
   _UploadGalleryViewPage createState() => _UploadGalleryViewPage();
 }
 class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
+  final _formKey = GlobalKey<FormState>();
+  final _listKey = GlobalKey<AnimatedListState>();
+  TextEditingController _nameController = TextEditingController();
+  TextEditingController _descController = TextEditingController();
 
+  List<DropdownMenuItem<int>> _levelItems = [];
+  List<dynamic> _tags = [];
+  int _page = 0;
+  int _privacyLevel = -1;
+  bool _isLoading = false;
+  PageController _pageController;
   bool _showImages = false;
+  bool _displayGrid = false;
 
   @override
   void initState() {
@@ -196,9 +48,24 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
     return 4;
   }
 
+  Map<String, dynamic> getImagesInfo() {
+    return {
+      'name': _nameController.text,
+      'comment': _descController.text,
+      'tag_ids': _tags,
+      'level': _privacyLevel
+    };
+  }
+
   @override
   Widget build(BuildContext context) {
     ThemeData _theme = Theme.of(context);
+    if(isPortrait(context)) {
+      _pageController = PageController(viewportFraction: 7/8);
+    } else {
+      _pageController = PageController(viewportFraction: 2/4);
+    }
+
     return Scaffold(
       appBar: AppBar(
         iconTheme: _theme.iconTheme,
@@ -212,8 +79,14 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
         title: Text(appStrings(context).categoryUpload_images),
         actions: [
           IconButton(
-            onPressed: () {
-              API.uploader.uploadPhotos(widget.imageData, widget.category);
+            onPressed: () async {
+              setState(() {
+                _isLoading = true;
+              });
+              await API.uploader.uploadPhotos(widget.imageData, widget.category, getImagesInfo());
+              setState(() {
+                _isLoading = false;
+              });
               Navigator.of(context).pop();
             },
             icon: Icon(Icons.upload_file),
@@ -233,14 +106,146 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
                 ),
               ),
               Text(appStrings(context).showPhotos),
-              IconButton(
-                onPressed: () {
+              GestureDetector(
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color: Colors.grey,
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: _displayGrid ?
+                            Colors.orange :
+                            Colors.transparent,
+                        ),
+                        child: Icon(Icons.apps,
+                          color: _displayGrid ?
+                            Colors.white :
+                            Colors.orange
+                        ),
+                      ),
+                      Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: _displayGrid ?
+                            Colors.transparent :
+                            Colors.orange,
+                        ),
+                        child: Icon(Icons.description,
+                          color: _displayGrid ?
+                            Colors.orange :
+                            Colors.white
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                onTap: () {
                   setState(() {
-                    _showImages = !_showImages;
+                    _displayGrid = !_displayGrid;
                   });
                 },
-                icon: Icon(Icons.more_horiz),
               ),
+
+              Container(
+                height: 150,
+                child: PageView(
+                  controller: _pageController,
+                  onPageChanged: (int) {
+                    setState(() {
+                      _page = int;
+                    });
+                  },
+                  scrollDirection: Axis.horizontal,
+                  physics: PageScrollPhysics(),
+                  children: widget.imageData.map<Widget>((image) {
+                    return Container(
+                      padding: EdgeInsets.symmetric(horizontal: 5),
+                      child: Stack(
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.symmetric(vertical: 10),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Container(
+                                  height: 130,
+                                  width: 130,
+                                  padding: EdgeInsets.all(5),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                    color: _theme.inputDecorationTheme.fillColor,
+                                  ),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(7),
+                                    child: AssetThumb(
+                                      asset: image,
+                                      width: 100,
+                                      height: 100,
+                                      spinner: Text(""),
+                                      quality: 50,
+                                    ),
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Container(
+                                    height: 110,
+                                    padding: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.only(
+                                        topRight: Radius.circular(10),
+                                        bottomRight: Radius.circular(10),
+                                      ),
+                                      color: _theme.inputDecorationTheme.fillColor,
+                                    ),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text('${image.name}', style: _theme.textTheme.bodyText2, overflow: TextOverflow.fade),
+                                        Text('${image.metadata}', style: _theme.textTheme.bodyText2, overflow: TextOverflow.fade),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Positioned(
+                              bottom: 0,
+                              right: 10,
+                              child: InkWell(
+                                onTap: () {
+                                  int page = _page;
+                                  if(_page == widget.imageData.length-1) {
+                                    _page--;
+                                  }
+                                  setState(() {
+                                    widget.imageData.removeAt(page);
+                                  });
+                                },
+                                child: Container(
+                                  padding: EdgeInsets.all(3),
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: _theme.scaffoldBackgroundColor,
+                                  ),
+                                  child: Icon(Icons.remove_circle_outline, color: _theme.errorColor),
+                                ),
+                              )
+                          ),
+                        ],
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+              Divider(
+                thickness: 1,
+              ),
+
               Container(
                 padding: EdgeInsets.all(10),
                 child: _showImages ? GridView.builder( // Put images on a grid
@@ -285,20 +290,200 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
                 ) : Text(""),
               ),
 
+              Form(
+                key: _formKey,
+                child: Column(
+                  children: [
+                    Align(
+                      alignment: Alignment.topLeft,
+                      child: Text(appStrings(context).editImageDetails_title,
+                          style: _theme.textTheme.headline5
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(top: 5, bottom: 15),
+                      child: TextFieldRequired(
+                        controller: _nameController,
+                        hint: appStrings(context).editImageDetails_titlePlaceholder,
+                      ),
+                    ), // Name
+                    Align(
+                      alignment: Alignment.topLeft,
+                      child: Text(appStrings(context).editImageDetails_description,
+                          style: _theme.textTheme.headline5
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(top: 5),
+                      child: TextFieldDescription(
+                        controller: _descController,
+                        hint: appStrings(context).editImageDetails_descriptionPlaceholder,
+                        minLines: 5,
+                        maxLines: 10,
+                        padding: EdgeInsets.all(10),
+                      ),
+                    ), // Description
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(appStrings(context).tagsAdd_title,
+                            style: _theme.textTheme.headline5
+                        ),
+                        IconButton(
+                          tooltip: appStrings(context).tagsTitle_selectOne,
+                          onPressed: () {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return SelectTagDialog(
+                                    _tags, (tags) {
+                                  setState(() {
+                                    tags.forEach((tag) {
+                                      if(!_tags.contains(tag)) {
+                                        _tags.insert(tags.indexOf(tag), tag);
+                                        _listKey.currentState.insertItem(tags.indexOf(tag));
+                                      }
+                                    });
+                                  });
+                                }
+                                );
+                              }
+                            );
+                          },
+                          icon: Icon(Icons.add_circle_outline),
+                        ),
+                      ],
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(bottom: 5),
+                      child: AnimatedList(
+                        shrinkWrap: true,
+                        physics: NeverScrollableScrollPhysics(),
+                        key: _listKey,
+                        initialItemCount: _tags.length,
+                        itemBuilder: (BuildContext context, int index, Animation<double> animation) {
+                          if(_tags.length == 0) return Container();
+                          if(_tags.length == 1) {
+                            return tagItem(_tags[index], animation,
+                              borderRadius: BorderRadius.circular(10),
+                            );
+                          }
+                          if(index == 0) {
+                            return tagItem(_tags[index], animation,
+                              borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
+                              border: Border(bottom: BorderSide(color: _theme.scaffoldBackgroundColor)),
+                            );
+                          }
+                          if(index == _tags.length-1) {
+                            return tagItem(_tags[index], animation,
+                              borderRadius: BorderRadius.vertical(bottom: Radius.circular(10)),
+                            );
+                          }
+                          return tagItem(_tags[index], animation,
+                            border: Border(bottom: BorderSide(color: _theme.scaffoldBackgroundColor)),
+                          );
+                        },
+                      ),
+                    ),
+                    SizedBox(height: 10),
+                    Align(
+                      alignment: Alignment.topLeft,
+                      child: Text(appStrings(context).editImageDetails_privacyLevel,
+                          style: _theme.textTheme.headline5
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(top: 5, bottom: 10),
+                      child: Container(
+                        padding: EdgeInsets.symmetric(horizontal: 10),
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: _theme.inputDecorationTheme.fillColor
+                        ),
+                        child: DropdownButton<int>(
+                          onTap: () {
+                            FocusScopeNode currentFocus = FocusScope.of(context);
+                            if (!currentFocus.hasPrimaryFocus) {
+                              currentFocus.unfocus();
+                            }
+                          },
+                          isExpanded: true,
+                          underline: Container(),
+                          value: _privacyLevel,
+                          onChanged: (level) {
+                            setState(() {
+                              _privacyLevel = level;
+                            });
+                          },
+                          style: TextStyle(fontSize: 14, color: Color(0xff5c5c5c)),
+                          items: _levelItems,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
               Container(
                 margin: EdgeInsets.all(10),
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () {
-                    API.uploader.uploadPhotos(widget.imageData, widget.category);
+                  onPressed: () async {
+                    setState(() {
+                      _isLoading = true;
+                    });
+                    await API.uploader.uploadPhotos(widget.imageData, widget.category, getImagesInfo());
+                    setState(() {
+                      _isLoading = false;
+                    });
                     Navigator.of(context).pop();
                   },
                   style: ButtonStyle(
                     backgroundColor: MaterialStateProperty.all<Color>(Color(0xffff7700)),
                   ),
-                  child: Text(appStrings(context).imageUploadDetailsButton_title,
-                      style: TextStyle(fontSize: 16)),
+                  child: _isLoading?
+                  CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white)
+                    ) : Text(appStrings(context).imageUploadDetailsButton_title,
+                      style: TextStyle(fontSize: 16, color: Colors.white)
+                    ),
                 ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget tagItem(dynamic tag, Animation<double> animation, {BorderRadius borderRadius, Border border}) {
+    var _theme = Theme.of(context);
+
+    return SizeTransition(
+      axis: Axis.vertical,
+      sizeFactor: animation,
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: borderRadius ?? BorderRadius.zero,
+          color: Theme.of(context).cardColor,
+        ),
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+          decoration: BoxDecoration(
+            border: border ?? Border.fromBorderSide(BorderSide.none),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('${tag['name']}', style: _theme.textTheme.subtitle1),
+              InkWell(
+                onTap: () async {
+                  _listKey.currentState.removeItem(_tags.indexOf(tag), (context, animation) => tagItem(tag, animation));
+                  setState(() {
+                    _tags.remove(tag);
+                  });
+                },
+                child: Icon(Icons.remove_circle_outline, color: Theme.of(context).errorColor),
               ),
             ],
           ),
