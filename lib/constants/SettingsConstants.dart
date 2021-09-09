@@ -64,6 +64,7 @@ Map<int, String> albumSort(context) {
 
 Map<int, String> privacyLevels(context) {
   return {
+    -1: appStrings(context).privacyLevel_unchanged,
     0: appStrings(context).privacyLevel_everybody,
     1: appStrings(context).privacyLevel_adminsFamilyFriendsContacts,
     2: appStrings(context).privacyLevel_adminsFamilyFriends,

@@ -141,7 +141,7 @@
     "categoryUpload_mediaTypes": "Types de média",
     "categoryUpload_otherAlbums": "Autres albums",
     "categoryUpload_pasteboard": "Presse papiers",
-    "categoyUpload_loadSubCategories": "load",
+    "categoryUpload_loadSubCategories": "charger",
     "categoryUpload_images": "Transférer des photos",
     "categoryUpload_videos": "Transférer des Videos",
     "setDefaultCategory_select": "Veuillez sélectionner un album ou un sous-album qui deviendra le nouvel album racine.",

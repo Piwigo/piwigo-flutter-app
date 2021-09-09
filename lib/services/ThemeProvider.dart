@@ -35,16 +35,25 @@ ThemeData light = ThemeData(
   inputDecorationTheme: InputDecorationTheme(
     prefixStyle: TextStyle(color: Color(0xffff7700)),
     fillColor: Color(0xffe0e0e0),
-    hintStyle: TextStyle(color: Color(0xff9e9e9e)),
+    hintStyle: TextStyle(fontSize: 14,
+        fontStyle: FontStyle.italic,
+        color: Color(0xff9e9e9e)
+    ),
+    labelStyle: TextStyle(fontSize: 14, color: Color(0xff282828)),
   ),
+
+
 
   textTheme: TextTheme(
     headline1: TextStyle(fontSize: 26.0, fontWeight: FontWeight.bold, color: Color(0xff000000)),
     headline2: TextStyle(fontSize: 26.0, color: Color(0xffffffff)),
-    headline3: TextStyle(fontSize: 40, fontWeight: FontWeight.bold, color: Color(0xff000000)),
-    headline4: TextStyle(fontSize: 16, color: Color(0xffff7700)),
-    headline6: TextStyle(fontSize: 20.0, color: Color(0xffff7700)),
-    subtitle1: TextStyle(fontSize: 14.0, color: Color(0xff9e9e9e)),
+    headline3: TextStyle(fontSize: 40.0, fontWeight: FontWeight.bold, color: Color(0xff000000)),
+    headline4: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold, color: Color(0xffff7700)),
+    headline5: TextStyle(fontSize: 16.0, color: Color(0xff000000)), // Text Fields
+    headline6: TextStyle(fontSize: 16.0, color: Color(0xffff7700)),
+    subtitle1: TextStyle(fontSize: 14.0, color: Color(0xff1d1d1d)),
+    subtitle2: TextStyle(fontSize: 14.0, color: Color(0xff9e9e9e)),
+    bodyText1: TextStyle(fontSize: 14.0, color: Color(0xff000000)),
     bodyText2: TextStyle(fontSize: 11.0, color: Color(0xff000000)),
   ),
 );
@@ -80,16 +89,25 @@ ThemeData dark = ThemeData(
   ),
   inputDecorationTheme: InputDecorationTheme(
     prefixStyle: TextStyle(color: Color(0xffff7700)),
-    fillColor: Color(0xffbdbdbd),
-    hintStyle: TextStyle(color: Color(0xff9e9e9e)),
+    fillColor: Color(0xffefefef),
+    hintStyle: TextStyle(fontSize: 14,
+        fontStyle: FontStyle.italic,
+        color: Color(0xff6f6f6f)
+    ),
+    labelStyle: TextStyle(fontSize: 14, color: Color(0xff393939))
   ),
 
 
   textTheme: TextTheme(
     headline1: TextStyle(fontSize: 26.0, fontWeight: FontWeight.bold, color: Color(0xffffffff)),
     headline2: TextStyle(fontSize: 26.0, color: Color(0xffffffff)),
+    headline3: TextStyle(fontSize: 26.0),
+    headline4: TextStyle(fontSize: 26.0),
+    headline5: TextStyle(fontSize: 14), // Text Fields
     headline6: TextStyle(fontSize: 20.0, color: Color(0xffff7700)),
     subtitle1: TextStyle(fontSize: 14.0, color: Color(0xff9e9e9e)),
+    subtitle2: TextStyle(fontSize: 14.0),
+    bodyText1: TextStyle(fontSize: 11.0),
     bodyText2: TextStyle(fontSize: 11.0, color: Color(0xffffffff)),
   ),
 );

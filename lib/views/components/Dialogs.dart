@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:piwigo_ng/api/CategoryAPI.dart';
 import 'package:piwigo_ng/api/ImageAPI.dart';
 import 'package:piwigo_ng/api/TagAPI.dart';
 import 'package:piwigo_ng/constants/SettingsConstants.dart';
 import 'package:piwigo_ng/services/OrientationService.dart';
+import 'package:piwigo_ng/views/components/Buttons.dart';
+import 'package:piwigo_ng/views/components/TextFields.dart';
 
 import 'CustomShapes.dart';
 import 'SnackBars.dart';
@@ -69,7 +72,6 @@ class PiwigoDialog extends StatelessWidget {
   }
 }
 
-
 class DialogHeader extends StatelessWidget {
   const DialogHeader({Key key, this.title}) : super(key: key);
 
@@ -98,7 +100,7 @@ class DialogHeader extends StatelessWidget {
         Container(
           padding: EdgeInsets.all(5.0),
           alignment: Alignment.center,
-          child: Text(title, style: _theme.textTheme.headline6),
+          child: Text(title, style: _theme.textTheme.headline4),
         ),
       ],
     );
@@ -167,6 +169,25 @@ Future<bool> confirmDownloadDialog(
   );
 
   return (isConfirm != null) ? isConfirm : false;
+}
+
+Future<int> confirmMoveAssignImage(
+    BuildContext context, {
+      String content,
+    }) async {
+  final int confirm = await showDialog<int>(
+    context: context,
+    builder: (_) => MultiConfirmDialog(
+      content: content,
+      no: Text(appStrings(context).alertCancelButton, style: TextStyle(color: Colors.grey)),
+      actions: <Widget>[
+        Text(appStrings(context).moveImage_title, style: TextStyle(color: Theme.of(context).accentColor)),
+        Text(appStrings(context).copyImage_title, style: TextStyle(color: Theme.of(context).accentColor)),
+      ],
+    ),
+  );
+
+  return (confirm != null) ? confirm : -1;
 }
 
 class ConfirmDialog extends StatelessWidget {
@@ -326,199 +347,147 @@ class MultiConfirmDialog extends StatelessWidget {
   }
 }
 
+class CreateCategoryDialog extends StatefulWidget {
+  const CreateCategoryDialog({Key key, this.catId = "0"}) : super(key: key);
 
-Widget createCategoryAlert(BuildContext context, String catId) {
-  ThemeData _theme = Theme.of(context);
+  final String catId;
+
+  @override
+  _CreateCategoryDialogState createState() => _CreateCategoryDialogState();
+}
+class _CreateCategoryDialogState extends State<CreateCategoryDialog> {
   final _formKey = GlobalKey<FormState>();
-  final _addAlbumNameController = TextEditingController();
-  final _addAlbumDescController = TextEditingController();
+  TextEditingController _nameController;
+  TextEditingController _descController;
+  bool _isLoading = false;
 
-  return PiwigoDialog(
-    title: appStrings(context).createNewAlbum_title,
-    content: Form(
-      key: _formKey,
-      child: Column(
-        children: <Widget>[
-          isPortrait(context) ?
-          Column(
-            children: [
-              Padding(
-                padding: EdgeInsets.all(5),
-                child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 10),
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      color: _theme.inputDecorationTheme.fillColor
-                  ),
-                  child: TextFormField(
-                    maxLines: 1,
-                    controller: _addAlbumNameController,
-                    style: TextStyle(fontSize: 14, color: Color(0xff5c5c5c)),
-                    textAlignVertical: TextAlignVertical.top,
-                    decoration: InputDecoration(
-                      contentPadding: EdgeInsets.zero,
-                      border: InputBorder.none,
-                      hintText: appStrings(context).createNewAlbum_placeholder,
-                      hintStyle: TextStyle(fontSize: 14, fontStyle: FontStyle.italic, color: _theme.disabledColor),
-                    ),
-                    validator: (value) {
-                      if(value.isEmpty) {
-                        return '';
-                      }
-                      return null;
-                    },
-                  ),
-                ),
-              ), // Title field
-              Padding(
-                padding: EdgeInsets.all(5),
-                child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 10),
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      color: _theme.inputDecorationTheme.fillColor
-                  ),
-                  child: TextFormField(
-                    minLines: 1,
-                    maxLines: 3,
-                    controller: _addAlbumDescController,
-                    style: TextStyle(fontSize: 14, color: Color(0xff5c5c5c)),
-                    textAlignVertical: TextAlignVertical.top,
-                    decoration: InputDecoration(
-                      contentPadding: EdgeInsets.zero,
-                      border: InputBorder.none,
-                      hintText: appStrings(context).createNewAlbumDescription_placeholder,
-                      hintStyle: TextStyle(fontSize: 14, fontStyle: FontStyle.italic, color: _theme.disabledColor),
-                    ),
-                  ),
-                ),
-              ), // Description field
-            ],
-          ) : Row(
-            children: [
-              Flexible(
-                child: Padding(
-                  padding: EdgeInsets.all(5),
-                  child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 10),
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        color: _theme.inputDecorationTheme.fillColor
-                    ),
-                    child: TextFormField(
-                      maxLines: 1,
-                      controller: _addAlbumNameController,
-                      style: TextStyle(fontSize: 14, color: Color(0xff5c5c5c)),
-                      textAlignVertical: TextAlignVertical.top,
-                      decoration: InputDecoration(
-                        contentPadding: EdgeInsets.zero,
-                        border: InputBorder.none,
-                        hintText: appStrings(context).createNewAlbum_placeholder,
-                        hintStyle: TextStyle(fontSize: 14, fontStyle: FontStyle.italic, color: _theme.disabledColor),
-                      ),
-                      validator: (value) {
-                        if(value.isEmpty) {
-                          return '';
-                        }
-                        return null;
-                      },
-                    ),
-                  ),
-                ), // Title field
-              ),
-              Flexible(
-                child: Padding(
-                  padding: EdgeInsets.all(5),
-                  child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 10),
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        color: _theme.inputDecorationTheme.fillColor
-                    ),
-                    child: TextFormField(
-                      minLines: 1,
-                      maxLines: 3,
-                      controller: _addAlbumDescController,
-                      style: TextStyle(fontSize: 14, color: Color(0xff5c5c5c)),
-                      textAlignVertical: TextAlignVertical.top,
-                      decoration: InputDecoration(
-                        contentPadding: EdgeInsets.zero,
-                        border: InputBorder.none,
-                        hintText: appStrings(context).createNewAlbumDescription_placeholder,
-                        hintStyle: TextStyle(fontSize: 14, fontStyle: FontStyle.italic, color: _theme.disabledColor),
-                      ),
-                    ),
-                  ),
-                ), // Description field
-              ),
-            ],
-          ),
-          Padding(
-            padding: EdgeInsets.all(5.0),
-            child: Container(
-              width: double.infinity,
-              height: 50,
-              child: TextButton(
-                style: ButtonStyle(
-                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                    RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                  backgroundColor: MaterialStateProperty.all(_theme.accentColor),
-                ),
-                child: Text(appStrings(context).alertAddButton, style: TextStyle(fontSize: 16, color: Colors.white)),
-                onPressed: () async {
-                  if (_formKey.currentState.validate()) {
-                    _formKey.currentState.save();
-                    try {
-                      var result = await addCategory(
-                          _addAlbumNameController.text,
-                          _addAlbumDescController.text, catId);
-                      print('Created Album ${_addAlbumNameController
-                          .text} : $result');
-                      if(result['stat'] == 'fail') {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                            errorSnackBar(context, result['result'])
-                        );
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                            albumAddedSnackBar(context)
-                        );
-                      }
-                      _addAlbumNameController.text = "";
-                      Navigator.of(context).pop();
-                    } catch (e) {
-                      print(e);
-                    }
-                  }
-                },
+  @override
+  void initState() {
+    _nameController = TextEditingController();
+    _descController = TextEditingController();
+
+    _nameController.addListener(() {
+      setState(() {});
+    });
+
+    super.initState();
+  }
+
+  bool _isNameEmpty() {
+    return _nameController.text.toString() == ''
+        || _nameController.text == null;
+  }
+
+  void onCreateAlbum() async {
+    if (_isNameEmpty()) return null;
+    if (_formKey.currentState.validate()) {
+      _formKey.currentState.save();
+      setState(() {
+        _isLoading = true;
+      });
+      try {
+        var result = await addCategory(
+            _nameController.text,
+            _descController.text, widget.catId);
+
+        if(result['stat'] == 'fail') {
+          setState(() {
+            _isLoading = false;
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+              errorSnackBar(context, result['result'])
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+              albumAddedSnackBar(context)
+          );
+          _nameController.text = "";
+          _descController.text = "";
+          Navigator.of(context).pop();
+        }
+      } catch (e) {
+        setState(() {
+          _isLoading = false;
+        });
+        print(e);
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    ThemeData _theme = Theme.of(context);
+    return PiwigoDialog(
+      title: appStrings(context).createNewAlbum_title,
+      content: Form(
+        key: _formKey,
+        child: Column(
+          children: <Widget>[
+            Center(
+              child: Text(appStrings(context).createNewAlbum_message,
+                style: _theme.textTheme.subtitle1,
               ),
             ),
-          ), // Save Button
-        ],
+            isPortrait(context) ?
+            Column(
+              children: [
+                Padding(
+                  padding: EdgeInsets.all(5),
+                  child: TextFieldRequired(
+                    controller: _nameController,
+                    hint: appStrings(context).createNewAlbum_placeholder,
+                  ),
+                ), // Title field
+                Padding(
+                  padding: EdgeInsets.all(5),
+                  child: TextFieldDescription(
+                    controller: _descController,
+                    hint: appStrings(context).createNewAlbumDescription_placeholder,
+                  ),
+                ), // Description field
+              ],
+            ) : Row(
+              children: [
+                Flexible(
+                  child: Padding(
+                    padding: EdgeInsets.all(5),
+                    child: TextFieldRequired(
+                      controller: _nameController,
+                      hint: appStrings(context).createNewAlbum_placeholder,
+                    ),
+                  ), // Title field
+                ),
+                Flexible(
+                  child: Padding(
+                    padding: EdgeInsets.all(5),
+                    child: TextFieldDescription(
+                      controller: _descController,
+                      hint: appStrings(context).createNewAlbumDescription_placeholder,
+                    ),
+                  ), // Description field
+                ),
+              ],
+            ),
+            Padding(
+              padding: EdgeInsets.all(5.0),
+              child: DialogButton(
+                child: _isLoading?
+                  CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white)
+                  ) : Text(appStrings(context).alertAddButton,
+                      style: TextStyle(fontSize: 16, color: Colors.white)
+                  ),
+                style: _isNameEmpty() ?
+                  dialogButtonStyleDisabled(context) :
+                  dialogButtonStyle(context),
+                onPressed: onCreateAlbum,
+              ),
+            ), // Save Button
+          ],
+        ),
       ),
-    ),
-  );
-}
-
-Future<int> confirmMoveAssignImage(
-    BuildContext context, {
-      String content,
-    }) async {
-  final int confirm = await showDialog<int>(
-    context: context,
-    builder: (_) => MultiConfirmDialog(
-      content: content,
-      no: Text(appStrings(context).alertCancelButton, style: TextStyle(color: Colors.grey)),
-      actions: <Widget>[
-        Text(appStrings(context).moveImage_title, style: TextStyle(color: Theme.of(context).accentColor)),
-        Text(appStrings(context).copyImage_title, style: TextStyle(color: Theme.of(context).accentColor)),
-      ],
-    ),
-  );
-
-  return (confirm != null) ? confirm : -1;
+    );
+  }
 }
 
 class EditCategoryDialog extends StatefulWidget {
@@ -534,15 +503,62 @@ class EditCategoryDialog extends StatefulWidget {
 }
 class _EditCategoryDialogState extends State<EditCategoryDialog> {
   final _formKey = GlobalKey<FormState>();
-  TextEditingController _addAlbumNameController;
-  TextEditingController _addAlbumDescController;
-
+  TextEditingController _editAlbumNameController;
+  TextEditingController _editAlbumDescController;
+  bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
-    _addAlbumNameController = TextEditingController(text: widget.catName);
-    _addAlbumDescController = TextEditingController(text: widget.catDesc);
+    _editAlbumNameController = TextEditingController(text: widget.catName);
+    _editAlbumDescController = TextEditingController(text: widget.catDesc);
+
+    _editAlbumNameController.addListener(() {
+      setState(() {});
+    });
+  }
+
+  bool _isNameEmpty() {
+    return _editAlbumNameController.text.toString() == ''
+        || _editAlbumNameController.text == null;
+  }
+
+  void onEditAlbum() async {
+    if (_isNameEmpty()) return null;
+    if (_formKey.currentState.validate()) {
+      _formKey.currentState.save();
+      setState(() {
+        _isLoading = true;
+      });
+      try {
+        var result = await editCategory(
+            widget.catId,
+            _editAlbumNameController.text,
+            _editAlbumDescController.text
+        );
+
+        if(result['stat'] == 'fail') {
+          setState(() {
+            _isLoading = false;
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+              errorSnackBar(context, result['result'])
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+              albumEditedSnackBar(context)
+          );
+          _editAlbumNameController.text = "";
+          _editAlbumDescController.text = "";
+          Navigator.of(context).pop();
+        }
+      } catch (e) {
+        setState(() {
+          _isLoading = false;
+        });
+        print(e);
+      }
+    }
   }
 
   @override
@@ -556,64 +572,25 @@ class _EditCategoryDialogState extends State<EditCategoryDialog> {
         child:  Column(
           children: <Widget>[
             Center(
-              child: Text(appStrings(context).renameCategory_message),
+              child: Text(appStrings(context).renameCategory_message,
+                style: _theme.textTheme.subtitle1,
+              ),
             ),
             isPortrait(context) ?
             Column(
               children: [
                 Padding(
                   padding: EdgeInsets.all(5),
-                  child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 10),
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        color: _theme.inputDecorationTheme.fillColor
-                    ),
-                    child: TextFormField(
-                      maxLines: 1,
-                      controller: _addAlbumNameController,
-                      style: TextStyle(fontSize: 14, color: Color(0xff5c5c5c)),
-                      textAlignVertical: TextAlignVertical.top,
-                      decoration: InputDecoration(
-                        contentPadding: EdgeInsets.zero,
-                        border: InputBorder.none,
-                        hintText: appStrings(context).createNewAlbum_placeholder,
-                        hintStyle: TextStyle(fontSize: 14,
-                            fontStyle: FontStyle.italic,
-                            color: _theme.disabledColor),
-                      ),
-                      validator: (value) {
-                        if (value.isEmpty) {
-                          return '';
-                        }
-                        return null;
-                      },
-                    ),
+                  child: TextFieldRequired(
+                    controller: _editAlbumNameController,
+                    hint: appStrings(context).createNewAlbum_placeholder,
                   ),
                 ),
                 Padding(
                   padding: EdgeInsets.all(5),
-                  child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 10),
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        color: _theme.inputDecorationTheme.fillColor
-                    ),
-                    child: TextFormField(
-                      minLines: 1,
-                      maxLines: 3,
-                      controller: _addAlbumDescController,
-                      style: TextStyle(fontSize: 14, color: Color(0xff5c5c5c)),
-                      textAlignVertical: TextAlignVertical.top,
-                      decoration: InputDecoration(
-                        contentPadding: EdgeInsets.zero,
-                        border: InputBorder.none,
-                        hintText: appStrings(context).createNewAlbumDescription_placeholder,
-                        hintStyle: TextStyle(fontSize: 14,
-                            fontStyle: FontStyle.italic,
-                            color: _theme.disabledColor),
-                      ),
-                    ),
+                  child: TextFieldDescription(
+                    controller: _editAlbumDescController,
+                    hint: appStrings(context).createNewAlbumDescription_placeholder,
                   ),
                 ),
               ],
@@ -622,59 +599,18 @@ class _EditCategoryDialogState extends State<EditCategoryDialog> {
                 Flexible(
                   child: Padding(
                     padding: EdgeInsets.all(5),
-                    child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 10),
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          color: _theme.inputDecorationTheme.fillColor
-                      ),
-                      child: TextFormField(
-                        maxLines: 1,
-                        controller: _addAlbumNameController,
-                        style: TextStyle(fontSize: 14, color: Color(0xff5c5c5c)),
-                        textAlignVertical: TextAlignVertical.top,
-                        decoration: InputDecoration(
-                          contentPadding: EdgeInsets.zero,
-                          border: InputBorder.none,
-                          hintText: appStrings(context).createNewAlbum_placeholder,
-                          hintStyle: TextStyle(fontSize: 14,
-                              fontStyle: FontStyle.italic,
-                              color: _theme.disabledColor),
-                        ),
-                        validator: (value) {
-                          if (value.isEmpty) {
-                            return 'Please enter a name';
-                          }
-                          return null;
-                        },
-                      ),
+                    child: TextFieldRequired(
+                      controller: _editAlbumNameController,
+                      hint: appStrings(context).createNewAlbum_placeholder,
                     ),
                   ),
                 ),
                 Flexible(
                   child: Padding(
                     padding: EdgeInsets.all(5),
-                    child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 10),
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          color: _theme.inputDecorationTheme.fillColor
-                      ),
-                      child: TextFormField(
-                        minLines: 1,
-                        maxLines: 3,
-                        controller: _addAlbumDescController,
-                        style: TextStyle(fontSize: 14, color: Color(0xff5c5c5c)),
-                        textAlignVertical: TextAlignVertical.top,
-                        decoration: InputDecoration(
-                          contentPadding: EdgeInsets.zero,
-                          border: InputBorder.none,
-                          hintText: appStrings(context).createNewAlbumDescription_placeholder,
-                          hintStyle: TextStyle(fontSize: 14,
-                              fontStyle: FontStyle.italic,
-                              color: _theme.disabledColor),
-                        ),
-                      ),
+                    child: TextFieldDescription(
+                      controller: _editAlbumDescController,
+                      hint: appStrings(context).createNewAlbumDescription_placeholder,
                     ),
                   ),
                 ),
@@ -682,50 +618,17 @@ class _EditCategoryDialogState extends State<EditCategoryDialog> {
             ),
             Padding(
               padding: EdgeInsets.all(5.0),
-              child: Container(
-                width: double.infinity,
-                height: 50,
-                child: TextButton(
-                  style: ButtonStyle(
-                    shape: MaterialStateProperty.all<
-                        RoundedRectangleBorder>(
-                      RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                    backgroundColor: MaterialStateProperty.all(
-                        _theme.accentColor),
+              child: DialogButton(
+                child: _isLoading?
+                  CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white)
+                  ) : Text(appStrings(context).categoryCellOption_rename,
+                      style: TextStyle(fontSize: 16, color: Colors.white)
                   ),
-                  child: Text(appStrings(context).categoryCellOption_rename,
-                      style: TextStyle(fontSize: 16, color: Colors.white)),
-                  onPressed: () async {
-                    if (_formKey.currentState.validate()) {
-                      _formKey.currentState.save();
-                      try {
-                        var result = await editCategory(
-                            widget.catId,
-                            _addAlbumNameController.text,
-                            _addAlbumDescController.text
-                        );
-                        print('Edited Album ${_addAlbumNameController.text} : $result');
-                        if(result['stat'] == 'fail') {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                              errorSnackBar(context, result['result'])
-                          );
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                              albumEditedSnackBar(context)
-                          );
-                        }
-                        _addAlbumNameController.text = "";
-                        _addAlbumDescController.text = "";
-                        Navigator.of(context).pop();
-                      } catch (e) {
-                        print(e);
-                      }
-                    }
-                  },
-                ),
+                style: _isNameEmpty() ?
+                  dialogButtonStyleDisabled(context) :
+                  dialogButtonStyle(context),
+                onPressed: onEditAlbum,
               ),
             ),
           ],
@@ -749,10 +652,11 @@ class _EditImageSelectionDialogState extends State<EditImageSelectionDialog> {
   final _listKey = GlobalKey<AnimatedListState>();
   TextEditingController _nameController = TextEditingController();
   TextEditingController _descController = TextEditingController();
+
   List<DropdownMenuItem<int>> _levelItems = [];
   List<dynamic> _tags = [];
   int _page = 0;
-  int _privacyLevel = 0;
+  int _privacyLevel = -1;
   bool _isLoading = false;
   PageController _pageController;
 
@@ -772,14 +676,44 @@ class _EditImageSelectionDialogState extends State<EditImageSelectionDialog> {
       });
       setState(() {});
     });
-
   }
 
   bool isNameEmpty() {
-    if(_nameController.text == "" || _nameController.text == null) {
-      return true;
+    return _nameController.text == ""
+        || _nameController.text == null;
+  }
+
+  void onEditSelection() async {
+    if (_formKey.currentState.validate()) {
+      _formKey.currentState.save();
+      setState(() {
+        _isLoading = true;
+      });
+      try {
+        int nbEdited = await editImages(context,
+            widget.images.map<Map<String,dynamic>>((image) {
+              return {
+                'id': image['id'],
+                'name': _nameController.text,
+                'desc': _descController.text,
+              };
+            }).toList(),
+            _tags.map<int>((tag) {
+              return int.parse(tag['id']);
+            }).toList(),
+            _privacyLevel
+        );
+        ScaffoldMessenger.of(context).showSnackBar(
+            imagesEditedSnackBar(context, nbEdited)
+        );
+        Navigator.of(context).pop();
+      } catch (e) {
+        print(e);
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
-    return false;
   }
 
   @override
@@ -789,8 +723,7 @@ class _EditImageSelectionDialogState extends State<EditImageSelectionDialog> {
     if(isPortrait(context)) {
       _pageController = PageController(viewportFraction: 7/8);
     } else {
-      print('land');
-      _pageController = PageController(viewportFraction: 2/5);
+      _pageController = PageController(viewportFraction: 2/4);
     }
 
     return PiwigoDialog(
@@ -801,7 +734,7 @@ class _EditImageSelectionDialogState extends State<EditImageSelectionDialog> {
         child: Column(
           children: <Widget>[
             Container(
-              height: 140,
+              height: 150,
               child: PageView(
                 controller: _pageController,
                 onPageChanged: (int) {
@@ -816,8 +749,21 @@ class _EditImageSelectionDialogState extends State<EditImageSelectionDialog> {
                     padding: EdgeInsets.symmetric(horizontal: 5),
                     child: Stack(
                       children: [
+                        /*Positioned(
+                          top: 0,
+                          right: 8,
+                          child: Container(
+                            padding: EdgeInsets.all(3),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.rectangle,
+                              borderRadius: BorderRadius.circular(5),
+                              color: _theme.inputDecorationTheme.fillColor,
+                            ),
+                            child: FaIcon(FontAwesomeIcons.solidEdit, color: _theme.inputDecorationTheme.fillColor),
+                          ),
+                        ),*/
                         Padding(
-                          padding: EdgeInsets.symmetric(vertical: 5),
+                          padding: EdgeInsets.symmetric(vertical: 10),
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
@@ -885,30 +831,28 @@ class _EditImageSelectionDialogState extends State<EditImageSelectionDialog> {
                             )
                         ),
                         /*
-                            Positioned(
-                                top: -25,
-                                right: -15,
-                                child: InkWell(
-                                  onTap: () {
-                                    print('change image name');
-                                  },
-                                  child: Container(
-                                    padding: EdgeInsets.all(3),
-                                    child: Stack(
-                                      alignment: Alignment.bottomLeft,
-                                      children: [
-                                        Icon(Icons.edit_sharp, color: _theme.scaffoldBackgroundColor, size: 55),
-                                        Positioned(
-                                          bottom: 6,
-                                          left: 6,
-                                          child: Icon(Icons.edit, color: _theme.iconTheme.color),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                )
+                        Positioned(
+                          top: 0,
+                          right: 8,
+                          child: InkWell(
+                            onTap: () {
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return RenameImageDialog(
+                                    imageId: widget.images[_page]['id'],
+                                    imageName: widget.images[_page]['file'],
+                                  );
+                                }
+                              );
+                            },
+                            child: Container(
+                              padding: EdgeInsets.all(3),
+                              child: FaIcon(FontAwesomeIcons.solidEdit, color: _theme.iconTheme.color, size: 20),
                             ),
-                             */
+                          ),
+                        ),
+                         */
                       ],
                     ),
                   );
@@ -920,86 +864,58 @@ class _EditImageSelectionDialogState extends State<EditImageSelectionDialog> {
             ),
             Align(
               alignment: Alignment.topLeft,
-              child: Text(appStrings(context).editImageDetails_title, style: _theme.textTheme.bodyText1),
+              child: Text(appStrings(context).editImageDetails_title,
+                  style: _theme.textTheme.headline5
+              ),
             ),
             Padding(
-              padding: EdgeInsets.all(5),
-              child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 10),
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    color: _theme.inputDecorationTheme.fillColor
-                ),
-                child: TextFormField(
-                  maxLines: 1,
-                  controller: _nameController,
-                  style: TextStyle(fontSize: 14, color: Color(0xff5c5c5c)),
-                  textAlignVertical: TextAlignVertical.top,
-                  decoration: InputDecoration(
-                    contentPadding: EdgeInsets.zero,
-                    border: InputBorder.none,
-                    hintText: appStrings(context).editImageDetails_titlePlaceholder,
-                    hintStyle: TextStyle(fontSize: 14,
-                        fontStyle: FontStyle.italic,
-                        color: _theme.disabledColor),
-                  ),
-                ),
+              padding: EdgeInsets.only(top: 5, bottom: 15),
+              child: TextFieldRequired(
+                controller: _nameController,
+                hint: appStrings(context).editImageDetails_titlePlaceholder,
               ),
-
             ), // Name
             Align(
               alignment: Alignment.topLeft,
-              child: Text(appStrings(context).editImageDetails_description, style: _theme.textTheme.bodyText1),
+              child: Text(appStrings(context).editImageDetails_description,
+                style: _theme.textTheme.headline5
+              ),
             ),
             Padding(
-              padding: EdgeInsets.all(5),
-              child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    color: _theme.inputDecorationTheme.fillColor
-                ),
-                child: TextFormField(
-                  minLines: 5,
-                  maxLines: 10,
-                  controller: _descController,
-                  style: TextStyle(fontSize: 14, color: Color(0xff5c5c5c)),
-                  textAlignVertical: TextAlignVertical.top,
-                  decoration: InputDecoration(
-                    contentPadding: EdgeInsets.zero,
-                    border: InputBorder.none,
-                    hintText: appStrings(context).editImageDetails_descriptionPlaceholder,
-                    hintStyle: TextStyle(fontSize: 14,
-                        fontStyle: FontStyle.italic,
-                        color: _theme.disabledColor),
-                  ),
-                ),
+              padding: EdgeInsets.only(top: 5),
+              child: TextFieldDescription(
+                controller: _descController,
+                hint: appStrings(context).editImageDetails_descriptionPlaceholder,
+                minLines: 5,
+                maxLines: 10,
+                padding: EdgeInsets.all(10),
               ),
             ), // Description
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(appStrings(context).tagsAdd_title, style: _theme.textTheme.bodyText1),
+                Text(appStrings(context).tagsAdd_title,
+                  style: _theme.textTheme.headline5
+                ),
                 IconButton(
                   tooltip: appStrings(context).tagsTitle_selectOne,
                   onPressed: () {
                     showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return SelectTagDialog(
-                              _tags,
-                                  (tags) {
-                                setState(() {
-                                  tags.forEach((tag) {
-                                    if(!_tags.contains(tag)) {
-                                      _tags.insert(tags.indexOf(tag), tag);
-                                      _listKey.currentState.insertItem(tags.indexOf(tag));
-                                    }
-                                  });
+                      context: context,
+                      builder: (BuildContext context) {
+                        return SelectTagDialog(
+                            _tags, (tags) {
+                              setState(() {
+                                tags.forEach((tag) {
+                                  if(!_tags.contains(tag)) {
+                                    _tags.insert(tags.indexOf(tag), tag);
+                                    _listKey.currentState.insertItem(tags.indexOf(tag));
+                                  }
                                 });
-                              }
-                          );
-                        }
+                              });
+                            }
+                        );
+                      }
                     );
                   },
                   icon: Icon(Icons.add_circle_outline),
@@ -1007,7 +923,7 @@ class _EditImageSelectionDialogState extends State<EditImageSelectionDialog> {
               ],
             ),
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 5.0),
+              padding: EdgeInsets.only(bottom: 5),
               child: AnimatedList(
                 shrinkWrap: true,
                 physics: NeverScrollableScrollPhysics(),
@@ -1040,10 +956,12 @@ class _EditImageSelectionDialogState extends State<EditImageSelectionDialog> {
             SizedBox(height: 10),
             Align(
               alignment: Alignment.topLeft,
-              child: Text(appStrings(context).editImageDetails_privacyLevel, style: _theme.textTheme.bodyText1),
+              child: Text(appStrings(context).editImageDetails_privacyLevel,
+                style: _theme.textTheme.headline5
+              ),
             ),
             Padding(
-              padding: EdgeInsets.all(5),
+              padding: EdgeInsets.only(top: 5, bottom: 10),
               child: Container(
                 padding: EdgeInsets.symmetric(horizontal: 10),
                 decoration: BoxDecoration(
@@ -1072,55 +990,14 @@ class _EditImageSelectionDialogState extends State<EditImageSelectionDialog> {
             ), // Privacy
             Padding(
               padding: EdgeInsets.all(5.0),
-              child: Container(
-                width: double.infinity,
-                height: 50,
-                child: TextButton(
-                  style: ButtonStyle(
-                    shape: MaterialStateProperty.all<
-                        RoundedRectangleBorder>(
-                      RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                    backgroundColor: MaterialStateProperty.all(
-                        _theme.accentColor),
-                  ),
-                  child: _isLoading? CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(Colors.white)) : Text('Save',
-                      style: TextStyle(fontSize: 16, color: Colors.white)),
-                  onPressed: () async {
-                    if (_formKey.currentState.validate()) {
-                      _formKey.currentState.save();
-                      setState(() {
-                        _isLoading = true;
-                      });
-                      try {
-                        int nbEdited = await editImages(context,
-                            widget.images.map<Map<String,dynamic>>((image) {
-                              return {
-                                'id': image['id'],
-                                'name': _nameController.text,
-                                'desc': _descController.text,
-                              };
-                            }).toList(),
-                            _tags.map<int>((tag) {
-                              return int.parse(tag['id']);
-                            }).toList(),
-                            _privacyLevel
-                        );
-                        ScaffoldMessenger.of(context).showSnackBar(
-                            imagesEditedSnackBar(context, nbEdited)
-                        );
-                        Navigator.of(context).pop();
-                      } catch (e) {
-                        print(e);
-                        setState(() {
-                          _isLoading = false;
-                        });
-                      }
-                    }
-                  },
+              child: DialogButton(
+                child: _isLoading?
+                CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white)
+                ) : Text(appStrings(context).alertConfirmButton,
+                    style: TextStyle(fontSize: 16, color: Colors.white)
                 ),
+                onPressed: onEditSelection,
               ),
             ),
           ],
@@ -1130,32 +1007,33 @@ class _EditImageSelectionDialogState extends State<EditImageSelectionDialog> {
   }
 
   Widget tagItem(dynamic tag, Animation<double> animation, {BorderRadius borderRadius, Border border}) {
+    var _theme = Theme.of(context);
+
     return SizeTransition(
       axis: Axis.vertical,
       sizeFactor: animation,
       child: Container(
-        height: 50,
         decoration: BoxDecoration(
           borderRadius: borderRadius ?? BorderRadius.zero,
           color: Theme.of(context).cardColor,
         ),
         child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 10),
+          padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
           decoration: BoxDecoration(
             border: border ?? Border.fromBorderSide(BorderSide.none),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('${tag['name']}'),
-              IconButton(
-                onPressed: () async {
+              Text('${tag['name']}', style: _theme.textTheme.subtitle1),
+              InkWell(
+                onTap: () async {
                   _listKey.currentState.removeItem(_tags.indexOf(tag), (context, animation) => tagItem(tag, animation));
                   setState(() {
                     _tags.remove(tag);
                   });
                 },
-                icon: Icon(Icons.remove_circle_outline, color: Theme.of(context).errorColor),
+                child: Icon(Icons.remove_circle_outline, color: Theme.of(context).errorColor),
               ),
             ],
           ),
@@ -1193,6 +1071,14 @@ class _SelectTagDialogState extends State<SelectTagDialog> {
     return false;
   }
 
+  void onSelectTags() {
+    setState(() {
+      _isLoading = true;
+    });
+    widget.onConfirm(_selectedTags);
+    Navigator.of(context).pop();
+  }
+
   @override
   Widget build(BuildContext context) {
     ThemeData _theme = Theme.of(context);
@@ -1205,7 +1091,7 @@ class _SelectTagDialogState extends State<SelectTagDialog> {
           if(snapshot.hasData) {
             if(snapshot.data['stat'] == 'fail') {
               return Center(
-                child: Text('Failed to load tags'),
+                child: Text(appStrings(context).coreDataFetch_TagError),
               );
             }
             var tags = snapshot.data["result"]['tags'];
@@ -1220,10 +1106,12 @@ class _SelectTagDialogState extends State<SelectTagDialog> {
                     Container(
                       alignment: Alignment.topLeft,
                       padding: EdgeInsets.all(5),
-                      child: Text(appStrings(context).tagsHeader_selected, style: _theme.textTheme.bodyText1),
+                      child: Text(appStrings(context).tagsHeader_selected,
+                        style: _theme.textTheme.headline5
+                      ),
                     ),
                     Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 5.0),
+                      padding: EdgeInsets.symmetric(vertical: 5.0),
                       child: ListView.builder(
                         shrinkWrap: true,
                         physics: NeverScrollableScrollPhysics(),
@@ -1269,14 +1157,16 @@ class _SelectTagDialogState extends State<SelectTagDialog> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(appStrings(context).tagsHeader_notSelected, style: _theme.textTheme.bodyText1),
+                          Text(appStrings(context).tagsHeader_notSelected,
+                            style: _theme.textTheme.headline5
+                          ),
                           SizedBox(width: 5),
                           InkWell(
                             onTap: () {
                               showDialog(
                                   context: context,
                                   builder: (BuildContext context) {
-                                    return createTagAlert(context);
+                                    return CreateTagDialog();
                                   }
                               ).whenComplete(() {
                                 setState(() {
@@ -1290,7 +1180,7 @@ class _SelectTagDialogState extends State<SelectTagDialog> {
                       ),
                     ),
                     Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 5.0),
+                      padding: EdgeInsets.symmetric(vertical: 5.0),
                       child: ListView.builder(
                         shrinkWrap: true,
                         physics: NeverScrollableScrollPhysics(),
@@ -1330,33 +1220,17 @@ class _SelectTagDialogState extends State<SelectTagDialog> {
                         },
                       ),
                     ),
+                    SizedBox(height: 10),
                     Padding(
                       padding: EdgeInsets.all(5.0),
-                      child: Container(
-                        width: double.infinity,
-                        height: 50,
-                        child: TextButton(
-                          style: ButtonStyle(
-                            shape: MaterialStateProperty.all<
-                                RoundedRectangleBorder>(
-                              RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                            backgroundColor: MaterialStateProperty.all(
-                                _theme.accentColor),
+                      child: DialogButton(
+                        child: _isLoading?
+                          CircularProgressIndicator(
+                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white)
+                          ) : Text(appStrings(context).alertConfirmButton,
+                            style: TextStyle(fontSize: 16, color: Colors.white)
                           ),
-                          child: _isLoading?
-                            CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(Colors.white)) :
-                            Text(appStrings(context).alertConfirmButton, style: TextStyle(fontSize: 16, color: Colors.white)),
-                          onPressed: () {
-                            setState(() {
-                              _isLoading = true;
-                            });
-                            widget.onConfirm(_selectedTags);
-                            Navigator.of(context).pop();
-                          },
-                        ),
+                        onPressed: onSelectTags,
                       ),
                     ),
                   ],
@@ -1380,6 +1254,8 @@ class _SelectTagDialogState extends State<SelectTagDialog> {
   }
 
   Widget tagItem(dynamic tag, Icon icon, {Function() onTap, BorderRadius borderRadius, Border border}) {
+    var _theme = Theme.of(context);
+
     return Container(
       decoration: BoxDecoration(
         borderRadius: borderRadius ?? BorderRadius.zero,
@@ -1389,14 +1265,14 @@ class _SelectTagDialogState extends State<SelectTagDialog> {
         onTap: onTap,
         child: Container(
           height: 40,
-          padding: EdgeInsets.symmetric(horizontal: 10),
+          padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
           decoration: BoxDecoration(
             border: border ?? Border.fromBorderSide(BorderSide.none),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('${tag['name']}'),
+              Text('${tag['name']}', style: _theme.textTheme.subtitle1),
               icon,
             ],
           ),
@@ -1406,84 +1282,224 @@ class _SelectTagDialogState extends State<SelectTagDialog> {
   }
 }
 
-Widget createTagAlert(BuildContext context) {
-  ThemeData _theme = Theme.of(context);
+class CreateTagDialog extends StatefulWidget {
+  const CreateTagDialog({Key key}) : super(key: key);
+
+  @override
+  _CreateTagDialogState createState() => _CreateTagDialogState();
+}
+class _CreateTagDialogState extends State<CreateTagDialog> {
   final _formKey = GlobalKey<FormState>();
-  final _addTagNameController = TextEditingController();
+  TextEditingController _nameController;
+  bool _isLoading = false;
 
-  return PiwigoDialog(
-    title: appStrings(context).tagsAdd_title,
-    content: Form(
-      key: _formKey,
-      child: Column(
-        children: <Widget>[
-          Center(
-            child: Text(appStrings(context).tagsAdd_message),
-          ),
-          Padding(
-            padding: EdgeInsets.all(5),
-            child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 10),
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  color: _theme.inputDecorationTheme.fillColor
-              ),
-              child: TextFormField(
-                maxLines: 1,
-                controller: _addTagNameController,
-                style: TextStyle(fontSize: 14, color: Color(0xff5c5c5c)),
-                textAlignVertical: TextAlignVertical.top,
-                decoration: InputDecoration(
-                  contentPadding: EdgeInsets.zero,
-                  border: InputBorder.none,
-                  hintText: appStrings(context).tagsAdd_placeholder,
-                  hintStyle: TextStyle(fontSize: 14, fontStyle: FontStyle.italic, color: _theme.disabledColor),
-                ),
-                validator: (value) {
-                  if(value.isEmpty) {
-                    return '';
-                  }
-                  return null;
-                },
+  @override
+  void initState() {
+    _nameController = TextEditingController();
+
+    _nameController.addListener(() {
+      setState(() {});
+    });
+
+    super.initState();
+  }
+
+  bool _isNameEmpty() {
+    return _nameController.text.toString() == ''
+        || _nameController.text == null;
+  }
+
+  void onCreateTag() async {
+    if (_isNameEmpty()) return null;
+    if (_formKey.currentState.validate()) {
+      _formKey.currentState.save();
+      setState(() {
+        _isLoading = true;
+      });
+      try {
+        var result = await createTag(
+          _nameController.text,
+        );
+
+        if(result['stat'] == 'fail') {
+          setState(() {
+            _isLoading = false;
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+              errorSnackBar(context, result['result'])
+          );
+        } else {
+          _nameController.text = "";
+          Navigator.of(context).pop();
+        }
+      } catch (e) {
+        print(e);
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    var _theme = Theme.of(context);
+    return PiwigoDialog(
+      title: appStrings(context).tagsAdd_title,
+      content: Form(
+        key: _formKey,
+        child: Column(
+          children: <Widget>[
+            Center(
+              child: Text(appStrings(context).tagsAdd_message,
+                style: _theme.textTheme.subtitle1,
               ),
             ),
-          ),
-          Padding(
-            padding: EdgeInsets.all(5.0),
-            child: Container(
-              width: double.infinity,
-              height: 50,
-              child: TextButton(
-                style: ButtonStyle(
-                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                    RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
+            Padding(
+              padding: EdgeInsets.all(5),
+              child: TextFieldRequired(
+                controller: _nameController,
+                hint: appStrings(context).tagsAdd_placeholder,
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.all(5.0),
+              child: DialogButton(
+                child: _isLoading?
+                  CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white)
+                  ) : Text(appStrings(context).alertAddButton,
+                      style: TextStyle(fontSize: 16, color: Colors.white)
                   ),
-                  backgroundColor: MaterialStateProperty.all(_theme.accentColor),
-                ),
-                child: Text(appStrings(context).alertAddButton, style: TextStyle(fontSize: 16, color: Colors.white)),
-                onPressed: () async {
-                  if (_formKey.currentState.validate()) {
-                    _formKey.currentState.save();
-                    try {
-                      var result = await createTag(
-                        _addTagNameController.text,
-                      );
-                      print('Create tag : $result');
-
-                      _addTagNameController.text = "";
-                      Navigator.of(context).pop();
-                    } catch (e) {
-                      print(e);
-                    }
-                  }
-                },
+                style: _isNameEmpty() ?
+                  dialogButtonStyleDisabled(context) :
+                  dialogButtonStyle(context),
+                onPressed: onCreateTag,
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
-    ),
-  );
+    );
+  }
+}
+
+class RenameImageDialog extends StatefulWidget {
+  const RenameImageDialog({Key key, this.imageId, this.imageName}) : super(key: key);
+
+  final int imageId;
+  final String imageName;
+
+  @override
+  _RenameImageDialogState createState() => _RenameImageDialogState();
+}
+class _RenameImageDialogState extends State<RenameImageDialog> {
+  final _formKey = GlobalKey<FormState>();
+  TextEditingController _nameController;
+  bool _isLoading = false;
+
+  @override
+  void initState() {
+    _nameController = TextEditingController(text: widget.imageName);
+
+    _nameController.addListener(() {
+      setState(() {});
+    });
+
+    super.initState();
+  }
+
+  bool _isNameEmpty() {
+    return _nameController.text.toString() == ''
+        || _nameController.text == null;
+  }
+
+  void onRename() async {
+    if (_isNameEmpty()) return null;
+    if (_formKey.currentState.validate()) {
+      _formKey.currentState.save();
+      setState(() {
+        _isLoading = true;
+      });
+      try {
+        var result = await renameImage(
+          widget.imageId,
+          _nameController.text,
+        );
+
+        if(result['stat'] == 'fail') {
+          setState(() {
+            _isLoading = false;
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+              errorSnackBar(context, result['result'])
+          );
+        } else {
+          _nameController.text = "";
+          Navigator.of(context).pop();
+        }
+      } catch (e) {
+        print(e);
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    var _theme = Theme.of(context);
+
+    return PiwigoDialog(
+      title: appStrings(context).renameImage_title,
+      content: Form(
+        key: _formKey,
+        child: Column(
+          children: <Widget>[
+            Center(
+              child: Text(appStrings(context).renameImage_message(widget.imageName),
+                style: _theme.textTheme.subtitle1,
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.all(5),
+              child: TextFieldRequired(
+                controller: _nameController,
+                hint: appStrings(context).editImageDetails_titlePlaceholder,
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.all(5.0),
+              child: DialogButton(
+                child: _isLoading?
+                  CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white)
+                  ) : Text(appStrings(context).alertAddButton,
+                    style: TextStyle(fontSize: 16, color: Colors.white)
+                  ),
+                style: _isNameEmpty() ?
+                  dialogButtonStyleDisabled(context) :
+                  dialogButtonStyle(context),
+                onPressed: onRename,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+
+class ErrorDialog extends StatelessWidget {
+  const ErrorDialog({Key key, this.errorMessage = "", this.errorTitle}) : super(key: key);
+
+  final String errorTitle;
+  final String errorMessage;
+
+  @override
+  Widget build(BuildContext context) {
+    var _theme = Theme.of(context);
+    return PiwigoDialog(
+      title: errorTitle ?? appStrings(context).errorHUD_label,
+      content: Center(
+        child: Text(errorMessage, style: _theme.textTheme.subtitle1),
+      ),
+    );
+  }
 }

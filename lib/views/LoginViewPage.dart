@@ -1,6 +1,7 @@
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
+import 'dart:math';
 import 'package:piwigo_ng/api/API.dart';
 import 'package:piwigo_ng/api/SessionAPI.dart';
 import 'package:flutter/material.dart';
@@ -163,13 +164,15 @@ class _LoginViewPageState extends State<LoginViewPage> {
                                     ),
                                     child: TextFormField(
                                       controller: urlController,
-                                      style: TextStyle(fontSize: 14, color: Color(0xff5c5c5c)),
+                                      style: _theme.inputDecorationTheme.labelStyle,
                                       focusNode: urlFieldFocus,
                                       decoration: InputDecoration(
-                                        icon: _validUrl? Icon(Icons.public, color: _theme.disabledColor) : Icon(Icons.error_outline, color: _theme.errorColor),
+                                        icon: _validUrl?
+                                          Icon(Icons.public, color: _theme.inputDecorationTheme.hintStyle.color) :
+                                          Icon(Icons.error_outline, color: _theme.errorColor),
                                         border: InputBorder.none,
                                         hintText: appStrings(context).login_serverPlaceholder,
-                                        hintStyle: TextStyle(fontStyle: FontStyle.italic, color: _theme.disabledColor),
+                                        hintStyle: _theme.inputDecorationTheme.hintStyle,
                                         prefix: urlFieldFocus.hasFocus? InkWell(
                                           onTap: () {
                                             setState(() {
@@ -178,8 +181,8 @@ class _LoginViewPageState extends State<LoginViewPage> {
                                           },
                                           child: Column(
                                             children: [
-                                              Text(protocol(_httpProtocol), style: TextStyle(fontSize: 14, color: Color(0xff5c5c5c))),
-                                              Text(protocol(!_httpProtocol), style: TextStyle(fontSize: 9, color: Color(0xff5c5c5c))),
+                                              Text(protocol(_httpProtocol), style: _theme.inputDecorationTheme.labelStyle),
+                                              Text(protocol(!_httpProtocol), style: TextStyle(fontSize: 9, color: _theme.inputDecorationTheme.labelStyle.color)),
                                             ],
                                           ),
                                         ) : urlController.text == null || urlController.text == "" ?
@@ -203,13 +206,13 @@ class _LoginViewPageState extends State<LoginViewPage> {
                                           ),
                                           child: TextFormField(
                                             controller: usernameController,
-                                            style: TextStyle(fontSize: 14, color: Color(0xff5c5c5c)),
+                                            style: _theme.inputDecorationTheme.labelStyle,
                                             maxLines: 1,
                                             decoration: InputDecoration(
-                                              icon: Icon(Icons.person, color: _theme.disabledColor),
+                                              icon: Icon(Icons.person, color: _theme.inputDecorationTheme.hintStyle.color),
                                               border: InputBorder.none,
                                               hintText: appStrings(context).login_userPlaceholder,
-                                              hintStyle: TextStyle(fontStyle: FontStyle.italic, color: _theme.disabledColor),
+                                              hintStyle: _theme.inputDecorationTheme.hintStyle,
                                             ),
                                           ),
                                         ),
@@ -221,7 +224,10 @@ class _LoginViewPageState extends State<LoginViewPage> {
                                           usernameController.text = '';
                                         });
                                       },
-                                      child: Icon(Icons.highlight_remove),
+                                      child: Transform.rotate(
+                                        angle: 45*pi/180,
+                                        child: Icon(Icons.add_circle, size: 30),
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -238,7 +244,7 @@ class _LoginViewPageState extends State<LoginViewPage> {
                                           ),
                                           child: TextFormField(
                                             controller: passwordController,
-                                            style: TextStyle(fontSize: 14, color: Color(0xff5c5c5c)),
+                                            style: _theme.inputDecorationTheme.labelStyle,
                                             obscureText: _obscurePassword,
                                             decoration: InputDecoration(
                                               icon: InkWell(
@@ -248,12 +254,12 @@ class _LoginViewPageState extends State<LoginViewPage> {
                                                   });
                                                 },
                                                 child: _obscurePassword ?
-                                                  Icon(Icons.lock, color: _theme.disabledColor) :
-                                                  Icon(Icons.lock_open, color: _theme.disabledColor),
+                                                  Icon(Icons.lock, color: _theme.inputDecorationTheme.hintStyle.color) :
+                                                  Icon(Icons.lock_open, color: _theme.inputDecorationTheme.hintStyle.color),
                                               ),
                                               border: InputBorder.none,
                                               hintText: appStrings(context).login_passwordPlaceholder,
-                                              hintStyle: TextStyle(fontStyle: FontStyle.italic, color: _theme.disabledColor),
+                                              hintStyle: _theme.inputDecorationTheme.hintStyle,
                                             ),
                                           ),
                                         ),
@@ -265,7 +271,10 @@ class _LoginViewPageState extends State<LoginViewPage> {
                                           passwordController.text = '';
                                         });
                                       },
-                                      child: Icon(Icons.highlight_remove),
+                                      child: Transform.rotate(
+                                        angle: 45*pi/180,
+                                        child: Icon(Icons.add_circle, size: 30),
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -331,7 +340,7 @@ class _LoginViewPageState extends State<LoginViewPage> {
                               child: Container(
                                 padding: EdgeInsets.only(top: 20),
                                 alignment: Alignment.bottomCenter,
-                                child: Text(dotenv.env['APP_VERSION'], style: TextStyle(fontSize: 14)),
+                                child: Text(dotenv.env['APP_VERSION'], style: _theme.textTheme.headline6),
                               ),
                             ),
                           ],

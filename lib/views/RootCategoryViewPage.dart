@@ -199,7 +199,7 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
           showDialog(
             context: context,
             builder: (BuildContext context) {
-              return createCategoryAlert(context, "0");
+              return CreateCategoryDialog(catId: "0");
             }
           ).whenComplete(() {
             setState(() {

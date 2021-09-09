@@ -394,6 +394,7 @@
     "privacyLevel_adminsFamilyFriends": "Admins, Family, Friends",
     "privacyLevel_adminsFamilyFriendsContacts": "Admins, Family, Friends, Contacts",
     "privacyLevel_everybody": "Everybody",
+    "privacyLevel_unchanged": "Unchanged",
 
 
     "none": "none",
@@ -432,7 +433,12 @@
 
 
     "renameImage_title": "Original File",
-    "renameImage_message": "Enter a new file name for this photo",
+    "renameImage_message": "Enter a new file name for this photo \"{file}\"",
+    "@renameImage_message": {
+        "placeholders": {
+            "file": {}
+        }
+    },
     "renameImageHUD_label": "Renaming File…",
     "renameImageHUD_renamed": "{count, plural, =1{File Renamed} other{{count} Files Renamed}}",
     "@renameImageHUD_renamed": {

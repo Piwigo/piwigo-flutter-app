@@ -255,7 +255,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
             showDialog(
               context: context,
               builder: (BuildContext context) {
-                return createCategoryAlert(context, widget.category);
+                return CreateCategoryDialog(catId: widget.category);
               }
             ).whenComplete(() {
               setState(() {
