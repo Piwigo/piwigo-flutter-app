@@ -122,6 +122,22 @@ Future<bool> confirmDeleteDialog(
   return (isConfirm != null) ? isConfirm : false;
 }
 
+Future<bool> confirmRemoveSelectionDialog(
+    BuildContext context, {
+      String content,
+    }) async {
+  final bool isConfirm = await showDialog<bool>(
+    context: context,
+    builder: (_) => ConfirmDialog(
+      content: content,
+      yes: Text(appStrings(context).alertRemoveButton, style: TextStyle(color: Colors.red)),
+      no: Text(appStrings(context).alertCancelButton, style: TextStyle(color: Colors.grey)),
+    ),
+  );
+
+  return (isConfirm != null) ? isConfirm : false;
+}
+
 Future<bool> confirmMoveDialog(
     BuildContext context, {
       String content,
@@ -715,6 +731,24 @@ class _EditImageSelectionDialogState extends State<EditImageSelectionDialog> {
     }
   }
 
+  onRemoveImage() async {
+    if(await confirmRemoveSelectionDialog(context,
+      content: appStrings(context).removeSelectedImage_message,
+    )) {
+      if(widget.images.length == 1) {
+        Navigator.of(context).pop();
+      } else {
+        int page = _page;
+        if(_page == widget.images.length-1) {
+          _page--;
+        }
+        setState(() {
+          widget.images.removeAt(page);
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     ThemeData _theme = Theme.of(context);
@@ -806,19 +840,7 @@ class _EditImageSelectionDialogState extends State<EditImageSelectionDialog> {
                             bottom: 0,
                             right: 10,
                             child: InkWell(
-                              onTap: () {
-                                if(widget.images.length == 1) {
-                                  Navigator.of(context).pop();
-                                } else {
-                                  int page = _page;
-                                  if(_page == widget.images.length-1) {
-                                    _page--;
-                                  }
-                                  setState(() {
-                                    widget.images.removeAt(page);
-                                  });
-                                }
-                              },
+                              onTap: onRemoveImage,
                               child: Container(
                                 padding: EdgeInsets.all(3),
                                 decoration: BoxDecoration(

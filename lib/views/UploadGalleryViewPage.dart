@@ -7,6 +7,7 @@ import 'package:piwigo_ng/api/API.dart';
 
 import 'package:flutter/material.dart';
 
+import 'components/Buttons.dart';
 import 'components/Dialogs.dart';
 import 'components/TextFields.dart';
 
@@ -74,6 +75,71 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
     };
   }
 
+  BoxShadow _switchIconShadow() {
+    return BoxShadow(
+      color: Colors.grey.withOpacity(0.5),
+      spreadRadius: 1,
+      blurRadius: 3,
+      offset: Offset(0, 1), // changes position of shadow
+    );
+  }
+
+  addFiles() async {
+    try {
+      List<Media> mediaList = await ImagesPicker.pick(
+        count: 100,
+        pickType: PickType.all,
+        quality: 0.8,
+      );
+      print(mediaList[0].path);
+      if(mediaList.isNotEmpty) {
+        widget.imageData.addAll(mediaList);
+      }
+    } catch (e) {
+      print('Dio error ${e.toString()}');
+    }
+  }
+
+  takePhoto() async {
+    try {
+      List<Media> mediaList = await ImagesPicker.openCamera(
+        pickType: PickType.image,
+        quality: 0.8,
+      );
+      print(mediaList[0].path);
+      if(mediaList.isNotEmpty) {
+        widget.imageData.addAll(mediaList);
+      }
+    } catch (e) {
+      print('Dio error ${e.toString()}');
+    }
+  }
+
+  onRemoveFile() async {
+    if(await confirmRemoveSelectionDialog(context,
+      content: appStrings(context).removeSelectedImage_message,
+    )) {
+      int page = _page;
+      if(_page == widget.imageData.length-1) {
+        _page--;
+      }
+      setState(() {
+        widget.imageData.removeAt(page);
+      });
+    }
+  }
+
+  onUpload() async {
+    setState(() {
+      _isLoading = true;
+    });
+    await API.uploader.uploadPhotos(widget.imageData, widget.category, getImagesInfo());
+    setState(() {
+      _isLoading = false;
+    });
+    Navigator.of(context).pop();
+  }
+
   @override
   Widget build(BuildContext context) {
     ThemeData _theme = Theme.of(context);
@@ -119,74 +185,47 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
               Center(
                 child: Padding(
                   padding: EdgeInsets.all(10),
-                  child: Text(appStrings(context).imageCount(widget.imageData.length), style: TextStyle(fontSize: 20, color: _theme.textTheme.bodyText2.color)),
+                  child: Text(appStrings(context).imageCount(widget.imageData.length),
+                      style: TextStyle(fontSize: 20, color: _theme.textTheme.bodyText2.color)
+                  ),
                 ),
               ),
-
               Padding(
-                padding: EdgeInsets.all(10),
-                child: GestureDetector(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      color: _theme.inputDecorationTheme.fillColor,
+                padding: EdgeInsets.only(left: 20, top: 10, bottom: 10, right: 10),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IconSwitch(
+                      isOnLeft: _displayGrid,
+                      onTap: () {
+                        setState(() {
+                          _displayGrid = !_displayGrid;
+                        });
+                      },
                     ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
+                    Row(
                       children: [
-                        Container(
-                          padding: EdgeInsets.all(5),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: _displayGrid ?
-                            _theme.accentColor :
-                            Colors.transparent,
-                            boxShadow: _displayGrid ? [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.5),
-                                spreadRadius: 1,
-                                blurRadius: 3,
-                                offset: Offset(0, 1), // changes position of shadow
-                              ),
-                            ] : [],
-                          ),
-                          child: Icon(Icons.apps,
-                              color: _displayGrid ?
-                              Colors.white :
-                              _theme.iconTheme.color
+                        ElevatedButton(
+                          onPressed: addFiles,
+                          child: Icon(Icons.add_to_photos, color: _theme.accentColor,),
+                          style: ElevatedButton.styleFrom(
+                            shape: CircleBorder(),
+                            padding: EdgeInsets.all(10),
+                            primary: Colors.white,
                           ),
                         ),
-                        SizedBox(width: 5),
-                        Container(
-                          padding: EdgeInsets.all(5),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: _displayGrid ?
-                            Colors.transparent :
-                            _theme.accentColor,
-                            boxShadow: _displayGrid ? [] : [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.5),
-                                spreadRadius: 1,
-                                blurRadius: 3,
-                                offset: Offset(0, 1), // changes position of shadow
-                              ),
-                            ],
-                          ),
-                          child: Icon(Icons.description,
-                              color: _displayGrid ?
-                              _theme.iconTheme.color :
-                              Colors.white
+                        ElevatedButton(
+                          onPressed: takePhoto,
+                          child: Icon(Icons.photo_camera_rounded, color: _theme.accentColor,),
+                          style: ElevatedButton.styleFrom(
+                            shape: CircleBorder(),
+                            padding: EdgeInsets.all(10),
+                            primary: Colors.white,
                           ),
                         ),
                       ],
                     ),
-                  ),
-                  onTap: () {
-                    setState(() {
-                      _displayGrid = !_displayGrid;
-                    });
-                  },
+                  ],
                 ),
               ),
 
@@ -204,29 +243,42 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
                     itemBuilder: (BuildContext context, int index) {
                       Media image = widget.imageData[index];
                       return Container(
-                        child: Card(
-                          elevation: 5,
-                          semanticContainer: true,
-                          child: GridTile(
-                            child: Container(
-                              child: Image.file(File(image.thumbPath),
-                              fit: BoxFit.cover,
+                        child: Stack(
+                          children: [
+                            Container(
+                              width: double.infinity,
+                              height: double.infinity,
+                              child: Card(
+                                elevation: 0,
+                                semanticContainer: true,
+                                child: GridTile(
+                                  child: Container(
+                                    child: Image.file(File(image.thumbPath),
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                ),
+                              ),
                             ),
-                          ),
+                            Positioned(
+                                bottom: -5,
+                                right: -5,
+                                child: InkWell(
+                                  onTap: onRemoveFile,
+                                  child: Container(
+                                    padding: EdgeInsets.all(3),
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.only(topLeft: Radius.circular(15)),
+                                      // shape: BoxShape.circle,
+                                      color: _theme.scaffoldBackgroundColor,
+                                    ),
+                                    child: Icon(Icons.remove_circle_outline, color: _theme.errorColor),
+                                  ),
+                                )
+                            ),
+                          ],
                         ),
-                      ));
-                      /*
-                      return FutureBuilder(
-                        future: FlutterAbsolutePath.getAbsolutePath(widget.imageData[index].identifier),
-                        builder: (context, snapshot) {
-                          if(snapshot.hasData) {
-                            return createCardImage(context, snapshot.data);
-                          } else {
-                            return CircularProgressIndicator();
-                          }
-                        }
-                      ); // Custom grid cells
-                      */
+                      );
                     }
                   ),
                 ) :
@@ -292,15 +344,7 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
                                 bottom: 0,
                                 right: 10,
                                 child: InkWell(
-                                  onTap: () {
-                                    int page = _page;
-                                    if(_page == widget.imageData.length-1) {
-                                      _page--;
-                                    }
-                                    setState(() {
-                                      widget.imageData.removeAt(page);
-                                    });
-                                  },
+                                  onTap: onRemoveFile,
                                   child: Container(
                                     padding: EdgeInsets.all(3),
                                     decoration: BoxDecoration(
@@ -321,7 +365,6 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
               Divider(
                 thickness: 1,
               ),
-
               Padding(
                 padding: EdgeInsets.all(10),
                 child: Form(
@@ -466,29 +509,17 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
                   ),
                 ),
               ),
-
               Container(
                 margin: EdgeInsets.all(10),
                 width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () async {
-                    setState(() {
-                      _isLoading = true;
-                    });
-                    await API.uploader.uploadPhotos(widget.imageData, widget.category, getImagesInfo());
-                    setState(() {
-                      _isLoading = false;
-                    });
-                    Navigator.of(context).pop();
-                  },
-                  style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all<Color>(Color(0xffff7700)),
-                  ),
+                child: DialogButton(
+                  style: dialogButtonStyle(context),
+                  onPressed: onUpload,
                   child: _isLoading?
-                  CircularProgressIndicator(
+                    CircularProgressIndicator(
                       valueColor: AlwaysStoppedAnimation<Color>(Colors.white)
                     ) : Text(appStrings(context).imageUploadDetailsButton_title,
-                      style: TextStyle(fontSize: 16, color: Colors.white)
+                        style: TextStyle(fontSize: 16, color: Colors.white)
                     ),
                 ),
               ),

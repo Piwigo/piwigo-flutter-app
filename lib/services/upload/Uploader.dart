@@ -68,7 +68,7 @@ class Uploader {
     }
 
     print('new status');
-    createDio();
+    // createDio();
 
     await _showUploadNotification(result);
   }
@@ -77,14 +77,8 @@ class Uploader {
     API.dio = Dio();
     API.cookieJar = CookieJar();
     API.dio.interceptors.add(CookieManager(API.cookieJar));
-    if(API.prefs.getBool("is_logged") != null && API.prefs.getBool("is_logged")) {
-      API.dio.options.baseUrl = API.prefs.getString("base_url");
-      if(API.prefs.getBool("is_guest") != null && !API.prefs.getBool("is_guest")) {
-        await loginUser(API.prefs.getString("base_url"), API.prefs.getString("username"), API.prefs.getString("password"));
-      } else {
-        await loginGuest(API.prefs.getString("base_url"));
-      }
-    }
+    API.dio.options.baseUrl = API.prefs.getString("base_url");
+    await loginUser(API.prefs.getString("base_url"), API.prefs.getString("username"), API.prefs.getString("password"));
   }
 
   void upload(Media photo, String category) async {

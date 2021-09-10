@@ -275,16 +275,16 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
               List<Media> mediaList = await ImagesPicker.pick(
                 count: 100,
                 pickType: PickType.all,
-                quality: 0.5,
+                quality: 0.8,
               );
               print(mediaList[0].path);
-              // List<Asset> imageList = res.map((media) => Asset(media.thumbPath, media.path.split('/').last, media.size.ceil(), media.size.ceil())).toList();
               if(mediaList.isNotEmpty) {
                 Navigator.push(context, MaterialPageRoute(
                     builder: (context) => UploadGalleryViewPage(imageData: mediaList, category: widget.category)
                 )).whenComplete(() {
                   setState(() {
-                    // refresh
+                    API.uploader.createDio();
+                    print('After upload'); // refresh
                   });
                 });
               }
@@ -292,6 +292,34 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
               print('Dio error ${e.toString()}');
             }
           }
+        ),
+        SpeedDialChild(
+            elevation: 5,
+            labelWidget: Text(appStrings(context).categoryUpload_take, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white)),
+            child: Icon(Icons.photo_camera_rounded),
+            backgroundColor: _theme.floatingActionButtonTheme.backgroundColor,
+            foregroundColor: _theme.floatingActionButtonTheme.foregroundColor,
+            onTap: () async {
+              try {
+                List<Media> mediaList = await ImagesPicker.openCamera(
+                  pickType: PickType.image,
+                  quality: 0.8,
+                );
+                print(mediaList[0].path);
+                if(mediaList.isNotEmpty) {
+                  Navigator.push(context, MaterialPageRoute(
+                      builder: (context) => UploadGalleryViewPage(imageData: mediaList, category: widget.category)
+                  )).whenComplete(() {
+                    setState(() {
+                      API.uploader.createDio();
+                      print('After upload'); // refresh
+                    });
+                  });
+                }
+              } catch (e) {
+                print('Dio error ${e.toString()}');
+              }
+            }
         ),
       ],
     );

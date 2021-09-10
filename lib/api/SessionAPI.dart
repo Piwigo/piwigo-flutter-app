@@ -29,6 +29,7 @@ Future<String> loginUser(String url, String username, String password) async {
         var status = await sessionStatus();
         print(status);
         if(status["stat"] == "ok") {
+          print("$url, $username");
           savePreferences(status["result"], url: url, username: username, password: password, isLogged: true, isGuest: false);
           return null;
         }
