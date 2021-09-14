@@ -6,7 +6,10 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:piwigo_ng/constants/SettingsConstants.dart';
 import 'package:piwigo_ng/views/LoginViewPage.dart';
 import 'package:piwigo_ng/api/API.dart';
+import 'package:piwigo_ng/views/PrivacyPolicyViewPage.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+import 'components/AppBars.dart';
 
 
 class SettingsPage extends StatefulWidget {
@@ -19,6 +22,7 @@ class _SettingsPageState extends State<SettingsPage> {
   String _albumDerivative;
   String _thumbnailDerivative;
   String _fsDerivative;
+  double kExpandedHeight = 100.0;
 
   @override
   void initState() {
@@ -33,45 +37,12 @@ class _SettingsPageState extends State<SettingsPage> {
     return Scaffold(
       body: CustomScrollView(
         slivers: <Widget>[
-          SliverAppBar(
-            pinned: true,
-            snap: false,
-            floating: false,
-            expandedHeight: 100.0,
+          AppBarExpandable(
             leading: IconButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
+              onPressed: Navigator.of(context).pop,
               icon: Icon(Icons.check, color: _theme.iconTheme.color),
             ),
-            title: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Container(),
-                // Consumer<ThemeNotifier>(
-                //   builder: (context, notifier, child) => Switch(
-                //     onChanged:(value){
-                //       notifier.toggleTheme();
-                //     },
-                //     value: notifier.darkTheme,
-                //   ),
-                // ),
-                // TODO: Add tutorials
-                //Icon(Icons.info_outline, color: _theme.iconTheme.color),
-              ],
-            ),
-            flexibleSpace: FlexibleSpaceBar(
-              background: Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    margin: EdgeInsets.only(left: 20),
-                    child: Text(appStrings(context).tabBar_preferences, style: TextStyle(fontSize: 26.0, fontWeight: FontWeight.w900, color: Color(0xff000000))),
-                  ),
-                ],
-              ),
-            ),
+            title: appStrings(context).tabBar_preferences,
           ),
           SliverPadding(
             padding: EdgeInsets.only(top: 30),
@@ -166,44 +137,67 @@ class _SettingsPageState extends State<SettingsPage> {
                                   },
                                 ),
                               ),
-                              TableCell(
-                                Text(appStrings(context).settings_portraitNberOfThumbnails, style: TextStyle(color: Colors.black, fontSize: 16)),
-                                Expanded(
-                                  child: Slider(
-                                    label: '${API.prefs.getDouble("portrait_image_count").ceil()}/6',
-                                    activeColor: Color(0xffff7700),
-                                    inactiveColor: Color(0xffeeeeee),
-                                    divisions: 5,
-                                    min: Constants.PORTRAIT_IMAGE_COUNT_MIN,
-                                    max: Constants.PORTRAIT_IMAGE_COUNT_MAX,
-                                    value: API.prefs.getDouble("portrait_image_count"),
-                                    onChanged: (i) {
-                                      setState(() {
-                                        print(i.ceilToDouble());
-                                        API.prefs.setDouble("portrait_image_count", i.ceilToDouble());
-                                      });
-                                    },
-                                  ),
-                                ),
-                              ),
-                              TableCell(
-                                Text(appStrings(context).settings_landscapeNberOfThumbnails, style: TextStyle(color: Colors.black, fontSize: 16)),
-                                Expanded(
-                                  child: Slider(
-                                    label: '${API.prefs.getDouble("landscape_image_count").ceil()}/10',
-                                    activeColor: Color(0xffff7700),
-                                    inactiveColor: Color(0xffeeeeee),
-                                    divisions: 6,
-                                    min: Constants.LANDSCAPE_IMAGE_COUNT_MIN,
-                                    max: Constants.LANDSCAPE_IMAGE_COUNT_MAX,
-                                    value: API.prefs.getDouble("landscape_image_count"),
-                                    onChanged: (i) {
-                                      setState(() {
-                                        print(i.ceilToDouble());
-                                        API.prefs.setDouble("landscape_image_count", i.ceilToDouble());
-                                      });
-                                    },
-                                  ),
+                              TableCellSingle(
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Padding(
+                                      padding: EdgeInsets.only(bottom: 5),
+                                      child: Text(appStrings(context).defaultNberOfThumbnails, style: TextStyle(color: Colors.black, fontSize: 16)),
+                                    ),
+                                    Row(
+                                      children: [
+                                        Text(appStrings(context).defaultNberOfThumbnails_portrait, style: TextStyle(color: Colors.black, fontSize: 16)),
+                                        Expanded(
+                                          child: Container(
+                                            height: 30.0,
+                                            child: Slider(
+                                              label: '${API.prefs.getDouble("portrait_image_count").ceil()}/6',
+                                              activeColor: Color(0xffff7700),
+                                              inactiveColor: Color(0xffeeeeee),
+                                              divisions: 5,
+                                              min: Constants.PORTRAIT_IMAGE_COUNT_MIN,
+                                              max: Constants.PORTRAIT_IMAGE_COUNT_MAX,
+                                              value: API.prefs.getDouble("portrait_image_count"),
+                                              onChanged: (i) {
+                                                setState(() {
+                                                  print(i.ceilToDouble());
+                                                  API.prefs.setDouble("portrait_image_count", i.ceilToDouble());
+                                                });
+                                              },
+                                            ),
+                                          ),
+                                        ),
+                                        Text('${API.prefs.getDouble("portrait_image_count").ceil()}', style: TextStyle(color: Colors.black, fontSize: 16)),
+                                      ],
+                                    ),
+                                    Row(
+                                      children: [
+                                        Text(appStrings(context).defaultNberOfThumbnails_landscape, style: TextStyle(color: Colors.black, fontSize: 16)),
+                                        Expanded(
+                                          child: Container(
+                                            height: 30.0,
+                                            child: Slider(
+                                              label: '${API.prefs.getDouble("landscape_image_count").ceil()}/10',
+                                              activeColor: Color(0xffff7700),
+                                              inactiveColor: Color(0xffeeeeee),
+                                              divisions: 6,
+                                              min: Constants.LANDSCAPE_IMAGE_COUNT_MIN,
+                                              max: Constants.LANDSCAPE_IMAGE_COUNT_MAX,
+                                              value: API.prefs.getDouble("landscape_image_count"),
+                                              onChanged: (i) {
+                                                setState(() {
+                                                  print(i.ceilToDouble());
+                                                  API.prefs.setDouble("landscape_image_count", i.ceilToDouble());
+                                                });
+                                              },
+                                            ),
+                                          ),
+                                        ),
+                                        Text('${API.prefs.getDouble("landscape_image_count").ceil()}', style: TextStyle(color: Colors.black, fontSize: 16)),
+                                      ],
+                                    ),
+                                  ],
                                 ),
                               ),
                               TableCell(
@@ -318,6 +312,17 @@ class _SettingsPageState extends State<SettingsPage> {
                                   FaIcon(FontAwesomeIcons.language, color: Colors.grey.shade600, size: 20),
                                 ),
                               ),
+                              GestureDetector(
+                                onTap: () {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(builder: (_) => PrivacyPolicyViewPage())
+                                  );
+                                },
+                                child: TableCell(
+                                  Text(appStrings(context).settings_privacy, style: TextStyle(color: Colors.black, fontSize: 16)),
+                                  FaIcon(Icons.privacy_tip, color: Colors.grey.shade600, size: 20),
+                                ),
+                              ),
                               TableCell(
                                 Text(appStrings(context).settings_appName, style: TextStyle(color: Colors.black, fontSize: 16)),
                                 Text(dotenv.env['APP_VERSION'], overflow: TextOverflow.ellipsis, softWrap: false, style: TextStyle(color: Colors.grey.shade600, fontSize: 14)),
@@ -366,6 +371,28 @@ class TableCell extends StatelessWidget {
             right,
           ] + (options ?? []),
         ),
+      ),
+    );
+  }
+}
+
+class TableCellSingle extends StatelessWidget {
+  const TableCellSingle(this.content, {Key key, this.isEnd = false}) : super(key: key);
+
+  final Widget content;
+  final bool isEnd;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: EdgeInsets.only(left: 10, top: 5),
+      padding: EdgeInsets.symmetric(horizontal: 10),
+      decoration: BoxDecoration(
+        border: isEnd ? Border.all(width: 0, color: Colors.white) : Border(bottom: BorderSide(width: 0.5, color: Colors.grey)),
+        color: Colors.white,
+      ),
+      child: Center(
+        child: content,
       ),
     );
   }

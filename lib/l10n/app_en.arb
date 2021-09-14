@@ -772,11 +772,9 @@
     "defaultThumbnailSize": "Size",
     "defaultThumbnailSize320px": "Thumbnails Size",
     "defaultThumbnailSize414px": "Default Size of Thumbnails",
-    "defaultNberOfThumbnails": "Number",
-    "defaultNberOfThumbnails320px": "Number/Row",
-    "defaultNberOfThumbnails414px": "Number per Row",
-    "settings_portraitNberOfThumbnails": "Portrait Image/Row",
-    "settings_landscapeNberOfThumbnails": "Landscape Image/Row",
+    "defaultNberOfThumbnails": "Number of thumbnails per row",
+    "defaultNberOfThumbnails_portrait": "Portrait Mode",
+    "defaultNberOfThumbnails_landscape": "Landscape Mode",
     "defaultThumbnailSizeTitle": "Default Size",
     "defaultThumbnailSizeHeader": "Please select a photo thumbnail size",
     "settings_displayTitles": "Titles on Thumbnails",
@@ -912,5 +910,6 @@
     "settings_crowdinURL": "https://crowdin.com/project/piwigo-ng",
     "settings_pwgForumURL": "http://piwigo.org/forum",
     "settings_acknowledgements": "Acknowledgements",
-    "settings_privacy": "Privacy Policy"
+    "settings_privacy": "Privacy Policy",
+    "settings_privacyUrl": "https://piwigo.org/mobile-apps-privacy-policy&webview"
 }

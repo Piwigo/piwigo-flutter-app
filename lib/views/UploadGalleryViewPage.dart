@@ -565,23 +565,4 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
       ),
     );
   }
-
-  /*
-  Widget createCardImage(BuildContext context, String imagePath) {
-    return Container(
-      child: Card(
-        elevation: 5,
-        semanticContainer: true,
-        child: GridTile(
-          child: Container(
-            child: Image.file(
-              File(imagePath),
-              fit: BoxFit.fill,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-  */
 }

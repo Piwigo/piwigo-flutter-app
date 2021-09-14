@@ -22,19 +22,6 @@ String albumSubCount(dynamic album, context) {
 }
 
 
-/*
-String albumSubCount(dynamic album, context) {
-  String displayString = '${album["total_nb_images"]} ${album["total_nb_images"] == 1 ? 'photo' : 'photos'}';
-  if(album["nb_categories"] > 0) {
-    displayString += ', ${album["nb_categories"]} ${album["nb_categories"] == 1 ? 'sub-album' : 'sub-albums'}';
-  }
-  return displayString;
-}
-
- */
-
-
-
 Widget albumListItem(BuildContext context, dynamic album, bool isAdmin, Function(String) onRefresh) {
   ThemeData _theme = Theme.of(context);
 
@@ -52,7 +39,7 @@ Widget albumListItem(BuildContext context, dynamic album, bool isAdmin, Function
       });
     },
     child: Container(
-      padding: EdgeInsets.only(top: 5, bottom: 5),
+      // padding: EdgeInsets.only(top: 5, bottom: 5),
       child: Slidable(
         enabled: isAdmin,
         actionPane: SlidableBehindActionPane(),
@@ -145,7 +132,6 @@ Widget albumListItem(BuildContext context, dynamic album, bool isAdmin, Function
     ),
   );
 }
-
 Widget categoryListCard(BuildContext context, dynamic album, bool isAdmin) {
   ThemeData _theme = Theme.of(context);
   return Row(
@@ -202,8 +188,8 @@ Widget albumListItemRight(BuildContext context, dynamic album, bool isAdmin, Fun
         onRefresh('Closed children category');
       });
     },
-    child: Padding(
-      padding: EdgeInsets.only(top: 5, bottom: 5),
+    child: Container(
+      // padding: EdgeInsets.only(top: 5, bottom: 5),
       child: Slidable(
         enabled: isAdmin,
         actionPane: SlidableBehindActionPane(),
@@ -296,7 +282,6 @@ Widget albumListItemRight(BuildContext context, dynamic album, bool isAdmin, Fun
     ),
   );
 }
-
 Widget categoryListCardRight(BuildContext context, dynamic album, bool isAdmin) {
   ThemeData _theme = Theme.of(context);
   return Row(
@@ -380,7 +365,6 @@ Widget albumInfo(BuildContext context, album) {
     ),
   );
 }
-
 Widget albumThumbnail(BuildContext context, album, {BorderRadius borderRadius = BorderRadius.zero}) {
   return Container(
     decoration: BoxDecoration(
@@ -403,7 +387,6 @@ Widget albumThumbnail(BuildContext context, album, {BorderRadius borderRadius = 
     ),
   );
 }
-
 Widget albumItemSeparator(BuildContext context) {
   return Container(
     decoration: ShapeDecoration(

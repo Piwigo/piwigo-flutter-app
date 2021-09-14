@@ -1,4 +1,5 @@
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:flat_icons_flutter/flat_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
@@ -38,6 +39,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
   ScrollController _controller = ScrollController();
   List<dynamic> imageList = [];
 
+  // TODO: zoom in/out grid
   double _scaleFactor = 1.0;
   double _baseScaleFactor = 1.0;
 
@@ -161,7 +163,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
           icon: Icon(Icons.cancel),
         ) : widget.isAdmin? IconButton(
           onPressed: openEditMode,
-          icon: Icon(Icons.touch_app),
+          icon: Icon(Icons.touch_app_rounded),
         ) : Container(),
       ],
     );
@@ -340,11 +342,11 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
             GridView.builder(
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: isPortrait(context)? 1 : 2,
-                mainAxisSpacing: 3,
-                crossAxisSpacing: 5,
+                mainAxisSpacing: 10,
+                crossAxisSpacing: 10,
                 childAspectRatio: albumGridAspectRatio(context),
               ),
-              padding: EdgeInsets.symmetric(horizontal: 5),
+              padding: EdgeInsets.all(10),
               itemCount: albums.length,
               shrinkWrap: true,
               physics: NeverScrollableScrollPhysics(),
