@@ -90,7 +90,6 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
     _selectedItems.clear();
   }
 
-
   Future<void> onRefresh() {
     setState(() {
       _page = 0;
@@ -146,7 +145,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
       floating: false,
       centerTitle: true,
       iconTheme: IconThemeData(
-        color: _theme.iconTheme.color,//change your color here
+        color: _theme.iconTheme.color,
       ),
       leading: IconButton(
         onPressed: () {
@@ -415,7 +414,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
                     decoration: BoxDecoration(
                       color: Colors.white,
                       border: _isSelected(image['id']) ?
-                      Border.all(width: 5, color: _theme.accentColor) :
+                      Border.all(width: 5, color: _theme.colorScheme.primary) :
                       Border.all(width: 0, color: Colors.white),
                     ),
                     child: Stack(

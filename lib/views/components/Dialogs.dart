@@ -196,8 +196,8 @@ Future<int> confirmMoveAssignImage(
       content: content,
       no: Text(appStrings(context).alertCancelButton, style: TextStyle(color: Colors.grey)),
       actions: <Widget>[
-        Text(appStrings(context).moveImage_title, style: TextStyle(color: Theme.of(context).accentColor)),
-        Text(appStrings(context).copyImage_title, style: TextStyle(color: Theme.of(context).accentColor)),
+        Text(appStrings(context).moveImage_title, style: TextStyle(color: Theme.of(context).colorScheme.primary)),
+        Text(appStrings(context).copyImage_title, style: TextStyle(color: Theme.of(context).colorScheme.primary)),
       ],
     ),
   );

@@ -27,7 +27,6 @@ class ImageViewPage extends StatefulWidget {
   @override
   _ImageViewPageState createState() => _ImageViewPageState();
 }
-
 class _ImageViewPageState extends State<ImageViewPage> {
   String _derivative;
   PageController _pageController;
@@ -41,7 +40,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
   @override
   void initState() {
     super.initState();
-    SystemChrome.setEnabledSystemUIOverlays([SystemUiOverlay.bottom]);
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive, overlays: [SystemUiOverlay.bottom]);
     _pageController = PageController(initialPage: widget.index);
     _derivative = API.prefs.getString('full_screen_image_size');
     _page = widget.index;
@@ -59,7 +58,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
 
   @override
   void dispose() {
-    SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge, overlays: SystemUiOverlay.values);
     super.dispose();
   }
 
@@ -83,6 +82,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
       backgroundColor: Colors.black,
       resizeToAvoidBottomInset: true,
       extendBodyBehindAppBar: true,
+      extendBody: true,
       appBar: showToolBar ? AppBar(
         iconTheme: IconThemeData(
           color: _theme.iconTheme.color, //change your color here
@@ -117,7 +117,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
         ],
       ) : AppBar(
         elevation: 0,
-        leading: Text(""),
+        leading: SizedBox(),
         backgroundColor: Colors.transparent
       ),
       body: Container(
@@ -131,6 +131,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
             }
             setState(() {
               _page = newPage;
+              showToolBar = true;
             });
           },
           itemBuilder: (context, index) {
@@ -142,9 +143,16 @@ class _ImageViewPageState extends State<ImageViewPage> {
                 child: Stack(
                   alignment: Alignment.center,
                   children: [
-                    Image.network(images[index]["derivatives"][_derivative]["url"]),
+                    Container(
+                      height: double.infinity,
+                      width: double.infinity,
+                      child: CachedNetworkImage(
+                        imageUrl: images[index]["derivatives"][_derivative]["url"],
+                        fit: BoxFit.contain,
+                      ),
+                    ),
                     IconShadowWidget(
-                      Icon(Icons.play_arrow_rounded, size: 100, color: Color(0xFFFFFFFF)),
+                      Icon(Icons.play_arrow_rounded, size: 100, color: Color(0x80FFFFFF)),
                       shadowColor: Colors.black45,
                     ),
                   ],
@@ -152,14 +160,19 @@ class _ImageViewPageState extends State<ImageViewPage> {
               );
             }
             return GestureDetector(
-              onScaleStart: (details) {
+              onTap: () {
                 setState(() {
-                  showToolBar = false;
+                  showToolBar = !showToolBar;
                 });
               },
+              child: CachedNetworkImage(
+                imageUrl: images[index]["derivatives"][_derivative]["url"],
+                fit: BoxFit.contain,
+              ),
+              /*
               child: PhotoView(
                 controller: _photoScaleController,
-                imageProvider: CachedNetworkImageProvider(images[index]["derivatives"][_derivative]["url"]),
+                imageProvider: NetworkImage(images[index]["derivatives"][_derivative]["url"]),
                 minScale: PhotoViewComputedScale.contained,
                 scaleStateChangedCallback: (scale) {
                   print("scale cb ${scale.isScaleStateZooming}");
@@ -190,38 +203,11 @@ class _ImageViewPageState extends State<ImageViewPage> {
                   }
                 }, */
               ),
+
+               */
             );
           }
         ),
-        /*
-        PhotoViewGallery.builder(
-          scrollPhysics: const BouncingScrollPhysics(),
-          itemCount: images.length,
-          pageController: _pageController,
-          onPageChanged: (newPage) async {
-            if(newPage == images.length-1) {
-              await nextPage();
-            }
-            setState(() {
-              _page = newPage;
-            });
-          },
-          builder: (BuildContext context, int index) {
-            return PhotoViewGalleryPageOptions(
-              imageProvider: CachedNetworkImageProvider(images[index]["derivatives"][_derivative]["url"]),
-              minScale: PhotoViewComputedScale.contained,
-            );
-          },
-          loadingBuilder: (context, event) => Center(
-            child: Container(
-              child: CircularProgressIndicator(
-                value: event == null
-                    ? 0 : event.cumulativeBytesLoaded / event.expectedTotalBytes,
-              ),
-            ),
-          ),
-        ),
-        */
       ),
       bottomNavigationBar: widget.isAdmin && showToolBar? BottomNavigationBar(
         onTap: (index) async {

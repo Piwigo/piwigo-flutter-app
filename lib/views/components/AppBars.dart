@@ -16,7 +16,7 @@ class FlexibleSpaceCustom extends StatelessWidget {
           double percent = (constraints.maxHeight - kToolbarHeight);
           double dx = 0;
 
-          dx = 100 - percent;
+          dx = 80 - percent;
           if (constraints.maxHeight == 100) {
             dx = 0;
           }
@@ -58,6 +58,7 @@ class AppBarExpandable extends StatelessWidget {
       floating: false,
       expandedHeight: 100.0,
       centerTitle: true,
+      backgroundColor: _theme.appBarTheme.backgroundColor,
       leading: leading ?? IconButton(
         onPressed: () {
           Navigator.of(context).pop();

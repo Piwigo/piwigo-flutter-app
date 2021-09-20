@@ -32,7 +32,7 @@ ButtonStyle dialogButtonStyle(context) {
         borderRadius: BorderRadius.circular(10),
       ),
     ),
-    backgroundColor: MaterialStateProperty.all(_theme.accentColor),
+    backgroundColor: MaterialStateProperty.all(_theme.colorScheme.primary),
   );
 }
 

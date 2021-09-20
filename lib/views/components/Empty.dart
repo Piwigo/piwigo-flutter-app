@@ -5,6 +5,6 @@ class Empty extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text('');
+    return SizedBox();
   }
 }

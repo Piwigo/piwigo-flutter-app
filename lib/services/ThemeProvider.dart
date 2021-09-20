@@ -10,27 +10,36 @@ ThemeData light = ThemeData(
   dialogBackgroundColor: Color(0xffeeeeee),
   bottomAppBarColor: Color(0xffeeeeee),
   focusColor: Color(0xffff7700),
-  accentColor: Color(0xffff7700),
   backgroundColor: Color(0xffffffff),
-  buttonColor: Color(0xcbff7700),
+  // buttonColor: Color(0xcbff7700),
   scaffoldBackgroundColor: Color(0xffeeeeee),
   cardColor: Color(0xffffffff),
   errorColor: Color(0xffff0e00),
   primaryColorLight: Color(0xffffffff),
   primaryColorDark: Color(0xff000000),
+  appBarTheme: AppBarTheme(
+    backgroundColor: Color(0xffeeeeee),
+    iconTheme: IconThemeData(
+      color: Color(0xffff7700),
+    ),
+    titleTextStyle: TextStyle(fontSize: 20.0, color: Color(0xff000000)),
+  ),
+  colorScheme: ColorScheme.light(
+    primary: Color(0xffff7700)
+  ),
 
   iconTheme: IconThemeData(
     color: Color(0xffff7700),
-  ),
-  accentIconTheme: IconThemeData(
-    color: Color(0xffffffff),
   ),
   floatingActionButtonTheme: FloatingActionButtonThemeData(
     backgroundColor: Color(0xbbff7000),
     foregroundColor: Color(0xffffffff),
   ),
   buttonTheme: ButtonThemeData(
-    buttonColor: Color(0xcbff7700),
+    colorScheme: ColorScheme.light(
+      primary: Color(0xffff7700),
+    ),
+    buttonColor: Color(0xffff7700),
   ),
   inputDecorationTheme: InputDecorationTheme(
     prefixStyle: TextStyle(color: Color(0xffff7700)),
@@ -57,6 +66,7 @@ ThemeData light = ThemeData(
     bodyText2: TextStyle(fontSize: 11.0, color: Color(0xff000000)),
   ),
 );
+
 ThemeData dark = ThemeData(
   brightness: Brightness.dark,
 
@@ -65,9 +75,9 @@ ThemeData dark = ThemeData(
   dialogBackgroundColor: Color(0xff2D2D2D),
   bottomAppBarColor: Color(0xff232323),
   focusColor: Color(0xffff7700),
-  accentColor: Color(0xffff7700),
+  // accentColor: Color(0xffff7700),
   backgroundColor: Color(0xff2D2D2D),
-  buttonColor: Color(0x30ff7700),
+  // buttonColor: Color(0x30ff7700),
   scaffoldBackgroundColor: Color(0xff232323),
   cardColor: Color(0xffffffff),
   errorColor: Color(0xffff0e00),
@@ -76,9 +86,6 @@ ThemeData dark = ThemeData(
 
   iconTheme: IconThemeData(
     color: Color(0xffff7700),
-  ),
-  accentIconTheme: IconThemeData(
-    color: Color(0xffffffff),
   ),
   floatingActionButtonTheme: FloatingActionButtonThemeData(
     backgroundColor: Color(0x30ff7700),
