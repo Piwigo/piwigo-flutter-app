@@ -142,7 +142,6 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
 
   @override
   Widget build(BuildContext context) {
-    ThemeData _theme = Theme.of(context);
     if(isPortrait(context)) {
       _pageController = PageController(viewportFraction: 7/8);
     } else {
@@ -151,7 +150,7 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
 
     return Scaffold(
       appBar: AppBar(
-        iconTheme: _theme.iconTheme,
+        iconTheme: Theme.of(context).iconTheme,
         leading: IconButton(
           onPressed: () {
             Navigator.of(context).pop();
@@ -186,7 +185,7 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
                 child: Padding(
                   padding: EdgeInsets.all(10),
                   child: Text(appStrings(context).imageCount(widget.imageData.length),
-                      style: TextStyle(fontSize: 20, color: _theme.textTheme.bodyText2.color)
+                      style: TextStyle(fontSize: 20, color: Theme.of(context).textTheme.bodyText2.color)
                   ),
                 ),
               ),
@@ -207,7 +206,7 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
                       children: [
                         ElevatedButton(
                           onPressed: addFiles,
-                          child: Icon(Icons.add_to_photos, color: _theme.accentColor,),
+                          child: Icon(Icons.add_to_photos, color: Theme.of(context).iconTheme.color),
                           style: ElevatedButton.styleFrom(
                             shape: CircleBorder(),
                             padding: EdgeInsets.all(10),
@@ -216,7 +215,7 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
                         ),
                         ElevatedButton(
                           onPressed: takePhoto,
-                          child: Icon(Icons.photo_camera_rounded, color: _theme.accentColor,),
+                          child: Icon(Icons.photo_camera_rounded, color: Theme.of(context).iconTheme.color),
                           style: ElevatedButton.styleFrom(
                             shape: CircleBorder(),
                             padding: EdgeInsets.all(10),
@@ -270,9 +269,9 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.only(topLeft: Radius.circular(15)),
                                       // shape: BoxShape.circle,
-                                      color: _theme.scaffoldBackgroundColor,
+                                      color: Theme.of(context).scaffoldBackgroundColor,
                                     ),
-                                    child: Icon(Icons.remove_circle_outline, color: _theme.errorColor),
+                                    child: Icon(Icons.remove_circle_outline, color: Theme.of(context).errorColor),
                                   ),
                                 )
                             ),
@@ -309,7 +308,7 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
                                     padding: EdgeInsets.all(5),
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(10),
-                                      color: _theme.inputDecorationTheme.fillColor,
+                                      color: Theme.of(context).inputDecorationTheme.fillColor,
                                     ),
                                     child: ClipRRect(
                                       borderRadius: BorderRadius.circular(7),
@@ -327,12 +326,12 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
                                           topRight: Radius.circular(10),
                                           bottomRight: Radius.circular(10),
                                         ),
-                                        color: _theme.inputDecorationTheme.fillColor,
+                                        color: Theme.of(context).inputDecorationTheme.fillColor,
                                       ),
                                       child: Column(
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
-                                          Text('${image.path.split('/').last}', style: _theme.textTheme.bodyText2, overflow: TextOverflow.fade),
+                                          Text('${image.path.split('/').last}', style: Theme.of(context).textTheme.bodyText2, overflow: TextOverflow.fade),
                                         ],
                                       ),
                                     ),
@@ -349,9 +348,9 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
                                     padding: EdgeInsets.all(3),
                                     decoration: BoxDecoration(
                                       shape: BoxShape.circle,
-                                      color: _theme.scaffoldBackgroundColor,
+                                      color: Theme.of(context).scaffoldBackgroundColor,
                                     ),
-                                    child: Icon(Icons.remove_circle_outline, color: _theme.errorColor),
+                                    child: Icon(Icons.remove_circle_outline, color: Theme.of(context).errorColor),
                                   ),
                                 )
                             ),
@@ -375,14 +374,14 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
                         child: Padding(
                           padding: EdgeInsets.all(10),
                           child: Text(appStrings(context).imageUploadDetailsEdit_title,
-                            style: _theme.textTheme.subtitle1,
+                            style: Theme.of(context).textTheme.subtitle1,
                           ),
                         ),
                       ),
                       Align(
                         alignment: Alignment.topLeft,
                         child: Text(appStrings(context).editImageDetails_title,
-                            style: _theme.textTheme.headline5
+                            style: Theme.of(context).textTheme.headline5
                         ),
                       ),
                       Padding(
@@ -395,7 +394,7 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
                       Align(
                         alignment: Alignment.topLeft,
                         child: Text(appStrings(context).editImageDetails_description,
-                            style: _theme.textTheme.headline5
+                            style: Theme.of(context).textTheme.headline5
                         ),
                       ),
                       Padding(
@@ -412,7 +411,7 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(appStrings(context).tagsAdd_title,
-                              style: _theme.textTheme.headline5
+                              style: Theme.of(context).textTheme.headline5
                           ),
                           IconButton(
                             tooltip: appStrings(context).tagsTitle_selectOne,
@@ -456,7 +455,7 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
                             if(index == 0) {
                               return tagItem(_tags[index], animation,
                                 borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
-                                border: Border(bottom: BorderSide(color: _theme.scaffoldBackgroundColor)),
+                                border: Border(bottom: BorderSide(color: Theme.of(context).scaffoldBackgroundColor)),
                               );
                             }
                             if(index == _tags.length-1) {
@@ -465,7 +464,7 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
                               );
                             }
                             return tagItem(_tags[index], animation,
-                              border: Border(bottom: BorderSide(color: _theme.scaffoldBackgroundColor)),
+                              border: Border(bottom: BorderSide(color: Theme.of(context).scaffoldBackgroundColor)),
                             );
                           },
                         ),
@@ -474,7 +473,7 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
                       Align(
                         alignment: Alignment.topLeft,
                         child: Text(appStrings(context).editImageDetails_privacyLevel,
-                            style: _theme.textTheme.headline5
+                            style: Theme.of(context).textTheme.headline5
                         ),
                       ),
                       Padding(
@@ -483,7 +482,7 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
                           padding: EdgeInsets.symmetric(horizontal: 10),
                           decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(10),
-                              color: _theme.inputDecorationTheme.fillColor
+                              color: Theme.of(context).inputDecorationTheme.fillColor
                           ),
                           child: DropdownButton<int>(
                             onTap: () {
@@ -531,8 +530,6 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
   }
 
   Widget tagItem(dynamic tag, Animation<double> animation, {BorderRadius borderRadius, Border border}) {
-    var _theme = Theme.of(context);
-
     return SizeTransition(
       axis: Axis.vertical,
       sizeFactor: animation,
@@ -549,7 +546,7 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('${tag['name']}', style: _theme.textTheme.subtitle1),
+              Text('${tag['name']}', style: Theme.of(context).textTheme.subtitle1),
               InkWell(
                 onTap: () async {
                   _listKey.currentState.removeItem(_tags.indexOf(tag), (context, animation) => tagItem(tag, animation));

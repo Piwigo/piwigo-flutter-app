@@ -25,26 +25,28 @@ class DialogButton extends StatelessWidget {
 }
 
 ButtonStyle dialogButtonStyle(context) {
-  var _theme = Theme.of(context);
   return ButtonStyle(
     shape: MaterialStateProperty.all<RoundedRectangleBorder>(
       RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
       ),
     ),
-    backgroundColor: MaterialStateProperty.all(_theme.colorScheme.primary),
+    backgroundColor: MaterialStateProperty.all(
+      Theme.of(context).colorScheme.primary
+    ),
   );
 }
 
 ButtonStyle dialogButtonStyleDisabled(context) {
-  var _theme = Theme.of(context);
   return ButtonStyle(
     shape: MaterialStateProperty.all<RoundedRectangleBorder>(
       RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
       ),
     ),
-    backgroundColor: MaterialStateProperty.all(_theme.disabledColor),
+    backgroundColor: MaterialStateProperty.all(
+      Theme.of(context).disabledColor
+    ),
   );
 }
 
@@ -78,14 +80,12 @@ class IconSwitch extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var _theme = Theme.of(context);
-
     return GestureDetector(
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
-          color: _theme.inputDecorationTheme.fillColor,
+          color: Theme.of(context).inputDecorationTheme.fillColor,
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -94,11 +94,11 @@ class IconSwitch extends StatelessWidget {
               padding: EdgeInsets.all(5),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
-                color: isOnLeft ? _theme.accentColor : Colors.transparent,
+                color: isOnLeft ? Theme.of(context).iconTheme.color : Colors.transparent,
                 boxShadow: _switchIconShadow(true),
               ),
               child: Icon(Icons.apps_rounded,
-                  color: isOnLeft ? Colors.white : _theme.iconTheme.color
+                  color: isOnLeft ? Colors.white : Theme.of(context).iconTheme.color
               ),
             ),
             SizedBox(width: 5),
@@ -106,11 +106,11 @@ class IconSwitch extends StatelessWidget {
               padding: EdgeInsets.all(5),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
-                color: isOnLeft ? Colors.transparent : _theme.accentColor,
+                color: isOnLeft ? Colors.transparent : Theme.of(context).iconTheme.color,
                 boxShadow: _switchIconShadow(false),
               ),
               child: Icon(Icons.description_rounded,
-                  color: isOnLeft ? _theme.iconTheme.color : Colors.white
+                  color: isOnLeft ? Theme.of(context).iconTheme.color : Colors.white
               ),
             ),
           ],
