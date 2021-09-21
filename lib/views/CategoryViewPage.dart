@@ -30,7 +30,6 @@ class CategoryViewPage extends StatefulWidget {
   @override
   _CategoryViewPageState createState() => _CategoryViewPageState();
 }
-
 class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerProviderStateMixin {
   bool _isEditMode;
   int _page;
@@ -90,11 +89,113 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
     _selectedItems.clear();
   }
 
-  Future<void> onRefresh() {
+  Future<void> _onRefresh() {
     setState(() {
       _page = 0;
     });
     return Future.delayed(Duration(milliseconds: 500));
+  }
+
+  void _onEditSelection() async {
+    showDialog(context: context,
+      builder: (BuildContext context) {
+        return EditImageSelectionDialog(
+          catId: int.parse(widget.category),
+          images: _selectedItems.values.toList(),
+        );
+      }
+    ).whenComplete(() {
+      setState(() {
+        _selectedItems.clear();
+        _isEditMode = false;
+      });
+    });
+  }
+  void _onDownloadSelection() async {
+    if (await confirmDownloadDialog(context,
+      content: appStrings(context)
+          .downloadImage_title(_selectedItems.length),
+    )) {
+      print('Download ${_selectedItems.keys.toList()}');
+
+      List<dynamic> selection = [];
+      selection.addAll(_selectedItems.values.toList());
+
+      setState(() {
+        _isEditMode = false;
+        _selectedItems.clear();
+      });
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(appStrings(context).downloadingImages(selection.length)),
+            CircularProgressIndicator(),
+          ],
+        ),
+      ));
+
+      await downloadImages(selection);
+    }
+  }
+  void _onMoveCopySelection() async {
+    await moveCategoryModalBottomSheet(context,
+      widget.category,
+      widget.title,
+      true,
+      (item) async {
+        int result = await confirmMoveAssignImage(context,
+          content: appStrings(context).moveImage_message(_selectedItems.length, "", item.name),
+        );
+        print(result);
+        if (result == 0) {
+          int nbMoved = await moveImages(context,
+            _selectedItems.values.toList(),
+            int.parse(item.id)
+          );
+          ScaffoldMessenger.of(context).showSnackBar(
+              imagesMovedSnackBar(context, nbMoved)
+          );
+          Navigator.of(context).pop();
+        } else if (result == 1) {
+          int nbAssigned = await assignImages(context,
+            _selectedItems.values.toList(),
+            int.parse(item.id)
+          );
+          ScaffoldMessenger.of(context).showSnackBar(
+              imagesAssignedSnackBar(context, nbAssigned)
+          );
+          Navigator.of(context).pop();
+        }
+      },
+    );
+    setState(() {
+      _isEditMode = false;
+      _selectedItems.clear();
+    });
+  }
+  void _onDeleteSelection() async {
+    if(await confirmDeleteDialog(context,
+      content: appStrings(context).deleteImageCount_title(_selectedItems.length),
+    )) {
+      print('Delete ${_selectedItems.keys}');
+
+      List<int> selection = [];
+      selection.addAll(_selectedItems.keys.toList());
+
+      setState(() {
+        _isEditMode = false;
+        _selectedItems.clear();
+      });
+
+      int nbSuccess = await deleteImages(context, selection);
+
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(appStrings(context).deleteImageSuccess_message(nbSuccess)),
+      ));
+      setState(() {});
+    }
   }
 
   handleAlbumSnapshot(AsyncSnapshot albumSnapshot, int nbImages) {
@@ -243,7 +344,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
       foregroundColor: _theme.floatingActionButtonTheme.foregroundColor,
       overlayColor: Colors.black,
       elevation: 5.0,
-      overlayOpacity: 0.3,
+      overlayOpacity: 0,
       shape: CircleBorder(),
       children: [
         SpeedDialChild(
@@ -333,14 +434,14 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
       notificationPredicate: (notification) {
         return notification.metrics.atEdge;
       },
-      onRefresh: onRefresh,
+      onRefresh: _onRefresh,
       child: SingleChildScrollView(
         child: Column(
           children: [
             albums.length > 0 ?
             GridView.builder(
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: isPortrait(context)? 1 : 2,
+                crossAxisCount: (MediaQuery.of(context).size.width/400).floor(),
                 mainAxisSpacing: 10,
                 crossAxisSpacing: 10,
                 childAspectRatio: albumGridAspectRatio(context),
@@ -351,14 +452,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
               physics: NeverScrollableScrollPhysics(),
               itemBuilder: (BuildContext context, int index) {
                 var album = albums[index];
-                if (isPortrait(context) || index%2 == 0) {
-                  return albumListItem(context, album, widget.isAdmin, (message) {
-                    setState(() {
-                      print('$message');
-                    });
-                  });
-                }
-                return albumListItemRight(context, album, widget.isAdmin, (message) {
+                return albumListItem(context, album, widget.isAdmin, (message) {
                   setState(() {
                     print('$message');
                   });
@@ -494,123 +588,23 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
     ThemeData _theme = Theme.of(context);
     return BottomNavigationBar(
       onTap: (index) async {
-        switch (index) {
-          case 0:
-            if(_selectedItems.length > 0) {
-              print('Edit: ${_selectedItems.keys}');
-              showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return EditImageSelectionDialog(
-                      catId: int.parse(widget.category),
-                      images: _selectedItems.values.toList(),
-                    );
-                  }
-              ).whenComplete(() {
-                print('Edited ${_selectedItems.length} images');
-                setState(() {
-                  _selectedItems.clear();
-                  _isEditMode = false;
-                });
-              });
-            }
-            break;
-          case 1:
-            if(_selectedItems.length > 0) {
-              if(await confirmDownloadDialog(context,
-                content: appStrings(context).downloadImage_title(_selectedItems.length),
-              )) {
-                print('Download ${_selectedItems.keys.toList()}');
-
-                List<dynamic> selection = [];
-                selection.addAll(_selectedItems.values.toList());
-
-                setState(() {
-                  _isEditMode = false;
-                  _selectedItems.clear();
-                });
-                ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                  content: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(appStrings(context).downloadingImages(selection.length)),
-                      CircularProgressIndicator(),
-                    ],
-                  ),
-                ));
-
-                await downloadImages(selection);
-              }
-            }
-            break;
-          case 2:
-            if(_selectedItems.length > 0) {
-              print('Move ${_selectedItems.keys}');
-              await moveCategoryModalBottomSheet(context,
-                widget.category,
-                widget.title,
-                true,
-                (item) async {
-                  int result = await confirmMoveAssignImage(context,
-                    content: appStrings(context).moveImage_message(_selectedItems.length, "", item.name),
-                  );
-                  print(result);
-                  if (result == 0) {
-                    print('Move selection to ${item.id}');
-                    int nbMoved = await moveImages(context,
-                      _selectedItems.values.toList(),
-                      int.parse(item.id)
-                    );
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      imagesMovedSnackBar(context, nbMoved)
-                    );
-                    Navigator.of(context).pop();
-                  } else if (result == 1) {
-                    print('Assign selection to ${item.id}');
-                    int nbAssigned = await assignImages(context,
-                      _selectedItems.values.toList(),
-                      int.parse(item.id)
-                    );
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      imagesAssignedSnackBar(context, nbAssigned)
-                    );
-                    Navigator.of(context).pop();
-                  }
-                },
-              );
-              setState(() {
-                _isEditMode = false;
-                _selectedItems.clear();
-              });
-            }
-            break;
-          case 3:
-            if(_selectedItems.length > 0) {
-              if(await confirmDeleteDialog(context,
-                content: appStrings(context).deleteImageCount_title(_selectedItems.length),
-              )) {
-                print('Delete ${_selectedItems.keys}');
-
-                List<int> selection = [];
-                selection.addAll(_selectedItems.keys.toList());
-
-                setState(() {
-                  _isEditMode = false;
-                  _selectedItems.clear();
-                });
-
-                int nbSuccess = await deleteImages(context, selection);
-
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                  content: Text(appStrings(context).deleteImageSuccess_message(nbSuccess)),
-                ));
-                setState(() {});
-              }
-            }
-            break;
-          default:
-            break;
+        if(_selectedItems.length > 0) {
+          switch (index) {
+            case 0:
+              _onEditSelection();
+              break;
+            case 1:
+              _onDownloadSelection();
+              break;
+            case 2:
+              _onMoveCopySelection();
+              break;
+            case 3:
+              _onDeleteSelection();
+              break;
+            default:
+              break;
+          }
         }
       },
       items: <BottomNavigationBarItem>[

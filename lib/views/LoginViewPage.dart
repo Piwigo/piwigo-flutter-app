@@ -2,6 +2,7 @@ import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter/gestures.dart';
+import 'package:flutter/services.dart';
 import 'dart:math';
 import 'package:piwigo_ng/api/API.dart';
 import 'package:piwigo_ng/api/SessionAPI.dart';
@@ -94,8 +95,6 @@ class _LoginViewPageState extends State<LoginViewPage> {
 
   @override
   void initState() {
-    super.initState();
-    //createDio();
     isLoggedIn = false;
     _isLoading = false;
     _validUrl = false;
@@ -116,11 +115,22 @@ class _LoginViewPageState extends State<LoginViewPage> {
     });
     getSharedPrefs();
     WidgetsBinding.instance.addPostFrameCallback((_) => createDio());
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+    ]);
+
+    super.initState();
   }
 
   @override
   void dispose() {
     urlController.dispose();
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeRight,
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
     super.dispose();
   }
 
@@ -165,7 +175,6 @@ class _LoginViewPageState extends State<LoginViewPage> {
         }
     );
   }
-
 
   @override
   Widget build(BuildContext context) {

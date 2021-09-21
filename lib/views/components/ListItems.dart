@@ -38,11 +38,11 @@ Widget albumListItem(BuildContext context, dynamic album, bool isAdmin, Function
         onRefresh('Closed children category');
       });
     },
-    child: Container(
-      // padding: EdgeInsets.only(top: 5, bottom: 5),
+    child: ClipRRect(
+      borderRadius: BorderRadius.circular(10),
       child: Slidable(
         enabled: isAdmin,
-        actionPane: SlidableBehindActionPane(),
+        actionPane: SlidableDrawerActionPane(),
         actionExtentRatio: 0.15,
         child: categoryListCard(context, album, isAdmin),
         secondaryActions: <Widget>[
@@ -95,37 +95,27 @@ Widget albumListItem(BuildContext context, dynamic album, bool isAdmin, Function
                 onRefresh('Moved ${album['name']} : $result');
               },
             ),
-          Container(
-            height: albumGridItemHeight(context),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.only(
-                bottomRight: Radius.circular(10),
-                topRight: Radius.circular(10),
-              ),
-              color: _theme.errorColor,
-            ),
-            child: IconSlideAction(
-              color: Colors.transparent,
-              iconWidget: Icon(Icons.delete, size: 38, color: _theme.accentIconTheme.color),
-              onTap: () async {
-                if (await confirmDeleteDialog(context,
-                  content: appStrings(context).deleteCategory_message(album["total_nb_images"], album["name"]),
-                )) {
-                  var result = await deleteCategory(album['id'].toString());
-                  if(result['stat'] == 'fail') {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                        errorSnackBar(context, result['result'])
-                    );
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                        albumDeletedSnackBar(context)
-                    );
-                    onRefresh('Deleted ${album['name']} : $result');
-                  }
+          IconSlideAction(
+            color: _theme.errorColor,
+            iconWidget: Icon(Icons.delete, size: 38, color: _theme.accentIconTheme.color),
+            onTap: () async {
+              if (await confirmDeleteDialog(context,
+                content: appStrings(context).deleteCategory_message(album["total_nb_images"], album["name"]),
+              )) {
+                var result = await deleteCategory(album['id'].toString());
+                if(result['stat'] == 'fail') {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                      errorSnackBar(context, result['result'])
+                  );
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                      albumDeletedSnackBar(context)
+                  );
+                  onRefresh('Deleted ${album['name']} : $result');
                 }
-              },
-              closeOnTap: true,
-            ),
+              }
+            },
+            closeOnTap: true,
           ),
         ],
       ),
@@ -366,26 +356,28 @@ Widget albumInfo(BuildContext context, album) {
   );
 }
 Widget albumThumbnail(BuildContext context, album, {BorderRadius borderRadius = BorderRadius.zero}) {
-  return Container(
-    decoration: BoxDecoration(
-      border: Border.all(width: 0, color: Theme.of(context).backgroundColor),
-      color: Theme.of(context).backgroundColor,
-      borderRadius: borderRadius,
-    ),
-    padding: EdgeInsets.all(5),
-    height: albumGridItemHeight(context),
-    width: albumGridItemHeight(context),
-    child: album["tn_url"] == null ?
-    Icon(Icons.image_not_supported_outlined, size: 50)
-        :
-    ClipRRect(
-      borderRadius: BorderRadius.circular(7.0),
-      child: Image.network(
-        album["tn_url"],
-        fit: BoxFit.cover,
+  return LayoutBuilder(builder: (context, layout) {
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(width: 0, color: Theme.of(context).backgroundColor),
+        color: Theme.of(context).backgroundColor,
+        borderRadius: borderRadius,
       ),
-    ),
-  );
+      padding: EdgeInsets.all(5),
+      height: layout.maxHeight,// albumGridItemHeight(context),
+      width: layout.maxHeight,// albumGridItemHeight(context),
+      child: album["tn_url"] == null ?
+      Icon(Icons.image_not_supported_outlined, size: 50)
+          :
+      ClipRRect(
+        borderRadius: BorderRadius.circular(7.0),
+        child: Image.network(
+          album["tn_url"],
+          fit: BoxFit.cover,
+        ),
+      ),
+    );
+  });
 }
 Widget albumItemSeparator(BuildContext context) {
   return Container(

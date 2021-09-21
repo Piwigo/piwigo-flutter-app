@@ -74,6 +74,18 @@ class _ImageViewPageState extends State<ImageViewPage> {
     }
   }
 
+  void _onEditImage() async {
+    showDialog(context: context,
+      builder: (BuildContext context) {
+        return EditImageSelectionDialog(
+          catId: int.parse(widget.category),
+          images: [images[_page]],
+        );
+      }
+    ).whenComplete(() {
+      setState(() {});
+    });
+  }
   void _onDownloadImage() async {
     if(await confirmDownloadDialog(context,
       content: appStrings(context).downloadImage_confirmation(1),
@@ -93,7 +105,6 @@ class _ImageViewPageState extends State<ImageViewPage> {
       await downloadSingleImage(images[_page]);
     }
   }
-
   void _onMoveCopyImage() async {
     await moveCategoryModalBottomSheet(context,
       widget.category,
@@ -132,7 +143,6 @@ class _ImageViewPageState extends State<ImageViewPage> {
       },
     );
   }
-
   void _onDeleteImage() async {
     if(await confirmDeleteDialog(context,
       content: appStrings(context).deleteImage_message(1),
@@ -302,25 +312,15 @@ class _ImageViewPageState extends State<ImageViewPage> {
       onTap: (index) async {
         switch (index) {
           case 0:
-            _onDownloadImage();
+            _onEditImage();
             break;
           case 1:
+            _onDownloadImage();
+            break;
+          case 2:
             _onMoveCopyImage();
             break;
-        /*
-            case 2:
-              print('Attach $_page');
-              await moveCategoryModalBottomSheet(context,
-                widget.category,
-                widget.title,
-                true,
-                (item) async {
-                  // TODO: implement Attach function
-                },
-              );
-              break;
-               */
-          case 2: // TODO: change to 3 if implemented Attach function
+          case 3:
             _onDeleteImage();
             break;
           default:
@@ -328,6 +328,10 @@ class _ImageViewPageState extends State<ImageViewPage> {
         }
       },
       items: <BottomNavigationBarItem>[
+        BottomNavigationBarItem(
+          icon: Icon(Icons.edit, color: Theme.of(context).iconTheme.color),
+          label: appStrings(context).imageOptions_edit,
+        ),
         BottomNavigationBarItem(
           icon: Icon(Icons.download_rounded, color: Theme.of(context).iconTheme.color),
           label: appStrings(context).imageOptions_download,

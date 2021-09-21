@@ -17,13 +17,15 @@ class PiwigoDialog extends StatelessWidget {
   final Widget content;
   final double width;
 
+  double _getWidth(context) {
+    if(isPortrait(context)) {
+      return MediaQuery.of(context).size.width*3/4;
+    }
+    return MediaQuery.of(context).size.height*3/4;
+  }
+
   @override
   Widget build(BuildContext context) {
-    ThemeData _theme = Theme.of(context);
-    Size _screenSize = MediaQuery.of(context).size;
-
-    double _width = width?? _screenSize.width*3/4;
-
     return Dialog(
       backgroundColor: Colors.transparent,
       insetPadding: EdgeInsets.all(10),
@@ -35,9 +37,9 @@ class PiwigoDialog extends StatelessWidget {
               padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               decoration: ShapeDecoration(
                   shape: DialogBackgroundShape(radius: 25),
-                  color: _theme.scaffoldBackgroundColor
+                  color: Theme.of(context).scaffoldBackgroundColor
               ),
-              width: _width,
+              width: width ?? _getWidth(context),
               child: SingleChildScrollView(
                 child: Column(
                   children: [
@@ -78,8 +80,6 @@ class DialogHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    ThemeData _theme = Theme.of(context);
-
     return Stack(
       children: [
         /*
@@ -90,7 +90,7 @@ class DialogHeader extends StatelessWidget {
               Navigator.of(context).pop();
             },
             child: CircleAvatar(
-              child: Icon(Icons.cancel, color: _theme.errorColor),
+              child: Icon(Icons.cancel, color: Theme.of(context.errorColor),
               backgroundColor: Colors.transparent,
             ),
           ),
@@ -99,7 +99,7 @@ class DialogHeader extends StatelessWidget {
         Container(
           padding: EdgeInsets.all(5.0),
           alignment: Alignment.center,
-          child: Text(title, style: _theme.textTheme.headline4),
+          child: Text(title, style: Theme.of(context).textTheme.headline4),
         ),
       ],
     );
@@ -213,8 +213,6 @@ class ConfirmDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    ThemeData _theme = Theme.of(context);
-
     return WillPopScope(
       child: AlertDialog(
         contentPadding: EdgeInsets.all(10.0),
@@ -223,7 +221,7 @@ class ConfirmDialog extends StatelessWidget {
           // padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(20),
-            color: _theme.scaffoldBackgroundColor,
+            color: Theme.of(context).scaffoldBackgroundColor,
           ),
           child: SingleChildScrollView(
             child: Column(
@@ -292,10 +290,7 @@ class MultiConfirmDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    ThemeData _theme = Theme.of(context);
-
     List<Widget> actionsRow = [];
-
     actions.forEach((action) {
       actionsRow.add(Expanded(
         child: Container(
@@ -316,7 +311,7 @@ class MultiConfirmDialog extends StatelessWidget {
           // padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(20),
-            color: _theme.scaffoldBackgroundColor,
+            color: Theme.of(context).scaffoldBackgroundColor,
           ),
           child: SingleChildScrollView(
             child: Column(
@@ -431,7 +426,6 @@ class _CreateCategoryDialogState extends State<CreateCategoryDialog> {
 
   @override
   Widget build(BuildContext context) {
-    ThemeData _theme = Theme.of(context);
     return PiwigoDialog(
       title: appStrings(context).createNewAlbum_title,
       content: Form(
@@ -440,7 +434,7 @@ class _CreateCategoryDialogState extends State<CreateCategoryDialog> {
           children: <Widget>[
             Center(
               child: Text(appStrings(context).createNewAlbum_message,
-                style: _theme.textTheme.subtitle1,
+                style: Theme.of(context).textTheme.subtitle1,
               ),
             ),
             isPortrait(context) ?
@@ -578,8 +572,6 @@ class _EditCategoryDialogState extends State<EditCategoryDialog> {
 
   @override
   Widget build(BuildContext context) {
-    ThemeData _theme = Theme.of(context);
-
     return PiwigoDialog(
       title: appStrings(context).renameCategory_title,
       content: Form(
@@ -588,7 +580,7 @@ class _EditCategoryDialogState extends State<EditCategoryDialog> {
           children: <Widget>[
             Center(
               child: Text(appStrings(context).renameCategory_message,
-                style: _theme.textTheme.subtitle1,
+                style: Theme.of(context).textTheme.subtitle1,
               ),
             ),
             isPortrait(context) ?
@@ -730,8 +722,7 @@ class _EditImageSelectionDialogState extends State<EditImageSelectionDialog> {
       }
     }
   }
-
-  onRemoveImage() async {
+  void onRemoveImage() async {
     if(await confirmRemoveSelectionDialog(context,
       content: appStrings(context).removeSelectedImage_message,
     )) {
@@ -749,9 +740,15 @@ class _EditImageSelectionDialogState extends State<EditImageSelectionDialog> {
     }
   }
 
+  double _getWidth() {
+    if(isPortrait(context)) {
+      return MediaQuery.of(context).size.width*7/8;
+    }
+    return MediaQuery.of(context).size.height*7/8;
+  }
+
   @override
   Widget build(BuildContext context) {
-    ThemeData _theme = Theme.of(context);
     Size _screenSize = MediaQuery.of(context).size;
     if(isPortrait(context)) {
       _pageController = PageController(viewportFraction: 7/8);
@@ -761,7 +758,7 @@ class _EditImageSelectionDialogState extends State<EditImageSelectionDialog> {
 
     return PiwigoDialog(
       title: appStrings(context).imageOptions_edit,
-      width: _screenSize.width*7/8,
+      width: _getWidth(),
       content: Form(
         key: _formKey,
         child: Column(
@@ -790,9 +787,9 @@ class _EditImageSelectionDialogState extends State<EditImageSelectionDialog> {
                             decoration: BoxDecoration(
                               shape: BoxShape.rectangle,
                               borderRadius: BorderRadius.circular(5),
-                              color: _theme.inputDecorationTheme.fillColor,
+                              color: Theme.of(context.inputDecorationTheme.fillColor,
                             ),
-                            child: FaIcon(FontAwesomeIcons.solidEdit, color: _theme.inputDecorationTheme.fillColor),
+                            child: FaIcon(FontAwesomeIcons.solidEdit, color: Theme.of(context.inputDecorationTheme.fillColor),
                           ),
                         ),*/
                         Padding(
@@ -806,7 +803,7 @@ class _EditImageSelectionDialogState extends State<EditImageSelectionDialog> {
                                 padding: EdgeInsets.all(5),
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(10),
-                                  color: _theme.inputDecorationTheme.fillColor,
+                                  color: Theme.of(context).inputDecorationTheme.fillColor,
                                 ),
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(7),
@@ -822,13 +819,13 @@ class _EditImageSelectionDialogState extends State<EditImageSelectionDialog> {
                                       topRight: Radius.circular(10),
                                       bottomRight: Radius.circular(10),
                                     ),
-                                    color: _theme.inputDecorationTheme.fillColor,
+                                    color: Theme.of(context).inputDecorationTheme.fillColor,
                                   ),
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      Text('${image['file']}', style: _theme.textTheme.bodyText2, overflow: TextOverflow.fade),
-                                      Text('${image['date_creation']}', style: _theme.textTheme.bodyText2, overflow: TextOverflow.fade),
+                                      Text('${image['file']}', style: Theme.of(context).textTheme.bodyText2, overflow: TextOverflow.fade),
+                                      // Text('${image['date_creation']}', style: Theme.of(context.textTheme.bodyText2, overflow: TextOverflow.fade),
                                     ],
                                   ),
                                 ),
@@ -845,9 +842,9 @@ class _EditImageSelectionDialogState extends State<EditImageSelectionDialog> {
                                 padding: EdgeInsets.all(3),
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  color: _theme.scaffoldBackgroundColor,
+                                  color: Theme.of(context).scaffoldBackgroundColor,
                                 ),
-                                child: Icon(Icons.remove_circle_outline, color: _theme.errorColor),
+                                child: Icon(Icons.remove_circle_outline, color: Theme.of(context).errorColor),
                               ),
                             )
                         ),
@@ -869,7 +866,7 @@ class _EditImageSelectionDialogState extends State<EditImageSelectionDialog> {
                             },
                             child: Container(
                               padding: EdgeInsets.all(3),
-                              child: FaIcon(FontAwesomeIcons.solidEdit, color: _theme.iconTheme.color, size: 20),
+                              child: FaIcon(FontAwesomeIcons.solidEdit, color: Theme.of(context.iconTheme.color, size: 20),
                             ),
                           ),
                         ),
@@ -886,7 +883,7 @@ class _EditImageSelectionDialogState extends State<EditImageSelectionDialog> {
             Align(
               alignment: Alignment.topLeft,
               child: Text(appStrings(context).editImageDetails_title,
-                  style: _theme.textTheme.headline5
+                  style: Theme.of(context).textTheme.headline5
               ),
             ),
             Padding(
@@ -899,7 +896,7 @@ class _EditImageSelectionDialogState extends State<EditImageSelectionDialog> {
             Align(
               alignment: Alignment.topLeft,
               child: Text(appStrings(context).editImageDetails_description,
-                style: _theme.textTheme.headline5
+                style: Theme.of(context).textTheme.headline5
               ),
             ),
             Padding(
@@ -916,7 +913,7 @@ class _EditImageSelectionDialogState extends State<EditImageSelectionDialog> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(appStrings(context).tagsAdd_title,
-                  style: _theme.textTheme.headline5
+                  style: Theme.of(context).textTheme.headline5
                 ),
                 IconButton(
                   tooltip: appStrings(context).tagsTitle_selectOne,
@@ -960,7 +957,7 @@ class _EditImageSelectionDialogState extends State<EditImageSelectionDialog> {
                   if(index == 0) {
                     return tagItem(_tags[index], animation,
                       borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
-                      border: Border(bottom: BorderSide(color: _theme.scaffoldBackgroundColor)),
+                      border: Border(bottom: BorderSide(color: Theme.of(context).scaffoldBackgroundColor)),
                     );
                   }
                   if(index == _tags.length-1) {
@@ -969,7 +966,7 @@ class _EditImageSelectionDialogState extends State<EditImageSelectionDialog> {
                     );
                   }
                   return tagItem(_tags[index], animation,
-                    border: Border(bottom: BorderSide(color: _theme.scaffoldBackgroundColor)),
+                    border: Border(bottom: BorderSide(color: Theme.of(context).scaffoldBackgroundColor)),
                   );
                 },
               ),
@@ -978,7 +975,7 @@ class _EditImageSelectionDialogState extends State<EditImageSelectionDialog> {
             Align(
               alignment: Alignment.topLeft,
               child: Text(appStrings(context).editImageDetails_privacyLevel,
-                style: _theme.textTheme.headline5
+                style: Theme.of(context).textTheme.headline5
               ),
             ),
             Padding(
@@ -987,7 +984,7 @@ class _EditImageSelectionDialogState extends State<EditImageSelectionDialog> {
                 padding: EdgeInsets.symmetric(horizontal: 10),
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
-                    color: _theme.inputDecorationTheme.fillColor
+                    color: Theme.of(context).inputDecorationTheme.fillColor
                 ),
                 child: DropdownButton<int>(
                   onTap: () {
@@ -1028,8 +1025,6 @@ class _EditImageSelectionDialogState extends State<EditImageSelectionDialog> {
   }
 
   Widget tagItem(dynamic tag, Animation<double> animation, {BorderRadius borderRadius, Border border}) {
-    var _theme = Theme.of(context);
-
     return SizeTransition(
       axis: Axis.vertical,
       sizeFactor: animation,
@@ -1046,7 +1041,7 @@ class _EditImageSelectionDialogState extends State<EditImageSelectionDialog> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('${tag['name']}', style: _theme.textTheme.subtitle1),
+              Text('${tag['name']}', style: Theme.of(context).textTheme.subtitle1),
               InkWell(
                 onTap: () async {
                   _listKey.currentState.removeItem(_tags.indexOf(tag), (context, animation) => tagItem(tag, animation));
@@ -1102,7 +1097,6 @@ class _SelectTagDialogState extends State<SelectTagDialog> {
 
   @override
   Widget build(BuildContext context) {
-    ThemeData _theme = Theme.of(context);
     Size _screenSize = MediaQuery.of(context).size;
     return PiwigoDialog(
       title: appStrings(context).tags,
@@ -1128,7 +1122,7 @@ class _SelectTagDialogState extends State<SelectTagDialog> {
                       alignment: Alignment.topLeft,
                       padding: EdgeInsets.all(5),
                       child: Text(appStrings(context).tagsHeader_selected,
-                        style: _theme.textTheme.headline5
+                        style: Theme.of(context).textTheme.headline5
                       ),
                     ),
                     Padding(
@@ -1140,7 +1134,7 @@ class _SelectTagDialogState extends State<SelectTagDialog> {
                         itemBuilder: (BuildContext context, int index) {
                           if(_selectedTags.length == 0) return Container();
                           Icon icon = Icon(Icons.remove_circle_outline, color: Colors.red);
-                          Border border = Border(bottom: BorderSide(color: _theme.scaffoldBackgroundColor));
+                          Border border = Border(bottom: BorderSide(color: Theme.of(context).scaffoldBackgroundColor));
                           Function() onTap = () {
                             setState(() {
                               if(isSelected(_selectedTags[index])) _selectedTags.remove(_selectedTags[index]);
@@ -1179,7 +1173,7 @@ class _SelectTagDialogState extends State<SelectTagDialog> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(appStrings(context).tagsHeader_notSelected,
-                            style: _theme.textTheme.headline5
+                            style: Theme.of(context).textTheme.headline5
                           ),
                           SizedBox(width: 5),
                           InkWell(
@@ -1209,7 +1203,7 @@ class _SelectTagDialogState extends State<SelectTagDialog> {
                         itemBuilder: (BuildContext context, int index) {
                           if(tags.length == 0) return Container();
                           Icon icon = Icon(Icons.add_circle_outline, color: Colors.green);
-                          Border border = Border(bottom: BorderSide(color: _theme.scaffoldBackgroundColor));
+                          Border border = Border(bottom: BorderSide(color: Theme.of(context).scaffoldBackgroundColor));
                           Function() onTap = () {
                             setState(() {
                               if(!isSelected(tags[index])) _selectedTags.add(tags[index]);
@@ -1275,8 +1269,6 @@ class _SelectTagDialogState extends State<SelectTagDialog> {
   }
 
   Widget tagItem(dynamic tag, Icon icon, {Function() onTap, BorderRadius borderRadius, Border border}) {
-    var _theme = Theme.of(context);
-
     return Container(
       decoration: BoxDecoration(
         borderRadius: borderRadius ?? BorderRadius.zero,
@@ -1293,7 +1285,7 @@ class _SelectTagDialogState extends State<SelectTagDialog> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('${tag['name']}', style: _theme.textTheme.subtitle1),
+              Text('${tag['name']}', style: Theme.of(context).textTheme.subtitle1),
               icon,
             ],
           ),
@@ -1361,7 +1353,6 @@ class _CreateTagDialogState extends State<CreateTagDialog> {
 
   @override
   Widget build(BuildContext context) {
-    var _theme = Theme.of(context);
     return PiwigoDialog(
       title: appStrings(context).tagsAdd_title,
       content: Form(
@@ -1370,7 +1361,7 @@ class _CreateTagDialogState extends State<CreateTagDialog> {
           children: <Widget>[
             Center(
               child: Text(appStrings(context).tagsAdd_message,
-                style: _theme.textTheme.subtitle1,
+                style: Theme.of(context).textTheme.subtitle1,
               ),
             ),
             Padding(
@@ -1464,8 +1455,6 @@ class _RenameImageDialogState extends State<RenameImageDialog> {
 
   @override
   Widget build(BuildContext context) {
-    var _theme = Theme.of(context);
-
     return PiwigoDialog(
       title: appStrings(context).renameImage_title,
       content: Form(
@@ -1474,7 +1463,7 @@ class _RenameImageDialogState extends State<RenameImageDialog> {
           children: <Widget>[
             Center(
               child: Text(appStrings(context).renameImage_message(widget.imageName),
-                style: _theme.textTheme.subtitle1,
+                style: Theme.of(context).textTheme.subtitle1,
               ),
             ),
             Padding(
@@ -1515,11 +1504,10 @@ class ErrorDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var _theme = Theme.of(context);
     return PiwigoDialog(
       title: errorTitle ?? appStrings(context).errorHUD_label,
       content: Center(
-        child: Text(errorMessage, style: _theme.textTheme.subtitle1),
+        child: Text(errorMessage, style: Theme.of(context).textTheme.subtitle1),
       ),
     );
   }

@@ -22,7 +22,6 @@ class RootCategoryViewPage extends StatefulWidget {
   @override
   _RootCategoryViewPageState createState() => _RootCategoryViewPageState();
 }
-
 class _RootCategoryViewPageState extends State<RootCategoryViewPage> with SingleTickerProviderStateMixin {
   String _rootCategory;
   TextEditingController _searchController = TextEditingController();
@@ -92,7 +91,7 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
                         children: [
                           GridView.builder(
                             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: isPortrait(context)? 1 : 2,
+                              crossAxisCount: (MediaQuery.of(context).size.width/400).floor(),
                               mainAxisSpacing: 10,
                               crossAxisSpacing: 10,
                               childAspectRatio: albumGridAspectRatio(context),
@@ -103,14 +102,7 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
                             physics: NeverScrollableScrollPhysics(),
                             itemBuilder: (BuildContext context, int index) {
                               var album = albums[index];
-                              if (isPortrait(context) || index%2 == 0) {
-                                return albumListItem(context, album, widget.isAdmin, (message) {
-                                  setState(() {
-                                    print('$message');
-                                  });
-                                });
-                              }
-                              return albumListItemRight(context, album, widget.isAdmin, (message) {
+                              return albumListItem(context, album, widget.isAdmin, (message) {
                                 setState(() {
                                   print('$message');
                                 });

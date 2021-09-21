@@ -32,7 +32,7 @@ ThemeData light = ThemeData(
     color: Color(0xffff7700),
   ),
   floatingActionButtonTheme: FloatingActionButtonThemeData(
-    backgroundColor: Color(0xbbff7000),
+    backgroundColor: Color(0xffff7000),
     foregroundColor: Color(0xffffffff),
   ),
   buttonTheme: ButtonThemeData(
