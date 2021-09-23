@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:piwigo_ng/api/CategoryAPI.dart';
 import 'package:piwigo_ng/model/CategoryModel.dart';
+import 'package:piwigo_ng/views/components/Buttons.dart';
 
 void addCatRecursive(List<int> rank, CategoryModel cat, CategoryModel inputCat) {
   if(rank.length > 1) {
@@ -159,5 +160,127 @@ Widget categoryChildrenList(List<CategoryModel> nodes, String catId, String catN
       },
     ),
   );
+}
+
+
+class TreeViewNode extends StatefulWidget {
+  const TreeViewNode({
+    Key key,
+    this.node,
+    this.catId = "0",
+    this.catName = "",
+    this.isImage = false,
+    this.isRoot = false,
+    this.onSelected,
+    this.indentIndex = 0,
+  }) : super(key: key);
+
+  final CategoryModel node;
+  final String catId;
+  final String catName;
+  final bool isImage;
+  final bool isRoot;
+  final Function(CategoryModel) onSelected;
+  final int indentIndex;
+
+  @override
+  _TreeViewNodeState createState() => _TreeViewNodeState();
+}
+class _TreeViewNodeState extends State<TreeViewNode> {
+  bool _isExpanded = false;
+
+  bool _isActualCategory() {
+    return widget.node.children.map((e) => e.id).contains(widget.catId);
+  }
+  bool _isTappable() {
+    if(widget.isImage) {
+      return !widget.isRoot && widget.node.id != widget.catId;
+    }
+    return !_isActualCategory();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        GestureDetector(
+          onTap: _isTappable() ? () {
+              widget.onSelected(widget.node);
+            } : null,
+          child: Container(
+            width: double.infinity,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Container(
+                    padding: EdgeInsets.symmetric(
+                        horizontal: 10 + widget.indentIndex * 10.0,
+                        vertical: 10
+                    ),
+                    child: Text('${widget.node.name}',
+                        overflow: TextOverflow.fade,
+                        softWrap: false,
+                        style: TextStyle(fontSize: 16,
+                          color: _isTappable() ?
+                          Colors.black : Theme.of(context).disabledColor,
+                        )),
+                  ),
+                ),
+                widget.node.children.length > 0 ? InkWell(
+                  onTap: () {
+                    setState(() {
+                      _isExpanded = !_isExpanded;
+                    });
+                  },
+                  child: Row(
+                    children: [
+                      Text('${widget.node.children.length}...', style: TextStyle(fontSize: 16,
+                        color: Theme.of(context).iconTheme.color,
+                      )),
+                      Container(
+                        padding: EdgeInsets.only(right: 10, top: 10, bottom: 10),
+                        child: AnimatedIconButton(
+                          Icon(Icons.keyboard_arrow_right),
+                          isActive: _isExpanded,
+                        ),
+                      ),
+                    ],
+                  ),
+                ) : SizedBox(),
+              ],
+            ),
+          ),
+        ),
+        widget.node.children.length > 0 && _isExpanded ? Divider(
+          indent: 10.0,
+          endIndent: 0.0,
+          height: 1.0,
+        ) : SizedBox(),
+        ListView.separated(
+            itemCount: _isExpanded ? widget.node.children.length : 0,
+            physics: NeverScrollableScrollPhysics(),
+            shrinkWrap: true,
+            itemBuilder: (context, index) {
+              return TreeViewNode(
+                node: widget.node.children[index],
+                catId: widget.catId,
+                catName: widget.catName,
+                isImage: widget.isImage,
+                onSelected: widget.onSelected,
+                indentIndex: widget.indentIndex+1,
+              );
+            },
+          separatorBuilder: (context, index) {
+            return index == widget.node.children.length-1 ? SizedBox() : Divider(
+              indent: 10.0,
+              endIndent: 0.0,
+              height: 1.0,
+            );
+          },
+        ),
+      ],
+    );
+  }
 }
 

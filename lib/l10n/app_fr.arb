@@ -460,8 +460,8 @@
             "photo": {}
         }
     },
-    "copImage_message": "{count, plural, =1{Êtes-vous certain de vouloir copier la photo {photo} dans l’album {album} ?} other{Êtes-vous certain de vouloir copier les photos dans l’album {album} ?}}",
-    "@copImage_message": {
+    "copyImage_message": "{count, plural, =1{Êtes-vous certain de vouloir copier la photo {photo} dans l’album {album} ?} other{Êtes-vous certain de vouloir copier les photos dans l’album {album} ?}}",
+    "@copyImage_message": {
         "placeholders": {
             "count": {},
             "photo": {},

@@ -16,6 +16,8 @@
     "alertClearButton": "Clear",
     "alertConfirmButton": "Confirm",
     "alertRemoveButton": "Remove",
+    "alertMoveButton": "Move",
+    "alertCopyButton": "Copy",
 
     "loadingHUD_label": "Loading…",
     "completeHUD_label": "Complete",
@@ -537,6 +539,12 @@
     "videoSaveError_title": "Fail Saving Video",
     "videoSaveError_message": "Failed to save video",
 
+    "moveOrCopyImage_title": "{count, plural, =1{Do you want to move or copy this image ?} other{Do you want to move or copy {count} images ?}}",
+    "@moveOrCopyImage_title": {
+        "placeholders": {
+            "count": {}
+        }
+    },
 
     "moveImage_title": "Move to Album",
     "moveImage_selectAlbum": "{count, plural, =1{Please, select the album in which you wish to move the photo {photo}.} other{Please, select the album in which you wish to move the photos.}}",
@@ -583,8 +591,8 @@
             "photo": {}
         }
     },
-    "copImage_message": "{count, plural, =1{Are you sure you want to copy the photo {photo} to the album {album} ?} other{Are you sure you want to copy the photos to the album {album} ?}}",
-    "@copImage_message": {
+    "copyImage_message": "{count, plural, =1{Are you sure you want to copy the photo {photo} to the album {album} ?} other{Are you sure you want to copy the photos to the album {album} ?}}",
+    "@copyImage_message": {
         "placeholders": {
             "count": {},
             "photo": {},
@@ -597,7 +605,7 @@
             "count": {}
         }
     },
-    "copyImageHUD_copied": "{count, plural, =1{Photo Assigned} other{Photos Assigned}}",
+    "copyImageHUD_copied": "{count, plural, =1{Photo Copied} other{Photos Copied}}",
     "@copyImageHUD_copied": {
         "placeholders": {
             "count": {}

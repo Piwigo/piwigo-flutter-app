@@ -140,40 +140,71 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
     }
   }
   void _onMoveCopySelection() async {
-    await moveCategoryModalBottomSheet(context,
-      widget.category,
-      widget.title,
-      true,
-      (item) async {
-        int result = await confirmMoveAssignImage(context,
-          content: appStrings(context).moveImage_message(_selectedItems.length, "", item.name),
-        );
-        print(result);
-        if (result == 0) {
-          int nbMoved = await moveImages(context,
-            _selectedItems.values.toList(),
-            int.parse(item.id)
-          );
-          ScaffoldMessenger.of(context).showSnackBar(
-              imagesMovedSnackBar(context, nbMoved)
-          );
-          Navigator.of(context).pop();
-        } else if (result == 1) {
-          int nbAssigned = await assignImages(context,
-            _selectedItems.values.toList(),
-            int.parse(item.id)
-          );
-          ScaffoldMessenger.of(context).showSnackBar(
-              imagesAssignedSnackBar(context, nbAssigned)
-          );
-          Navigator.of(context).pop();
-        }
-      },
+    int choice = await chooseMoveCopyImage(context,
+      content: appStrings(context).moveOrCopyImage_title(_selectedItems.length)
     );
-    setState(() {
-      _isEditMode = false;
-      _selectedItems.clear();
-    });
+
+    switch(choice) {
+      case 0: showDialog(context: context,
+          builder: (context) {
+            return MoveOrCopyDialog(
+              title: appStrings(context).moveImage_title,
+              subtitle: appStrings(context).moveImage_selectAlbum(_selectedItems.length, ''),
+              catId: widget.category,
+              catName: widget.title,
+              isImage: true,
+              onSelected: (item) async {
+                if( await confirmMoveImage(context,
+                  content: appStrings(context).moveImage_message(_selectedItems.length, "", item.name),
+                )) {
+                  int nbMoved = await moveImages(context,
+                      _selectedItems.values.toList(),
+                      int.parse(item.id)
+                  );
+                  ScaffoldMessenger.of(context).showSnackBar(imagesMovedSnackBar(context, nbMoved));
+                  Navigator.of(context).pop();
+                }
+              },
+            );
+          }
+        ).whenComplete(() {
+          setState(() {
+            _selectedItems.clear();
+            _isEditMode = false;
+          });
+        });
+        break;
+      case 1: showDialog(context: context,
+          builder: (context) {
+            return MoveOrCopyDialog(
+              title: appStrings(context).copyImage_title,
+              subtitle: appStrings(context).copyImage_selectAlbum(_selectedItems.length, ''),
+              catId: widget.category,
+              catName: widget.title,
+              isImage: true,
+              onSelected: (item) async {
+                if( await confirmAssignImage(context,
+                  content: appStrings(context).copyImage_message(_selectedItems.length, "", item.name),
+                )) {
+                  int nbCopied = await assignImages(context,
+                      _selectedItems.values.toList(),
+                      int.parse(item.id)
+                  );
+                  ScaffoldMessenger.of(context).showSnackBar(imagesAssignedSnackBar(context, nbCopied));
+                  Navigator.of(context).pop();
+                }
+              },
+            );
+          }
+        ).whenComplete(() {
+          setState(() {
+            _selectedItems.clear();
+            _isEditMode = false;
+          });
+        });
+        break;
+      default: break;
+    }
   }
   void _onDeleteSelection() async {
     if(await confirmDeleteDialog(context,

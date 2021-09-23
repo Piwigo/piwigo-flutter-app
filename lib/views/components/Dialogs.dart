@@ -1,8 +1,11 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:piwigo_ng/api/CategoryAPI.dart';
 import 'package:piwigo_ng/api/ImageAPI.dart';
 import 'package:piwigo_ng/api/TagAPI.dart';
 import 'package:piwigo_ng/constants/SettingsConstants.dart';
+import 'package:piwigo_ng/model/CategoryModel.dart';
+import 'package:piwigo_ng/services/MoveAlbumService.dart';
 import 'package:piwigo_ng/services/OrientationService.dart';
 import 'package:piwigo_ng/views/components/Buttons.dart';
 import 'package:piwigo_ng/views/components/TextFields.dart';
@@ -10,12 +13,317 @@ import 'package:piwigo_ng/views/components/TextFields.dart';
 import 'CustomShapes.dart';
 import 'SnackBars.dart';
 
+class ConfirmDialog extends StatelessWidget {
+  const ConfirmDialog({Key key, this.content, this.yes, this.no, this.yesColor}) : super(key: key);
+  final String content;
+  final Text yes;
+  final Text no;
+  final Color yesColor;
+
+  double _getWidth(context) {
+    if(isPortrait(context)) {
+      return MediaQuery.of(context).size.width/2;
+    }
+    return MediaQuery.of(context).size.height/2;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return WillPopScope(
+      child: AlertDialog(
+        contentPadding: EdgeInsets.all(10.0),
+        backgroundColor: Colors.transparent,
+        content: Container(
+          width: _getWidth(context),
+          padding: EdgeInsets.all(10.0),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            color: Theme.of(context).scaffoldBackgroundColor,
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                Container(
+                  padding: EdgeInsets.only(left: 20, right: 20, bottom: 20),
+                  alignment: Alignment.center,
+                  child: Text(
+                    (content != null) ? '$content' : appStrings(context).deleteCategoryConfirm_title,
+                    softWrap: true,
+                    maxLines: 3,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.black),
+                  ),
+                ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                          color: Theme.of(context).disabledColor,
+                        ),
+                        child: TextButton(
+                          child: no,
+                          onPressed: () => Navigator.pop(context, false),
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 5.0),
+                    Expanded(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                          color: yesColor,
+                        ),
+                        child: TextButton(
+                          child: yes,
+                          onPressed: () => Navigator.pop(context, true),
+                        ),
+                      ),
+                    ),
+                  ]
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+      onWillPop: () async {
+        Navigator.pop(context, false);
+        return true;
+      },
+    );
+  }
+}
+
+class MultiConfirmDialog extends StatelessWidget {
+  const MultiConfirmDialog({Key key, this.content, this.actions, this.no}) : super(key: key);
+  final String content;
+  final List<Widget> actions;
+  final Text no;
+
+  @override
+  Widget build(BuildContext context) {
+    List<Widget> actionsRow = [];
+    actions.forEach((action) {
+      actionsRow.add(Container(
+        width: double.infinity,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          color: Theme.of(context).colorScheme.primary,
+        ),
+        child: TextButton(
+          child: action,
+          onPressed: () => Navigator.pop(context, actions.indexOf(action)),
+        ),
+      ));
+      if(actions.last != action) actionsRow.add(SizedBox(height: 5.0));
+    });
+
+    return WillPopScope(
+      child: AlertDialog(
+        contentPadding: EdgeInsets.all(10.0),
+        backgroundColor: Colors.transparent,
+        content: Container(
+          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            color: Theme.of(context).scaffoldBackgroundColor,
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  alignment: Alignment.center,
+                  child: Text(
+                    (content != null) ? '$content' : appStrings(context).deleteCategoryConfirm_title,
+                    softWrap: true,
+                    maxLines: 3,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.black),
+                  ),
+                ),
+                Column(children: actionsRow),
+                Divider(thickness: 1.0, height: 5.0, endIndent: 5.0, indent: 5.0),
+                Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    color: Theme.of(context).disabledColor,
+                  ),
+                  child: TextButton(
+                    child: no,
+                    onPressed: () => Navigator.pop(context, -1),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+      onWillPop: () async {
+        Navigator.pop(context, -1);
+        return true;
+      },
+    );
+  }
+}
+
+
+Future<bool> confirmDeleteDialog(context, {content = ''}) async {
+  final bool isConfirm = await showDialog<bool>(
+    context: context,
+    builder: (_) => ConfirmDialog(
+      content: content,
+      yesColor: Colors.red,
+      yes: Text(appStrings(context).deleteCategoryConfirm_deleteButton,
+          style: TextStyle(fontSize: 16, color: Colors.white)
+      ),
+      no: Text(appStrings(context).alertCancelButton,
+          style: TextStyle(fontSize: 16, color: Colors.white)
+      ),
+    ),
+  );
+
+  return (isConfirm != null) ? isConfirm : false;
+}
+
+Future<bool> confirmRemoveSelectionDialog(context, {content = ''}) async {
+  final bool isConfirm = await showDialog<bool>(
+    context: context,
+    builder: (_) => ConfirmDialog(
+      content: content,
+      yesColor: Colors.red,
+      yes: Text(appStrings(context).alertRemoveButton,
+          style: TextStyle(fontSize: 16, color: Colors.white)
+      ),
+      no: Text(appStrings(context).alertCancelButton,
+          style: TextStyle(fontSize: 16, color: Colors.white)
+      ),
+    ),
+  );
+
+  return (isConfirm != null) ? isConfirm : false;
+}
+
+Future<bool> confirmMoveDialog(context, {content = ''}) async {
+  final bool isConfirm = await showDialog<bool>(
+    context: context,
+    builder: (_) => ConfirmDialog(
+      content: content,
+      yesColor: Colors.green,
+      yes: Text(appStrings(context).moveImage_title,
+          style: TextStyle(fontSize: 16, color: Colors.white)
+      ),
+      no: Text(appStrings(context).alertCancelButton,
+          style: TextStyle(fontSize: 16, color: Colors.white)
+      ),
+    ),
+  );
+
+  return (isConfirm != null) ? isConfirm : false;
+}
+
+Future<bool> confirmAssignDialog(context, {content = ''}) async {
+  final bool isConfirm = await showDialog<bool>(
+    context: context,
+    builder: (_) => ConfirmDialog(
+      content: content,
+      yesColor: Colors.green,
+      yes: Text(appStrings(context).copyImage_title,
+          style: TextStyle(fontSize: 16, color: Colors.white)
+      ),
+      no: Text(appStrings(context).alertCancelButton,
+          style: TextStyle(fontSize: 16, color: Colors.white)
+      ),
+    ),
+  );
+
+  return (isConfirm != null) ? isConfirm : false;
+}
+
+Future<bool> confirmDownloadDialog(context, {content = ''}) async {
+  final bool isConfirm = await showDialog<bool>(
+    context: context,
+    builder: (_) => ConfirmDialog(
+      content: content,
+      yesColor: Colors.blue,
+      yes: Text(appStrings(context).imageOptions_download,
+          style: TextStyle(fontSize: 16, color: Colors.white)
+      ),
+      no: Text(appStrings(context).alertCancelButton,
+          style: TextStyle(fontSize: 16, color: Colors.white)
+      ),
+    ),
+  );
+
+  return (isConfirm != null) ? isConfirm : false;
+}
+
+Future<bool> confirmMoveImage(context, {content = ''}) async {
+  final bool isConfirm = await showDialog<bool>(
+    context: context,
+    builder: (_) => ConfirmDialog(
+      content: content,
+      yesColor: Theme.of(context).colorScheme.primary,
+      yes: Text(appStrings(context).alertMoveButton,
+          style: TextStyle(fontSize: 16, color: Colors.white)
+      ),
+      no: Text(appStrings(context).alertCancelButton,
+          style: TextStyle(fontSize: 16, color: Colors.white)
+      ),
+    ),
+  );
+
+  return (isConfirm != null) ? isConfirm : false;
+}
+
+Future<bool> confirmAssignImage(context, {content = ''}) async {
+  final bool isConfirm = await showDialog<bool>(
+    context: context,
+    builder: (_) => ConfirmDialog(
+      content: content,
+      yesColor: Theme.of(context).colorScheme.primary,
+      yes: Text(appStrings(context).alertCopyButton,
+          style: TextStyle(fontSize: 16, color: Colors.white)
+      ),
+      no: Text(appStrings(context).alertCancelButton,
+          style: TextStyle(fontSize: 16, color: Colors.white)
+      ),
+    ),
+  );
+
+  return (isConfirm != null) ? isConfirm : false;
+}
+
+Future<int> chooseMoveCopyImage(context, {content = ''}) async {
+  final int confirm = await showDialog<int>(
+    context: context,
+    builder: (_) => MultiConfirmDialog(
+      content: content,
+      no: Text(appStrings(context).alertCancelButton, style: TextStyle(fontSize: 16, color: Colors.white)),
+      actions: <Widget>[
+        Text(appStrings(context).moveImage_title, style: TextStyle(fontSize: 16, color: Colors.white)),
+        Text(appStrings(context).copyImage_title, style: TextStyle(fontSize: 16, color: Colors.white)),
+      ],
+    ),
+  );
+
+  return (confirm != null) ? confirm : -1;
+}
+
+
+
+
+
 class PiwigoDialog extends StatelessWidget {
-  const PiwigoDialog({Key key,this.title, this.content, this.width}) : super(key: key);
+  const PiwigoDialog({Key key,this.title = "", this.content, this.width, this.height}) : super(key: key);
 
   final String title;
   final Widget content;
   final double width;
+  final double height;
 
   double _getWidth(context) {
     if(isPortrait(context)) {
@@ -32,12 +340,30 @@ class PiwigoDialog extends StatelessWidget {
       child: Container(
         child: Stack(
           children: [
+            height != null ?
             Container(
               margin: EdgeInsets.all(20),
               padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               decoration: ShapeDecoration(
-                  shape: DialogBackgroundShape(radius: 25),
-                  color: Theme.of(context).scaffoldBackgroundColor
+                shape: DialogBackgroundShape(radius: 25),
+                color: Theme.of(context).scaffoldBackgroundColor,
+              ),
+              width: width ?? _getWidth(context),
+              height: height,
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    DialogHeader(title: title),
+                    content,
+                  ],
+                ),
+              ),
+            ) : Container(
+              margin: EdgeInsets.all(20),
+              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              decoration: ShapeDecoration(
+                shape: DialogBackgroundShape(radius: 25),
+                color: Theme.of(context).scaffoldBackgroundColor,
               ),
               width: width ?? _getWidth(context),
               child: SingleChildScrollView(
@@ -106,256 +432,6 @@ class DialogHeader extends StatelessWidget {
   }
 }
 
-Future<bool> confirmDeleteDialog(
-    BuildContext context, {
-      String content,
-    }) async {
-  final bool isConfirm = await showDialog<bool>(
-    context: context,
-    builder: (_) => ConfirmDialog(
-      content: content,
-      yes: Text(appStrings(context).deleteCategoryConfirm_deleteButton, style: TextStyle(color: Colors.red)),
-      no: Text(appStrings(context).alertCancelButton, style: TextStyle(color: Colors.grey)),
-    ),
-  );
-
-  return (isConfirm != null) ? isConfirm : false;
-}
-
-Future<bool> confirmRemoveSelectionDialog(
-    BuildContext context, {
-      String content,
-    }) async {
-  final bool isConfirm = await showDialog<bool>(
-    context: context,
-    builder: (_) => ConfirmDialog(
-      content: content,
-      yes: Text(appStrings(context).alertRemoveButton, style: TextStyle(color: Colors.red)),
-      no: Text(appStrings(context).alertCancelButton, style: TextStyle(color: Colors.grey)),
-    ),
-  );
-
-  return (isConfirm != null) ? isConfirm : false;
-}
-
-Future<bool> confirmMoveDialog(
-    BuildContext context, {
-      String content,
-    }) async {
-  final bool isConfirm = await showDialog<bool>(
-    context: context,
-    builder: (_) => ConfirmDialog(
-      content: content,
-      yes: Text(appStrings(context).moveImage_title, style: TextStyle(color: Colors.green)),
-      no: Text(appStrings(context).alertCancelButton, style: TextStyle(color: Colors.grey)),
-    ),
-  );
-
-  return (isConfirm != null) ? isConfirm : false;
-}
-
-Future<bool> confirmAssignDialog(
-    BuildContext context, {
-      String content,
-    }) async {
-  final bool isConfirm = await showDialog<bool>(
-    context: context,
-    builder: (_) => ConfirmDialog(
-      content: content,
-      yes: Text(appStrings(context).copyImage_title, style: TextStyle(color: Colors.green)),
-      no: Text(appStrings(context).alertCancelButton, style: TextStyle(color: Colors.grey)),
-    ),
-  );
-
-  return (isConfirm != null) ? isConfirm : false;
-}
-
-Future<bool> confirmDownloadDialog(
-    BuildContext context, {
-      String content,
-    }) async {
-  final bool isConfirm = await showDialog<bool>(
-    context: context,
-    builder: (_) => ConfirmDialog(
-      content: content,
-      yes: Text(appStrings(context).imageOptions_download, style: TextStyle(color: Colors.blue)),
-      no: Text(appStrings(context).alertCancelButton, style: TextStyle(color: Colors.grey)),
-    ),
-  );
-
-  return (isConfirm != null) ? isConfirm : false;
-}
-
-Future<int> confirmMoveAssignImage(
-    BuildContext context, {
-      String content,
-    }) async {
-  final int confirm = await showDialog<int>(
-    context: context,
-    builder: (_) => MultiConfirmDialog(
-      content: content,
-      no: Text(appStrings(context).alertCancelButton, style: TextStyle(color: Colors.grey)),
-      actions: <Widget>[
-        Text(appStrings(context).moveImage_title, style: TextStyle(color: Theme.of(context).colorScheme.primary)),
-        Text(appStrings(context).copyImage_title, style: TextStyle(color: Theme.of(context).colorScheme.primary)),
-      ],
-    ),
-  );
-
-  return (confirm != null) ? confirm : -1;
-}
-
-class ConfirmDialog extends StatelessWidget {
-  const ConfirmDialog({Key key, this.content, this.yes, this.no}) : super(key: key);
-  final String content;
-  final Text yes;
-  final Text no;
-
-  @override
-  Widget build(BuildContext context) {
-    return WillPopScope(
-      child: AlertDialog(
-        contentPadding: EdgeInsets.all(10.0),
-        backgroundColor: Colors.transparent,
-        content: Container(
-          // padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-            color: Theme.of(context).scaffoldBackgroundColor,
-          ),
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                  alignment: Alignment.center,
-                  child: Text(
-                    (content != null) ? '$content' : appStrings(context).deleteCategoryConfirm_title,
-                    softWrap: true,
-                    maxLines: 3,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.black),
-                  ),
-                ),
-                Divider(thickness: 1, height: 0, endIndent: 5, indent: 5),
-                IntrinsicHeight(
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.only(bottomLeft: Radius.circular(20)),
-                            // color: Colors.red,
-                          ),
-                          child: TextButton(
-                            child: no,
-                            onPressed: () => Navigator.pop(context, false),
-                          ),
-                        ),
-                      ),
-                      VerticalDivider(thickness: 1, width: 0, endIndent: 5),
-                      Expanded(
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.only(bottomRight: Radius.circular(20)),
-                            // color: Colors.green,
-                          ),
-                          child: TextButton(
-                            child: yes,
-                            onPressed: () => Navigator.pop(context, true),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-      onWillPop: () async {
-        Navigator.pop(context, false);
-        return true;
-      },
-    );
-  }
-}
-
-class MultiConfirmDialog extends StatelessWidget {
-  const MultiConfirmDialog({Key key, this.content, this.actions, this.no}) : super(key: key);
-  final String content;
-  final List<Widget> actions;
-  final Text no;
-
-  @override
-  Widget build(BuildContext context) {
-    List<Widget> actionsRow = [];
-    actions.forEach((action) {
-      actionsRow.add(Expanded(
-        child: Container(
-          child: TextButton(
-            child: action,
-            onPressed: () => Navigator.pop(context, actions.indexOf(action)),
-          ),
-        ),
-      ));
-      if(actions.last != action) actionsRow.add(VerticalDivider(width: 1, thickness: 1));
-    });
-
-    return WillPopScope(
-      child: AlertDialog(
-        contentPadding: EdgeInsets.all(10.0),
-        backgroundColor: Colors.transparent,
-        content: Container(
-          // padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-            color: Theme.of(context).scaffoldBackgroundColor,
-          ),
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                  alignment: Alignment.center,
-                  child: Text(
-                    (content != null) ? '$content' : appStrings(context).deleteCategoryConfirm_title,
-                    softWrap: true,
-                    maxLines: 3,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.black),
-                  ),
-                ),
-                Divider(thickness: 1, height: 0, endIndent: 5, indent: 5),
-                IntrinsicHeight(
-                  child: Row(
-                    children: actionsRow,
-                  ),
-                ),
-                Divider(thickness: 1, height: 0, endIndent: 5, indent: 5),
-                Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.vertical(bottom: Radius.circular(20)),
-                    // color: Colors.red,
-                  ),
-                  child: TextButton(
-                    child: no,
-                    onPressed: () => Navigator.pop(context, -1),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-      onWillPop: () async {
-        Navigator.pop(context, -1);
-        return true;
-      },
-    );
-  }
-}
 
 class CreateCategoryDialog extends StatefulWidget {
   const CreateCategoryDialog({Key key, this.catId = "0"}) : super(key: key);
@@ -1495,6 +1571,114 @@ class _RenameImageDialogState extends State<RenameImageDialog> {
   }
 }
 
+class MoveOrCopyDialog extends StatefulWidget {
+  const MoveOrCopyDialog({
+    Key key,
+    this.isImage = false,
+    this.catId = "0",
+    this.onSelected,
+    this.catName = "",
+    this.title = "",
+    this.subtitle = ""
+  }) : super(key: key);
+
+  final bool isImage;
+  final String catId;
+  final String catName;
+  final String title;
+  final String subtitle;
+  final Function(CategoryModel) onSelected;
+
+  @override
+  _MoveOrCopyDialogState createState() => _MoveOrCopyDialogState();
+}
+class _MoveOrCopyDialogState extends State<MoveOrCopyDialog> {
+
+  bool isActualCategory(dynamic root) {
+    return root.children.map((e) => e.id).contains(widget.catId);
+  }
+
+  CategoryModel createAlbumTree(snapshot) {
+    CategoryModel root = CategoryModel("0", "root", fullname: "root");
+    snapshot.data['result']['categories'].forEach((cat) {
+      List<int> rank = cat['global_rank'].split('.').map(int.parse).toList().cast<int>();
+      CategoryModel newCat = CategoryModel(cat['id'], cat['name'], comment: cat['comment'], nbImages: cat['nb_images'].toString(), fullname: cat['fullname'], status: cat['status']);
+      if(rank.length > 1) {
+        CategoryModel nextInputCat = root.children.elementAt(rank.first-1);
+        rank.removeAt(0);
+        addCatRecursive(rank, newCat, nextInputCat);
+      } else {
+        root.children.add(newCat);
+      }
+    });
+    return root;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return PiwigoDialog(
+      height: MediaQuery.of(context).size.height*0.8,
+      title: widget.title,
+      content: FutureBuilder<Map<String,dynamic>>(
+        future: getAlbumList(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            if(snapshot.data['stat'] == 'fail') {
+              return Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Center(
+                    child: Text('Failed to load albums'),
+                  ),
+                  Text(snapshot.data['result']),
+                ],
+              );
+            }
+            CategoryModel root = createAlbumTree(snapshot);
+            return Container(
+              padding: EdgeInsets.symmetric(horizontal: 10),
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.all(20),
+                      child: Text(widget.subtitle, style: TextStyle(color: Theme.of(context).textTheme.subtitle1.color ,fontSize: 16)),
+                    ),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).inputDecorationTheme.fillColor,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: ListView.builder(
+                        itemCount: 1,
+                        physics: NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        itemBuilder: (context, index) {
+                          return TreeViewNode(
+                            node: root,
+                            catId: widget.catId,
+                            catName: widget.catName,
+                            isImage: widget.isImage,
+                            isRoot: true,
+                            onSelected: widget.onSelected,
+                          );
+                        },
+                      ),
+                    ),
+                  ]
+                ),
+              ),
+            );
+          } else {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+        }
+      ),
+    );
+  }
+}
 
 class ErrorDialog extends StatelessWidget {
   const ErrorDialog({Key key, this.errorMessage = "", this.errorTitle}) : super(key: key);

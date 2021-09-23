@@ -197,179 +197,174 @@ class _LoginViewPageState extends State<LoginViewPage> {
                   ),
                   child: IntrinsicHeight(
                     child: Padding(
-                      padding: EdgeInsets.all(30),
+                      padding: EdgeInsets.symmetric(horizontal: 30, vertical: 20),
                       child: Column(
                         children: <Widget>[
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Padding(
-                                padding: EdgeInsets.all(50),
-                                child: Image.asset('assets/logo/piwigo_logo.png'),
-                              ),
-                              Padding(
-                                padding: EdgeInsets.all(5),
-                                child: Container(
-                                  padding: EdgeInsets.symmetric(horizontal: 10),
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
-                                      border: _validUrl? Border.all(width: 0, color: Colors.transparent) : Border.all(color: _theme.errorColor),
-                                      color: _theme.inputDecorationTheme.fillColor
-                                  ),
-                                  child: TextFormField(
-                                    controller: urlController,
-                                    style: _theme.inputDecorationTheme.labelStyle,
-                                    focusNode: urlFieldFocus,
-                                    decoration: InputDecoration(
-                                      icon: _validUrl?
-                                        Icon(Icons.public, color: _theme.inputDecorationTheme.hintStyle.color) :
-                                        Icon(Icons.error_outline, color: _theme.errorColor),
-                                      border: InputBorder.none,
-                                      hintText: appStrings(context).login_serverPlaceholder,
-                                      hintStyle: _theme.inputDecorationTheme.hintStyle,
-                                      prefix: urlFieldFocus.hasFocus? InkWell(
-                                        onTap: () {
-                                          setState(() {
-                                            _httpProtocol = !_httpProtocol;
-                                          });
-                                        },
-                                        child: Column(
-                                          children: [
-                                            Text(protocol(_httpProtocol), style: _theme.inputDecorationTheme.labelStyle),
-                                            Text(protocol(!_httpProtocol), style: TextStyle(fontSize: 9, color: _theme.inputDecorationTheme.labelStyle.color)),
-                                          ],
-                                        ),
-                                      ) : urlController.text == null || urlController.text == "" ?
-                                      Text("") : Text(protocol(_httpProtocol), style: TextStyle(fontSize: 14, color: Color(0xff5c5c5c))),
-                                      suffixText: '/',
-                                      suffixStyle: TextStyle(fontSize: 14, color: Color(0xff5c5c5c)),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: Padding(
-                                      padding: EdgeInsets.all(5),
-                                      child: Container(
-                                        padding: EdgeInsets.symmetric(horizontal: 10),
-                                        decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(10),
-                                            color: _theme.inputDecorationTheme.fillColor
-                                        ),
-                                        child: TextFormField(
-                                          controller: usernameController,
-                                          style: _theme.inputDecorationTheme.labelStyle,
-                                          maxLines: 1,
-                                          decoration: InputDecoration(
-                                            icon: Icon(Icons.person, color: _theme.inputDecorationTheme.hintStyle.color),
-                                            border: InputBorder.none,
-                                            hintText: appStrings(context).login_userPlaceholder,
-                                            hintStyle: _theme.inputDecorationTheme.hintStyle,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  InkWell(
-                                    onTap: () {
-                                      setState(() {
-                                        usernameController.text = '';
-                                      });
-                                    },
-                                    child: Transform.rotate(
-                                      angle: 45*pi/180,
-                                      child: Icon(Icons.add_circle, size: 30),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: Padding(
-                                      padding: EdgeInsets.all(5),
-                                      child: Container(
-                                        padding: EdgeInsets.symmetric(horizontal: 10),
-                                        decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(10),
-                                            color: _theme.inputDecorationTheme.fillColor
-                                        ),
-                                        child: TextFormField(
-                                          controller: passwordController,
-                                          style: _theme.inputDecorationTheme.labelStyle,
-                                          obscureText: _obscurePassword,
-                                          decoration: InputDecoration(
-                                            icon: InkWell(
-                                              onTap: () {
-                                                setState(() {
-                                                  _obscurePassword = !_obscurePassword;
-                                                });
-                                              },
-                                              child: _obscurePassword ?
-                                                Icon(Icons.lock, color: _theme.inputDecorationTheme.hintStyle.color) :
-                                                Icon(Icons.lock_open, color: _theme.inputDecorationTheme.hintStyle.color),
-                                            ),
-                                            border: InputBorder.none,
-                                            hintText: appStrings(context).login_passwordPlaceholder,
-                                            hintStyle: _theme.inputDecorationTheme.hintStyle,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  InkWell(
-                                    onTap: () {
-                                      setState(() {
-                                        passwordController.text = '';
-                                      });
-                                    },
-                                    child: Transform.rotate(
-                                      angle: 45*pi/180,
-                                      child: Icon(Icons.add_circle, size: 30),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Container(
-                                width: double.infinity,
-                                height: 60,
-                                padding: EdgeInsets.all(5),
-                                child: DialogButton(
-                                  style: _validUrl ? dialogButtonStyle(context) : dialogButtonStyleDisabled(context),
-                                  child: _isLoading?
-                                    CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(Colors.white)) :
-                                    Text(appStrings(context).login, style: TextStyle(fontSize: 16, color: Colors.white)),
-                                  onPressed: onConnection,
-                                ),
-                              ),
-                            ],
-                          ),
                           Expanded(
                             child: Column(
-                              mainAxisAlignment: MainAxisAlignment.end,
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                RichText(
-                                  text: TextSpan(
-                                    text: appStrings(context).settings_privacy,
-                                    style: _theme.textTheme.headline6,
-                                    recognizer: TapGestureRecognizer()
-                                      ..onTap = () {
-                                        Navigator.of(context).push(
-                                            MaterialPageRoute(builder: (_) => PrivacyPolicyViewPage())
-                                        );
-                                      }
+                                Padding(
+                                  padding: EdgeInsets.all(50),
+                                  child: Image.asset('assets/logo/piwigo_logo.png'),
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.all(5),
+                                  child: Container(
+                                    padding: EdgeInsets.symmetric(horizontal: 10),
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(10),
+                                        border: _validUrl? Border.all(width: 0, color: Colors.transparent) : Border.all(color: _theme.errorColor),
+                                        color: _theme.inputDecorationTheme.fillColor
+                                    ),
+                                    child: TextFormField(
+                                      controller: urlController,
+                                      style: _theme.inputDecorationTheme.labelStyle,
+                                      focusNode: urlFieldFocus,
+                                      decoration: InputDecoration(
+                                        icon: _validUrl?
+                                        Icon(Icons.public, color: _theme.inputDecorationTheme.hintStyle.color) :
+                                        Icon(Icons.error_outline, color: _theme.errorColor),
+                                        border: InputBorder.none,
+                                        hintText: appStrings(context).login_serverPlaceholder,
+                                        hintStyle: _theme.inputDecorationTheme.hintStyle,
+                                        prefix: urlFieldFocus.hasFocus? InkWell(
+                                          onTap: () {
+                                            setState(() {
+                                              _httpProtocol = !_httpProtocol;
+                                            });
+                                          },
+                                          child: Column(
+                                            children: [
+                                              Text(protocol(_httpProtocol), style: _theme.inputDecorationTheme.labelStyle),
+                                              Text(protocol(!_httpProtocol), style: TextStyle(fontSize: 9, color: _theme.inputDecorationTheme.labelStyle.color)),
+                                            ],
+                                          ),
+                                        ) : urlController.text == null || urlController.text == "" ?
+                                        Text("") : Text(protocol(_httpProtocol), style: TextStyle(fontSize: 14, color: Color(0xff5c5c5c))),
+                                        suffixText: '/',
+                                        suffixStyle: TextStyle(fontSize: 14, color: Color(0xff5c5c5c)),
+                                      ),
+                                    ),
                                   ),
                                 ),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Padding(
+                                        padding: EdgeInsets.all(5),
+                                        child: Container(
+                                          padding: EdgeInsets.symmetric(horizontal: 10),
+                                          decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.circular(10),
+                                              color: _theme.inputDecorationTheme.fillColor
+                                          ),
+                                          child: TextFormField(
+                                            controller: usernameController,
+                                            style: _theme.inputDecorationTheme.labelStyle,
+                                            maxLines: 1,
+                                            decoration: InputDecoration(
+                                              icon: Icon(Icons.person, color: _theme.inputDecorationTheme.hintStyle.color),
+                                              border: InputBorder.none,
+                                              hintText: appStrings(context).login_userPlaceholder,
+                                              hintStyle: _theme.inputDecorationTheme.hintStyle,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    InkWell(
+                                      onTap: () {
+                                        setState(() {
+                                          usernameController.text = '';
+                                        });
+                                      },
+                                      child: Transform.rotate(
+                                        angle: 45*pi/180,
+                                        child: Icon(Icons.add_circle, size: 30),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Padding(
+                                        padding: EdgeInsets.all(5),
+                                        child: Container(
+                                          padding: EdgeInsets.symmetric(horizontal: 10),
+                                          decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.circular(10),
+                                              color: _theme.inputDecorationTheme.fillColor
+                                          ),
+                                          child: TextFormField(
+                                            controller: passwordController,
+                                            style: _theme.inputDecorationTheme.labelStyle,
+                                            obscureText: _obscurePassword,
+                                            decoration: InputDecoration(
+                                              icon: InkWell(
+                                                onTap: () {
+                                                  setState(() {
+                                                    _obscurePassword = !_obscurePassword;
+                                                  });
+                                                },
+                                                child: _obscurePassword ?
+                                                Icon(Icons.lock, color: _theme.inputDecorationTheme.hintStyle.color) :
+                                                Icon(Icons.lock_open, color: _theme.inputDecorationTheme.hintStyle.color),
+                                              ),
+                                              border: InputBorder.none,
+                                              hintText: appStrings(context).login_passwordPlaceholder,
+                                              hintStyle: _theme.inputDecorationTheme.hintStyle,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    InkWell(
+                                      onTap: () {
+                                        setState(() {
+                                          passwordController.text = '';
+                                        });
+                                      },
+                                      child: Transform.rotate(
+                                        angle: 45*pi/180,
+                                        child: Icon(Icons.add_circle, size: 30),
+                                      ),
+                                    ),
+                                  ],
+                                ),
                                 Container(
-                                  padding: EdgeInsets.only(top: 20),
-                                  alignment: Alignment.bottomCenter,
-                                  child: Text(dotenv.env['APP_VERSION'], style: _theme.textTheme.headline5),
+                                  width: double.infinity,
+                                  height: 60,
+                                  padding: EdgeInsets.all(5),
+                                  child: DialogButton(
+                                    style: _validUrl ? dialogButtonStyle(context) : dialogButtonStyleDisabled(context),
+                                    child: _isLoading?
+                                    CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(Colors.white)) :
+                                    Text(appStrings(context).login, style: TextStyle(fontSize: 16, color: Colors.white)),
+                                    onPressed: onConnection,
+                                  ),
                                 ),
                               ],
                             ),
                           ),
+                          Container(
+                            padding: EdgeInsets.symmetric(vertical: 5),
+                            alignment: Alignment.bottomCenter,
+                            child: RichText(
+                              text: TextSpan(
+                                  text: appStrings(context).settings_privacy,
+                                  style: _theme.textTheme.headline6,
+                                  recognizer: TapGestureRecognizer()
+                                    ..onTap = () {
+                                      Navigator.of(context).push(
+                                          MaterialPageRoute(builder: (_) => PrivacyPolicyViewPage())
+                                      );
+                                    }
+                              ),
+                            ),
+                          ),
+                          Text(dotenv.env['APP_VERSION'], style: _theme.textTheme.headline5),
                         ],
                       ),
                     ),

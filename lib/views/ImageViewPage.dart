@@ -106,42 +106,71 @@ class _ImageViewPageState extends State<ImageViewPage> {
     }
   }
   void _onMoveCopyImage() async {
-    await moveCategoryModalBottomSheet(context,
-      widget.category,
-      widget.title,
-      true,
-          (item) async {
-        int result = await confirmMoveAssignImage(
-          context,
-          content: appStrings(context).moveImage_message(1, images[_page],item.name),
-        );
+    int choice = await chooseMoveCopyImage(context);
 
-        if (result == 0) {
-          print('Move $_page to ${item.id}');
-          var response = await moveImage(images[_page]['id'], [int.parse(item.id)]);
-          if(response['stat'] == 'fail') {
-            ScaffoldMessenger.of(context).showSnackBar(
-                errorSnackBar(context, response['result']));
-            Navigator.of(context).pop();
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-                imagesMovedSnackBar(context, 1));
-            Navigator.of(context).pop();
+    switch(choice) {
+      case 0: showDialog(context: context,
+          builder: (context) {
+            return MoveOrCopyDialog(
+              title: appStrings(context).moveImage_title,
+              subtitle: appStrings(context).moveImage_selectAlbum(1, images[_page]),
+              catId: widget.category,
+              catName: widget.title,
+              isImage: true,
+              onSelected: (item) async {
+                if(await confirmMoveImage(context,
+                  content: appStrings(context).moveImage_message(1, images[_page], item.name),
+                )) {
+                  var response = await moveImage(images[_page]['id'], [int.parse(item.id)]);
+                  if(response['stat'] == 'fail') {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                        errorSnackBar(context, response['result']));
+                    Navigator.of(context).pop();
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                        imagesMovedSnackBar(context, 1));
+                    Navigator.of(context).pop();
+                  }
+                }
+              },
+            );
           }
-        } else if (result == 1) {
-          var response = await assignImage(images[_page]['id'], [int.parse(item.id)]);
-          if(response['stat'] == 'fail') {
-            ScaffoldMessenger.of(context).showSnackBar(
-                errorSnackBar(context, response['result']));
-            Navigator.of(context).pop();
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-                imagesAssignedSnackBar(context, 1));
-            Navigator.of(context).pop();
+      ).whenComplete(() {
+        setState(() {});
+      });
+      break;
+      case 1: showDialog(context: context,
+          builder: (context) {
+            return MoveOrCopyDialog(
+              title: appStrings(context).copyImage_title,
+              subtitle: appStrings(context).copyImage_selectAlbum(1, images[_page]),
+              catId: widget.category,
+              catName: widget.title,
+              isImage: true,
+              onSelected: (item) async {
+                if(await confirmAssignImage(context,
+                  content: appStrings(context).copyImage_message(1, images[_page], item.name),
+                )) {
+                  var response = await assignImage(images[_page]['id'], [int.parse(item.id)]);
+                  if (response['stat'] == 'fail') {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                        errorSnackBar(context, response['result']));
+                    Navigator.of(context).pop();
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                        imagesAssignedSnackBar(context, 1));
+                    Navigator.of(context).pop();
+                  }
+                }
+              },
+            );
           }
-        }
-      },
-    );
+      ).whenComplete(() {
+        setState(() {});
+      });
+      break;
+      default: break;
+    }
   }
   void _onDeleteImage() async {
     if(await confirmDeleteDialog(context,

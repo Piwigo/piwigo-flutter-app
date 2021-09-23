@@ -17,7 +17,6 @@ class SettingsPage extends StatefulWidget {
   @override
   _SettingsPageState createState() => _SettingsPageState();
 }
-
 class _SettingsPageState extends State<SettingsPage> {
   double _currentSliderValue = 5;
   String _albumDerivative;
@@ -284,6 +283,8 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 }
 
+
+
 class TableCell extends StatelessWidget {
   const TableCell(this.left, this.right, {Key key, this.options, this.isEnd = false}) : super(key: key);
 
@@ -337,13 +338,14 @@ class TableCellSingle extends StatelessWidget {
   }
 }
 
+
+
 class ImageRowCountSliders extends StatefulWidget {
   const ImageRowCountSliders({Key key}) : super(key: key);
 
   @override
   _ImageRowCountSlidersState createState() => _ImageRowCountSlidersState();
 }
-
 class _ImageRowCountSlidersState extends State<ImageRowCountSliders> {
   @override
   Widget build(BuildContext context) {

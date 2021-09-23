@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:piwigo_ng/constants/SettingsConstants.dart';
+import 'dart:math' show pi;
 
 class DialogButton extends StatelessWidget {
   const DialogButton({Key key, this.style, this.onPressed, this.child}) : super(key: key);
@@ -36,7 +37,6 @@ ButtonStyle dialogButtonStyle(context) {
     ),
   );
 }
-
 ButtonStyle dialogButtonStyleDisabled(context) {
   return ButtonStyle(
     shape: MaterialStateProperty.all<RoundedRectangleBorder>(
@@ -49,7 +49,6 @@ ButtonStyle dialogButtonStyleDisabled(context) {
     ),
   );
 }
-
 
 class IconSwitch extends StatelessWidget {
   const IconSwitch({Key key, this.isOnLeft, this.onTap}) : super(key: key);
@@ -119,3 +118,58 @@ class IconSwitch extends StatelessWidget {
     );
   }
 }
+
+class AnimatedIconButton extends StatefulWidget {
+  const AnimatedIconButton(this.icon, {Key key, this.isActive = false}) : super(key: key);
+
+  final Widget icon;
+  final bool isActive;
+
+  @override
+  _AnimatedIconButtonState createState() => _AnimatedIconButtonState();
+}
+
+class _AnimatedIconButtonState extends State<AnimatedIconButton> with TickerProviderStateMixin {
+  Animation<double> _animation;
+  AnimationController _controller;
+
+  @override
+  void initState() {
+    _controller = AnimationController(
+      duration: Duration(milliseconds: 300),
+      vsync: this,
+    );
+    _animation = Tween<double>(
+      begin: 0,
+      end: -45,
+    ).animate(_controller);
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (widget.isActive) {
+      _controller.forward();
+    } else {
+      _controller.reverse();
+    }
+
+    return AnimatedBuilder(
+      animation: _controller,
+      child: widget.icon,
+      builder: (context, child) {
+        return Transform.rotate(
+          angle: _animation.value * (-pi / 90),
+          child: child,
+        );
+      },
+    );
+  }
+}
+
