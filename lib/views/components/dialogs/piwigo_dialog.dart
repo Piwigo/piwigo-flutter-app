@@ -5,12 +5,13 @@ import 'package:piwigo_ng/views/components/custom_shapes.dart';
 
 
 class PiwigoDialog extends StatelessWidget {
-  const PiwigoDialog({Key key,this.title = "", this.content, this.width, this.height}) : super(key: key);
+  const PiwigoDialog({Key key,this.title = "", this.content, this.width, this.height, this.action}) : super(key: key);
 
   final String title;
   final Widget content;
   final double width;
   final double height;
+  final Widget action;
 
   double _getWidth(context) {
     if(isPortrait(context)) {
@@ -40,7 +41,7 @@ class PiwigoDialog extends StatelessWidget {
               child: SingleChildScrollView(
                 child: Column(
                   children: [
-                    DialogHeader(title: title),
+                    DialogHeader(title: title, action: action),
                     content,
                   ],
                 ),
@@ -56,7 +57,7 @@ class PiwigoDialog extends StatelessWidget {
               child: SingleChildScrollView(
                 child: Column(
                   children: [
-                    DialogHeader(title: title),
+                    DialogHeader(title: title, action: action),
                     content,
                   ],
                 ),
@@ -87,34 +88,27 @@ class PiwigoDialog extends StatelessWidget {
 }
 
 class DialogHeader extends StatelessWidget {
-  const DialogHeader({Key key, this.title}) : super(key: key);
+  const DialogHeader({Key key, this.title, this.action}) : super(key: key);
 
   final String title;
+  final Widget action;
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        /*
-        Align(
-          alignment: Alignment.topLeft,
-          child: InkResponse(
-            onTap: () {
-              Navigator.of(context).pop();
-            },
-            child: CircleAvatar(
-              child: Icon(Icons.cancel, color: Theme.of(context.errorColor),
-              backgroundColor: Colors.transparent,
-            ),
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 5.0),
+      child: Stack(
+        children: [
+          Align(
+            alignment: Alignment.bottomLeft,
+            child: action,
           ),
-        ),
-         */
-        Container(
-          padding: EdgeInsets.all(5.0),
-          alignment: Alignment.center,
-          child: Text(title, style: Theme.of(context).textTheme.headline4),
-        ),
-      ],
+          Container(
+            alignment: Alignment.center,
+            child: Text(title, style: Theme.of(context).textTheme.headline4),
+          ),
+        ],
+      ),
     );
   }
 }

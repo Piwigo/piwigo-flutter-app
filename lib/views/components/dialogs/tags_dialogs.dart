@@ -34,12 +34,10 @@ class _SelectTagDialogState extends State<SelectTagDialog> {
   void _sortTagList(List<TagModel> list) {
     list.sort((a, b) => a.compareTo(b));
   }
-
   void _updateLists(List<TagModel> allTags) {
     _sortTagList(allTags);
     _sortTagList(_selectedTags);
   }
-
   bool _isSelected(TagModel tag) {
     for(var selectedTag in _selectedTags) {
       if(tag.id == selectedTag.id) {
@@ -47,6 +45,16 @@ class _SelectTagDialogState extends State<SelectTagDialog> {
       }
     }
     return false;
+  }
+  List<TagModel> _tagListFromJson(List<dynamic> jsonList) {
+    return jsonList.map((json) => TagModel.fromJson(json)).toList();
+  }
+  _isSelectedEndTag(TagModel tag) {
+    return _isSelected(tag) && (tag.id == _selectedTags.last.id);
+  }
+  _isUnselectedEndTag(TagModel tag, List<TagModel> tags) {
+    List<TagModel> unselectedTags = tags.where((e) => !_selectedTags.contains(e)).toList();
+    return !_isSelected(tag) && (tag.id == unselectedTags.last.id);
   }
 
   void _onSelectTags() {
@@ -57,23 +65,24 @@ class _SelectTagDialogState extends State<SelectTagDialog> {
     Navigator.of(context).pop();
   }
 
-  List<TagModel> _tagListFromJson(List<dynamic> jsonList) {
-    return jsonList.map((json) => TagModel.fromJson(json)).toList();
-  }
-
-  _isSelectedEndTag(TagModel tag) {
-    return _isSelected(tag) && (tag.id == _selectedTags.last.id);
-  }
-
-  _isUnselectedEndTag(TagModel tag, List<TagModel> tags) {
-    List<TagModel> unselectedTags = tags.where((e) => !_selectedTags.contains(e)).toList();
-    return !_isSelected(tag) && (tag.id == unselectedTags.last.id);
-  }
 
   @override
   Widget build(BuildContext context) {
     Size _screenSize = MediaQuery.of(context).size;
     return PiwigoDialog(
+      action: InkWell(
+        onTap: () {
+          showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return CreateTagDialog();
+              }
+          ).whenComplete(() {
+            setState(() {});
+          });
+        },
+        child: Icon(Icons.add_circle_outline),
+      ),
       title: appStrings(context).tags,
       content: FutureBuilder<Map<String,dynamic>>(
         future: getAdminTags(),
@@ -91,6 +100,7 @@ class _SelectTagDialogState extends State<SelectTagDialog> {
               child: SingleChildScrollView(
                 child: Column(
                   children: [
+                    SizedBox(height: 10),
                     Container(
                       alignment: Alignment.topLeft,
                       padding: EdgeInsets.all(5),
@@ -104,7 +114,10 @@ class _SelectTagDialogState extends State<SelectTagDialog> {
                         color: Theme.of(context).inputDecorationTheme.fillColor,
                         borderRadius: BorderRadius.circular(20),
                       ),
-                      child: ListView.builder(
+                      child: _selectedTags.isEmpty ? TagItem(
+                        TagModel(0, appStrings(context).none),
+                        isEnd: true,
+                      ) : ListView.builder(
                         shrinkWrap: true,
                         physics: NeverScrollableScrollPhysics(),
                         itemCount: tags.length,
@@ -124,32 +137,12 @@ class _SelectTagDialogState extends State<SelectTagDialog> {
                         },
                       ),
                     ),
-                    SizedBox(height: 10),
-                    Padding(
+                    SizedBox(height: 20),
+                    Container(
+                      alignment: Alignment.topLeft,
                       padding: EdgeInsets.all(5),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(appStrings(context).tagsHeader_notSelected,
-                              style: Theme.of(context).textTheme.headline5
-                          ),
-                          SizedBox(width: 5),
-                          InkWell(
-                            onTap: () {
-                              showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return CreateTagDialog();
-                                  }
-                              ).whenComplete(() {
-                                setState(() {
-                                  print('refresh');
-                                });
-                              });
-                            },
-                            child: Icon(Icons.add_circle_outline),
-                          ),
-                        ],
+                      child: Text(appStrings(context).tagsHeader_notSelected,
+                          style: Theme.of(context).textTheme.headline5
                       ),
                     ),
                     Container(
@@ -158,7 +151,10 @@ class _SelectTagDialogState extends State<SelectTagDialog> {
                         color: Theme.of(context).inputDecorationTheme.fillColor,
                         borderRadius: BorderRadius.circular(20),
                       ),
-                      child: ListView.builder(
+                      child: _selectedTags.length == tags.length ? TagItem(
+                        TagModel(0, appStrings(context).none),
+                        isEnd: true,
+                      ) : ListView.builder(
                         shrinkWrap: true,
                         physics: NeverScrollableScrollPhysics(),
                         itemCount: tags.length,
@@ -178,7 +174,7 @@ class _SelectTagDialogState extends State<SelectTagDialog> {
                         },
                       ),
                     ),
-                    SizedBox(height: 10),
+                    SizedBox(height: 20),
                     Padding(
                       padding: EdgeInsets.all(5.0),
                       child: DialogButton(
@@ -350,10 +346,7 @@ class _TagItemState extends State<TagItem> with SingleTickerProviderStateMixin {
         if (_isExpanded) {
           _controller.forward();
         } else {
-          _controller.reverse().then<void>((void value) {
-            if (!mounted) return;
-            setState(() {});
-          });
+          _controller.reverse();
         }
       });
     } else if (widget.tag != oldWidget.tag) {
@@ -364,31 +357,35 @@ class _TagItemState extends State<TagItem> with SingleTickerProviderStateMixin {
 
   Widget _buildTagItem() {
     return InkWell(
-      onTap: widget.onTap,
+      onTap: _isExpanded ? widget.onTap : () {},
       child: Column(
         children: [
           Container(
-            height: 40,
-            padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text('${widget.tag.name}',
-                    style: Theme.of(context).textTheme.subtitle1
-                ),
-                widget.icon ?? SizedBox(),
-              ],
-            ),
+          height: 40,
+          padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('${widget.tag.name}',
+                  style: Theme.of(context).textTheme.subtitle1
+              ),
+              widget.icon ?? SizedBox(),
+            ],
           ),
+        ),
+          _isExpanded && !widget.isEnd ? Divider(
+            indent: 10.0,
+            endIndent: 0.0,
+            height: 1.0,
+          ) : SizedBox(),
         ],
       ),
     );
   }
 
-
   @override
   Widget build(BuildContext context) {
-    if (_isExpanded) {
+    if (_isExpanded && widget.isExpanded) {
       _controller.forward();
     } else {
       _controller.reverse();
@@ -400,20 +397,11 @@ class _TagItemState extends State<TagItem> with SingleTickerProviderStateMixin {
     return AnimatedBuilder(
       animation: _controller.view,
       builder: (BuildContext context, Widget child) {
-        return Column(
-          children: [
-            ClipRect(
-              child: Align(
-                heightFactor: _heightFactor.value,
-                child: child,
-              ),
-            ),
-            _isExpanded && !widget.isEnd ? Divider(
-              indent: 10.0,
-              endIndent: 0.0,
-              height: 1.0,
-            ) : SizedBox(),
-          ],
+        return ClipRect(
+          child: Align(
+            heightFactor: _heightFactor.value,
+            child: child,
+          ),
         );
       },
       child: closed ? null : _buildTagItem(),

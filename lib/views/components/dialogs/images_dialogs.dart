@@ -201,7 +201,8 @@ class _EditImageSelectionDialogState extends State<EditImageSelectionDialog> {
                             ],
                           ),
                         ),
-                        Positioned(
+                        widget.images.length > 1 ?
+                          Positioned(
                             bottom: 0,
                             right: 10,
                             child: InkWell(
@@ -215,7 +216,7 @@ class _EditImageSelectionDialogState extends State<EditImageSelectionDialog> {
                                 child: Icon(Icons.remove_circle_outline, color: Theme.of(context).errorColor),
                               ),
                             )
-                        ),
+                          ) : SizedBox(),
                         /*
                         Positioned(
                           top: 0,
@@ -268,7 +269,7 @@ class _EditImageSelectionDialogState extends State<EditImageSelectionDialog> {
               ),
             ),
             Padding(
-              padding: EdgeInsets.only(top: 5),
+              padding: EdgeInsets.only(top: 5, bottom: 15),
               child: TextFieldDescription(
                 controller: _descController,
                 hint: appStrings(context).editImageDetails_descriptionPlaceholder,
@@ -283,9 +284,8 @@ class _EditImageSelectionDialogState extends State<EditImageSelectionDialog> {
                 Text(appStrings(context).tagsAdd_title,
                     style: Theme.of(context).textTheme.headline5
                 ),
-                IconButton(
-                  tooltip: appStrings(context).tagsTitle_selectOne,
-                  onPressed: () {
+                InkWell(
+                  onTap: () {
                     showDialog(
                       context: context,
                       builder: (BuildContext context) {
@@ -301,17 +301,20 @@ class _EditImageSelectionDialogState extends State<EditImageSelectionDialog> {
                       }
                     );
                   },
-                  icon: Icon(Icons.add_circle_outline),
+                  child: Icon(Icons.add_circle_outline),
                 ),
               ],
             ),
             Container(
-              padding: EdgeInsets.only(bottom: 5),
+              margin: EdgeInsets.only(top: 5, bottom: 15),
               decoration: BoxDecoration(
                 color: Theme.of(context).inputDecorationTheme.fillColor,
                 borderRadius: BorderRadius.circular(20),
               ),
-              child: ListView.builder(
+              child: _currentTags.isEmpty ? TagItem(
+                TagModel(0, appStrings(context).none),
+                isEnd: true,
+              ) : ListView.builder(
                 shrinkWrap: true,
                 physics: NeverScrollableScrollPhysics(),
                 itemCount: _tags.length,
@@ -330,7 +333,6 @@ class _EditImageSelectionDialogState extends State<EditImageSelectionDialog> {
                 },
               ),
             ),
-            SizedBox(height: 10),
             Align(
               alignment: Alignment.topLeft,
               child: Text(appStrings(context).editImageDetails_privacyLevel,

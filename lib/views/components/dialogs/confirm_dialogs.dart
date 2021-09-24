@@ -25,7 +25,7 @@ class ConfirmDialog extends StatelessWidget {
         backgroundColor: Colors.transparent,
         content: Container(
           width: _getWidth(context),
-          padding: EdgeInsets.all(10.0),
+          padding: EdgeInsets.all(20.0),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(20),
             color: Theme.of(context).scaffoldBackgroundColor,
@@ -34,12 +34,12 @@ class ConfirmDialog extends StatelessWidget {
             child: Column(
               children: [
                 Container(
-                  padding: EdgeInsets.only(left: 20, right: 20, bottom: 20),
+                  padding: EdgeInsets.only(bottom: 20),
                   alignment: Alignment.center,
                   child: Text(
                     (content != null) ? '$content' : appStrings(context).deleteCategoryConfirm_title,
                     softWrap: true,
-                    maxLines: 3,
+                    //maxLines: 3,
                     textAlign: TextAlign.center,
                     style: TextStyle(color: Colors.black),
                   ),
@@ -124,12 +124,12 @@ class MultiConfirmDialog extends StatelessWidget {
             child: Column(
               children: [
                 Container(
-                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  padding: EdgeInsets.symmetric(vertical: 10),
                   alignment: Alignment.center,
                   child: Text(
                     (content != null) ? '$content' : appStrings(context).deleteCategoryConfirm_title,
                     softWrap: true,
-                    maxLines: 3,
+                    // maxLines: 3,
                     textAlign: TextAlign.center,
                     style: TextStyle(color: Colors.black),
                   ),

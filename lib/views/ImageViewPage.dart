@@ -29,7 +29,6 @@ class ImageViewPage extends StatefulWidget {
 class _ImageViewPageState extends State<ImageViewPage> {
   String _derivative;
   PageController _pageController;
-  PhotoViewController _photoScaleController = PhotoViewController();
   ScrollPhysics _pageViewPhysic = BouncingScrollPhysics();
   int _page;
   int _imagePage;
@@ -39,7 +38,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
   @override
   void initState() {
     super.initState();
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive, overlays: [SystemUiOverlay.bottom]);
+    // SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive, overlays: [SystemUiOverlay.bottom]);
     _pageController = PageController(initialPage: widget.index);
     _derivative = API.prefs.getString('full_screen_image_size');
     _page = widget.index;
@@ -57,7 +56,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
 
   @override
   void dispose() {
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge, overlays: SystemUiOverlay.values);
+    // SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge, overlays: SystemUiOverlay.values);
     super.dispose();
   }
 
@@ -251,7 +250,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
               }
               setState(() {
                 _page = newPage;
-                showToolBar = true;
+                // showToolBar = true;
               });
             },
             itemBuilder: (context, index) {
@@ -299,7 +298,6 @@ class _ImageViewPageState extends State<ImageViewPage> {
 
   Widget _displayImage(dynamic image) {
     return PhotoView(
-      controller: _photoScaleController,
       imageProvider: NetworkImage(image["derivatives"][_derivative]["url"]),
       minScale: PhotoViewComputedScale.contained,
       backgroundDecoration: BoxDecoration(
@@ -308,7 +306,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
         Colors.black,
       ),
       scaleStateChangedCallback: (scale) {
-        if(scale.isScaleStateZooming && _photoScaleController.scale > 0.5) {
+        if(scale.isScaleStateZooming) {
           setState(() {
             _pageViewPhysic = NeverScrollableScrollPhysics();
           });
@@ -318,20 +316,6 @@ class _ImageViewPageState extends State<ImageViewPage> {
           });
         }
       },
-      /* onScaleEnd: (context, details, value) {
-                print("scale ${_photoScaleController.scale}");
-                if(_photoScaleController.scale > 0.5) {
-                  setState(() {
-                    _pageViewPhysic = NeverScrollableScrollPhysics();
-                    showToolBar = false;
-                  });
-                } else {
-                  setState(() {
-                    _pageViewPhysic = BouncingScrollPhysics();
-                    showToolBar = true;
-                  });
-                }
-              }, */
     );
   }
 
