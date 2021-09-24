@@ -460,8 +460,8 @@
             "photo": {}
         }
     },
-    "copImage_message": "{count, plural, =1{Êtes-vous certain de vouloir copier la photo {photo} dans l’album {album} ?} other{Êtes-vous certain de vouloir copier les photos dans l’album {album} ?}}",
-    "@copImage_message": {
+    "copyImage_message": "{count, plural, =1{Êtes-vous certain de vouloir copier la photo {photo} dans l’album {album} ?} other{Êtes-vous certain de vouloir copier les photos dans l’album {album} ?}}",
+    "@copyImage_message": {
         "placeholders": {
             "count": {},
             "photo": {},
@@ -740,5 +740,6 @@
     "settings_crowdinURL": "https://crowdin.com/project/piwigo-ng",
     "settings_pwgForumURL": "http://fr.piwigo.org",
     "settings_acknowledgements": "Remerciements",
-    "settings_privacy": "Politique de Confidentialité"
+    "settings_privacy": "Politique de Confidentialité",
+    "settings_privacyUrl": "https://piwigo.org/mobile-apps-privacy-policy&webview&lang=fr_FR"
 }

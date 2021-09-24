@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:piwigo_ng/api/API.dart';
 
 class Constants {
 
@@ -32,8 +31,8 @@ class Constants {
     8: 'Admins',
   };
 
-  static double PORTRAIT_IMAGE_COUNT_MIN = 1;
-  static double PORTRAIT_IMAGE_COUNT_MAX = 6;
+  static double PORTRAIT_IMAGE_COUNT_MIN = 1.0;
+  static double PORTRAIT_IMAGE_COUNT_MAX = 6.0;
   static double LANDSCAPE_IMAGE_COUNT_MIN = 4.0;
   static double LANDSCAPE_IMAGE_COUNT_MAX = 10.0;
 
@@ -64,6 +63,7 @@ Map<int, String> albumSort(context) {
 
 Map<int, String> privacyLevels(context) {
   return {
+    -1: appStrings(context).privacyLevel_unchanged,
     0: appStrings(context).privacyLevel_everybody,
     1: appStrings(context).privacyLevel_adminsFamilyFriendsContacts,
     2: appStrings(context).privacyLevel_adminsFamilyFriends,

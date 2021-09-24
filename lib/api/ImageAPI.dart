@@ -9,7 +9,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:path/path.dart' as path;
-import 'package:piwigo_ng/views/components/SnackBars.dart';
+import 'package:piwigo_ng/views/components/snackbars.dart';
 
 import 'API.dart';
 
@@ -297,12 +297,7 @@ Future<int> editImages(BuildContext context, List<Map<String, dynamic>> images, 
   int nbEdited = 0;
   for(var image in images) {
     var response = await editImage(image['id'], image['name'], image['desc'], tags, level);
-    if(response['stat'] == 'fail') {
-      ScaffoldMessenger.of(context).hideCurrentSnackBar();
-      ScaffoldMessenger.of(context).showSnackBar(
-          errorSnackBar(context, '${response['result']}')
-      );
-    } else {
+    if(response['stat'] != 'fail') {
       nbEdited++;
     }
   }
@@ -313,15 +308,55 @@ Future<dynamic> editImage(int imageId, String name, String desc, List<int> tags,
     "format": "json",
     "method": "pwg.images.setInfo",
   };
-  FormData formData = FormData.fromMap({
+
+  Map<String,dynamic> form = {
     "image_id": imageId,
-    "name": name,
-    "comment": desc,
-    "tag_ids": tags,
-    "level": level,
     "single_value_mode": "replace",
     "multiple_value_mode": "append"
-  });
+  };
+  if(name != "" && name != null) form["name"] = name;
+  if(desc != "" && desc != null) form["comment"] = desc;
+  if(tags.isNotEmpty) form["tag_ids"] = tags;
+  if(level != -1) form["level"] = level;
+
+  FormData formData = FormData.fromMap(form);
+
+  try {
+    Response response = await API.dio.post('ws.php',
+        data: formData,
+        queryParameters: queries
+    );
+
+    if (response.statusCode == 200) {
+      return json.decode(response.data);
+    } else {
+      return {
+        'stat': 'fail',
+        'result': response.statusMessage
+      };
+    }
+  } catch (e) {
+    var error = e as DioError;
+    return {
+      'stat': 'fail',
+      'result': error.message
+    };
+  }
+}
+
+Future<dynamic> renameImage(int imageId, String name) async {
+  Map<String, String> queries = {
+    "format": "json",
+    "method": "pwg.images.setInfo",
+  };
+
+  Map<String,dynamic> form = {
+    "image_id": imageId,
+    "name": name,
+    "single_value_mode": "replace"
+  };
+
+  FormData formData = FormData.fromMap(form);
 
   try {
     Response response = await API.dio.post('ws.php',

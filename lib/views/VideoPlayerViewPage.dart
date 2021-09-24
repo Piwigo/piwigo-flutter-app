@@ -1,4 +1,3 @@
-
 import 'package:better_player/better_player.dart';
 import 'package:flutter/material.dart';
 
@@ -21,6 +20,12 @@ class _VideoPlayerViewPageState extends State<VideoPlayerViewPage> {
       resizeToAvoidBottomInset: true,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
+        leading: IconButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            icon: Icon(Icons.chevron_left),
+          ),
         elevation: 0,
         foregroundColor: Colors.white,
         backgroundColor: Colors.transparent
@@ -33,9 +38,13 @@ class _VideoPlayerViewPageState extends State<VideoPlayerViewPage> {
               fit: BoxFit.contain,
               aspectRatio: widget.ratio,
               fullScreenAspectRatio: widget.ratio,
+              autoPlay: true,
+              autoDispose: true,
               controlsConfiguration: BetterPlayerControlsConfiguration(
                 enableSkips: false,
                 enableFullscreen: false,
+                enableAudioTracks: false,
+                enableMute: false,
                 unMuteIcon: Icons.volume_off,
               ),
             ),
