@@ -9,7 +9,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:path/path.dart' as path;
-import 'package:piwigo_ng/views/components/SnackBars.dart';
+import 'package:piwigo_ng/views/components/snackbars.dart';
 
 import 'API.dart';
 

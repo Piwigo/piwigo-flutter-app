@@ -1,5 +1,4 @@
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:flat_icons_flutter/flat_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
@@ -10,14 +9,13 @@ import 'package:piwigo_ng/api/API.dart';
 import 'package:piwigo_ng/api/CategoryAPI.dart';
 import 'package:piwigo_ng/api/ImageAPI.dart';
 import 'package:piwigo_ng/constants/SettingsConstants.dart';
-import 'package:piwigo_ng/services/MoveAlbumService.dart';
 import 'package:piwigo_ng/services/OrientationService.dart';
-import 'package:piwigo_ng/views/components/Dialogs.dart';
-import 'package:piwigo_ng/views/components/ListItems.dart';
-import 'package:piwigo_ng/views/components/SnackBars.dart';
+import 'package:piwigo_ng/views/components/list_item.dart';
+import 'package:piwigo_ng/views/components/snackbars.dart';
 
-import 'ImageViewPage.dart';
-import 'UploadGalleryViewPage.dart';
+import 'package:piwigo_ng/views/ImageViewPage.dart';
+import 'package:piwigo_ng/views/UploadGalleryViewPage.dart';
+import 'package:piwigo_ng/views/components/dialogs/dialogs.dart';
 
 
 class CategoryViewPage extends StatefulWidget {
@@ -154,7 +152,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
               catName: widget.title,
               isImage: true,
               onSelected: (item) async {
-                if( await confirmMoveImage(context,
+                if( await confirmMoveDialog(context,
                   content: appStrings(context).moveImage_message(_selectedItems.length, "", item.name),
                 )) {
                   int nbMoved = await moveImages(context,
@@ -183,7 +181,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
               catName: widget.title,
               isImage: true,
               onSelected: (item) async {
-                if( await confirmAssignImage(context,
+                if( await confirmAssignDialog(context,
                   content: appStrings(context).copyImage_message(_selectedItems.length, "", item.name),
                 )) {
                   int nbCopied = await assignImages(context,
@@ -375,7 +373,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
       foregroundColor: _theme.floatingActionButtonTheme.foregroundColor,
       overlayColor: Colors.black,
       elevation: 5.0,
-      overlayOpacity: 0,
+      overlayOpacity: 0.5,
       shape: CircleBorder(),
       children: [
         SpeedDialChild(
@@ -483,10 +481,8 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
               physics: NeverScrollableScrollPhysics(),
               itemBuilder: (BuildContext context, int index) {
                 var album = albums[index];
-                return albumListItem(context, album, widget.isAdmin, (message) {
-                  setState(() {
-                    print('$message');
-                  });
+                return AlbumListItem(album, isAdmin: widget.isAdmin, onClose: () {
+                  setState(() {});
                 });
               },
             ) : Center(),
@@ -680,7 +676,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
             child: Container(
               margin: EdgeInsets.only(bottom: 0, right: widget.isAdmin? 70 : 0),
               child: FloatingActionButton(
-                backgroundColor: Color(0xaa868686),
+                backgroundColor: Color(0xff868686),
                 onPressed: () {
                   Navigator.of(context).popUntil((route) => route.isFirst);
                 },

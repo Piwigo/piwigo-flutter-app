@@ -11,7 +11,7 @@ import 'package:multi_image_picker/multi_image_picker.dart';
 import 'package:piwigo_ng/api/API.dart';
 import 'package:piwigo_ng/api/SessionAPI.dart';
 import 'package:piwigo_ng/constants/SettingsConstants.dart';
-import 'package:piwigo_ng/views/components/SnackBars.dart';
+import 'package:piwigo_ng/views/components/snackbars.dart';
 
 import 'chunked_uploader.dart';
 

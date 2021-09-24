@@ -7,9 +7,9 @@ import 'package:piwigo_ng/api/API.dart';
 
 import 'package:flutter/material.dart';
 
-import 'components/Buttons.dart';
-import 'components/Dialogs.dart';
-import 'components/TextFields.dart';
+import 'package:piwigo_ng/views/components/buttons.dart';
+import 'package:piwigo_ng/views/components/textfields.dart';
+import 'package:piwigo_ng/views/components/dialogs/dialogs.dart';
 
 class UploadGalleryViewPage extends StatefulWidget {
   final List<Media> imageData;

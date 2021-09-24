@@ -10,8 +10,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:piwigo_ng/constants/SettingsConstants.dart';
 
-import 'PrivacyPolicyViewPage.dart';
-import 'components/Buttons.dart';
+import 'package:piwigo_ng/views/PrivacyPolicyViewPage.dart';
+import 'package:piwigo_ng/views/components/buttons.dart';
 
 
 class LoginViewPage extends StatefulWidget {

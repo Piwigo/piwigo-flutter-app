@@ -6,12 +6,11 @@ import 'package:photo_view/photo_view.dart';
 import 'package:piwigo_ng/api/API.dart';
 import 'package:piwigo_ng/api/ImageAPI.dart';
 import 'package:piwigo_ng/constants/SettingsConstants.dart';
-import 'package:piwigo_ng/services/MoveAlbumService.dart';
-import 'package:piwigo_ng/views/components/Dialogs.dart';
-import 'package:piwigo_ng/views/components/SnackBars.dart';
+import 'package:piwigo_ng/views/components/snackbars.dart';
 import 'package:path/path.dart' as Path;
 
-import 'VideoPlayerViewPage.dart';
+import 'package:piwigo_ng/views/VideoPlayerViewPage.dart';
+import 'package:piwigo_ng/views/components/dialogs/dialogs.dart';
 
 
 class ImageViewPage extends StatefulWidget {
@@ -113,13 +112,13 @@ class _ImageViewPageState extends State<ImageViewPage> {
           builder: (context) {
             return MoveOrCopyDialog(
               title: appStrings(context).moveImage_title,
-              subtitle: appStrings(context).moveImage_selectAlbum(1, images[_page]),
+              subtitle: appStrings(context).moveImage_selectAlbum(1, images[_page]['name']),
               catId: widget.category,
               catName: widget.title,
               isImage: true,
               onSelected: (item) async {
-                if(await confirmMoveImage(context,
-                  content: appStrings(context).moveImage_message(1, images[_page], item.name),
+                if(await confirmMoveDialog(context,
+                  content: appStrings(context).moveImage_message(1, images[_page]['name'], item.name),
                 )) {
                   var response = await moveImage(images[_page]['id'], [int.parse(item.id)]);
                   if(response['stat'] == 'fail') {
@@ -143,13 +142,13 @@ class _ImageViewPageState extends State<ImageViewPage> {
           builder: (context) {
             return MoveOrCopyDialog(
               title: appStrings(context).copyImage_title,
-              subtitle: appStrings(context).copyImage_selectAlbum(1, images[_page]),
+              subtitle: appStrings(context).copyImage_selectAlbum(1, images[_page]['name']),
               catId: widget.category,
               catName: widget.title,
               isImage: true,
               onSelected: (item) async {
-                if(await confirmAssignImage(context,
-                  content: appStrings(context).copyImage_message(1, images[_page], item.name),
+                if(await confirmAssignDialog(context,
+                  content: appStrings(context).copyImage_message(1, images[_page]['name'], item.name),
                 )) {
                   var response = await assignImage(images[_page]['id'], [int.parse(item.id)]);
                   if (response['stat'] == 'fail') {
@@ -243,25 +242,25 @@ class _ImageViewPageState extends State<ImageViewPage> {
             });
           },
           child: PageView.builder(
-              physics: _pageViewPhysic,
-              itemCount: images.length,
-              controller: _pageController,
-              onPageChanged: (newPage) async {
-                if(newPage == images.length-1) {
-                  await nextPage();
-                }
-                setState(() {
-                  _page = newPage;
-                  showToolBar = true;
-                });
-              },
-              itemBuilder: (context, index) {
-                var image = images[index];
-                if(Path.extension(image['element_url']) == '.mp4') {
-                  return _displayVideo(image);
-                }
-                return _displayImage(image);
+            physics: _pageViewPhysic,
+            itemCount: images.length,
+            controller: _pageController,
+            onPageChanged: (newPage) async {
+              if(newPage == images.length-1) {
+                await nextPage();
               }
+              setState(() {
+                _page = newPage;
+                showToolBar = true;
+              });
+            },
+            itemBuilder: (context, index) {
+              var image = images[index];
+              if(Path.extension(image['element_url']) == '.mp4') {
+                return _displayVideo(image);
+              }
+              return _displayImage(image);
+            }
           ),
         ),
       ),

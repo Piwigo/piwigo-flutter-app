@@ -9,8 +9,8 @@ import 'package:piwigo_ng/api/API.dart';
 import 'package:piwigo_ng/views/PrivacyPolicyViewPage.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'components/AppBars.dart';
-import 'components/sliders.dart';
+import 'package:piwigo_ng/views/components/appbars.dart';
+import 'package:piwigo_ng/views/components/sliders.dart';
 
 
 class SettingsPage extends StatefulWidget {
@@ -363,65 +363,59 @@ class _ImageRowCountSlidersState extends State<ImageRowCountSliders> {
               Text(appStrings(context).defaultNberOfThumbnails_portrait,
                   style: TextStyle(color: Colors.black, fontSize: 16)
               ),
-              Row(
-                children: [
-                  Container(
-                    height: 30.0,
-                    width: 300.0,
-                    child: PiwigoSlider(
-                      label: '${API.prefs.getDouble("portrait_image_count").ceil()}/6',
-                      min: Constants.PORTRAIT_IMAGE_COUNT_MIN,
-                      max: Constants.PORTRAIT_IMAGE_COUNT_MAX,
-                      value: API.prefs.getDouble("portrait_image_count"),
-                      onChangeEnd: (i) {
-                        setState(() {
-                          API.prefs.setDouble("portrait_image_count", i.ceilToDouble());
-                        });
-                      },
-                    ),
+              Expanded(
+                child: Container(
+                  height: 30.0,
+                  constraints: BoxConstraints(maxWidth: 300.0),
+                  child: PiwigoSlider(
+                    label: '${API.prefs.getDouble("portrait_image_count").ceil()}/6',
+                    min: Constants.PORTRAIT_IMAGE_COUNT_MIN,
+                    max: Constants.PORTRAIT_IMAGE_COUNT_MAX,
+                    value: API.prefs.getDouble("portrait_image_count"),
+                    onChangeEnd: (i) {
+                      setState(() {
+                        API.prefs.setDouble("portrait_image_count", i.ceilToDouble());
+                      });
+                    },
                   ),
-                  SizedBox(
-                    width: 20,
-                    child: Text('${API.prefs.getDouble("portrait_image_count").ceil()}',
-                      textAlign: TextAlign.end,
-                      style: TextStyle(color: Colors.black, fontSize: 16),
-                    ),
-                  ),
-                ],
+                ),
+              ),
+              SizedBox(
+                width: 20,
+                child: Text('${API.prefs.getDouble("portrait_image_count").ceil()}',
+                  textAlign: TextAlign.end,
+                  style: TextStyle(color: Colors.black, fontSize: 16),
+                ),
               ),
             ],
           ),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(appStrings(context).defaultNberOfThumbnails_landscape,
                   style: TextStyle(color: Colors.black, fontSize: 16)
               ),
-              Row(
-                children: [
-                  Container(
-                    height: 30.0,
-                    width: 300.0,
-                    child: PiwigoSlider(
-                      label: '${API.prefs.getDouble("landscape_image_count").ceil()}/10',
-                      min: Constants.LANDSCAPE_IMAGE_COUNT_MIN,
-                      max: Constants.LANDSCAPE_IMAGE_COUNT_MAX,
-                      value: API.prefs.getDouble("landscape_image_count"),
-                      onChangeEnd: (i) {
-                        setState(() {
-                          API.prefs.setDouble("landscape_image_count", i.ceilToDouble());
-                        });
-                      },
-                    ),
+              Expanded(
+                child: Container(
+                  height: 30.0,
+                  child: PiwigoSlider(
+                    label: '${API.prefs.getDouble("landscape_image_count").ceil()}/10',
+                    min: Constants.LANDSCAPE_IMAGE_COUNT_MIN,
+                    max: Constants.LANDSCAPE_IMAGE_COUNT_MAX,
+                    value: API.prefs.getDouble("landscape_image_count"),
+                    onChangeEnd: (i) {
+                      setState(() {
+                        API.prefs.setDouble("landscape_image_count", i.ceilToDouble());
+                      });
+                    },
                   ),
-                  SizedBox(
-                    width: 20,
-                    child: Text('${API.prefs.getDouble("landscape_image_count").ceil()}',
-                      textAlign: TextAlign.end,
-                      style: TextStyle(color: Colors.black, fontSize: 16),
-                    ),
-                  ),
-                ],
+                ),
+              ),
+              SizedBox(
+                width: 20,
+                child: Text('${API.prefs.getDouble("landscape_image_count").ceil()}',
+                  textAlign: TextAlign.end,
+                  style: TextStyle(color: Colors.black, fontSize: 16),
+                ),
               ),
             ],
           ),

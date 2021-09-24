@@ -1,19 +1,17 @@
-import 'package:flutter/material.dart';
-
 import 'dart:async';
+
+import 'package:flutter/material.dart';
 
 import 'package:piwigo_ng/api/API.dart';
 import 'package:piwigo_ng/api/CategoryAPI.dart';
 import 'package:piwigo_ng/constants/SettingsConstants.dart';
 import 'package:piwigo_ng/services/OrientationService.dart';
 import 'package:piwigo_ng/services/upload/Uploader.dart';
-import 'package:piwigo_ng/views/components/Dialogs.dart';
-import 'package:piwigo_ng/views/components/ListItems.dart';
+import 'package:piwigo_ng/views/components/list_item.dart';
 import 'package:piwigo_ng/views/SettingsViewPage.dart';
-import 'package:piwigo_ng/views/components/TextFields.dart';
 
-import 'components/AppBars.dart';
-import 'components/Empty.dart';
+import 'package:piwigo_ng/views/components/appbars.dart';
+import 'package:piwigo_ng/views/components/dialogs/dialogs.dart';
 
 class RootCategoryViewPage extends StatefulWidget {
   final bool isAdmin;
@@ -102,10 +100,8 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
                             physics: NeverScrollableScrollPhysics(),
                             itemBuilder: (BuildContext context, int index) {
                               var album = albums[index];
-                              return albumListItem(context, album, widget.isAdmin, (message) {
-                                setState(() {
-                                  print('$message');
-                                });
+                              return AlbumListItem(album, isAdmin: widget.isAdmin, onClose: () {
+                                setState(() {});
                               });
                             },
                           ),
