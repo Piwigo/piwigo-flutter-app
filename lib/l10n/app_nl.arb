@@ -144,7 +144,7 @@
     "categoryUpload_mediaTypes": "Media Types",
     "categoryUpload_otherAlbums": "Other Albums",
     "categoryUpload_pasteboard": "Clipboard",
-    "categoyUpload_loadSubCategories": "load",
+    "categoryUpload_loadSubCategories": "load",
     "categoryUpload_images": "Upload Photos",
     "categoryUpload_videos": "Upload Videos",
     "categoryUpload_take": "Take Photo",
@@ -757,5 +757,5 @@
     "settings_pwgForumURL": "http://piwigo.org/forum",
     "settings_acknowledgements": "Acknowledgements",
     "settings_privacy": "Privacy Policy",
-    "settings_privacyUrl": "https://piwigo.org/mobile-apps-privacy-policy&webview"
+    "settings_privacyUrl": "&lang=en_EN"
 }
