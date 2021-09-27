@@ -635,7 +635,7 @@
     "defaultThumbnailSize": "Taille",
     "defaultThumbnailSize320px": "Taille des Vignettes",
     "defaultThumbnailSize414px": "Taille par Défaut des Vignettes",
-    "defaultNberOfThumbnails": "Nombre",
+    "defaultNberOfThumbnails": "Nombre de miniatures par lignes",
     "defaultNberOfThumbnails_portrait": "Mode portrait",
     "defaultNberOfThumbnails_landscape": "Mode paysage",
     "defaultThumbnailSizeTitle": "Taille par défaut",
