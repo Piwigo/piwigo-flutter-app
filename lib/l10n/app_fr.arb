@@ -144,7 +144,7 @@
     "categoryUpload_mediaTypes": "Types de média",
     "categoryUpload_otherAlbums": "Autres albums",
     "categoryUpload_pasteboard": "Presse papiers",
-    "categoryUpload_loadSubCategories": "charger",
+    "categoryUpload_loadSubCategories": "load",
     "categoryUpload_images": "Transférer des photos",
     "categoryUpload_videos": "Transférer des Videos",
     "categoryUpload_take": "Prendre une photo",
@@ -173,11 +173,11 @@
     "renameCategory_button": "Renommer",
     "renameCategoryHUD_label": "Changement du Nom…",
     "renameCategoryHUD_renamed": "Album renommé",
-    "renameCategoryError_title": "Echec du Changement",
-    "renameCategoryError_message": "Impossible de renommer votre album",
+    "renameCategoryError_title": "Rename Fail",
+    "renameCategoryError_message": "Failed to rename your album",
     "refreshCategoryHUD_label": "Rafraichissement en cours…",
-    "refreshCategoryError_title": "Echec du Rafraichissement",
-    "refreshCategoryError_message": "Le rafraichissement de l'image d'album a échoué",
+    "refreshCategoryError_title": "Refresh Fail",
+    "refreshCategoryError_message": "Failed to refresh your album representative",
     "deleteCategory_title": "EFFACER L'ALBUM",
     "deleteCategory_message": "{count, plural, =1{ÊTES-VOUS SÛR DE VOULOIR SUPPRIMER L’ALBUM {album} ET SA PHOTO ?} other{ÊTES-VOUS SÛR DE VOULOIR SUPPRIMER L’ALBUM {album} ET LES {count} PHOTOS ?}",
     "@deleteCategory_message": {
@@ -757,5 +757,5 @@
     "settings_pwgForumURL": "http://fr.piwigo.org",
     "settings_acknowledgements": "Remerciements",
     "settings_privacy": "Politique de Confidentialité",
-    "settings_privacyUrl": "&lang=fr_FR"
+    "settings_privacyUrl": "&lang=en_EN"
 }
