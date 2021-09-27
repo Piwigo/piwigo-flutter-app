@@ -14,6 +14,9 @@
     "alertTryButton": "Essayer",
     "alertClearButton": "Vider",
     "alertConfirmButton": "Confirmer",
+    "alertRemoveButton": "Retirer",
+    "alertMoveButton": "Déplacer",
+    "alertCopyButton": "Copier",
     "loadingHUD_label": "Chargement…",
     "completeHUD_label": "Terminé",
     "errorHUD_label": "Erreur",
@@ -144,6 +147,7 @@
     "categoryUpload_loadSubCategories": "charger",
     "categoryUpload_images": "Transférer des photos",
     "categoryUpload_videos": "Transférer des Videos",
+    "categoryUpload_take": "Prendre une photo",
     "setDefaultCategory_select": "Veuillez sélectionner un album ou un sous-album qui deviendra le nouvel album racine.",
     "setDefaultCategory_title": "Album par Défaut",
     "setDefaultCategory_message": "Etes-vous sûr de vouloir définir l'album {album} comme Album par Défaut ?",
@@ -169,11 +173,11 @@
     "renameCategory_button": "Renommer",
     "renameCategoryHUD_label": "Changement du Nom…",
     "renameCategoryHUD_renamed": "Album renommé",
-    "renameCategoyError_title": "Echec du Changement",
-    "renameCategoyError_message": "Impossible de renommer votre album",
+    "renameCategoryError_title": "Echec du Changement",
+    "renameCategoryError_message": "Impossible de renommer votre album",
     "refreshCategoryHUD_label": "Rafraichissement en cours…",
-    "refreshCategoyError_title": "Echec du Rafraichissement",
-    "refreshCategoyError_message": "Le rafraichissement de l'image d'album a échoué",
+    "refreshCategoryError_title": "Echec du Rafraichissement",
+    "refreshCategoryError_message": "Le rafraichissement de l'image d'album a échoué",
     "deleteCategory_title": "EFFACER L'ALBUM",
     "deleteCategory_message": "{count, plural, =1{ÊTES-VOUS SÛR DE VOULOIR SUPPRIMER L’ALBUM {album} ET SA PHOTO ?} other{ÊTES-VOUS SÛR DE VOULOIR SUPPRIMER L’ALBUM {album} ET LES {count} PHOTOS ?}",
     "@deleteCategory_message": {
@@ -306,6 +310,7 @@
     "privacyLevel_adminsFamilyFriends": "Admins, Famille, Amis",
     "privacyLevel_adminsFamilyFriendsContacts": "Admins, Famille, Amis, Contacts",
     "privacyLevel_everybody": "Tout le Monde",
+    "privacyLevel_unchanged": "Inchangé",
     "none": "aucun",
     "tag": "Tag",
     "tags": "Tags",
@@ -337,6 +342,11 @@
     "selectLimit": "Limite de sélection atteinte",
     "renameImage_title": "Fichier d'origine",
     "renameImage_message": "Entrez un nouveau nom de fichier pour cette photo",
+    "@renameImage_message": {
+        "placeholders": {
+            "file": {}
+        }
+    },
     "renameImageHUD_label": "Changement du Nom…",
     "renameImageHUD_renamed": "{count, plural, =1{Fichier renommé} other{{count} Fichiers renommés}}",
     "@renameImageHUD_renamed": {
@@ -385,6 +395,8 @@
             "count": {}
         }
     },
+    "removeSelectedImage_title": "Enlever l'image sélectionnée",
+    "removeSelectedImage_message": "Êtes vous sûr de vouloir retirer l'image de la sélection ?",
     "downloadImage_title": "{count, plural, =1{Télécharger la photo} other{Télécharger {count} photos}}",
     "@downloadImage_title": {
         "placeholders": {
@@ -417,6 +429,12 @@
     "imageSaveError_message": "Impossible d’enregistrer la photo.",
     "videoSaveError_title": "Vidéo non Enregistrée",
     "videoSaveError_message": "Impossible d’enregistrer la vidéo.",
+    "moveOrCopyImage_title": "{count, plural, =1{Voulez-vous déplacer ou copier cette image ?} other{Voulez-vous déplacer ou copier {count} images ?}}",
+    "@moveOrCopyImage_title": {
+        "placeholders": {
+            "count": {}
+        }
+    },
     "moveImage_title": "Déplacer vers un Album",
     "moveImage_selectAlbum": "{count, plural, =1{Veuillez sélectionner l'album dans lequel vous souhaitez déplacer la photo {photo}.} other{Veuillez sélectionner l'album dans lequel vous souhaitez déplacer les photos.}}",
     "@moveImage_selectAlbum": {
@@ -618,10 +636,8 @@
     "defaultThumbnailSize320px": "Taille des Vignettes",
     "defaultThumbnailSize414px": "Taille par Défaut des Vignettes",
     "defaultNberOfThumbnails": "Nombre",
-    "defaultNberOfThumbnails320px": "Nombre/ligne",
-    "defaultNberOfThumbnails414px": "Nombre par ligne",
-    "settings_portraitNberOfThumbnails": "Portrait Image/Ligne",
-    "settings_landscapeNberOfThumbnails": "Paysage Image/Ligne",
+    "defaultNberOfThumbnails_portrait": "Mode portrait",
+    "defaultNberOfThumbnails_landscape": "Mode paysage",
     "defaultThumbnailSizeTitle": "Taille par défaut",
     "defaultThumbnailSizeHeader": "Veuillez sélectionner une taille de vignette de photo",
     "settings_displayTitles": "Afficher Titres sur Vignettes",
@@ -741,5 +757,5 @@
     "settings_pwgForumURL": "http://fr.piwigo.org",
     "settings_acknowledgements": "Remerciements",
     "settings_privacy": "Politique de Confidentialité",
-    "settings_privacyUrl": "https://piwigo.org/mobile-apps-privacy-policy&webview&lang=fr_FR"
+    "settings_privacyUrl": "&lang=fr_FR"
 }

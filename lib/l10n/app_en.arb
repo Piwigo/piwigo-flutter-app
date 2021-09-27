@@ -188,7 +188,7 @@
     "categoryUpload_otherAlbums": "Other Albums",
     "categoryUpload_pasteboard": "Clipboard",
 
-    "categoyUpload_loadSubCategories": "load",
+    "categoryUpload_loadSubCategories": "load",
     "categoryUpload_images": "Upload Photos",
     "categoryUpload_videos": "Upload Videos",
     "categoryUpload_take": "Take Photo",
@@ -229,15 +229,15 @@
     "renameCategoryHUD_renamed": "Album Renamed",
 
 
-    "renameCategoyError_title": "Rename Fail",
-    "renameCategoyError_message": "Failed to rename your album",
+    "renameCategoryError_title": "Rename Fail",
+    "renameCategoryError_message": "Failed to rename your album",
 
 
     "refreshCategoryHUD_label": "Refreshing Representative…",
 
 
-    "refreshCategoyError_title": "Refresh Fail",
-    "refreshCategoyError_message": "Failed to refresh your album representative",
+    "refreshCategoryError_title": "Refresh Fail",
+    "refreshCategoryError_message": "Failed to refresh your album representative",
 
 
     "deleteCategory_title": "DELETE ALBUM",
@@ -919,5 +919,5 @@
     "settings_pwgForumURL": "http://piwigo.org/forum",
     "settings_acknowledgements": "Acknowledgements",
     "settings_privacy": "Privacy Policy",
-    "settings_privacyUrl": "https://piwigo.org/mobile-apps-privacy-policy&webview"
+    "settings_privacyUrl": "&lang=en_EN"
 }

@@ -14,6 +14,9 @@
     "alertTryButton": "Try",
     "alertClearButton": "Clear",
     "alertConfirmButton": "Confirm",
+    "alertRemoveButton": "Remove",
+    "alertMoveButton": "Move",
+    "alertCopyButton": "Copy",
     "loadingHUD_label": "Loading…",
     "completeHUD_label": "Complete",
     "errorHUD_label": "Error",
@@ -144,6 +147,7 @@
     "categoryUpload_loadSubCategories": "load",
     "categoryUpload_images": "Upload Photos",
     "categoryUpload_videos": "Upload Videos",
+    "categoryUpload_take": "Take Photo",
     "setDefaultCategory_select": "Please select an album or sub-album which will become the new root album.",
     "setDefaultCategory_title": "Default Album",
     "setDefaultCategory_message": "Are you sure you want to set the album {album} as default album?",
@@ -169,11 +173,11 @@
     "renameCategory_button": "Rename",
     "renameCategoryHUD_label": "Renaming Album…",
     "renameCategoryHUD_renamed": "Album Renamed",
-    "renameCategoyError_title": "Rename Fail",
-    "renameCategoyError_message": "Failed to rename your album",
+    "renameCategoryError_title": "Rename Fail",
+    "renameCategoryError_message": "Failed to rename your album",
     "refreshCategoryHUD_label": "Refreshing Representative…",
-    "refreshCategoyError_title": "Refresh Fail",
-    "refreshCategoyError_message": "Failed to refresh your album representative",
+    "refreshCategoryError_title": "Refresh Fail",
+    "refreshCategoryError_message": "Failed to refresh your album representative",
     "deleteCategory_title": "DELETE ALBUM",
     "deleteCategory_message": "{count, plural, =1{ARE YOU SURE YOU WANT TO DELETE THE ALBUM {album} AND IT'S PHOTO} other{ARE YOU SURE YOU WANT TO DELETE THE ALBUM {album} AND ALL {count} PHOTOS ?}",
     "@deleteCategory_message": {
@@ -306,6 +310,7 @@
     "privacyLevel_adminsFamilyFriends": "Admins, Family, Friends",
     "privacyLevel_adminsFamilyFriendsContacts": "Admins, Family, Friends, Contacts",
     "privacyLevel_everybody": "Everybody",
+    "privacyLevel_unchanged": "Unchanged",
     "none": "none",
     "tag": "Tag",
     "tags": "Tags",
@@ -337,6 +342,11 @@
     "selectLimit": "Selection limit reached",
     "renameImage_title": "Original File",
     "renameImage_message": "Enter a new file name for this photo",
+    "@renameImage_message": {
+        "placeholders": {
+            "file": {}
+        }
+    },
     "renameImageHUD_label": "Renaming File…",
     "renameImageHUD_renamed": "{count, plural, =1{File Renamed} other{{count} Files Renamed}}",
     "@renameImageHUD_renamed": {
@@ -385,6 +395,8 @@
             "count": {}
         }
     },
+    "removeSelectedImage_title": "Remove Selected Image",
+    "removeSelectedImage_message": "Are you sure you want to remove this image from the selection ?",
     "downloadImage_title": "{count, plural, =1{Download Photo} other{Download {count} Photos}}",
     "@downloadImage_title": {
         "placeholders": {
@@ -417,6 +429,12 @@
     "imageSaveError_message": "Failed to save photo",
     "videoSaveError_title": "Fail Saving Video",
     "videoSaveError_message": "Failed to save video",
+    "moveOrCopyImage_title": "{count, plural, =1{Do you want to move or copy this image ?} other{Do you want to move or copy {count} images ?}}",
+    "@moveOrCopyImage_title": {
+        "placeholders": {
+            "count": {}
+        }
+    },
     "moveImage_title": "Move to Album",
     "moveImage_selectAlbum": "{count, plural, =1{Please, select the album in which you wish to move the photo {photo}.} other{Please, select the album in which you wish to move the photos.}}",
     "@moveImage_selectAlbum": {
@@ -618,10 +636,8 @@
     "defaultThumbnailSize320px": "Thumbnails Size",
     "defaultThumbnailSize414px": "Default Size of Thumbnails",
     "defaultNberOfThumbnails": "Number",
-    "defaultNberOfThumbnails320px": "Number/Row",
-    "defaultNberOfThumbnails414px": "Number per Row",
-    "settings_portraitNberOfThumbnails": "Portrait Image/Row",
-    "settings_landscapeNberOfThumbnails": "Landscape Image/Row",
+    "defaultNberOfThumbnails_portrait": "Portrait Mode",
+    "defaultNberOfThumbnails_landscape": "Landscape Mode",
     "defaultThumbnailSizeTitle": "Default Size",
     "defaultThumbnailSizeHeader": "Please select a photo thumbnail size",
     "settings_displayTitles": "Titles on Thumbnails",
@@ -740,5 +756,6 @@
     "settings_crowdinURL": "https://crowdin.com/project/piwigo-ng",
     "settings_pwgForumURL": "http://piwigo.org/forum",
     "settings_acknowledgements": "Acknowledgements",
-    "settings_privacy": "Privacy Policy"
+    "settings_privacy": "Privacy Policy",
+    "settings_privacyUrl": "https://piwigo.org/mobile-apps-privacy-policy&webview"
 }
