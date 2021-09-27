@@ -15,6 +15,9 @@
     "alertTryButton": "Try",
     "alertClearButton": "Clear",
     "alertConfirmButton": "Confirm",
+    "alertRemoveButton": "Remove",
+    "alertMoveButton": "Move",
+    "alertCopyButton": "Copy",
 
     "loadingHUD_label": "Loading…",
     "completeHUD_label": "Complete",
@@ -112,18 +115,19 @@
 
 
 
-    "albumCount" : "{count, plural, =1{1 album} other{{count} albums}}",
+    "albumCount" : "{count, plural, =0{0 albums} =1{1 album} other{{count} albums}}",
     "@albumCount" : {
         "placeholders": {
             "count": {}
         }
     },
-    "subAlbumCount" : "{count, plural, =1{1 sub-album} other{{count} sub-albums}}",
+    "subAlbumCount" : "{count, plural,=0{0 sub-albums} =1{1 sub-album} other{{count} sub-albums}}",
     "@subAlbumCount" : {
         "placeholders": {
             "count": {}
         }
     },
+
     "showMore": "Show more… ({count})",
     "@showMore" : {
         "placeholders": {
@@ -131,16 +135,22 @@
         }
     },
     "showPhotos": "Show Photos",
+
+
     "categoryMainEmtpy": "No albums in your Piwigo yet.\rYou may pull down to refresh or re-login.",
     "categoryImageList_selectButton": "Select",
     "categoryImageList_deselectButton": "Deselect",
     "categoryImageList_noDataError": "Error No Data",
+
+
     "categoryDiscover_title": "Discover",
     "categoryDiscoverVisits_title": "Most visited",
     "categoryDiscoverVisits_legend": "hits",
     "categoryDiscoverBest_title": "Best rated",
     "categoryDiscoverRecent_title": "Recent photos",
     "categoryDiscoverFavorites_title": "Your favorites",
+
+
     "categorySort_nameAscending": "Photo Title, A → Z",
     "categorySort_nameDescending": "Photo Title, Z → A",
     "categorySort_fileNameAscending": "File Name, A → Z",
@@ -155,8 +165,11 @@
     "categorySort_visitsAscending": "Visits, low → high",
     "categorySort_manual": "Manual Order",
     "categorySort_random": "Random Order",
+
     "categorySort_videosOnly": "Videos Only",
     "categorySort_imagesOnly": "Photos Only",
+
+
     "categorySelection_title": "Album",
     "categorySelection_titleSub": "Sub-Albums",
     "categorySelection_root": "Root Album",
@@ -164,6 +177,8 @@
     "categorySelection_action": "Select an action for this album",
     "categorySelectionHUD_label": "Retrieving Albums Data…",
     "categorySelection_allAlbums": "All Albums",
+
+
     "categoryUpload_noSubAlbum": "There is no sub-album to upload photos to",
     "categoryUpload_chooseAlbum": "Select a sub-album to upload photos to",
     "categoryUpload_LocalAlbums": "Local Albums",
@@ -172,9 +187,13 @@
     "categoryUpload_mediaTypes": "Media Types",
     "categoryUpload_otherAlbums": "Other Albums",
     "categoryUpload_pasteboard": "Clipboard",
-    "categoryUpload_loadSubCategories": "load",
+
+    "categoyUpload_loadSubCategories": "load",
     "categoryUpload_images": "Upload Photos",
     "categoryUpload_videos": "Upload Videos",
+    "categoryUpload_take": "Take Photo",
+
+
     "setDefaultCategory_select": "Please select an album or sub-album which will become the new root album.",
     "setDefaultCategory_title": "Default Album",
     "setDefaultCategory_message": "Are you sure you want to set the album {album} as default album?",
@@ -183,6 +202,8 @@
             "album": {}
         }
     },
+
+
     "createNewAlbum_title": "New Album",
     "createNewAlbum_message": "Enter a name for this album:",
     "createNewAlbum_placeholder": "Album Name",
@@ -190,16 +211,24 @@
     "createNewAlbumDescription_noDescription": "no description",
     "createNewAlbumHUD_label": "Creating Album…",
     "createNewAlbumHUD_created": "Album Created",
+
+
     "createAlbumError_title": "Create Album Error",
     "createAlbumError_message": "Failed to create a new album",
+
+
     "categoryCellOption_rename": "Rename",
     "categoryCellOption_move": "Move",
     "categoryCellOption_delete": "Delete",
+
+
     "renameCategory_title": "Rename Album",
     "renameCategory_message": "Enter a new name for this album",
     "renameCategory_button": "Rename",
     "renameCategoryHUD_label": "Renaming Album…",
     "renameCategoryHUD_renamed": "Album Renamed",
+
+
     "renameCategoyError_title": "Rename Fail",
     "renameCategoyError_message": "Failed to rename your album",
 
@@ -212,7 +241,7 @@
 
 
     "deleteCategory_title": "DELETE ALBUM",
-    "deleteCategory_message": "{count, plural, =1{ARE YOU SURE YOU WANT TO DELETE THE ALBUM {album} AND IT'S PHOTO} other{ARE YOU SURE YOU WANT TO DELETE THE ALBUM {album} AND ALL {count} PHOTOS ?}",
+    "deleteCategory_message": "{count, plural, =0{ARE YOU SURE YOU WANT TO DELETE THE ALBUM {album}} =1{ARE YOU SURE YOU WANT TO DELETE THE ALBUM {album} AND ITS PHOTO} other{ARE YOU SURE YOU WANT TO DELETE THE ALBUM {album} AND ALL {count} PHOTOS ?}",
     "@deleteCategory_message" : {
         "placeholders": {
             "count": {},
@@ -294,7 +323,7 @@
 
 
     "singleImage": "Photo",
-    "imageCount": "{count, plural, =1{1 photo} other{{count} photos}}",
+    "imageCount": "{count, plural, =0{0 photos} =1{1 photo} other{{count} photos}}",
     "@imageCount": {
         "placeholders": {
             "count": {}
@@ -369,12 +398,13 @@
     "privacyLevel_adminsFamilyFriends": "Admins, Family, Friends",
     "privacyLevel_adminsFamilyFriendsContacts": "Admins, Family, Friends, Contacts",
     "privacyLevel_everybody": "Everybody",
+    "privacyLevel_unchanged": "Unchanged",
 
 
     "none": "none",
     "tag" : "Tag",
     "tags": "Tags",
-    "tagCount": "{count, plural, =1{1 tag} other{{count} tags}}",
+    "tagCount": "{count, plural, =0{0 tags} =1{1 tag} other{{count} tags}}",
     "@tagCount": {
         "placeholders": {
             "count": {}
@@ -396,7 +426,7 @@
 
 
     "selectImages": "Select Photos",
-    "selectImageSelectedCount": "{count, plural, =1{1 Photo Selected} other{{count} Photos Selected}}",
+    "selectImageSelectedCount": "{count, plural, =0{0 Photos Selected} =1{1 Photo Selected} other{{count} Photos Selected}}",
     "@selectImageSelectedCount": {
         "placeholders": {
             "count": {}
@@ -407,9 +437,14 @@
 
 
     "renameImage_title": "Original File",
-    "renameImage_message": "Enter a new file name for this photo",
+    "renameImage_message": "Enter a new file name for this photo \"{file}\"",
+    "@renameImage_message": {
+        "placeholders": {
+            "file": {}
+        }
+    },
     "renameImageHUD_label": "Renaming File…",
-    "renameImageHUD_renamed": "{count, plural, =1{File Renamed} other{{count} Files Renamed}}",
+    "renameImageHUD_renamed": "{count, plural, =0{0 Files Renamed} =1{File Renamed} other{{count} Files Renamed}}",
     "@renameImageHUD_renamed": {
         "placeholders": {
             "count": {}
@@ -427,20 +462,20 @@
             "count": {}
         }
     },
-    "deleteImageCount_title": "{count, plural, =1{Delete Photo} other{Delete {count} Photos}}",
+    "deleteImageCount_title": "{count, plural, =0{Delete Photos} =1{Delete Photo} other{Delete {count} Photos}}",
     "@deleteImageCount_title": {
         "placeholders": {
             "count": {}
         }
     },
-    "deleteImageHUD_deleting": "{count, plural, =1{Deleting Photo…} other{Deleting Photos…}}",
+    "deleteImageHUD_deleting": "{count, plural, =0{Deleting Photos…} =1{Deleting Photo…} other{Deleting Photos…}}",
     "@deleteImageHUD_deleting": {
         "placeholders": {
             "count": {}
         }
     },
     "removeSingleImage_title": "Remove from Album",
-    "removeImageHUD_removing": "{count, plural, =1{Removing Photo…} other{Removing Photos…}}",
+    "removeImageHUD_removing": "{count, plural, =0{Removing Photos…} =1{Removing Photo…} other{Removing Photos…}}",
     "@removeImageHUD_removing": {
         "placeholders": {
             "count": {}
@@ -456,15 +491,18 @@
 
     "deleteImageFail_title": "Delete Failed",
     "deleteImageFail_message": "Photo could not be deleted.",
-    "deleteImageSuccess_message": "{count, plural, =1{Successfully deleted 1 photo} other{Successfully deleted {count} photos}}",
+    "deleteImageSuccess_message": "{count, plural, =0{Successfully deleted 0 photos} =1{Successfully deleted 1 photo} other{Successfully deleted {count} photos}}",
     "@deleteImageSuccess_message": {
         "placeholders": {
             "count": {}
         }
     },
 
+    "removeSelectedImage_title": "Remove Selected Image",
+    "removeSelectedImage_message": "Are you sure you want to remove this image from the selection ?",
 
-    "downloadImage_title": "{count, plural, =1{Download Photo} other{Download {count} Photos}}",
+
+    "downloadImage_title": "{count, plural, =0{Download Photos} =1{Download Photo} other{Download {count} Photos}}",
     "@downloadImage_title": {
         "placeholders": {
             "count": {}
@@ -501,6 +539,12 @@
     "videoSaveError_title": "Fail Saving Video",
     "videoSaveError_message": "Failed to save video",
 
+    "moveOrCopyImage_title": "{count, plural, =1{Do you want to move or copy this image ?} other{Do you want to move or copy {count} images ?}}",
+    "@moveOrCopyImage_title": {
+        "placeholders": {
+            "count": {}
+        }
+    },
 
     "moveImage_title": "Move to Album",
     "moveImage_selectAlbum": "{count, plural, =1{Please, select the album in which you wish to move the photo {photo}.} other{Please, select the album in which you wish to move the photos.}}",
@@ -547,8 +591,8 @@
             "photo": {}
         }
     },
-    "copImage_message": "{count, plural, =1{Are you sure you want to copy the photo {photo} to the album {album} ?} other{Are you sure you want to copy the photos to the album {album} ?}}",
-    "@copImage_message": {
+    "copyImage_message": "{count, plural, =1{Are you sure you want to copy the photo {photo} to the album {album} ?} other{Are you sure you want to copy the photos to the album {album} ?}}",
+    "@copyImage_message": {
         "placeholders": {
             "count": {},
             "photo": {},
@@ -561,7 +605,7 @@
             "count": {}
         }
     },
-    "copyImageHUD_copied": "{count, plural, =1{Photo Assigned} other{Photos Assigned}}",
+    "copyImageHUD_copied": "{count, plural, =1{Photo Copied} other{Photos Copied}}",
     "@copyImageHUD_copied": {
         "placeholders": {
             "count": {}
@@ -736,11 +780,9 @@
     "defaultThumbnailSize": "Size",
     "defaultThumbnailSize320px": "Thumbnails Size",
     "defaultThumbnailSize414px": "Default Size of Thumbnails",
-    "defaultNberOfThumbnails": "Number",
-    "defaultNberOfThumbnails320px": "Number/Row",
-    "defaultNberOfThumbnails414px": "Number per Row",
-    "settings_portraitNberOfThumbnails": "Portrait Image/Row",
-    "settings_landscapeNberOfThumbnails": "Landscape Image/Row",
+    "defaultNberOfThumbnails": "Number of thumbnails per row",
+    "defaultNberOfThumbnails_portrait": "Portrait Mode",
+    "defaultNberOfThumbnails_landscape": "Landscape Mode",
     "defaultThumbnailSizeTitle": "Default Size",
     "defaultThumbnailSizeHeader": "Please select a photo thumbnail size",
     "settings_displayTitles": "Titles on Thumbnails",
@@ -843,19 +885,19 @@
     "settings_brightnessHelp": "In low ambient brightness, the Automatic option uses a darker color palette to make photos stand out against darker backgrounds.",
 
 
-    "userCount": "{count, plural, =1{1 user} other{{count} users}}",
+    "userCount": "{count, plural, =0{0 users} =1{1 user} other{{count} users}}",
     "@userCount" : {
         "placeholders": {
             "count": {}
         }
     },
-    "groupCount": "{count, plural, =1{1 group} other{{count} groups}}",
+    "groupCount": "{count, plural, =0{0 groups} =1{1 group} other{{count} groups}}",
     "@groupCount" : {
         "placeholders": {
             "count": {}
         }
     },
-    "commentCount": "{count, plural, =1{1 comment} other{{count} comments}}",
+    "commentCount": "{count, plural, =0{0 comments} =1{1 comment} other{{count} comments}}",
     "@commentCount" : {
         "placeholders": {
             "count": {}
@@ -876,5 +918,6 @@
     "settings_crowdinURL": "https://crowdin.com/project/piwigo-ng",
     "settings_pwgForumURL": "http://piwigo.org/forum",
     "settings_acknowledgements": "Acknowledgements",
-    "settings_privacy": "Privacy Policy"
+    "settings_privacy": "Privacy Policy",
+    "settings_privacyUrl": "https://piwigo.org/mobile-apps-privacy-policy&webview"
 }

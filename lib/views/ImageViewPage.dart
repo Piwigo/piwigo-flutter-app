@@ -1,4 +1,3 @@
-import 'package:better_player/better_player.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -7,12 +6,11 @@ import 'package:photo_view/photo_view.dart';
 import 'package:piwigo_ng/api/API.dart';
 import 'package:piwigo_ng/api/ImageAPI.dart';
 import 'package:piwigo_ng/constants/SettingsConstants.dart';
-import 'package:piwigo_ng/services/MoveAlbumService.dart';
-import 'package:piwigo_ng/views/components/Dialogs.dart';
-import 'package:piwigo_ng/views/components/SnackBars.dart';
+import 'package:piwigo_ng/views/components/snackbars.dart';
 import 'package:path/path.dart' as Path;
 
-import 'VideoPlayerViewPage.dart';
+import 'package:piwigo_ng/views/VideoPlayerViewPage.dart';
+import 'package:piwigo_ng/views/components/dialogs/dialogs.dart';
 
 
 class ImageViewPage extends StatefulWidget {
@@ -28,11 +26,9 @@ class ImageViewPage extends StatefulWidget {
   @override
   _ImageViewPageState createState() => _ImageViewPageState();
 }
-
 class _ImageViewPageState extends State<ImageViewPage> {
   String _derivative;
   PageController _pageController;
-  PhotoViewController _photoScaleController = PhotoViewController(initialScale: 1);
   ScrollPhysics _pageViewPhysic = BouncingScrollPhysics();
   int _page;
   int _imagePage;
@@ -42,7 +38,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
   @override
   void initState() {
     super.initState();
-    SystemChrome.setEnabledSystemUIOverlays([SystemUiOverlay.bottom]);
+    // SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive, overlays: [SystemUiOverlay.bottom]);
     _pageController = PageController(initialPage: widget.index);
     _derivative = API.prefs.getString('full_screen_image_size');
     _page = widget.index;
@@ -60,7 +56,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
 
   @override
   void dispose() {
-    SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
+    // SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge, overlays: SystemUiOverlay.values);
     super.dispose();
   }
 
@@ -76,22 +72,153 @@ class _ImageViewPageState extends State<ImageViewPage> {
     }
   }
 
+  void _onEditImage() async {
+    showDialog(context: context,
+      builder: (BuildContext context) {
+        return EditImageSelectionDialog(
+          catId: int.parse(widget.category),
+          images: [images[_page]],
+        );
+      }
+    ).whenComplete(() {
+      setState(() {});
+    });
+  }
+  void _onDownloadImage() async {
+    if(await confirmDownloadDialog(context,
+      content: appStrings(context).downloadImage_confirmation(1),
+    )) {
+      print('Download $_page');
+
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(appStrings(context).downloadingImages(1)),
+            CircularProgressIndicator(),
+          ],
+        ),
+      ));
+      await downloadSingleImage(images[_page]);
+    }
+  }
+  void _onMoveCopyImage() async {
+    int choice = await chooseMoveCopyImage(context);
+
+    switch(choice) {
+      case 0: showDialog(context: context,
+          builder: (context) {
+            return MoveOrCopyDialog(
+              title: appStrings(context).moveImage_title,
+              subtitle: appStrings(context).moveImage_selectAlbum(1, images[_page]['name']),
+              catId: widget.category,
+              catName: widget.title,
+              isImage: true,
+              onSelected: (item) async {
+                if(await confirmMoveDialog(context,
+                  content: appStrings(context).moveImage_message(1, images[_page]['name'], item.name),
+                )) {
+                  var response = await moveImage(images[_page]['id'], [int.parse(item.id)]);
+                  if(response['stat'] == 'fail') {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                        errorSnackBar(context, response['result']));
+                    Navigator.of(context).pop();
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                        imagesMovedSnackBar(context, 1));
+                    Navigator.of(context).pop();
+                  }
+                }
+              },
+            );
+          }
+      ).whenComplete(() {
+        setState(() {});
+      });
+      break;
+      case 1: showDialog(context: context,
+          builder: (context) {
+            return MoveOrCopyDialog(
+              title: appStrings(context).copyImage_title,
+              subtitle: appStrings(context).copyImage_selectAlbum(1, images[_page]['name']),
+              catId: widget.category,
+              catName: widget.title,
+              isImage: true,
+              onSelected: (item) async {
+                if(await confirmAssignDialog(context,
+                  content: appStrings(context).copyImage_message(1, images[_page]['name'], item.name),
+                )) {
+                  var response = await assignImage(images[_page]['id'], [int.parse(item.id)]);
+                  if (response['stat'] == 'fail') {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                        errorSnackBar(context, response['result']));
+                    Navigator.of(context).pop();
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                        imagesAssignedSnackBar(context, 1));
+                    Navigator.of(context).pop();
+                  }
+                }
+              },
+            );
+          }
+      ).whenComplete(() {
+        setState(() {});
+      });
+      break;
+      default: break;
+    }
+  }
+  void _onDeleteImage() async {
+    if(await confirmDeleteDialog(context,
+      content: appStrings(context).deleteImage_message(1),
+    )) {
+      var response = await deleteImage(images[_page]['id']);
+      if(response['stat'] == 'fail') {
+        ScaffoldMessenger.of(context).showSnackBar(
+            errorSnackBar(context, '${response['result']}')
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(appStrings(context).deleteImageHUD_deleting(1)),
+        ));
+      }
+      int page = _page;
+      if(page == images.length-1) {
+        if (page == 0) {
+          Navigator.of(context).pop();
+        } else {
+          setState(() {
+            _page--;
+            _pageController.previousPage(
+                duration: Duration(milliseconds: 100),
+                curve: Curves.easeIn);
+          });
+        }
+      }
+      images.removeAt(page);
+      setState(() {});
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    ThemeData _theme = Theme.of(context);
     return Scaffold(
       primary: true,
-      backgroundColor: Colors.black,
+      backgroundColor: showToolBar ?
+        Theme.of(context).scaffoldBackgroundColor :
+        Colors.black,
       resizeToAvoidBottomInset: true,
       extendBodyBehindAppBar: true,
+      extendBody: true,
       appBar: showToolBar ? AppBar(
         iconTheme: IconThemeData(
-          color: _theme.iconTheme.color, //change your color here
+          color: Theme.of(context).iconTheme.color, //change your color here
         ),
         centerTitle: true,
         title: Text('${images[_page]['name']}',
           overflow: TextOverflow.ellipsis,
-          style: TextStyle(color: Colors.white),
         ),
         leading: IconButton(
           onPressed: () {
@@ -99,274 +226,152 @@ class _ImageViewPageState extends State<ImageViewPage> {
           },
           icon: Icon(Icons.chevron_left),
         ),
-        backgroundColor: Color(0x80000000),
-        actions: [/*
-          widget.isAdmin? IconButton(
-            onPressed: () {
-              _settingModalBottomSheet(context, images[_pageController.page.toInt()]);
-            },
-            icon: Icon(Icons.edit),
-          ) : IconButton(
-            onPressed: () {
-              //TODO: Implement share image
-              print("share");
-            },
-            icon: Icon(Icons.share),
-          ),
-           Center(),
-           */
-        ],
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       ) : AppBar(
         elevation: 0,
-        leading: Text(""),
+        leading: SizedBox(),
         backgroundColor: Colors.transparent
       ),
       body: Container(
-        child: PageView.builder(
-          physics: _pageViewPhysic,
-          itemCount: images.length,
-          controller: _pageController,
-          onPageChanged: (newPage) async {
-            if(newPage == images.length-1) {
-              await nextPage();
-            }
+        child: GestureDetector(
+          onTap: () {
+            print('tap');
             setState(() {
-              _page = newPage;
+              showToolBar = !showToolBar;
             });
           },
-          itemBuilder: (context, index) {
-            if(Path.extension(images[index]['element_url']) == '.mp4') {
-              return GestureDetector(
-                onTap: () {
-                  Navigator.of(context).push(MaterialPageRoute(builder: (_) => VideoPlayerViewPage(images[index]['element_url'], ratio:images[index]['width']/images[index]['height'])));
-                },
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    Image.network(images[index]["derivatives"][_derivative]["url"]),
-                    IconShadowWidget(
-                      Icon(Icons.play_arrow_rounded, size: 100, color: Color(0xFFFFFFFF)),
-                      shadowColor: Colors.black45,
-                    ),
-                  ],
-                ),
-              );
+          child: PageView.builder(
+            physics: _pageViewPhysic,
+            itemCount: images.length,
+            controller: _pageController,
+            onPageChanged: (newPage) async {
+              if(newPage == images.length-1) {
+                await nextPage();
+              }
+              setState(() {
+                _page = newPage;
+                // showToolBar = true;
+              });
+            },
+            itemBuilder: (context, index) {
+              var image = images[index];
+              if(Path.extension(image['element_url']) == '.mp4') {
+                return _displayVideo(image);
+              }
+              return _displayImage(image);
             }
-            return GestureDetector(
-              onScaleStart: (details) {
-                setState(() {
-                  showToolBar = false;
-                });
-              },
-              child: PhotoView(
-                controller: _photoScaleController,
-                imageProvider: CachedNetworkImageProvider(images[index]["derivatives"][_derivative]["url"]),
-                minScale: PhotoViewComputedScale.contained,
-                scaleStateChangedCallback: (scale) {
-                  print("scale cb ${scale.isScaleStateZooming}");
-                  if(scale.isScaleStateZooming && _photoScaleController.scale > 0.5) {
-                    setState(() {
-                      _pageViewPhysic = NeverScrollableScrollPhysics();
-                      showToolBar = false;
-                    });
-                  } else {
-                    setState(() {
-                      _pageViewPhysic = BouncingScrollPhysics();
-                      showToolBar = true;
-                    });
-                  }
-                },
-                /* onScaleEnd: (context, details, value) {
-                  print("scale ${_photoScaleController.scale}");
-                  if(_photoScaleController.scale > 0.5) {
-                    setState(() {
-                      _pageViewPhysic = NeverScrollableScrollPhysics();
-                      showToolBar = false;
-                    });
-                  } else {
-                    setState(() {
-                      _pageViewPhysic = BouncingScrollPhysics();
-                      showToolBar = true;
-                    });
-                  }
-                }, */
+          ),
+        ),
+      ),
+      bottomNavigationBar: _bottomNavigationBar(),
+    );
+  }
+
+  Widget _displayVideo(dynamic image) {
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        Container(
+          height: double.infinity,
+          width: double.infinity,
+          child: CachedNetworkImage(
+            imageUrl: image["derivatives"][_derivative]["url"],
+            fit: BoxFit.contain,
+          ),
+        ),
+        GestureDetector(
+          onTap: () {
+            Navigator.of(context).push(MaterialPageRoute(
+              builder: (_) => VideoPlayerViewPage(image['element_url'],
+                ratio:image['width']/image['height'],
               ),
-            );
-          }
+            ));
+          },
+          child: IconShadowWidget(
+            Icon(Icons.play_arrow_rounded, size: 100, color: Color(0x80FFFFFF)),
+            shadowColor: Colors.black45,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _displayImage(dynamic image) {
+    return PhotoView(
+      imageProvider: NetworkImage(image["derivatives"][_derivative]["url"]),
+      minScale: PhotoViewComputedScale.contained,
+      backgroundDecoration: BoxDecoration(
+        color: showToolBar ?
+        Theme.of(context).scaffoldBackgroundColor :
+        Colors.black,
+      ),
+      scaleStateChangedCallback: (scale) {
+        if(scale.isScaleStateZooming) {
+          setState(() {
+            _pageViewPhysic = NeverScrollableScrollPhysics();
+          });
+        } else {
+          setState(() {
+            _pageViewPhysic = BouncingScrollPhysics();
+          });
+        }
+      },
+    );
+  }
+
+  Widget _bottomNavigationBar() {
+    return widget.isAdmin && showToolBar? BottomNavigationBar(
+      onTap: (index) async {
+        switch (index) {
+          case 0:
+            _onEditImage();
+            break;
+          case 1:
+            _onDownloadImage();
+            break;
+          case 2:
+            _onMoveCopyImage();
+            break;
+          case 3:
+            _onDeleteImage();
+            break;
+          default:
+            break;
+        }
+      },
+      items: <BottomNavigationBarItem>[
+        BottomNavigationBarItem(
+          icon: Icon(Icons.edit, color: Theme.of(context).iconTheme.color),
+          label: appStrings(context).imageOptions_edit,
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.download_rounded, color: Theme.of(context).iconTheme.color),
+          label: appStrings(context).imageOptions_download,
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.reply_outlined, color: Theme.of(context).iconTheme.color),
+          label: appStrings(context).moveImage_title,
         ),
         /*
-        PhotoViewGallery.builder(
-          scrollPhysics: const BouncingScrollPhysics(),
-          itemCount: images.length,
-          pageController: _pageController,
-          onPageChanged: (newPage) async {
-            if(newPage == images.length-1) {
-              await nextPage();
-            }
-            setState(() {
-              _page = newPage;
-            });
-          },
-          builder: (BuildContext context, int index) {
-            return PhotoViewGalleryPageOptions(
-              imageProvider: CachedNetworkImageProvider(images[index]["derivatives"][_derivative]["url"]),
-              minScale: PhotoViewComputedScale.contained,
-            );
-          },
-          loadingBuilder: (context, event) => Center(
-            child: Container(
-              child: CircularProgressIndicator(
-                value: event == null
-                    ? 0 : event.cumulativeBytesLoaded / event.expectedTotalBytes,
-              ),
-            ),
-          ),
-        ),
-        */
-      ),
-      bottomNavigationBar: widget.isAdmin && showToolBar? BottomNavigationBar(
-        onTap: (index) async {
-          switch (index) {
-            case 0:
-              if(await confirmDownloadDialog(context,
-                content: appStrings(context).downloadImage_confirmation(1),
-              )) {
-                print('Download $_page');
-
-                ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                  content: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(appStrings(context).downloadingImages(1)),
-                      CircularProgressIndicator(),
-                    ],
-                  ),
-                ));
-
-                await downloadSingleImage(images[_page]);
-              }
-              break;
-            case 1:
-              print('Move $_page');
-              await moveCategoryModalBottomSheet(context,
-                widget.category,
-                widget.title,
-                true,
-                (item) async {
-                  int result = await confirmMoveAssignImage(
-                    context,
-                    content: appStrings(context).moveImage_message(1, images[_page],item.name),
-                  );
-
-                  if (result == 0) {
-                    print('Move $_page to ${item.id}');
-                    var response = await moveImage(images[_page]['id'], [int.parse(item.id)]);
-                    if(response['stat'] == 'fail') {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                          errorSnackBar(context, response['result']));
-                      Navigator.of(context).pop();
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                          imagesMovedSnackBar(context, 1));
-                      Navigator.of(context).pop();
-                    }
-                  } else if (result == 1) {
-                    print('Assign $_page to ${item.id}');
-                    var response = await assignImage(images[_page]['id'], [int.parse(item.id)]);
-                    if(response['stat'] == 'fail') {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                          errorSnackBar(context, response['result']));
-                      Navigator.of(context).pop();
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                          imagesAssignedSnackBar(context, 1));
-                      Navigator.of(context).pop();
-                    }
-                  }
-                },
-              );
-              break;
-              /*
-            case 2:
-              print('Attach $_page');
-              await moveCategoryModalBottomSheet(context,
-                widget.category,
-                widget.title,
-                true,
-                (item) async {
-                  // TODO: implement Attach function
-                },
-              );
-              break;
-               */
-            case 2: // TODO: change to 3 if implemented Attach function
-              if(await confirmDeleteDialog(context,
-                content: appStrings(context).deleteImage_message(1),
-              )) {
-                print('Delete $_page');
-
-                var response = await deleteImage(images[_page]['id']);
-                if(response['stat'] == 'fail') {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    errorSnackBar(context, '${response['result']}')
-                  );
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text(appStrings(context).deleteImageHUD_deleting(1)),
-                  ));
-                }
-                int page = _page;
-                if(page == images.length-1) {
-                  if (page == 0) {
-                    Navigator.of(context).pop();
-                  } else {
-                    setState(() {
-                      _page--;
-                      _pageController.previousPage(
-                          duration: Duration(milliseconds: 100),
-                          curve: Curves.easeIn);
-                    });
-                  }
-                }
-                images.removeAt(page);
-                setState(() {});
-              }
-              break;
-            default:
-              break;
-          }
-        },
-        items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: Icon(Icons.download_rounded, color: _theme.iconTheme.color),
-            label: appStrings(context).imageOptions_download,
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.reply_outlined, color: _theme.iconTheme.color),
-            label: appStrings(context).moveImage_title,
-          ),
-          /*
-          BottomNavigationBarItem(
-            icon: Icon(Icons.attach_file, color: _theme.iconTheme.color),
+            icon: Icon(Icons.attach_file, color: Theme.of(context).iconTheme.color),
             label: "Attach",
             // TODO: implement attach thumbnail
           ),
           */
-          BottomNavigationBarItem(
-            icon: Icon(Icons.delete_outline, color: _theme.errorColor),
-            label: appStrings(context).deleteImage_delete,
-          ),
-        ],
-        backgroundColor: Color(0x80000000),
-        type: BottomNavigationBarType.fixed,
-        selectedFontSize: 14,
-        unselectedFontSize: 14,
-        showSelectedLabels: true,
-        showUnselectedLabels: true,
-        selectedItemColor: _theme.primaryColorLight,
-        unselectedItemColor: _theme.primaryColorLight,
-      ) : Text(""),
-    );
+        BottomNavigationBarItem(
+          icon: Icon(Icons.delete_outline, color: Theme.of(context).errorColor),
+          label: appStrings(context).deleteImage_delete,
+        ),
+      ],
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      type: BottomNavigationBarType.fixed,
+      selectedFontSize: 14,
+      unselectedFontSize: 14,
+      showSelectedLabels: false,
+      showUnselectedLabels: false,
+      selectedItemColor: Theme.of(context).primaryColorLight,
+      unselectedItemColor: Theme.of(context).primaryColorLight,
+    ) : SizedBox();
   }
 }

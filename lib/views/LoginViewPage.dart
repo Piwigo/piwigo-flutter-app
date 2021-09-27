@@ -1,11 +1,17 @@
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
+import 'package:flutter/gestures.dart';
+import 'package:flutter/services.dart';
+import 'dart:math';
 import 'package:piwigo_ng/api/API.dart';
 import 'package:piwigo_ng/api/SessionAPI.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:piwigo_ng/constants/SettingsConstants.dart';
+
+import 'package:piwigo_ng/views/PrivacyPolicyViewPage.dart';
+import 'package:piwigo_ng/views/components/buttons.dart';
 
 
 class LoginViewPage extends StatefulWidget {
@@ -89,8 +95,6 @@ class _LoginViewPageState extends State<LoginViewPage> {
 
   @override
   void initState() {
-    super.initState();
-    //createDio();
     isLoggedIn = false;
     _isLoading = false;
     _validUrl = false;
@@ -111,41 +115,93 @@ class _LoginViewPageState extends State<LoginViewPage> {
     });
     getSharedPrefs();
     WidgetsBinding.instance.addPostFrameCallback((_) => createDio());
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+    ]);
+
+    super.initState();
   }
 
   @override
   void dispose() {
     urlController.dispose();
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeRight,
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
     super.dispose();
   }
 
+  void onConnection() async {
+    if(!_validUrl) return;
+    setState(() {
+      _isLoading = true;
+    });
+
+    String completeUrl = '${protocol(_httpProtocol)}${urlController.text.replaceAll(RegExp(r"\s+"), "")}/';
+    String errorMessage;
+
+    if(usernameController.text == "" && passwordController.text == "") {
+      errorMessage = await loginGuest(completeUrl);
+      setState(() {
+        _isLoading = false;
+      });
+      if(errorMessage == null) {
+        Navigator.of(context).pushReplacementNamed("/root",
+          arguments: false,
+        );
+        return;
+      }
+    } else {
+      errorMessage = await loginUser(completeUrl, usernameController.text, passwordController.text);
+      setState(() {
+        _isLoading = false;
+      });
+      if(errorMessage == null) {
+        Navigator.of(context).pushReplacementNamed("/root",
+          arguments: true,
+        );
+        return;
+      }
+    }
+
+    showDialog(
+        barrierDismissible: true,
+        context: context,
+        builder: (BuildContext context) {
+          return connectionErrorDialog(errorMessage);
+        }
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     ThemeData _theme = Theme.of(context);
-    if (!this.isLoggedIn) {
-      return Scaffold(
-        resizeToAvoidBottomInset: true,
-        extendBody: true,
-        body: GestureDetector(
-          onTap: () {
-            FocusScope.of(context).unfocus();
-          },
-          child: Container(
-            child: LayoutBuilder(
-              builder: (BuildContext context, BoxConstraints constraints) {
-                return SingleChildScrollView(
-                  child: ConstrainedBox(
-                    constraints: constraints.copyWith(
-                      minHeight: constraints.maxHeight,
-                      maxHeight: double.infinity,
-                    ),
-                    child: IntrinsicHeight(
-                      child: Padding(
-                        padding: EdgeInsets.all(30),
-                        child: Column(
-                          children: <Widget>[
-                            Column(
+    return Scaffold(
+      resizeToAvoidBottomInset: true,
+      extendBody: true,
+      body: GestureDetector(
+        onTap: () {
+          FocusScope.of(context).unfocus();
+        },
+        child: Container(
+          child: LayoutBuilder(
+            builder: (BuildContext context, BoxConstraints constraints) {
+              return SingleChildScrollView(
+                child: ConstrainedBox(
+                  constraints: constraints.copyWith(
+                    minHeight: constraints.maxHeight,
+                    maxHeight: double.infinity,
+                  ),
+                  child: IntrinsicHeight(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 30, vertical: 20),
+                      child: Column(
+                        children: <Widget>[
+                          Expanded(
+                            child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Padding(
@@ -163,13 +219,15 @@ class _LoginViewPageState extends State<LoginViewPage> {
                                     ),
                                     child: TextFormField(
                                       controller: urlController,
-                                      style: TextStyle(fontSize: 14, color: Color(0xff5c5c5c)),
+                                      style: _theme.inputDecorationTheme.labelStyle,
                                       focusNode: urlFieldFocus,
                                       decoration: InputDecoration(
-                                        icon: _validUrl? Icon(Icons.public, color: _theme.disabledColor) : Icon(Icons.error_outline, color: _theme.errorColor),
+                                        icon: _validUrl?
+                                        Icon(Icons.public, color: _theme.inputDecorationTheme.hintStyle.color) :
+                                        Icon(Icons.error_outline, color: _theme.errorColor),
                                         border: InputBorder.none,
                                         hintText: appStrings(context).login_serverPlaceholder,
-                                        hintStyle: TextStyle(fontStyle: FontStyle.italic, color: _theme.disabledColor),
+                                        hintStyle: _theme.inputDecorationTheme.hintStyle,
                                         prefix: urlFieldFocus.hasFocus? InkWell(
                                           onTap: () {
                                             setState(() {
@@ -178,8 +236,8 @@ class _LoginViewPageState extends State<LoginViewPage> {
                                           },
                                           child: Column(
                                             children: [
-                                              Text(protocol(_httpProtocol), style: TextStyle(fontSize: 14, color: Color(0xff5c5c5c))),
-                                              Text(protocol(!_httpProtocol), style: TextStyle(fontSize: 9, color: Color(0xff5c5c5c))),
+                                              Text(protocol(_httpProtocol), style: _theme.inputDecorationTheme.labelStyle),
+                                              Text(protocol(!_httpProtocol), style: TextStyle(fontSize: 9, color: _theme.inputDecorationTheme.labelStyle.color)),
                                             ],
                                           ),
                                         ) : urlController.text == null || urlController.text == "" ?
@@ -203,13 +261,13 @@ class _LoginViewPageState extends State<LoginViewPage> {
                                           ),
                                           child: TextFormField(
                                             controller: usernameController,
-                                            style: TextStyle(fontSize: 14, color: Color(0xff5c5c5c)),
+                                            style: _theme.inputDecorationTheme.labelStyle,
                                             maxLines: 1,
                                             decoration: InputDecoration(
-                                              icon: Icon(Icons.person, color: _theme.disabledColor),
+                                              icon: Icon(Icons.person, color: _theme.inputDecorationTheme.hintStyle.color),
                                               border: InputBorder.none,
                                               hintText: appStrings(context).login_userPlaceholder,
-                                              hintStyle: TextStyle(fontStyle: FontStyle.italic, color: _theme.disabledColor),
+                                              hintStyle: _theme.inputDecorationTheme.hintStyle,
                                             ),
                                           ),
                                         ),
@@ -221,7 +279,10 @@ class _LoginViewPageState extends State<LoginViewPage> {
                                           usernameController.text = '';
                                         });
                                       },
-                                      child: Icon(Icons.highlight_remove),
+                                      child: Transform.rotate(
+                                        angle: 45*pi/180,
+                                        child: Icon(Icons.add_circle, size: 30),
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -238,7 +299,7 @@ class _LoginViewPageState extends State<LoginViewPage> {
                                           ),
                                           child: TextFormField(
                                             controller: passwordController,
-                                            style: TextStyle(fontSize: 14, color: Color(0xff5c5c5c)),
+                                            style: _theme.inputDecorationTheme.labelStyle,
                                             obscureText: _obscurePassword,
                                             decoration: InputDecoration(
                                               icon: InkWell(
@@ -248,12 +309,12 @@ class _LoginViewPageState extends State<LoginViewPage> {
                                                   });
                                                 },
                                                 child: _obscurePassword ?
-                                                  Icon(Icons.lock, color: _theme.disabledColor) :
-                                                  Icon(Icons.lock_open, color: _theme.disabledColor),
+                                                Icon(Icons.lock, color: _theme.inputDecorationTheme.hintStyle.color) :
+                                                Icon(Icons.lock_open, color: _theme.inputDecorationTheme.hintStyle.color),
                                               ),
                                               border: InputBorder.none,
                                               hintText: appStrings(context).login_passwordPlaceholder,
-                                              hintStyle: TextStyle(fontStyle: FontStyle.italic, color: _theme.disabledColor),
+                                              hintStyle: _theme.inputDecorationTheme.hintStyle,
                                             ),
                                           ),
                                         ),
@@ -265,7 +326,10 @@ class _LoginViewPageState extends State<LoginViewPage> {
                                           passwordController.text = '';
                                         });
                                       },
-                                      child: Icon(Icons.highlight_remove),
+                                      child: Transform.rotate(
+                                        angle: 45*pi/180,
+                                        child: Icon(Icons.add_circle, size: 30),
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -273,81 +337,45 @@ class _LoginViewPageState extends State<LoginViewPage> {
                                   width: double.infinity,
                                   height: 60,
                                   padding: EdgeInsets.all(5),
-                                  child: TextButton(
-                                    style: ButtonStyle(
-                                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                                        RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(10),
-                                        ),
-                                      ),
-                                      backgroundColor: MaterialStateProperty.all(_validUrl ? _theme.accentColor : _theme.disabledColor),
-                                    ),
-                                    onPressed: !_validUrl ? null : () async {
-                                      setState(() {
-                                        _isLoading = true;
-                                      });
-
-                                      String completeUrl = '${protocol(_httpProtocol)}${urlController.text.replaceAll(RegExp(r"\s+"), "")}/';
-                                      String errorMessage;
-
-                                      if(usernameController.text == "" && passwordController.text == "") {
-                                        errorMessage = await loginGuest(completeUrl);
-                                        setState(() {
-                                          _isLoading = false;
-                                        });
-                                        if(errorMessage == null) {
-                                          Navigator.of(context).pushReplacementNamed("/root",
-                                            arguments: false,
-                                          );
-                                          return;
-                                        }
-                                      } else {
-                                        errorMessage = await loginUser(completeUrl, usernameController.text, passwordController.text);
-                                        setState(() {
-                                          _isLoading = false;
-                                        });
-                                        if(errorMessage == null) {
-                                          Navigator.of(context).pushReplacementNamed("/root",
-                                            arguments: true,
-                                          );
-                                          return;
-                                        }
-                                      }
-
-                                      showDialog(
-                                          barrierDismissible: true,
-                                          context: context,
-                                          builder: (BuildContext context) {
-                                            return connectionErrorDialog(errorMessage);
-                                          }
-                                      );
-                                    },
-                                    child: _isLoading? CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(Colors.white)) : Text(appStrings(context).login, style: TextStyle(fontSize: 16, color: Colors.white)),
+                                  child: DialogButton(
+                                    style: _validUrl ? dialogButtonStyle(context) : dialogButtonStyleDisabled(context),
+                                    child: _isLoading?
+                                    CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(Colors.white)) :
+                                    Text(appStrings(context).login, style: TextStyle(fontSize: 16, color: Colors.white)),
+                                    onPressed: onConnection,
                                   ),
                                 ),
                               ],
                             ),
-                            Expanded(
-                              child: Container(
-                                padding: EdgeInsets.only(top: 20),
-                                alignment: Alignment.bottomCenter,
-                                child: Text(dotenv.env['APP_VERSION'], style: TextStyle(fontSize: 14)),
+                          ),
+                          Container(
+                            padding: EdgeInsets.symmetric(vertical: 5),
+                            alignment: Alignment.bottomCenter,
+                            child: RichText(
+                              text: TextSpan(
+                                  text: appStrings(context).settings_privacy,
+                                  style: _theme.textTheme.headline6,
+                                  recognizer: TapGestureRecognizer()
+                                    ..onTap = () {
+                                      Navigator.of(context).push(
+                                          MaterialPageRoute(builder: (_) => PrivacyPolicyViewPage())
+                                      );
+                                    }
                               ),
                             ),
-                          ],
-                        ),
+                          ),
+                          Text(dotenv.env['APP_VERSION'], style: _theme.textTheme.headline5),
+                        ],
                       ),
                     ),
                   ),
-                );
-              }
-            ),
+                ),
+              );
+            }
           ),
         ),
-      );
-    } else {
-      return CircularProgressIndicator();
-    }
+      ),
+    );
   }
 
   AlertDialog connectionErrorDialog(String error) {
