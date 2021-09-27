@@ -84,13 +84,13 @@
     "logoutConfirmation_title": "Logout",
     "logoutConfirmation_message": "Are you sure you want to logout?",
     "logoutFail_title": "Logout Failed",
-    "albumCount": "{count, plural, =0{0 albums} =1{1 album} other{{count} albums}}",
+    "albumCount": "{count, plural, =1{1 album} other{{count} albums}}",
     "@albumCount": {
         "placeholders": {
             "count": {}
         }
     },
-    "subAlbumCount": "{count, plural,=0{0 sub-albums} =1{1 sub-album} other{{count} sub-albums}}",
+    "subAlbumCount": "{count, plural, =1{1 sub-album} other{{count} sub-albums}}",
     "@subAlbumCount": {
         "placeholders": {
             "count": {}
@@ -179,7 +179,7 @@
     "refreshCategoyError_title": "Refresh Fail",
     "refreshCategoyError_message": "Failed to refresh your album representative",
     "deleteCategory_title": "DELETE ALBUM",
-    "deleteCategory_message": "{count, plural, =0{ARE YOU SURE YOU WANT TO DELETE THE ALBUM {album}} =1{ARE YOU SURE YOU WANT TO DELETE THE ALBUM {album} AND ITS PHOTO} other{ARE YOU SURE YOU WANT TO DELETE THE ALBUM {album} AND ALL {count} PHOTOS ?}",
+    "deleteCategory_message": "{count, plural, =1{ARE YOU SURE YOU WANT TO DELETE THE ALBUM {album} AND IT'S PHOTO} other{ARE YOU SURE YOU WANT TO DELETE THE ALBUM {album} AND ALL {count} PHOTOS ?}",
     "@deleteCategory_message": {
         "placeholders": {
             "count": {},
@@ -247,7 +247,7 @@
     "categoryImageSetError_title": "Photo Set Error",
     "categoryImageSetError_message": "Failed to set the album photo",
     "singleImage": "Photo",
-    "imageCount": "{count, plural, =0{0 photos} =1{1 photo} other{{count} photos}}",
+    "imageCount": "{count, plural, =1{1 photo} other{{count} photos}}",
     "@imageCount": {
         "placeholders": {
             "count": {}
@@ -314,7 +314,7 @@
     "none": "none",
     "tag": "Tag",
     "tags": "Tags",
-    "tagCount": "{count, plural, =0{0 tags} =1{1 tag} other{{count} tags}}",
+    "tagCount": "{count, plural, =1{1 tag} other{{count} tags}}",
     "@tagCount": {
         "placeholders": {
             "count": {}
@@ -332,7 +332,7 @@
     "tagsAddError_message": "Failed to create new tag",
     "tagsAddError_title": "Create Fail",
     "selectImages": "Select Photos",
-    "selectImageSelectedCount": "{count, plural, =0{0 Photos Selected} =1{1 Photo Selected} other{{count} Photos Selected}}",
+    "selectImageSelectedCount": "{count, plural, =1{1 Photo Selected} other{{count} Photos Selected}}",
     "@selectImageSelectedCount": {
         "placeholders": {
             "count": {}
@@ -341,14 +341,14 @@
     "selectAll": "Select All",
     "selectLimit": "Selection limit reached",
     "renameImage_title": "Original File",
-    "renameImage_message": "Enter a new file name for this photo \"{file}\"",
+    "renameImage_message": "Enter a new file name for this photo",
     "@renameImage_message": {
         "placeholders": {
             "file": {}
         }
     },
     "renameImageHUD_label": "Renaming File…",
-    "renameImageHUD_renamed": "{count, plural, =0{0 Files Renamed} =1{File Renamed} other{{count} Files Renamed}}",
+    "renameImageHUD_renamed": "{count, plural, =1{File Renamed} other{{count} Files Renamed}}",
     "@renameImageHUD_renamed": {
         "placeholders": {
             "count": {}
@@ -362,20 +362,20 @@
             "count": {}
         }
     },
-    "deleteImageCount_title": "{count, plural, =0{Delete Photos} =1{Delete Photo} other{Delete {count} Photos}}",
+    "deleteImageCount_title": "{count, plural, =1{Delete Photo} other{Delete {count} Photos}}",
     "@deleteImageCount_title": {
         "placeholders": {
             "count": {}
         }
     },
-    "deleteImageHUD_deleting": "{count, plural, =0{Deleting Photos…} =1{Deleting Photo…} other{Deleting Photos…}}",
+    "deleteImageHUD_deleting": "{count, plural, =1{Deleting Photo…} other{Deleting Photos…}}",
     "@deleteImageHUD_deleting": {
         "placeholders": {
             "count": {}
         }
     },
     "removeSingleImage_title": "Remove from Album",
-    "removeImageHUD_removing": "{count, plural, =0{Removing Photos…} =1{Removing Photo…} other{Removing Photos…}}",
+    "removeImageHUD_removing": "{count, plural, =1{Removing Photo…} other{Removing Photos…}}",
     "@removeImageHUD_removing": {
         "placeholders": {
             "count": {}
@@ -389,7 +389,7 @@
     },
     "deleteImageFail_title": "Delete Failed",
     "deleteImageFail_message": "Photo could not be deleted.",
-    "deleteImageSuccess_message": "{count, plural, =0{Successfully deleted 0 photos} =1{Successfully deleted 1 photo} other{Successfully deleted {count} photos}}",
+    "deleteImageSuccess_message": "{count, plural, =1{Successfully deleted 1 photo} other{Successfully deleted {count} photos}}",
     "@deleteImageSuccess_message": {
         "placeholders": {
             "count": {}
@@ -397,7 +397,7 @@
     },
     "removeSelectedImage_title": "Remove Selected Image",
     "removeSelectedImage_message": "Are you sure you want to remove this image from the selection ?",
-    "downloadImage_title": "{count, plural, =0{Download Photos} =1{Download Photo} other{Download {count} Photos}}",
+    "downloadImage_title": "{count, plural, =1{Download Photo} other{Download {count} Photos}}",
     "@downloadImage_title": {
         "placeholders": {
             "count": {}
@@ -492,7 +492,7 @@
             "count": {}
         }
     },
-    "copyImageHUD_copied": "{count, plural, =1{Photo Copied} other{Photos Copied}}",
+    "copyImageHUD_copied": "{count, plural, =1{Photo Assigned} other{Photos Assigned}}",
     "@copyImageHUD_copied": {
         "placeholders": {
             "count": {}
@@ -635,7 +635,7 @@
     "defaultThumbnailSize": "Size",
     "defaultThumbnailSize320px": "Thumbnails Size",
     "defaultThumbnailSize414px": "Default Size of Thumbnails",
-    "defaultNberOfThumbnails": "Number of thumbnails per row",
+    "defaultNberOfThumbnails": "Number",
     "defaultNberOfThumbnails_portrait": "Portrait Mode",
     "defaultNberOfThumbnails_landscape": "Landscape Mode",
     "defaultThumbnailSizeTitle": "Default Size",
@@ -725,19 +725,19 @@
     "settings_switchPalette": "Automatic",
     "settings_brightness": "Brightness",
     "settings_brightnessHelp": "In low ambient brightness, the Automatic option uses a darker color palette to make photos stand out against darker backgrounds.",
-    "userCount": "{count, plural, =0{0 users} =1{1 user} other{{count} users}}",
+    "userCount": "{count, plural, =1{1 user} other{{count} users}}",
     "@userCount": {
         "placeholders": {
             "count": {}
         }
     },
-    "groupCount": "{count, plural, =0{0 groups} =1{1 group} other{{count} groups}}",
+    "groupCount": "{count, plural, =1{1 group} other{{count} groups}}",
     "@groupCount": {
         "placeholders": {
             "count": {}
         }
     },
-    "commentCount": "{count, plural, =0{0 comments} =1{1 comment} other{{count} comments}}",
+    "commentCount": "{count, plural, =1{1 comment} other{{count} comments}}",
     "@commentCount": {
         "placeholders": {
             "count": {}
