@@ -68,7 +68,6 @@ class Uploader {
     }
 
     print('new status');
-    // createDio();
 
     await _showUploadNotification(result);
   }

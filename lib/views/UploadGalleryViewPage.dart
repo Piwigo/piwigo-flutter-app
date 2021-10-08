@@ -416,22 +416,20 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
                           IconButton(
                             tooltip: appStrings(context).tagsTitle_selectOne,
                             onPressed: () {
-                              showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return SelectTagDialog(
-                                        _tags, (tags) {
-                                      setState(() {
-                                        tags.forEach((tag) {
-                                          if(!_tags.contains(tag)) {
-                                            _tags.insert(tags.indexOf(tag), tag);
-                                            _listKey.currentState.insertItem(tags.indexOf(tag));
-                                          }
-                                        });
+                              Navigator.of(context).push(
+                                MaterialPageRoute(builder: (_) => SelectTagsPage(
+                                  selectedTags: _tags,
+                                  onConfirm: (tags) {
+                                    setState(() {
+                                      tags.forEach((tag) {
+                                        if(!_tags.contains(tag)) {
+                                          _tags.insert(tags.indexOf(tag), tag);
+                                          _listKey.currentState.insertItem(tags.indexOf(tag));
+                                        }
                                       });
-                                    }
-                                    );
+                                    });
                                   }
+                                ))
                               );
                             },
                             icon: Icon(Icons.add_circle_outline),

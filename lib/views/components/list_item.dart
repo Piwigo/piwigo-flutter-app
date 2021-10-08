@@ -20,11 +20,12 @@ String albumSubCount(dynamic album, context) {
 }
 
 class AlbumListItem extends StatefulWidget {
-  const AlbumListItem(this.album, {Key key, this.isAdmin = false, this.onClose}) : super(key: key);
+  const AlbumListItem(this.album, {Key key, this.isAdmin = false, this.onClose, this.onOpen}) : super(key: key);
 
   final dynamic album;
   final bool isAdmin;
   final Function() onClose;
+  final Function() onOpen;
 
   @override
   _AlbumListItemState createState() => _AlbumListItemState();
@@ -81,19 +82,41 @@ class _AlbumListItemState extends State<AlbumListItem> {
     widget.onClose();
   }
   void _onDeleteAlbum() async {
-    if (await confirmDeleteDialog(context,
-      content: appStrings(context).deleteCategory_message(widget.album["total_nb_images"], widget.album["name"]),
-    )) {
-      var result = await deleteCategory(widget.album['id'].toString());
-      if(result['stat'] == 'fail') {
-        ScaffoldMessenger.of(context).showSnackBar(
-            errorSnackBar(context, result['result'])
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-            albumDeletedSnackBar(context)
-        );
-        widget.onClose();
+    if(widget.album["total_nb_images"] > 0) {
+      int choice = await confirmDeleteAlbumWithImagesDialog(context,
+        content: appStrings(context).deleteCategory_message(widget.album["total_nb_images"], widget.album["name"]),
+        count: widget.album["total_nb_images"],
+      );
+      var result;
+      switch(choice) {
+        case 0: result = await deleteCategory(widget.album['id'].toString(),
+            deletionMode: 'no_delete');
+          break;
+        case 1: result = await deleteCategory(widget.album['id'].toString(),
+            deletionMode: 'delete_orphans');
+          break;
+        case 2: result = await deleteCategory(widget.album['id'].toString(),
+            deletionMode: 'force_delete');
+          break;
+        default: break;
+      }
+      widget.onClose();
+    }
+    else {
+      if (await confirmDeleteDialog(context,
+        content: appStrings(context).deleteCategory_message(widget.album["total_nb_images"], widget.album["name"]),
+      )) {
+        var result = await deleteCategory(widget.album['id'].toString());
+        if(result['stat'] == 'fail') {
+          ScaffoldMessenger.of(context).showSnackBar(
+              errorSnackBar(context, result['result'])
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+              albumDeletedSnackBar(context)
+          );
+          widget.onClose();
+        }
       }
     }
   }
@@ -102,6 +125,7 @@ class _AlbumListItemState extends State<AlbumListItem> {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
+        widget.onOpen();
         Navigator.of(context).push(
           MaterialPageRoute(builder: (context) => CategoryViewPage(
             title: widget.album["name"],

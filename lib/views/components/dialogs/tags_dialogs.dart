@@ -3,24 +3,23 @@ import 'package:flutter/material.dart';
 import 'package:piwigo_ng/api/TagAPI.dart';
 import 'package:piwigo_ng/constants/SettingsConstants.dart';
 import 'package:piwigo_ng/model/TagModel.dart';
+import 'package:piwigo_ng/services/OrientationService.dart';
 import 'package:piwigo_ng/views/components/buttons.dart';
 import 'package:piwigo_ng/views/components/textfields.dart';
 
 import 'package:piwigo_ng/views/components/snackbars.dart';
 import 'piwigo_dialog.dart';
 
+class SelectTagsPage extends StatefulWidget {
+  const SelectTagsPage({Key key, this.onConfirm, this.selectedTags}) : super(key: key);
 
-
-class SelectTagDialog extends StatefulWidget {
   final Function(List<TagModel>) onConfirm;
   final List<TagModel> selectedTags;
 
-  const SelectTagDialog(this.selectedTags, this.onConfirm, {Key key}) : super(key: key);
-
   @override
-  _SelectTagDialogState createState() => _SelectTagDialogState();
+  _SelectTagsPageState createState() => _SelectTagsPageState();
 }
-class _SelectTagDialogState extends State<SelectTagDialog> {
+class _SelectTagsPageState extends State<SelectTagsPage> {
   List<TagModel> _selectedTags = [];
   bool _isLoading = false;
 
@@ -68,23 +67,33 @@ class _SelectTagDialogState extends State<SelectTagDialog> {
 
   @override
   Widget build(BuildContext context) {
-    Size _screenSize = MediaQuery.of(context).size;
-    return PiwigoDialog(
-      action: InkWell(
-        onTap: () {
-          showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return CreateTagDialog();
-              }
-          ).whenComplete(() {
-            setState(() {});
-          });
-        },
-        child: Icon(Icons.add_circle_outline),
+    return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          icon: Icon(Icons.chevron_left),
+        ),
+        title: Text(appStrings(context).tags),
+        centerTitle: true,
+        actions: [
+          IconButton(
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return CreateTagDialog();
+                }
+              ).whenComplete(() {
+                setState(() {});
+              });
+            },
+            icon: Icon(Icons.add_circle_outline),
+          ),
+        ],
       ),
-      title: appStrings(context).tags,
-      content: FutureBuilder<Map<String,dynamic>>(
+      body: FutureBuilder<Map<String,dynamic>>(
         future: getAdminTags(),
         builder: (BuildContext context, AsyncSnapshot snapshot) {
           if(snapshot.hasData) {
@@ -96,113 +105,174 @@ class _SelectTagDialogState extends State<SelectTagDialog> {
             List<TagModel> tags = _tagListFromJson(snapshot.data["result"]['tags']);
             _updateLists(tags);
             return Container(
-              height: _screenSize.height*3/4,
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    SizedBox(height: 10),
-                    Container(
-                      alignment: Alignment.topLeft,
-                      padding: EdgeInsets.all(5),
-                      child: Text(appStrings(context).tagsHeader_selected,
-                          style: Theme.of(context).textTheme.headline5
+              padding: EdgeInsets.symmetric(horizontal: 20),
+              child: Column(
+                children: [
+                  SizedBox(height: 10),
+                  isPortrait(context) ? _portraitTagsList(tags)
+                      : _landscapeTagsList(tags),
+                  SizedBox(height: 10),
+                  Padding(
+                    padding: EdgeInsets.all(5.0),
+                    child: DialogButton(
+                      child: _isLoading?
+                      CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white)
+                      ) : Text(appStrings(context).alertConfirmButton,
+                          style: TextStyle(fontSize: 16, color: Colors.white)
                       ),
+                      onPressed: _onSelectTags,
                     ),
-                    Container(
-                      padding: EdgeInsets.symmetric(vertical: 5.0),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).inputDecorationTheme.fillColor,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: _selectedTags.isEmpty ? TagItem(
-                        TagModel(0, appStrings(context).none),
-                        isEnd: true,
-                      ) : ListView.builder(
-                        shrinkWrap: true,
-                        physics: NeverScrollableScrollPhysics(),
-                        itemCount: tags.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          TagModel tag = tags[index];
-                          return TagItem(tag,
-                            isExpanded: _isSelected(tag),
-                            isEnd: _isSelectedEndTag(tag),
-                            icon: Icon(Icons.remove_circle_outline, color: Colors.red),
-                            onTap: () {
-                              setState(() {
-                                _selectedTags.removeWhere((e) => e.id == tag.id);
-                                _updateLists(tags);
-                              });
-                            },
-                          );
-                        },
-                      ),
-                    ),
-                    SizedBox(height: 20),
-                    Container(
-                      alignment: Alignment.topLeft,
-                      padding: EdgeInsets.all(5),
-                      child: Text(appStrings(context).tagsHeader_notSelected,
-                          style: Theme.of(context).textTheme.headline5
-                      ),
-                    ),
-                    Container(
-                      padding: EdgeInsets.symmetric(vertical: 5.0),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).inputDecorationTheme.fillColor,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: _selectedTags.length == tags.length ? TagItem(
-                        TagModel(0, appStrings(context).none),
-                        isEnd: true,
-                      ) : ListView.builder(
-                        shrinkWrap: true,
-                        physics: NeverScrollableScrollPhysics(),
-                        itemCount: tags.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          TagModel tag = tags[index];
-                          return TagItem(tag,
-                            isExpanded: !_isSelected(tag),
-                            isEnd: _isUnselectedEndTag(tag, tags),
-                            icon: Icon(Icons.add_circle_outline, color: Colors.green),
-                            onTap: () {
-                              setState(() {
-                                _selectedTags.add(tag);
-                                _updateLists(tags);
-                              });
-                            },
-                          );
-                        },
-                      ),
-                    ),
-                    SizedBox(height: 20),
-                    Padding(
-                      padding: EdgeInsets.all(5.0),
-                      child: DialogButton(
-                        child: _isLoading?
-                        CircularProgressIndicator(
-                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white)
-                        ) : Text(appStrings(context).alertConfirmButton,
-                            style: TextStyle(fontSize: 16, color: Colors.white)
-                        ),
-                        onPressed: _onSelectTags,
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             );
           } else {
-            return Container(
-              constraints: BoxConstraints(
-                maxWidth: _screenSize.width*3/4,
-                maxHeight: _screenSize.width*3/4,
-              ),
-              child: Center(
-                child: CircularProgressIndicator(),
-              ),
+            return Center(
+              child: CircularProgressIndicator(),
             );
           }
         },
+      ),
+    );
+  }
+
+  Widget _selectedTagsColumn(List<TagModel> tags) {
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: 5.0),
+      decoration: BoxDecoration(
+        color: Theme.of(context).inputDecorationTheme.fillColor,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: _selectedTags.isEmpty ? TagItem(
+        TagModel(0, appStrings(context).none),
+        isEnd: true,
+      ) : ListView.builder(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        itemCount: tags.length,
+        itemBuilder: (BuildContext context, int index) {
+          TagModel tag = tags[index];
+          return TagItem(tag,
+            isExpanded: _isSelected(tag),
+            isEnd: _isSelectedEndTag(tag),
+            icon: Icon(Icons.remove_circle_outline, color: Colors.red),
+            onTap: () {
+              setState(() {
+                _selectedTags.removeWhere((e) => e.id == tag.id);
+                _updateLists(tags);
+              });
+            },
+          );
+        },
+      ),
+    );
+  }
+  Widget _unselectedTagsColumn(List<TagModel> tags) {
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: 5.0),
+      decoration: BoxDecoration(
+        color: Theme.of(context).inputDecorationTheme.fillColor,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: _selectedTags.length == tags.length ? TagItem(
+        TagModel(0, appStrings(context).none),
+        isEnd: true,
+      ) : ListView.builder(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        itemCount: tags.length,
+        itemBuilder: (BuildContext context, int index) {
+          TagModel tag = tags[index];
+          return TagItem(tag,
+            isExpanded: !_isSelected(tag),
+            isEnd: _isUnselectedEndTag(tag, tags),
+            icon: Icon(Icons.add_circle_outline, color: Colors.green),
+            onTap: () {
+              setState(() {
+                _selectedTags.add(tag);
+                _updateLists(tags);
+              });
+            },
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _portraitTagsList(List<TagModel> tags) {
+    return Expanded(
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            Container(
+              alignment: Alignment.topLeft,
+              padding: EdgeInsets.all(5),
+              child: Text(appStrings(context).tagsHeader_selected,
+                  style: Theme.of(context).textTheme.headline5
+              ),
+            ),
+            _selectedTagsColumn(tags),
+            SizedBox(height: 20),
+            Container(
+              alignment: Alignment.topLeft,
+              padding: EdgeInsets.all(5),
+              child: Text(appStrings(context).tagsHeader_notSelected,
+                  style: Theme.of(context).textTheme.headline5
+              ),
+            ),
+            _unselectedTagsColumn(tags),
+          ],
+        ),
+      ),
+    );
+  }
+  Widget _landscapeTagsList(List<TagModel> tags) {
+    return Expanded(
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Container(
+                  alignment: Alignment.topLeft,
+                  padding: EdgeInsets.all(5),
+                  child: Text(appStrings(context).tagsHeader_selected,
+                      style: Theme.of(context).textTheme.headline5
+                  ),
+                ),
+              ),
+              SizedBox(width: 20),
+              Expanded(
+                child: Container(
+                  alignment: Alignment.topLeft,
+                  padding: EdgeInsets.all(5),
+                  child: Text(appStrings(context).tagsHeader_notSelected,
+                      style: Theme.of(context).textTheme.headline5
+                  ),
+                ),
+              ),
+            ],
+          ),
+          Expanded(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: _selectedTagsColumn(tags),
+                  ),
+                ),
+                SizedBox(width: 20),
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: _unselectedTagsColumn(tags),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

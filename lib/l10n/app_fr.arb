@@ -188,8 +188,8 @@
     },
     "deleteCategory_empty": "Effacer Album Vide",
     "deleteCategory_noImages": "Conserver les photos",
-    "deleteCategory_orphanedImages": "Effacer Images Orphelines",
-    "deleteCategory_allImages": "Effacer {count} photos",
+    "deleteCategory_orphanedImages": "Effacer les images orphelines",
+    "deleteCategory_allImages": "{count, plural, =0{Effacer les photos} =1{Effacer la photo} other{Effacer {count} photos}}",
     "@deleteCategory_allImages": {
         "placeholders": {
             "count": {}
@@ -757,5 +757,5 @@
     "settings_pwgForumURL": "http://fr.piwigo.org",
     "settings_acknowledgements": "Remerciements",
     "settings_privacy": "Politique de Confidentialité",
-    "settings_privacyUrl": "&lang=en_EN"
+    "settings_privacyUrl": "&lang=fr_FR"
 }

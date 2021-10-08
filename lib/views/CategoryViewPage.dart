@@ -95,19 +95,12 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
   }
 
   void _onEditSelection() async {
-    showDialog(context: context,
-      builder: (BuildContext context) {
-        return EditImageSelectionDialog(
+    Navigator.of(context).push(
+        MaterialPageRoute(builder: (_) => EditImagesPage(
           catId: int.parse(widget.category),
           images: _selectedItems.values.toList(),
-        );
-      }
-    ).whenComplete(() {
-      setState(() {
-        _selectedItems.clear();
-        _isEditMode = false;
-      });
-    });
+        ))
+    );
   }
   void _onDownloadSelection() async {
     if (await confirmDownloadDialog(context,
@@ -205,6 +198,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
     }
   }
   void _onDeleteSelection() async {
+    print(_imageDeletionMode());
     if(await confirmDeleteDialog(context,
       content: appStrings(context).deleteImageCount_title(_selectedItems.length),
     )) {
@@ -225,6 +219,38 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
       ));
       setState(() {});
     }
+  }
+
+  void _onSelectAll() {
+    setState(() {
+      if(_selectedItems.length == imageList.length) {
+        _selectedItems.clear();
+      } else {
+        imageList.forEach((image) {
+          _selectedItems.putIfAbsent(image['id'], () => image);
+        });
+      }
+    });
+  }
+
+  int _imageDeletionMode() {
+    int nbUnique = 0;
+    _selectedItems.values.forEach((image) {
+      print(image["categories"]);
+      if(image["categories"].length == 1) nbUnique++;
+    });
+    if(nbUnique == 0) {
+      print(appStrings(context).deleteCategory_allImages(_selectedItems.length));
+      print(appStrings(context).removeSingleImage_title);
+      return 0;
+    }
+    if(nbUnique == _selectedItems.length) {
+      print(appStrings(context).deleteCategory_allImages(_selectedItems.length));
+      return 1;
+    }
+    print(appStrings(context).deleteCategory_allImages(_selectedItems.length));
+    print(appStrings(context).removeSingleImage_title);
+    return 2;
   }
 
   handleAlbumSnapshot(AsyncSnapshot albumSnapshot, int nbImages) {
@@ -251,6 +277,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: true,
+      extendBody: true,
       body: createListeners(
         NestedScrollView(
           controller: _controller,
@@ -288,12 +315,17 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
       Text(widget.title),
       actions: [
         _isEditMode ? IconButton(
+          onPressed: _onSelectAll,
+          icon: _selectedItems.length == imageList.length ?
+            Icon(Icons.check_circle) : Icon(Icons.circle_outlined),
+        ) : SizedBox(),
+        _isEditMode ? IconButton(
           onPressed: closeEditMode,
           icon: Icon(Icons.cancel),
         ) : widget.isAdmin? IconButton(
           onPressed: openEditMode,
           icon: Icon(Icons.touch_app_rounded),
-        ) : Container(),
+        ) : SizedBox(),
       ],
     );
   }
@@ -414,7 +446,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
                     builder: (context) => UploadGalleryViewPage(imageData: mediaList, category: widget.category)
                 )).whenComplete(() {
                   setState(() {
-                    API.uploader.createDio();
+                    // API.uploader.createDio();
                     print('After upload'); // refresh
                   });
                 });
@@ -442,7 +474,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
                       builder: (context) => UploadGalleryViewPage(imageData: mediaList, category: widget.category)
                   )).whenComplete(() {
                     setState(() {
-                      API.uploader.createDio();
+                      // API.uploader.createDio();
                       print('After upload'); // refresh
                     });
                   });
@@ -481,9 +513,13 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
               physics: NeverScrollableScrollPhysics(),
               itemBuilder: (BuildContext context, int index) {
                 var album = albums[index];
-                return AlbumListItem(album, isAdmin: widget.isAdmin, onClose: () {
-                  setState(() {});
-                });
+                return AlbumListItem(album,
+                  isAdmin: widget.isAdmin,
+                  onClose: () {
+                    setState(() {});
+                  },
+                  onOpen: closeEditMode,
+                );
               },
             ) : Center(),
             imageList.length > 0 ?

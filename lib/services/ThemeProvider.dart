@@ -11,7 +11,8 @@ ThemeData light = ThemeData(
   bottomAppBarColor: Color(0xffeeeeee),
   focusColor: Color(0xffff7700),
   backgroundColor: Color(0xffffffff),
-  // buttonColor: Color(0xcbff7700),
+  bottomSheetTheme: BottomSheetThemeData(
+      backgroundColor: Colors.black.withOpacity(0)),
   scaffoldBackgroundColor: Color(0xffeeeeee),
   cardColor: Color(0xffffffff),
   errorColor: Color(0xffff0e00),

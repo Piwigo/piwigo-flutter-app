@@ -65,7 +65,10 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
               builder: (BuildContext context, AsyncSnapshot albumSnapshot) {
                 if(albumSnapshot.hasData){
                   if(albumSnapshot.data['stat'] == 'fail') {
-                    return Center(child: Text(appStrings(context).categoryMainEmtpy));
+                    return Container(
+                      padding: EdgeInsets.all(10),
+                      child: Text(albumSnapshot.data['result']),
+                    ); //appStrings(context).categoryMainEmtpy
                   }
                   var albums = albumSnapshot.data['result']['categories'];
                   int nbPhotos = 0;

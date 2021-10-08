@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:piwigo_ng/constants/SettingsConstants.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
@@ -11,6 +12,7 @@ class PrivacyPolicyViewPage extends StatefulWidget {
 class _PrivacyPolicyViewPageState extends State<PrivacyPolicyViewPage> {
   bool _isLoading;
   double _loadingProgress;
+  String _url;
 
   @override
   void initState() {
@@ -20,24 +22,33 @@ class _PrivacyPolicyViewPageState extends State<PrivacyPolicyViewPage> {
     super.initState();
   }
 
+  NavigationDecision _navigation(NavigationRequest request) {
+    if(request.url == 'https://github.com/Piwigo/Piwigo-Android') {
+      return NavigationDecision.prevent;
+    }
+    if(request.url == 'https://github.com/Piwigo/Piwigo-Mobile') {
+      return NavigationDecision.prevent;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    var _theme = Theme.of(context);
+    _url = '${dotenv.env['PRIVACY_POLICIES']}${appStrings(context).settings_privacyUrl}';
     return Scaffold(
       appBar: AppBar(
         title: Text(appStrings(context).settings_privacy),
         centerTitle: true,
         leading: IconButton(
-          icon: Icon(Icons.chevron_left, color: _theme.iconTheme.color),
+          icon: Icon(Icons.chevron_left, color: Theme.of(context).iconTheme.color),
           onPressed: Navigator.of(context).pop,
         ),
       ),
       body: Stack(
         children: [
           WebView(
-            initialUrl: appStrings(context).settings_privacyUrl,
+            initialUrl: _url,
+            navigationDelegate: _navigation,
             onProgress: (progress) {
-              print('PageView progress $progress');
               setState(() {
                 _loadingProgress = progress/100;
               });

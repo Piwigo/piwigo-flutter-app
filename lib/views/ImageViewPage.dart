@@ -73,16 +73,12 @@ class _ImageViewPageState extends State<ImageViewPage> {
   }
 
   void _onEditImage() async {
-    showDialog(context: context,
-      builder: (BuildContext context) {
-        return EditImageSelectionDialog(
-          catId: int.parse(widget.category),
-          images: [images[_page]],
-        );
-      }
-    ).whenComplete(() {
-      setState(() {});
-    });
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => EditImagesPage(
+        catId: int.parse(widget.category),
+        images: [images[_page]],
+      ))
+    );
   }
   void _onDownloadImage() async {
     if(await confirmDownloadDialog(context,

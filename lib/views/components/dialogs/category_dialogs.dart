@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:piwigo_ng/api/CategoryAPI.dart';
 import 'package:piwigo_ng/constants/SettingsConstants.dart';
-import 'package:piwigo_ng/services/OrientationService.dart';
 import 'package:piwigo_ng/views/components/buttons.dart';
 import 'package:piwigo_ng/views/components/textfields.dart';
 
@@ -90,46 +89,50 @@ class _CreateCategoryDialogState extends State<CreateCategoryDialog> {
                 style: Theme.of(context).textTheme.subtitle1,
               ),
             ),
-            isPortrait(context) ?
-            Column(
-              children: [
-                Padding(
-                  padding: EdgeInsets.all(5),
-                  child: TextFieldRequired(
-                    controller: _nameController,
-                    hint: appStrings(context).createNewAlbum_placeholder,
-                  ),
-                ), // Title field
-                Padding(
-                  padding: EdgeInsets.all(5),
-                  child: TextFieldDescription(
-                    controller: _descController,
-                    hint: appStrings(context).createNewAlbumDescription_placeholder,
-                  ),
-                ), // Description field
-              ],
-            ) : Row(
-              children: [
-                Flexible(
-                  child: Padding(
-                    padding: EdgeInsets.all(5),
-                    child: TextFieldRequired(
+            SizedBox(height: 10),
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                color: Theme.of(context).inputDecorationTheme.fillColor,
+              ),
+              child: Column(
+                children: [
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 10),
+                    child: TextField(
+                      maxLines: 1,
                       controller: _nameController,
-                      hint: appStrings(context).createNewAlbum_placeholder,
+                      style: Theme.of(context).inputDecorationTheme.labelStyle,
+                      textAlignVertical: TextAlignVertical.top,
+                      decoration: InputDecoration(
+                        contentPadding: EdgeInsets.zero,
+                        border: InputBorder.none,
+                        hintText: appStrings(context).createNewAlbum_placeholder,
+                        hintStyle: Theme.of(context).inputDecorationTheme.hintStyle,
+                      ),
                     ),
-                  ), // Title field
-                ),
-                Flexible(
-                  child: Padding(
-                    padding: EdgeInsets.all(5),
-                    child: TextFieldDescription(
+                  ),
+                  Divider(height: 5.0),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 10),
+                    child: TextField(
                       controller: _descController,
-                      hint: appStrings(context).createNewAlbumDescription_placeholder,
+                      minLines: 1,
+                      maxLines: 5,
+                      style: Theme.of(context).inputDecorationTheme.labelStyle,
+                      textAlignVertical: TextAlignVertical.top,
+                      decoration: InputDecoration(
+                        contentPadding: EdgeInsets.zero,
+                        border: InputBorder.none,
+                        hintText: appStrings(context).createNewAlbumDescription_placeholder,
+                        hintStyle: Theme.of(context).inputDecorationTheme.hintStyle,
+                      ),
                     ),
-                  ), // Description field
-                ),
-              ],
+                  ),
+                ],
+              ),
             ),
+            SizedBox(height: 10),
             Padding(
               padding: EdgeInsets.all(5.0),
               child: DialogButton(
@@ -230,67 +233,68 @@ class _EditCategoryDialogState extends State<EditCategoryDialog> {
       title: appStrings(context).renameCategory_title,
       content: Form(
         key: _formKey,
-        child:  Column(
+        child: Column(
           children: <Widget>[
             Center(
               child: Text(appStrings(context).renameCategory_message,
                 style: Theme.of(context).textTheme.subtitle1,
               ),
             ),
-            isPortrait(context) ?
-            Column(
-              children: [
-                Padding(
-                  padding: EdgeInsets.all(5),
-                  child: TextFieldRequired(
-                    controller: _editAlbumNameController,
-                    hint: appStrings(context).createNewAlbum_placeholder,
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.all(5),
-                  child: TextFieldDescription(
-                    controller: _editAlbumDescController,
-                    hint: appStrings(context).createNewAlbumDescription_placeholder,
-                  ),
-                ),
-              ],
-            ) : Row(
-              children: [
-                Flexible(
-                  child: Padding(
-                    padding: EdgeInsets.all(5),
-                    child: TextFieldRequired(
-                      controller: _editAlbumNameController,
-                      hint: appStrings(context).createNewAlbum_placeholder,
-                    ),
-                  ),
-                ),
-                Flexible(
-                  child: Padding(
-                    padding: EdgeInsets.all(5),
-                    child: TextFieldDescription(
-                      controller: _editAlbumDescController,
-                      hint: appStrings(context).createNewAlbumDescription_placeholder,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            Padding(
-              padding: EdgeInsets.all(5.0),
-              child: DialogButton(
-                child: _isLoading?
-                CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white)
-                ) : Text(appStrings(context).categoryCellOption_rename,
-                    style: TextStyle(fontSize: 16, color: Colors.white)
-                ),
-                style: _isNameEmpty() ?
-                dialogButtonStyleDisabled(context) :
-                dialogButtonStyle(context),
-                onPressed: onEditAlbum,
+            SizedBox(height: 10),
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                color: Theme.of(context).inputDecorationTheme.fillColor,
               ),
+              child: Column(
+                children: [
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 10),
+                    child: TextField(
+                      maxLines: 1,
+                      controller: _editAlbumNameController,
+                      style: Theme.of(context).inputDecorationTheme.labelStyle,
+                      textAlignVertical: TextAlignVertical.top,
+                      decoration: InputDecoration(
+                        contentPadding: EdgeInsets.zero,
+                        border: InputBorder.none,
+                        hintText: appStrings(context).createNewAlbum_placeholder,
+                        hintStyle: Theme.of(context).inputDecorationTheme.hintStyle,
+                      ),
+                    ),
+                  ),
+                  Divider(height: 5.0),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 10),
+                    child: TextField(
+                      controller: _editAlbumDescController,
+                      minLines: 1,
+                      maxLines: 5,
+                      style: Theme.of(context).inputDecorationTheme.labelStyle,
+                      textAlignVertical: TextAlignVertical.top,
+                      decoration: InputDecoration(
+                        contentPadding: EdgeInsets.zero,
+                        border: InputBorder.none,
+                        hintText: appStrings(context).createNewAlbumDescription_placeholder,
+                        hintStyle: Theme.of(context).inputDecorationTheme.hintStyle,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(height: 10),
+            DialogButton(
+              child: _isLoading?
+              CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white)
+              ) : Text(appStrings(context).categoryCellOption_rename,
+                  style: TextStyle(fontSize: 16, color: Colors.white)
+              ),
+              style: _isNameEmpty() ?
+              dialogButtonStyleDisabled(context) :
+              dialogButtonStyle(context),
+              onPressed: onEditAlbum,
             ),
           ],
         ),

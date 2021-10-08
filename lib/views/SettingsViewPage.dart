@@ -339,7 +339,6 @@ class TableCellSingle extends StatelessWidget {
 }
 
 
-
 class ImageRowCountSliders extends StatefulWidget {
   const ImageRowCountSliders({Key key}) : super(key: key);
 

@@ -251,7 +251,7 @@
     "deleteCategory_empty": "Delete Empty Album",
     "deleteCategory_noImages": "Keep Photos",
     "deleteCategory_orphanedImages": "Delete Orphans",
-    "deleteCategory_allImages": "Delete {count} Photos",
+    "deleteCategory_allImages": "{count, plural, =0{Delete Photos} =1{Delete Photo} other{Delete {count} Photos}}",
     "@deleteCategory_allImages" : {
         "placeholders": {
             "count": {}
