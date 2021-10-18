@@ -42,6 +42,38 @@ Future<Map<String,dynamic>> fetchImages(String albumID, int page) async {
   }
 }
 
+Future<dynamic> getImageInfo(int imageId) async {
+  Map<String, String> queries = {
+    "format": "json",
+    "method": "pwg.images.getInfo",
+  };
+  FormData formData =  FormData.fromMap({
+    "image_id": imageId
+  });
+  try {
+    Response response = await API.dio.post('ws.php',
+        data: formData,
+        queryParameters: queries
+    );
+
+    if (response.statusCode == 200) {
+      return json.decode(response.data);
+    } else {
+      return {
+        'stat': 'fail',
+        'result': response.statusMessage
+      };
+    }
+  } catch (e) {
+    var error = e as DioError;
+    return {
+      'stat': 'fail',
+      'result': error.message
+    };
+  }
+}
+
+
 Future<bool> _requestPermissions() async {
   var permission = await Permission.storage.status;
   print(permission.isGranted);
@@ -149,6 +181,7 @@ Future<int> deleteImages(BuildContext context, List<int> imageIdList) async {
       ScaffoldMessenger.of(context).showSnackBar(
         errorSnackBar(context, '${response['result']}'),
       );
+      break;
     } else {
       nbSuccess++;
     }
@@ -187,6 +220,71 @@ Future<dynamic> deleteImage(int imageId) async {
   }
 }
 
+Future<int> removeImages(BuildContext context, List<int> imageIdList, String catId) async {
+  int nbSuccess = 0;
+  for(int id in imageIdList) {
+    var response = await removeImage(id, catId);
+    if(response['stat'] == 'fail') {
+      print(response);
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      ScaffoldMessenger.of(context).showSnackBar(
+        errorSnackBar(context, '${response['result']}'),
+      );
+      break;
+    } else {
+      nbSuccess++;
+    }
+  }
+  return nbSuccess;
+}
+Future<dynamic> removeImage(int imageId, String catId) async {
+  var imageInfo = await getImageInfo(imageId);
+  if(imageInfo['stat'] == 'fail') return imageInfo;
+
+  List<String> categories = imageInfo['result']['categories'].map<String>(
+      (cat) => cat['id'].toString()
+  ).toList();
+  categories.removeWhere((cat) => cat == catId);
+
+  if(categories.isEmpty) {
+    return await deleteImage(imageId);
+  }
+
+  Map<String, String> queries = {
+    "format": "json",
+    "method": "pwg.images.setInfo",
+  };
+  FormData formData =  FormData.fromMap({
+    "image_id": imageId,
+    "categories": categories,
+    "multiple_value_mode": "replace"
+  });
+
+  try {
+    Response response = await API.dio.post('ws.php',
+        data: formData,
+        queryParameters: queries
+    );
+
+    print(response.data);
+
+    if (response.statusCode == 200) {
+      return json.decode(response.data);
+    } else {
+      return {
+        'stat': 'fail',
+        'result': response.statusMessage
+      };
+    }
+  } catch (e) {
+    var error = e as DioError;
+    return {
+      'stat': 'fail',
+      'result': error.message
+    };
+  }
+}
+
 Future<int> moveImages(BuildContext context, List<dynamic> images, int category) async {
   int nbMoved = 0;
   for(var image in images) {
@@ -196,6 +294,7 @@ Future<int> moveImages(BuildContext context, List<dynamic> images, int category)
       ScaffoldMessenger.of(context).showSnackBar(
           errorSnackBar(context, '${response['result']}')
       );
+      break;
     } else {
       nbMoved++;
     }
@@ -251,6 +350,7 @@ Future<int> assignImages(BuildContext context, List<dynamic> images, int categor
       ScaffoldMessenger.of(context).showSnackBar(
           errorSnackBar(context, '${response['result']}')
       );
+      break;
     } else {
       nbAssigned++;
     }

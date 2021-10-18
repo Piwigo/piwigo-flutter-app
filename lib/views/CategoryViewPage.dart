@@ -198,12 +198,11 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
     }
   }
   void _onDeleteSelection() async {
-    print(_imageDeletionMode());
-    if(await confirmDeleteDialog(context,
-      content: appStrings(context).deleteImageCount_title(_selectedItems.length),
-    )) {
-      print('Delete ${_selectedItems.keys}');
-
+    int choice = await confirmRemoveImagesFromAlbumDialog(context,
+      content: appStrings(context).deleteImage_message(_selectedItems.length),
+      count: _selectedItems.length,
+    );
+    if(choice != -1) {
       List<int> selection = [];
       selection.addAll(_selectedItems.keys.toList());
 
@@ -212,11 +211,19 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
         _selectedItems.clear();
       });
 
-      int nbSuccess = await deleteImages(context, selection);
+      int nbSuccess = 0;
+      switch(choice) {
+        case 0: nbSuccess = await deleteImages(context, selection);
+        break;
+        case 1: nbSuccess = await removeImages(context, selection, widget.category);
+        break;
+        default: break;
+      }
 
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text(appStrings(context).deleteImageSuccess_message(nbSuccess)),
       ));
+
       setState(() {});
     }
   }
@@ -233,25 +240,6 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
     });
   }
 
-  int _imageDeletionMode() {
-    int nbUnique = 0;
-    _selectedItems.values.forEach((image) {
-      print(image["categories"]);
-      if(image["categories"].length == 1) nbUnique++;
-    });
-    if(nbUnique == 0) {
-      print(appStrings(context).deleteCategory_allImages(_selectedItems.length));
-      print(appStrings(context).removeSingleImage_title);
-      return 0;
-    }
-    if(nbUnique == _selectedItems.length) {
-      print(appStrings(context).deleteCategory_allImages(_selectedItems.length));
-      return 1;
-    }
-    print(appStrings(context).deleteCategory_allImages(_selectedItems.length));
-    print(appStrings(context).removeSingleImage_title);
-    return 2;
-  }
 
   handleAlbumSnapshot(AsyncSnapshot albumSnapshot, int nbImages) {
     if(albumSnapshot.data['stat'] == 'fail') {
@@ -490,6 +478,10 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
 
   Widget createPageContent(dynamic albums, int nbImages) {
     ThemeData _theme = Theme.of(context);
+
+    int albumCrossAxisCount = MediaQuery.of(context).size.width <= Constants.ALBUM_MIN_WIDTH ? 1
+        : (MediaQuery.of(context).size.width/Constants.ALBUM_MIN_WIDTH).floor();
+
     return RefreshIndicator(
       displacement: 20,
       notificationPredicate: (notification) {
@@ -502,7 +494,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
             albums.length > 0 ?
             GridView.builder(
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: (MediaQuery.of(context).size.width/400).floor(),
+                crossAxisCount: albumCrossAxisCount,
                 mainAxisSpacing: 10,
                 crossAxisSpacing: 10,
                 childAspectRatio: albumGridAspectRatio(context),

@@ -90,24 +90,7 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
                     child: SingleChildScrollView(
                       child: Column(
                         children: [
-                          GridView.builder(
-                            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: (MediaQuery.of(context).size.width/400).floor(),
-                              mainAxisSpacing: 10,
-                              crossAxisSpacing: 10,
-                              childAspectRatio: albumGridAspectRatio(context),
-                            ),
-                            padding: EdgeInsets.all(10),
-                            itemCount: albums.length,
-                            shrinkWrap: true,
-                            physics: NeverScrollableScrollPhysics(),
-                            itemBuilder: (BuildContext context, int index) {
-                              var album = albums[index];
-                              return AlbumListItem(album, isAdmin: widget.isAdmin, onClose: () {
-                                setState(() {});
-                              });
-                            },
-                          ),
+                          _albumGrid(albums),
                           Center(
                             child: Container(
                               padding: EdgeInsets.all(10),
@@ -142,6 +125,30 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
         },
         child: Icon(Icons.create_new_folder, color: _theme.primaryColorLight, size: 30),
       ) : Container(),
+    );
+  }
+
+  Widget _albumGrid(dynamic albums) {
+    int albumCrossAxisCount = MediaQuery.of(context).size.width <= Constants.ALBUM_MIN_WIDTH ? 1
+        : (MediaQuery.of(context).size.width/Constants.ALBUM_MIN_WIDTH).floor();
+
+    return GridView.builder(
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: albumCrossAxisCount,
+        mainAxisSpacing: 10,
+        crossAxisSpacing: 10,
+        childAspectRatio: albumGridAspectRatio(context),
+      ),
+      padding: EdgeInsets.all(10),
+      itemCount: albums.length,
+      shrinkWrap: true,
+      physics: NeverScrollableScrollPhysics(),
+      itemBuilder: (BuildContext context, int index) {
+        var album = albums[index];
+        return AlbumListItem(album, isAdmin: widget.isAdmin, onClose: () {
+          setState(() {});
+        });
+      },
     );
   }
 }

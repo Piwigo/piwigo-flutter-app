@@ -125,7 +125,7 @@ class _AlbumListItemState extends State<AlbumListItem> {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        widget.onOpen();
+        if(widget.onOpen != null) widget.onOpen();
         Navigator.of(context).push(
           MaterialPageRoute(builder: (context) => CategoryViewPage(
             title: widget.album["name"],

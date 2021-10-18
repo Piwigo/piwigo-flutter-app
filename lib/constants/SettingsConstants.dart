@@ -33,11 +33,12 @@ class Constants {
 
   static double CONFIRM_DIALOG_MAX_WIDTH = 500.0;
 
+  static double ALBUM_MIN_WIDTH = 400.0;
+
   static double PORTRAIT_IMAGE_COUNT_MIN = 1.0;
   static double PORTRAIT_IMAGE_COUNT_MAX = 6.0;
   static double LANDSCAPE_IMAGE_COUNT_MIN = 4.0;
   static double LANDSCAPE_IMAGE_COUNT_MAX = 10.0;
-
 }
 
 AppLocalizations appStrings(context) {

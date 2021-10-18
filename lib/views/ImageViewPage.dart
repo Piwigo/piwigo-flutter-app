@@ -167,19 +167,40 @@ class _ImageViewPageState extends State<ImageViewPage> {
     }
   }
   void _onDeleteImage() async {
-    if(await confirmDeleteDialog(context,
+    int choice = await confirmRemoveImagesFromAlbumDialog(context,
       content: appStrings(context).deleteImage_message(1),
-    )) {
-      var response = await deleteImage(images[_page]['id']);
-      if(response['stat'] == 'fail') {
-        ScaffoldMessenger.of(context).showSnackBar(
-            errorSnackBar(context, '${response['result']}')
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(appStrings(context).deleteImageHUD_deleting(1)),
-        ));
+      count: 1,
+    );
+
+    if(choice != -1) {
+      switch(choice) {
+        case 0:
+          var response = await deleteImage(images[_page]['id']);
+          if(response['stat'] == 'fail') {
+            ScaffoldMessenger.of(context).showSnackBar(
+                errorSnackBar(context, '${response['result']}')
+            );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text(appStrings(context).deleteImageHUD_deleting(1)),
+            ));
+          }
+          break;
+        case 1:
+          var response = await removeImage(images[_page]['id'], widget.category);
+          if(response['stat'] == 'fail') {
+            ScaffoldMessenger.of(context).showSnackBar(
+                errorSnackBar(context, '${response['result']}')
+            );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text(appStrings(context).removeImageHUD_removing(1)),
+            ));
+          }
+          break;
+        default: break;
       }
+
       int page = _page;
       if(page == images.length-1) {
         if (page == 0) {

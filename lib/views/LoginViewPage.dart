@@ -13,6 +13,8 @@ import 'package:piwigo_ng/constants/SettingsConstants.dart';
 import 'package:piwigo_ng/views/PrivacyPolicyViewPage.dart';
 import 'package:piwigo_ng/views/components/buttons.dart';
 
+import 'components/dialogs/error_dialog.dart';
+
 
 class LoginViewPage extends StatefulWidget {
   LoginViewPage({Key key}) : super(key: key);
@@ -65,7 +67,10 @@ class _LoginViewPageState extends State<LoginViewPage> {
         barrierDismissible: true,
         context: context,
         builder: (BuildContext context) {
-          return connectionErrorDialog(message);
+          return ErrorDialog(
+            errorTitle: appStrings(context).loginError_title,
+            errorMessage: message
+          );
         }
       );
     }
@@ -171,7 +176,10 @@ class _LoginViewPageState extends State<LoginViewPage> {
         barrierDismissible: true,
         context: context,
         builder: (BuildContext context) {
-          return connectionErrorDialog(errorMessage);
+          return ErrorDialog(
+              errorTitle: appStrings(context).loginError_title,
+              errorMessage: errorMessage
+          );
         }
     );
   }
@@ -375,22 +383,6 @@ class _LoginViewPageState extends State<LoginViewPage> {
           ),
         ),
       ),
-    );
-  }
-
-  AlertDialog connectionErrorDialog(String error) {
-    return AlertDialog(
-      title: Text('Connection failed'),
-      content: Text('$error'),
-      actions: [
-        IconButton(
-          color: Color(0xffff0e00),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          icon: Icon(Icons.close, color: Color(0xffffffff),)
-        ),
-      ],
     );
   }
 }
