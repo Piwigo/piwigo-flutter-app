@@ -2,7 +2,7 @@ name: piwigo_ng
 description: Proof of concept for Piwigo
 
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
-version: 0.0.10-beta+7
+version: 0.0.11-beta+8
 
 environment:
   sdk: ">=2.7.0 <3.0.0"
