@@ -1,15 +1,17 @@
-import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-
 import 'dart:async';
+
+import 'package:flutter/material.dart';
 
 import 'package:piwigo_ng/api/API.dart';
 import 'package:piwigo_ng/api/CategoryAPI.dart';
+import 'package:piwigo_ng/constants/SettingsConstants.dart';
 import 'package:piwigo_ng/services/OrientationService.dart';
-import 'package:piwigo_ng/views/components/Dialogs.dart';
-import 'package:piwigo_ng/views/components/ListItems.dart';
-import 'package:piwigo_ng/views/SettingsPage.dart';
-import 'package:piwigo_ng/views/UploadGalleryViewPage.dart';
+import 'package:piwigo_ng/services/upload/Uploader.dart';
+import 'package:piwigo_ng/views/components/list_item.dart';
+import 'package:piwigo_ng/views/SettingsViewPage.dart';
+
+import 'package:piwigo_ng/views/components/appbars.dart';
+import 'package:piwigo_ng/views/components/dialogs/dialogs.dart';
 
 class RootCategoryViewPage extends StatefulWidget {
   final bool isAdmin;
@@ -18,40 +20,21 @@ class RootCategoryViewPage extends StatefulWidget {
   @override
   _RootCategoryViewPageState createState() => _RootCategoryViewPageState();
 }
-
 class _RootCategoryViewPageState extends State<RootCategoryViewPage> with SingleTickerProviderStateMixin {
   String _rootCategory;
-
-  TextEditingController _searchTextController = new TextEditingController();
-  String _filter;
+  TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    API.uploader = Uploader(context);
     _rootCategory = "0";
-    _filter = "";
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      API.uploader = Uploader(context);
+    });
   }
   @override
   void dispose() {
     super.dispose();
-  }
-
-  bool _filterSearch(String name) {
-    if(_filter != null) {
-      if(!name.toLowerCase().contains(_filter.toLowerCase())) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  String albumSubCount(dynamic album) {
-    String displayString = '${album["total_nb_images"]} ${album["total_nb_images"] == 1 ? 'photo' : 'photos'}';
-    if(album["nb_categories"] > 0) {
-      displayString += ', ${album["nb_categories"]} ${album["nb_categories"] == 1 ? 'sub-album' : 'sub-albums'}';
-    }
-    return displayString;
   }
 
   @override
@@ -61,12 +44,7 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
       resizeToAvoidBottomInset: true,
       body: NestedScrollView(
         headerSliverBuilder: (context, innerBoxScrolled) => [
-          SliverAppBar(
-            pinned: true,
-            snap: false,
-            floating: false,
-            expandedHeight: 130.0,
-            centerTitle: true,
+          AppBarExpandable(
             leading: IconButton(
               onPressed: () {
                 Navigator.of(context).push(
@@ -75,49 +53,7 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
               },
               icon: Icon(Icons.settings, color: _theme.iconTheme.color),
             ),
-            /*
-            actions: [
-              IconButton(
-                onPressed: () {
-                  // TODO: implement exploration menu | favorites
-                },
-                icon: Icon(Icons.menu, color: _theme.iconTheme.color),
-              ),
-            ],
-             */
-            flexibleSpace: FlexibleSpaceBar(
-              title: Text("Albums", style: _theme.textTheme.headline1),
-              /*
-              background: Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // TODO: implement all image search
-                  Container(
-                    margin: EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        color: _theme.inputDecorationTheme.fillColor
-                    ),
-                    child: TextField(
-                      controller: _searchTextController,
-                      onChanged: (str) {
-                        setState(() {
-                          _filter = str;
-                        });
-                      },
-                      decoration: InputDecoration(
-                        border: InputBorder.none,
-                        prefixIcon: Icon(Icons.search, color: _theme.inputDecorationTheme.prefixStyle.color),
-                        hintText: "Search album",
-                        hintStyle: _theme.inputDecorationTheme.hintStyle,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-               */
-            ),
+            title: appStrings(context).tabBar_albums,
           ),
         ],
         body: GestureDetector(
@@ -129,7 +65,10 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
               builder: (BuildContext context, AsyncSnapshot albumSnapshot) {
                 if(albumSnapshot.hasData){
                   if(albumSnapshot.data['stat'] == 'fail') {
-                    return Center(child: Text('Failed to load albums'));
+                    return Container(
+                      padding: EdgeInsets.all(10),
+                      child: Text(albumSnapshot.data['result']),
+                    ); //appStrings(context).categoryMainEmtpy
                   }
                   var albums = albumSnapshot.data['result']['categories'];
                   int nbPhotos = 0;
@@ -151,52 +90,11 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
                     child: SingleChildScrollView(
                       child: Column(
                         children: [
-                          /*
-                          ListView.builder(
-                            itemCount: albums.length,
-                            shrinkWrap: true,
-                            physics: NeverScrollableScrollPhysics(),
-                            itemBuilder: (context, index) {
-                              return albumListItem(context, albums[index], widget.isAdmin, (message) {
-                                setState(() {
-                                  print('$message');
-                                });
-                              });
-                            },
-                          ),
-
-                           */
-                          GridView.builder(
-                            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: isPortrait(context)? 1 : 2,
-                              mainAxisSpacing: 3,
-                              crossAxisSpacing: 5,
-                              childAspectRatio: albumGridAspectRatio(context),
-                            ),
-                            padding: EdgeInsets.symmetric(horizontal: 5),
-                            itemCount: albums.length,
-                            shrinkWrap: true,
-                            physics: NeverScrollableScrollPhysics(),
-                            itemBuilder: (BuildContext context, int index) {
-                              var album = albums[index];
-                              if (isPortrait(context) || index%2 == 0) {
-                                return albumListItem(context, album, widget.isAdmin, (message) {
-                                  setState(() {
-                                    print('$message');
-                                  });
-                                });
-                              }
-                              return albumListItemRight(context, album, widget.isAdmin, (message) {
-                                setState(() {
-                                  print('$message');
-                                });
-                              });
-                            },
-                          ),
+                          _albumGrid(albums),
                           Center(
                             child: Container(
                               padding: EdgeInsets.all(10),
-                              child: Text('$nbPhotos ${nbPhotos == 1 ? 'photo' : 'photos'}', style: TextStyle(fontSize: 20, color: _theme.textTheme.bodyText2.color, fontWeight: FontWeight.w300)),
+                              child: Text(appStrings(context).imageCount(nbPhotos), style: TextStyle(fontSize: 20, color: _theme.textTheme.bodyText2.color, fontWeight: FontWeight.w300)),
                             ),
                           ),
                         ],
@@ -217,7 +115,7 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
           showDialog(
             context: context,
             builder: (BuildContext context) {
-              return createCategoryAlert(context, "0");
+              return CreateCategoryDialog(catId: "0");
             }
           ).whenComplete(() {
             setState(() {
@@ -227,6 +125,30 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
         },
         child: Icon(Icons.create_new_folder, color: _theme.primaryColorLight, size: 30),
       ) : Container(),
+    );
+  }
+
+  Widget _albumGrid(dynamic albums) {
+    int albumCrossAxisCount = MediaQuery.of(context).size.width <= Constants.ALBUM_MIN_WIDTH ? 1
+        : (MediaQuery.of(context).size.width/Constants.ALBUM_MIN_WIDTH).floor();
+
+    return GridView.builder(
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: albumCrossAxisCount,
+        mainAxisSpacing: 10,
+        crossAxisSpacing: 10,
+        childAspectRatio: albumGridAspectRatio(context),
+      ),
+      padding: EdgeInsets.all(10),
+      itemCount: albums.length,
+      shrinkWrap: true,
+      physics: NeverScrollableScrollPhysics(),
+      itemBuilder: (BuildContext context, int index) {
+        var album = albums[index];
+        return AlbumListItem(album, isAdmin: widget.isAdmin, onClose: () {
+          setState(() {});
+        });
+      },
     );
   }
 }

@@ -8,7 +8,8 @@ Future<Map<String,dynamic>> fetchAlbums(String albumID) async {
   Map<String, String> queries = {
     "format": "json",
     "method": "pwg.categories.getList",
-    "cat_id": albumID
+    "cat_id": albumID,
+    "thumbnail_size": API.prefs.getString('thumbnail_size'),
   };
 
   try {
@@ -23,10 +24,10 @@ Future<Map<String,dynamic>> fetchAlbums(String albumID) async {
       };
     }
   } catch(e) {
-    var error = e as DioError;
+    //var error = e as DioError;
     return {
       'stat': 'fail',
-      'result': error.message
+      'result': e.toString(),
     };
   }
 }
@@ -83,7 +84,7 @@ Future<dynamic> addCategory(String catName, String catDesc, String parent) async
     };
   }
 }
-Future<dynamic> deleteCategory(String catId) async {
+Future<dynamic> deleteCategory(String catId, {String deletionMode = "delete_orphans"}) async {
   Map<String, String> queries = {
     "format": "json",
     "method": "pwg.categories.delete",
@@ -91,6 +92,7 @@ Future<dynamic> deleteCategory(String catId) async {
   FormData formData =  FormData.fromMap({
     "category_id": catId,
     "pwg_token": API.prefs.getString("pwg_token"),
+    'photo_deletion_mode': deletionMode,
   });
   try {
     Response response = await API.dio.post('ws.php',

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:piwigo_ng/services/ThemeProvider.dart';
 import 'package:piwigo_ng/views/RootCategoryViewPage.dart';
@@ -7,15 +8,18 @@ import 'package:piwigo_ng/api/API.dart';
 import 'package:provider/provider.dart';
 import 'package:piwigo_ng/views/LoginViewPage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: ".env");
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
     statusBarColor: Colors.transparent,
   ));
   await getSharedPreferences();
   initLocalNotifications();
+
   runApp(MyApp());
 }
 
@@ -40,8 +44,22 @@ class MyApp extends StatelessWidget {
       child: Consumer<ThemeNotifier>(
         builder: (context, ThemeNotifier notifier, child) {
           return MaterialApp(
-            title: 'Piwigo',
+            title: "Piwigo NG",
             // theme: notifier.darkTheme ? dark : light,
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            /*
+            localizationsDelegates: [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: [
+              const Locale('en', ''), // English, no country code
+              const Locale('fr', ''), // Spanish, no country code
+            ],
+             */
             theme: light,
             initialRoute: '/',
             onGenerateRoute: (settings) {
