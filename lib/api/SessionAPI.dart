@@ -39,7 +39,7 @@ Future<String> loginUser(String url, String username, String password) async {
     }
 
   } catch(e) {
-    return 'Dio: Invalid url';
+    return 'Dio: Invalid url. Exception: ' + e.toString();
   }
   return 'Something happened';
 }

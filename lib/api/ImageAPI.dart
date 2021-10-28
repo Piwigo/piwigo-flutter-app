@@ -92,11 +92,11 @@ Future<String> _getDownloadPath() async {
 }
 Future<void> _showNotification(Map<String, dynamic> downloadStatus) async {
   final android = AndroidNotificationDetails(
-      'channel id',
-      'channel name',
-      'channel description',
-      priority: Priority.high,
-      importance: Importance.max
+        'channel id',
+        'channel name',
+        channelDescription: 'channel description',
+        priority: Priority.high,
+        importance: Importance.max
   );
   final platform = NotificationDetails(android: android);
   final isSuccess = downloadStatus['isSuccess'];
