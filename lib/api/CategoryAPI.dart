@@ -13,7 +13,7 @@ Future<Map<String,dynamic>> fetchAlbums(String albumID) async {
   };
 
   try {
-    Response response = await API.dio.get('ws.php', queryParameters: queries);
+    Response response = await API().dio.get('ws.php', queryParameters: queries);
 
     if (response.statusCode == 200) {
       return json.decode(response.data);
@@ -38,7 +38,7 @@ Future<Map<String,dynamic>> getAlbumList() async {
   };
 
   try {
-    Response response = await API.dio.get('ws.php', queryParameters: queries);
+    Response response = await API().dio.get('ws.php', queryParameters: queries);
 
     if (response.statusCode == 200) {
       return json.decode(response.data);
@@ -66,7 +66,7 @@ Future<dynamic> addCategory(String catName, String catDesc, String parent) async
     "parent": parent
   };
   try {
-    Response response = await API.dio.post('ws.php', queryParameters: queries);
+    Response response = await API().dio.post('ws.php', queryParameters: queries);
 
     if (response.statusCode == 200) {
       return json.decode(response.data);
@@ -95,7 +95,7 @@ Future<dynamic> deleteCategory(String catId, {String deletionMode = "delete_orph
     'photo_deletion_mode': deletionMode,
   });
   try {
-    Response response = await API.dio.post('ws.php',
+    Response response = await API().dio.post('ws.php',
         data: formData,
         queryParameters: queries
     );
@@ -128,7 +128,7 @@ Future<dynamic> moveCategory(int catId, String parentCatId) async {
   });
 
   try {
-    Response response = await API.dio.post('ws.php',
+    Response response = await API().dio.post('ws.php',
         data: formData,
         queryParameters: queries
     );
@@ -160,7 +160,7 @@ Future<dynamic> editCategory(int catId, String catName, String catDesc) async {
     "comment": catDesc,
   });
   try {
-    Response response = await API.dio.post(
+    Response response = await API().dio.post(
         'ws.php',
         data: formData,
         queryParameters: queries

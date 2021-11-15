@@ -2,7 +2,7 @@ name: piwigo_ng
 description: Proof of concept for Piwigo
 
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
-version: 0.0.11-beta+8
+version: 0.0.11-beta+10
 
 environment:
   sdk: ">=2.7.0 <3.0.0"
@@ -14,44 +14,58 @@ dependencies:
     sdk: flutter
   intl:
 
-  cupertino_icons: ^1.0.2
-  font_awesome_flutter:
-  flat_icons_flutter:
+  # Icons :
+  # cupertino_icons: ^1.0.2
+  font_awesome_flutter: ^9.2.0
+  # flat_icons_flutter: ^1.0.2
 
-  dio:
-  dio_cookie_manager:
-  cookie_jar:
-  shared_preferences:
+  # Requests :
+  dio: ^4.0.3
+  dio_cookie_manager: ^2.0.0
+  cookie_jar: ^3.0.1
+
+  # Upload and download :
+  chunked_uploader: ^0.1.0
+  # flutter_absolute_path: ^1.0.6
+  flutter_absolute_path:
+    git:
+      url: https://github.com/canewsin/flutter_absolute_path.git
+  path_provider: ^2.0.7
+  permission_handler: ^8.3.0
+  ext_storage: ^1.0.3
+  flutter_local_notifications: ^9.1.2
+
+  # File pickers :
+  multi_image_picker: ^4.8.01
+  images_picker: ^1.2.5
+  provider: ^6.0.1
+  # camera: ^0.9.4+3
+
+  # Local storage :
+  shared_preferences: ^2.0.8
+  flutter_dotenv: ^5.0.2
+  package_info_plus: ^1.3.0
+
+  # Widgets :
+  url_launcher: ^6.0.12
+  webview_flutter: ^2.3.1
+  flutter_speed_dial: ^4.6.6
+  icon_shadow: ^1.0.1
+  flutter_slidable: ^1.1.0
+  auto_size_text: ^3.0.0
+  # confirm_dialog: ^1.0.0
+
+  # Media :
   photo_view: ^0.9.0
   cached_network_image: ^3.0.0
-  chunked_uploader:
-  confirm_dialog:
-  video_player:
-  flutter_dotenv:
-  url_launcher:
-  webview_flutter:
-
-
-  flutter_speed_dial:
-  icon_shadow:
-  flutter_slidable:
-  path_provider:
-  permission_handler:
-  ext_storage:
-  flutter_local_notifications:
-  auto_size_text:
-
-  multi_image_picker:
-  images_picker:
-  provider:
-  camera:
-  wakelock:
-  better_player:
-  flutter_absolute_path:
+  better_player: ^0.0.79
+  wakelock: ^0.5.6
+  # video_player: ^2.2.7
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  dependency_validator: ^3.0.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

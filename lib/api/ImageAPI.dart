@@ -23,7 +23,7 @@ Future<Map<String,dynamic>> fetchImages(String albumID, int page) async {
   };
 
   try {
-    Response response = await API.dio.get('ws.php', queryParameters: queries);
+    Response response = await API().dio.get('ws.php', queryParameters: queries);
 
     if (response.statusCode == 200) {
       return json.decode(response.data);
@@ -51,7 +51,7 @@ Future<dynamic> getImageInfo(int imageId) async {
     "image_id": imageId
   });
   try {
-    Response response = await API.dio.post('ws.php',
+    Response response = await API().dio.post('ws.php',
         data: formData,
         queryParameters: queries
     );
@@ -94,7 +94,7 @@ Future<void> _showNotification(Map<String, dynamic> downloadStatus) async {
   final android = AndroidNotificationDetails(
       'channel id',
       'channel name',
-      'channel description',
+      channelDescription: 'channel description',
       priority: Priority.high,
       importance: Importance.max
   );
@@ -157,7 +157,7 @@ Future<dynamic> downloadImage(String dirPath, String url, String file) async {
 
   var localPath = path.join(dirPath, file);
   try {
-    Response response = await API.dio.download(
+    Response response = await API().dio.download(
       url,
       localPath,
     );
@@ -198,7 +198,7 @@ Future<dynamic> deleteImage(int imageId) async {
     "pwg_token": API.prefs.getString("pwg_token"),
   });
   try {
-    Response response = await API.dio.post('ws.php',
+    Response response = await API().dio.post('ws.php',
         data: formData,
         queryParameters: queries
     );
@@ -261,7 +261,7 @@ Future<dynamic> removeImage(int imageId, String catId) async {
   });
 
   try {
-    Response response = await API.dio.post('ws.php',
+    Response response = await API().dio.post('ws.php',
         data: formData,
         queryParameters: queries
     );
@@ -314,7 +314,7 @@ Future<dynamic> moveImage(int imageId, List<int> categories) async {
   });
 
   try {
-    Response response = await API.dio.post(
+    Response response = await API().dio.post(
       'ws.php',
       data: formData,
       queryParameters: queries
@@ -370,7 +370,7 @@ Future<dynamic> assignImage(int imageId, List<int> categories) async {
   });
 
   try {
-    Response response = await API.dio.post(
+    Response response = await API().dio.post(
         'ws.php',
         data: formData,
         queryParameters: queries
@@ -422,7 +422,7 @@ Future<dynamic> editImage(int imageId, String name, String desc, List<int> tags,
   FormData formData = FormData.fromMap(form);
 
   try {
-    Response response = await API.dio.post('ws.php',
+    Response response = await API().dio.post('ws.php',
         data: formData,
         queryParameters: queries
     );
@@ -459,7 +459,7 @@ Future<dynamic> renameImage(int imageId, String name) async {
   FormData formData = FormData.fromMap(form);
 
   try {
-    Response response = await API.dio.post('ws.php',
+    Response response = await API().dio.post('ws.php',
         data: formData,
         queryParameters: queries
     );

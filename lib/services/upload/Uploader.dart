@@ -30,7 +30,7 @@ class Uploader {
     final android = AndroidNotificationDetails(
         'channel id',
         'channel name',
-        'channel description',
+        channelDescription: 'channel description',
         priority: Priority.high,
         importance: Importance.max
     );
@@ -58,7 +58,7 @@ class Uploader {
 
       Response response = await uploadChunk(element, category, info);
 
-      API.dio.clear();
+      API().dio.clear();
       if(json.decode(response.data)["stat"] == "fail") {
         print("Request failed: ${response.statusCode}");
 
@@ -73,10 +73,10 @@ class Uploader {
   }
 
   void createDio() async {
-    API.dio = Dio();
+    API().dio = Dio();
     API.cookieJar = CookieJar();
-    API.dio.interceptors.add(CookieManager(API.cookieJar));
-    API.dio.options.baseUrl = API.prefs.getString("base_url");
+    API().dio.interceptors.add(CookieManager(API.cookieJar));
+    API().dio.options.baseUrl = API.prefs.getString("base_url");
     await loginUser(API.prefs.getString("base_url"), API.prefs.getString("username"), API.prefs.getString("password"));
   }
 
@@ -98,7 +98,7 @@ class Uploader {
       "name": photo.path.split('/').last,
     });
 
-    Response response = await API.dio.post("ws.php",
+    Response response = await API().dio.post("ws.php",
       data: formData,
       queryParameters: queries,
     );
@@ -126,7 +126,7 @@ class Uploader {
     if(info['tag_ids'].isNotEmpty) fields['tag_ids'] = info['tag_ids'];
     if(info['level'] != -1) fields['level'] = info['level'];
 
-    ChunkedUploader chunkedUploader = ChunkedUploader(API.dio);
+    ChunkedUploader chunkedUploader = ChunkedUploader(API().dio);
     print(await FlutterAbsolutePath.getAbsolutePath(photo.path));
     try {
       Future<Response> response = chunkedUploader.upload(

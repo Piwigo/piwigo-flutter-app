@@ -8,7 +8,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 class API {
   static final API _singleton = API._internal();
 
-  static Dio dio = Dio();
+  Dio dio = Dio();
   static CookieJar cookieJar = CookieJar();
   static Uploader uploader;
   static SharedPreferences prefs;

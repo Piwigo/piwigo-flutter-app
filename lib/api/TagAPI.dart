@@ -9,7 +9,7 @@ Future<Map<String,dynamic>> getAdminTags() async {
     "method": "pwg.tags.getAdminList",
   };
 
-  Response response = await API.dio.get('ws.php', queryParameters: queries);
+  Response response = await API().dio.get('ws.php', queryParameters: queries);
 
   try {
     if (response.statusCode == 200) {
@@ -37,7 +37,7 @@ Future<dynamic> createTag(String tagName) async {
   };
 
   try {
-    Response response = await API.dio.get('ws.php', queryParameters: queries);
+    Response response = await API().dio.get('ws.php', queryParameters: queries);
 
     if (response.statusCode == 200) {
       return json.decode(response.data)["result"];

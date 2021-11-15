@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:piwigo_ng/api/CategoryAPI.dart';
 import 'package:piwigo_ng/constants/SettingsConstants.dart';
 import 'package:piwigo_ng/views/components/buttons.dart';
-import 'package:piwigo_ng/views/components/textfields.dart';
 
 import 'piwigo_dialog.dart';
 import 'package:piwigo_ng/views/components/snackbars.dart';
