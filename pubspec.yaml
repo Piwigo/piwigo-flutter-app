@@ -47,6 +47,7 @@ dependencies:
   camera:
   wakelock:
   better_player:
+  flutter_absolute_path:
 
 dev_dependencies:
   flutter_test:

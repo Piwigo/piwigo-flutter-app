@@ -30,7 +30,7 @@ class Uploader {
     final android = AndroidNotificationDetails(
         'channel id',
         'channel name',
-        'channel description',
+        channelDescription: 'channel description',
         priority: Priority.high,
         importance: Importance.max
     );
