@@ -462,7 +462,6 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
                       builder: (context) => UploadGalleryViewPage(imageData: mediaList, category: widget.category)
                   )).whenComplete(() {
                     setState(() {
-                      // API.uploader.createDio();
                       print('After upload'); // refresh
                     });
                   });
