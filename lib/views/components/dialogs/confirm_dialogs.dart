@@ -30,23 +30,26 @@ class ConfirmDialog extends StatelessWidget {
           children: [
             Container(
               width: _getWidth(context),
-              padding: EdgeInsets.all(20.0),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(20),
                 color: Theme.of(context).scaffoldBackgroundColor,
               ),
               child: Column(
                 children: [
-                  Text((content != null) ? '$content'
-                      : appStrings(context).deleteCategoryConfirm_title,
-                    softWrap: true,
-                    maxLines: 5,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.black),
+                  Padding(
+                    padding: EdgeInsets.all(15.0),
+                    child: Text((content != null) ? '$content'
+                        : appStrings(context).deleteCategoryConfirm_title,
+                      softWrap: true,
+                      maxLines: 5,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: Colors.black),
+                    ),
                   ),
-                  Divider(height: 40),
+                  Divider(height: 1.0, indent: 10.0, endIndent: 10.0,),
                   InkWell(
                     child: Container(
+                      padding: EdgeInsets.all(15.0),
                       child: Center(
                         child: yes,
                       ),
@@ -60,13 +63,13 @@ class ConfirmDialog extends StatelessWidget {
             InkWell(
               child: Container(
                 width: _getWidth(context),
-                padding: EdgeInsets.all(20.0),
+                padding: EdgeInsets.all(15.0),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
                   color: Theme.of(context).scaffoldBackgroundColor,
                 ),
                 child: Center(
-                    child: no,
+                  child: no,
                 ),
               ),
               onTap: () => Navigator.pop(context, false),
@@ -101,16 +104,21 @@ class MultiConfirmDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     List<Widget> actionsRow = [];
     actions.forEach((action) {
-      actionsRow.add(InkWell(
-        onTap: () => Navigator.pop(context, actions.indexOf(action)),
-        child: Container(
-          width: double.infinity,
-          child: Center(
-            child: action,
+      actionsRow.add(
+        InkWell(
+          onTap: () => Navigator.pop(context, actions.indexOf(action)),
+          child: Container(
+            padding: EdgeInsets.all(15.0),
+            width: double.infinity,
+            child: Center(
+              child: action,
+            ),
           ),
-        )
-      ));
-      if(action != actions.last) actionsRow.add(Divider(height: 20.0));
+        ),
+      );
+      if(action != actions.last) actionsRow.add(
+        Divider(height: 1.0, indent: 10.0, endIndent: 10.0,),
+      );
     });
 
     return WillPopScope(
@@ -124,21 +132,23 @@ class MultiConfirmDialog extends StatelessWidget {
             children: [
               Container(
                 width: _getWidth(context),
-                padding: EdgeInsets.all(20),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
                   color: Theme.of(context).scaffoldBackgroundColor,
                 ),
                 child: Column(
                   children: [
-                    Text(
-                      (content != null) ? '$content' : appStrings(context).deleteCategoryConfirm_title,
-                      softWrap: true,
-                      // maxLines: 3,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(color: Colors.black),
+                    Padding(
+                      padding: EdgeInsets.all(15.0),
+                      child: Text(
+                        (content != null) ? '$content' : appStrings(context).deleteCategoryConfirm_title,
+                        softWrap: true,
+                        // maxLines: 3,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: Colors.black),
+                      ),
                     ),
-                    Divider(height: 20.0),
+                    Divider(height: 1.0, indent: 10.0, endIndent: 10.0,),
                     Column(children: actionsRow),
                   ],
                 ),
@@ -147,7 +157,7 @@ class MultiConfirmDialog extends StatelessWidget {
               InkWell(
                 child: Container(
                   width: double.infinity,
-                  padding: EdgeInsets.all(10.0),
+                  padding: EdgeInsets.all(15.0),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(20),
                     color: Theme.of(context).scaffoldBackgroundColor,
@@ -165,6 +175,105 @@ class MultiConfirmDialog extends StatelessWidget {
       ),
       onWillPop: () async {
         Navigator.pop(context, -1);
+        return true;
+      },
+    );
+  }
+}
+
+class ConfirmBottomSheet extends StatefulWidget {
+  const ConfirmBottomSheet({Key key, this.content, this.yes, this.no}) : super(key: key);
+
+  final String content;
+  final Widget yes;
+  final Widget no;
+
+  @override
+  _ConfirmBottomSheetState createState() => _ConfirmBottomSheetState();
+}
+class _ConfirmBottomSheetState extends State<ConfirmBottomSheet> with TickerProviderStateMixin {
+
+  double _getWidth(context) {
+    if(isPortrait(context)) {
+      return MediaQuery.of(context).size.width > Constants.CONFIRM_DIALOG_MAX_WIDTH ?
+      Constants.CONFIRM_DIALOG_MAX_WIDTH : MediaQuery.of(context).size.width;
+    }
+    return MediaQuery.of(context).size.height > Constants.CONFIRM_DIALOG_MAX_WIDTH ?
+    Constants.CONFIRM_DIALOG_MAX_WIDTH : MediaQuery.of(context).size.height;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return WillPopScope(
+      child: BottomSheet(
+        animationController: AnimationController(vsync: this),
+        enableDrag: false,
+        backgroundColor: Colors.transparent,
+        elevation: 0.0,
+        builder: (BuildContext context) {
+          return SingleChildScrollView(
+            padding: EdgeInsets.all(10.0),
+            child: Column(
+              children: [
+                Container(
+                  width: _getWidth(context),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    color: Theme.of(context).scaffoldBackgroundColor,
+                  ),
+                  child: Column(
+                    children: [
+                      widget.content != null ? Column(
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.all(15.0),
+                            child: Text(
+                              widget.content ?? appStrings(context).deleteCategoryConfirm_title,
+                              softWrap: true,
+                              // maxLines: 3,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(color: Colors.black),
+                            ),
+                          ),
+                          Divider(height: 1.0),
+                        ],
+                      ) : SizedBox(),
+                      InkWell(
+                        onTap: () => Navigator.pop(context, true),
+                        child: Container(
+                          padding: EdgeInsets.all(15.0),
+                          width: double.infinity,
+                          child: Center(
+                            child: widget.yes,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 10),
+                InkWell(
+                  child: Container(
+                    width: _getWidth(context),
+                    padding: EdgeInsets.all(15.0),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      color: Theme.of(context).scaffoldBackgroundColor,
+                    ),
+                    child: Center(
+                      child: widget.no,
+                    ),
+                  ),
+                  onTap: () => Navigator.pop(context, false),
+                ),
+              ],
+            ),
+          );
+        },
+        onClosing: () => Navigator.pop(context, false),
+      ),
+      onWillPop: () async {
+        Navigator.pop(context, false);
         return true;
       },
     );
@@ -196,16 +305,21 @@ class _MultiConfirmBottomSheetState extends State<MultiConfirmBottomSheet> with 
   Widget build(BuildContext context) {
     List<Widget> actionsRow = [];
     widget.actions.forEach((action) {
-      actionsRow.add(InkWell(
+      actionsRow.add(
+        InkWell(
           onTap: () => Navigator.pop(context, widget.actions.indexOf(action)),
           child: Container(
+            padding: EdgeInsets.all(15.0),
             width: double.infinity,
             child: Center(
               child: action,
             ),
-          )
-      ));
-      if(action != widget.actions.last) actionsRow.add(Divider(height: 30.0));
+          ),
+        ),
+      );
+      if(action != widget.actions.last) actionsRow.add(
+        Divider(height: 1.0),
+      );
     });
 
     return WillPopScope(
@@ -218,48 +332,50 @@ class _MultiConfirmBottomSheetState extends State<MultiConfirmBottomSheet> with 
           return SingleChildScrollView(
             padding: EdgeInsets.all(10.0),
             child: Column(
-                children: [
-                  Container(
-                    width: _getWidth(context),
-                    padding: EdgeInsets.all(15.0),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
-                      color: Theme.of(context).scaffoldBackgroundColor,
-                    ),
-                    child: Column(
-                      children: [
-                        widget.content != null ? Column(
-                          children: [
-                            Text(
+              children: [
+                Container(
+                  width: _getWidth(context),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    color: Theme.of(context).scaffoldBackgroundColor,
+                  ),
+                  child: Column(
+                    children: [
+                      widget.content != null ? Column(
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.all(15.0),
+                            child: Text(
                               widget.content ?? appStrings(context).deleteCategoryConfirm_title,
                               softWrap: true,
                               // maxLines: 3,
                               textAlign: TextAlign.center,
                               style: TextStyle(color: Colors.black),
                             ),
-                            Divider(height: 30.0),
-                          ],
-                        ) : SizedBox(),
-                        Column(children: actionsRow),
-                      ],
+                          ),
+                          Divider(height: 1.0),
+                        ],
+                      ) : SizedBox(),
+                      Column(children: actionsRow),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 10),
+                InkWell(
+                  child: Container(
+                    width: _getWidth(context),
+                    padding: EdgeInsets.all(15.0),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      color: Theme.of(context).scaffoldBackgroundColor,
+                    ),
+                    child: Center(
+                      child: widget.no,
                     ),
                   ),
-                  SizedBox(height: 10),
-                  InkWell(
-                    child: Container(
-                      width: _getWidth(context),
-                      padding: EdgeInsets.all(15.0),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20),
-                        color: Theme.of(context).scaffoldBackgroundColor,
-                      ),
-                      child: Center(
-                        child: widget.no,
-                      ),
-                    ),
-                    onTap: () => Navigator.pop(context, -1),
-                  ),
-                ]
+                  onTap: () => Navigator.pop(context, -1),
+                ),
+              ],
             ),
           );
         },
@@ -286,11 +402,11 @@ class DialogButtonText extends StatelessWidget {
 }
 
 
-
 Future<bool> confirmDeleteDialog(context, {content = ''}) async {
-  final bool isConfirm = await showDialog<bool>(
+  final bool isConfirm = await showModalBottomSheet<bool>(
     context: context,
-    builder: (_) => ConfirmDialog(
+    isScrollControlled: true,
+    builder: (_) => ConfirmBottomSheet(
       content: content,
       yes: DialogButtonText(appStrings(context).deleteCategoryConfirm_deleteButton, color: Colors.red),
       no: DialogButtonText(appStrings(context).alertCancelButton,
@@ -355,9 +471,10 @@ Future<bool> confirmRemoveSelectionDialog(context, {content = ''}) async {
 }
 
 Future<bool> confirmDownloadDialog(context, {content = ''}) async {
-  final bool isConfirm = await showDialog<bool>(
+  final bool isConfirm = await showModalBottomSheet<bool>(
     context: context,
-    builder: (_) => ConfirmDialog(
+    isScrollControlled: true,
+    builder: (_) => ConfirmBottomSheet(
       content: content,
       yes: DialogButtonText(appStrings(context).imageOptions_download,
           color: Theme.of(context).colorScheme.primary),
