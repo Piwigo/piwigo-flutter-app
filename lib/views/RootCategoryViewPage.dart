@@ -23,6 +23,7 @@ class RootCategoryViewPage extends StatefulWidget {
 class _RootCategoryViewPageState extends State<RootCategoryViewPage> with SingleTickerProviderStateMixin {
   String _rootCategory;
   TextEditingController _searchController = TextEditingController();
+  ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -43,8 +44,10 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
     return Scaffold(
       resizeToAvoidBottomInset: true,
       body: NestedScrollView(
+        controller: _scrollController,
         headerSliverBuilder: (context, innerBoxScrolled) => [
           AppBarExpandable(
+            scrollController: _scrollController,
             leading: IconButton(
               onPressed: () {
                 Navigator.of(context).push(
