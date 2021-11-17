@@ -24,6 +24,7 @@ class _SettingsPageState extends State<SettingsPage> {
   String _thumbnailDerivative;
   String _fsDerivative;
   double kExpandedHeight = 100.0;
+  ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -37,8 +38,10 @@ class _SettingsPageState extends State<SettingsPage> {
     ThemeData _theme = Theme.of(context);
     return Scaffold(
       body: CustomScrollView(
+        controller: _scrollController,
         slivers: <Widget>[
           AppBarExpandable(
+            scrollController: _scrollController,
             leading: IconButton(
               onPressed: Navigator.of(context).pop,
               icon: Icon(Icons.check, color: _theme.iconTheme.color),
