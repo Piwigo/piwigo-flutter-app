@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:images_picker/images_picker.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:piwigo_ng/constants/SettingsConstants.dart';
 import 'package:piwigo_ng/services/OrientationService.dart';
 import 'package:piwigo_ng/api/API.dart';
@@ -12,7 +12,7 @@ import 'package:piwigo_ng/views/components/textfields.dart';
 import 'package:piwigo_ng/views/components/dialogs/dialogs.dart';
 
 class UploadGalleryViewPage extends StatefulWidget {
-  final List<Media> imageData;
+  final List<XFile> imageData;
   final String category;
 
   UploadGalleryViewPage({Key key, this.imageData, this.category}) : super(key: key);
@@ -86,14 +86,11 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
 
   addFiles() async {
     try {
-      List<Media> mediaList = await ImagesPicker.pick(
-        count: 100,
-        pickType: PickType.all,
-        quality: 0.8,
-      );
-      print(mediaList[0].path);
+      List<XFile> mediaList = await ImagePicker().pickMultiImage();
       if(mediaList.isNotEmpty) {
-        widget.imageData.addAll(mediaList);
+        setState(() {
+          widget.imageData.addAll(mediaList);
+        });
       }
     } catch (e) {
       print('Dio error ${e.toString()}');
@@ -102,13 +99,11 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
 
   takePhoto() async {
     try {
-      List<Media> mediaList = await ImagesPicker.openCamera(
-        pickType: PickType.image,
-        quality: 0.8,
-      );
-      print(mediaList[0].path);
+      List<XFile> mediaList = [await ImagePicker().pickImage(source: ImageSource.camera)];
       if(mediaList.isNotEmpty) {
-        widget.imageData.addAll(mediaList);
+        setState(() {
+          widget.imageData.addAll(mediaList);
+        });
       }
     } catch (e) {
       print('Dio error ${e.toString()}');
@@ -136,6 +131,7 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
     await API.uploader.uploadPhotos(widget.imageData, widget.category, getImagesInfo());
     setState(() {
       _isLoading = false;
+      widget.imageData.clear();
     });
     Navigator.of(context).pop();
   }
@@ -240,7 +236,7 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
                     scrollDirection: Axis.vertical,
                     shrinkWrap: true,
                     itemBuilder: (BuildContext context, int index) {
-                      Media image = widget.imageData[index];
+                      XFile image = widget.imageData[index];
                       return Container(
                         child: Stack(
                           children: [
@@ -252,7 +248,7 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
                                 semanticContainer: true,
                                 child: GridTile(
                                   child: Container(
-                                    child: Image.file(File(image.thumbPath),
+                                    child: Image.file(File(image.path),
                                       fit: BoxFit.cover,
                                     ),
                                   ),
@@ -312,7 +308,7 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
                                     ),
                                     child: ClipRRect(
                                       borderRadius: BorderRadius.circular(7),
-                                      child: Image.file(File(image.thumbPath),
+                                      child: Image.file(File(image.path),
                                         fit: BoxFit.cover,
                                       ),
                                     ),
