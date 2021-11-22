@@ -2,7 +2,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
-import 'package:images_picker/images_picker.dart';
+import 'package:image_picker/image_picker.dart';
 import 'dart:async';
 
 import 'package:piwigo_ng/api/API.dart';
@@ -423,15 +423,10 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
           foregroundColor: _theme.floatingActionButtonTheme.foregroundColor,
           onTap: () async {
             try {
-              List<Media> mediaList = await ImagesPicker.pick(
-                count: 100,
-                pickType: PickType.all,
-                quality: 1.0,
-              );
-              print(mediaList[0].path);
-              if(mediaList.isNotEmpty) {
+              final List<XFile> images = await ImagePicker().pickMultiImage();
+              if(images.isNotEmpty) {
                 Navigator.push(context, MaterialPageRoute(
-                    builder: (context) => UploadGalleryViewPage(imageData: mediaList, category: widget.category)
+                    builder: (context) => UploadGalleryViewPage(imageData: images, category: widget.category)
                 )).whenComplete(() {
                   setState(() {
                     // API.uploader.createDio();
@@ -452,14 +447,10 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
             foregroundColor: _theme.floatingActionButtonTheme.foregroundColor,
             onTap: () async {
               try {
-                List<Media> mediaList = await ImagesPicker.openCamera(
-                  pickType: PickType.image,
-                  quality: 1.0,
-                );
-                print(mediaList[0].path);
-                if(mediaList.isNotEmpty) {
+                final List<XFile> images = [await ImagePicker().pickImage(source: ImageSource.camera)];
+                if(images.isNotEmpty) {
                   Navigator.push(context, MaterialPageRoute(
-                      builder: (context) => UploadGalleryViewPage(imageData: mediaList, category: widget.category)
+                      builder: (context) => UploadGalleryViewPage(imageData: images, category: widget.category)
                   )).whenComplete(() {
                     setState(() {
                       print('After upload'); // refresh
