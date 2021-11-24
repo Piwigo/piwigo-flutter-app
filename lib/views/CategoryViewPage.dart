@@ -1,4 +1,5 @@
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
@@ -423,7 +424,23 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
           foregroundColor: _theme.floatingActionButtonTheme.foregroundColor,
           onTap: () async {
             try {
-              final List<XFile> images = await ImagePicker().pickMultiImage();
+              ScaffoldMessenger.of(context).removeCurrentSnackBar();
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text('Loading files'),
+                    CircularProgressIndicator(),
+                  ],
+                ),
+                duration: Duration(days: 365),
+              ));
+              final List<XFile> images = ((await FilePicker.platform.pickFiles(
+                type: FileType.media,
+                allowMultiple: true,
+              )) ?.files ?? []).map<XFile>((e) => XFile(e.path, name: e.name, bytes: e.bytes)).toList();
+              ScaffoldMessenger.of(context).removeCurrentSnackBar();
               if(images.isNotEmpty) {
                 Navigator.push(context, MaterialPageRoute(
                     builder: (context) => UploadGalleryViewPage(imageData: images, category: widget.category)
@@ -435,7 +452,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
                 });
               }
             } catch (e) {
-              print('Dio error ${e.toString()}');
+              print('${e.toString()}');
             }
           }
         ),
