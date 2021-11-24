@@ -90,33 +90,35 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
         name: e.name,
         bytes: e.bytes,
       )).toList();
-      setState(() {
-        _isFilesLoading = false;
-      });
       if(mediaList.isNotEmpty) {
         setState(() {
           widget.imageData.addAll(mediaList);
         });
       }
     } catch (e) {
-      setState(() {
-        _isFilesLoading = false;
-      });
       print('${e.toString()}');
     }
+    setState(() {
+      _isFilesLoading = false;
+    });
   }
-
   takePhoto() async {
+    setState(() {
+      _isFilesLoading = true;
+    });
     try {
-      List<XFile> mediaList = [await ImagePicker().pickImage(source: ImageSource.camera)];
-      if(mediaList.isNotEmpty) {
+      final XFile image = await ImagePicker().pickImage(source: ImageSource.camera);
+      if(image != null) {
         setState(() {
-          widget.imageData.addAll(mediaList);
+          widget.imageData.add(image);
         });
       }
     } catch (e) {
       print('Dio error ${e.toString()}');
     }
+    setState(() {
+      _isFilesLoading = false;
+    });
   }
 
   onRemoveFile() async {
@@ -132,7 +134,6 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
       });
     }
   }
-
   onUpload() async {
     setState(() {
       _isLoading = true;
@@ -227,6 +228,9 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
                   ],
                 ),
               ),
+              _isFilesLoading ?
+                LinearProgressIndicator():
+                SizedBox(),
               _displayGrid ?
                 Container(
                   padding: EdgeInsets.all(10),

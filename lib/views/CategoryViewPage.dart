@@ -464,10 +464,10 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
             foregroundColor: _theme.floatingActionButtonTheme.foregroundColor,
             onTap: () async {
               try {
-                final List<XFile> images = [await ImagePicker().pickImage(source: ImageSource.camera)];
-                if(images.isNotEmpty) {
+                final XFile image = await ImagePicker().pickImage(source: ImageSource.camera);
+                if(image != null) {
                   Navigator.push(context, MaterialPageRoute(
-                      builder: (context) => UploadGalleryViewPage(imageData: images, category: widget.category)
+                      builder: (context) => UploadGalleryViewPage(imageData: [image], category: widget.category)
                   )).whenComplete(() {
                     setState(() {
                       print('After upload'); // refresh
