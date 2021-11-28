@@ -1,15 +1,12 @@
 import 'dart:convert';
 
-import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
-import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:images_picker/images_picker.dart';
 import 'package:multi_image_picker/multi_image_picker.dart';
 import 'package:piwigo_ng/api/API.dart';
-import 'package:piwigo_ng/api/SessionAPI.dart';
 import 'package:piwigo_ng/constants/SettingsConstants.dart';
 import 'package:piwigo_ng/views/components/snackbars.dart';
 
@@ -30,7 +27,7 @@ class Uploader {
     final android = AndroidNotificationDetails(
         'channel id',
         'channel name',
-        'channel description',
+        channelDescription: 'channel description',
         priority: Priority.high,
         importance: Importance.max
     );
@@ -55,10 +52,8 @@ class Uploader {
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
 
     for(var element in photos) {
-
       Response response = await uploadChunk(element, category, info);
 
-      API.dio.clear();
       if(json.decode(response.data)["stat"] == "fail") {
         print("Request failed: ${response.statusCode}");
 
@@ -72,14 +67,6 @@ class Uploader {
     await _showUploadNotification(result);
   }
 
-  void createDio() async {
-    API.dio = Dio();
-    API.cookieJar = CookieJar();
-    API.dio.interceptors.add(CookieManager(API.cookieJar));
-    API.dio.options.baseUrl = API.prefs.getString("base_url");
-    await loginUser(API.prefs.getString("base_url"), API.prefs.getString("username"), API.prefs.getString("password"));
-  }
-
   void upload(Media photo, String category) async {
     Map<String, String> queries = {"format":"json", "method": "pwg.images.upload"};
 
@@ -87,6 +74,12 @@ class Uploader {
 
     ByteData byteData = await asset.getByteData();
     List<int> imageData = byteData.buffer.asUint8List();
+
+    Dio dio = new Dio(
+      BaseOptions(
+        baseUrl: API.prefs.getString("base_url"),
+      ),
+    );
 
     FormData formData =  FormData.fromMap({
       "category": category,
@@ -98,7 +91,7 @@ class Uploader {
       "name": photo.path.split('/').last,
     });
 
-    Response response = await API.dio.post("ws.php",
+    Response response = await dio.post("ws.php",
       data: formData,
       queryParameters: queries,
     );
@@ -126,21 +119,26 @@ class Uploader {
     if(info['tag_ids'].isNotEmpty) fields['tag_ids'] = info['tag_ids'];
     if(info['level'] != -1) fields['level'] = info['level'];
 
-    ChunkedUploader chunkedUploader = ChunkedUploader(API.dio);
+    ChunkedUploader chunkedUploader = ChunkedUploader(new Dio(
+      BaseOptions(
+        baseUrl: API.prefs.getString("base_url"),
+      ),
+    ));
     print(await FlutterAbsolutePath.getAbsolutePath(photo.path));
     try {
       Future<Response> response = chunkedUploader.upload(
-          context: context,
-          path: "/ws.php",
-          filePath: await FlutterAbsolutePath.getAbsolutePath(photo.path),
-          maxChunkSize: API.prefs.getInt("upload_form_chunk_size")*1000,
-          params: queries,
-          method: 'POST',
-          data: fields,
-          contentType: Headers.formUrlEncodedContentType,
-          onUploadProgress: (value) {
-            // print('${photo.name} $progress');
-          });
+        context: context,
+        path: "/ws.php",
+        filePath: await FlutterAbsolutePath.getAbsolutePath(photo.path),
+        maxChunkSize: API.prefs.getInt("upload_form_chunk_size")*1000,
+        params: queries,
+        method: 'POST',
+        data: fields,
+        contentType: Headers.formUrlEncodedContentType,
+        onUploadProgress: (value) {
+          // print('${photo.name} $progress');
+        },
+      );
       return response;
     } on DioError catch (e) {
       print('Dio upload chunk error $e');

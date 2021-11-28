@@ -7,9 +7,9 @@ import 'dart:math';
 import 'package:piwigo_ng/api/API.dart';
 import 'package:piwigo_ng/api/SessionAPI.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:piwigo_ng/constants/SettingsConstants.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
+import 'package:piwigo_ng/constants/SettingsConstants.dart';
 import 'package:piwigo_ng/views/PrivacyPolicyViewPage.dart';
 import 'package:piwigo_ng/views/components/buttons.dart';
 
@@ -34,14 +34,14 @@ class _LoginViewPageState extends State<LoginViewPage> {
   TextEditingController passwordController = TextEditingController();
 
   void createDio() async {
-    API.dio = Dio();
+    API().dio = Dio();
     API.cookieJar = CookieJar();
-    API.dio.interceptors.add(CookieManager(API.cookieJar));
+    API().dio.interceptors.add(CookieManager(API.cookieJar));
     if(API.prefs.getBool("is_logged") != null && API.prefs.getBool("is_logged")) {
       setState(() {
         _isLoading = true;
       });
-      API.dio.options.baseUrl = API.prefs.getString("base_url");
+      API().dio.options.baseUrl = API.prefs.getString("base_url");
       String message;
       if(API.prefs.getBool("is_guest") != null && !API.prefs.getBool("is_guest")) {
         message = await loginUser(API.prefs.getString("base_url"), API.prefs.getString("username"), API.prefs.getString("password"));
@@ -372,7 +372,17 @@ class _LoginViewPageState extends State<LoginViewPage> {
                               ),
                             ),
                           ),
-                          Text(dotenv.env['APP_VERSION'], style: _theme.textTheme.headline5),
+                          FutureBuilder<PackageInfo>(
+                            future: PackageInfo.fromPlatform(),
+                            builder: (context, snapshot) {
+                              if(snapshot.hasData) {
+                                return Text(snapshot.data.version,
+                                  style: _theme.textTheme.headline5,
+                                );
+                              }
+                              return SizedBox();
+                            },
+                          ),
                         ],
                       ),
                     ),

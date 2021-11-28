@@ -14,10 +14,10 @@ Future<String> loginUser(String url, String username, String password) async {
     'password': password,
   };
 
-  API.dio.options.baseUrl = url;
+  API().dio.options.baseUrl = url;
 
   try {
-    Response response = await API.dio.post('ws.php',
+    Response response = await API().dio.post('ws.php',
       data: FormData.fromMap(fields),
       options: Options(contentType: Headers.formUrlEncodedContentType),
       queryParameters: queries,
@@ -45,7 +45,7 @@ Future<String> loginUser(String url, String username, String password) async {
 }
 Future<String> loginGuest(String url) async {
 
-  API.dio.options.baseUrl = url;
+  API().dio.options.baseUrl = url;
 
   var status = await sessionStatus();
 
@@ -63,7 +63,7 @@ Future<Map<String, dynamic>> sessionStatus() async {
   };
 
   try {
-    Response response = await API.dio.get('ws.php', queryParameters: queries);
+    Response response = await API().dio.get('ws.php', queryParameters: queries);
     return json.decode(response.data);
   } catch (e) {
     print('Dio error $e');

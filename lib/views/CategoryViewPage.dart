@@ -426,7 +426,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
               List<Media> mediaList = await ImagesPicker.pick(
                 count: 100,
                 pickType: PickType.all,
-                quality: 0.8,
+                quality: 1.0,
               );
               print(mediaList[0].path);
               if(mediaList.isNotEmpty) {
@@ -454,7 +454,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
               try {
                 List<Media> mediaList = await ImagesPicker.openCamera(
                   pickType: PickType.image,
-                  quality: 0.8,
+                  quality: 1.0,
                 );
                 print(mediaList[0].path);
                 if(mediaList.isNotEmpty) {
@@ -462,7 +462,6 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
                       builder: (context) => UploadGalleryViewPage(imageData: mediaList, category: widget.category)
                   )).whenComplete(() {
                     setState(() {
-                      // API.uploader.createDio();
                       print('After upload'); // refresh
                     });
                   });

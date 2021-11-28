@@ -60,8 +60,3 @@ void decrementImageCrossAxisCount(BuildContext context) {
     print('decrement: ${API.prefs.getDouble("landscape_image_count")}');
   }
 }
-
-
-double getDialogWidth(BuildContext context) {
-
-}

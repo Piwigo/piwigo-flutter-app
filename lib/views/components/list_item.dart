@@ -141,27 +141,40 @@ class _AlbumListItemState extends State<AlbumListItem> {
         borderRadius: BorderRadius.circular(10),
         child: Slidable(
           enabled: widget.isAdmin,
-          actionPane: SlidableDrawerActionPane(),
-          actionExtentRatio: 0.15,
           child: AlbumListCard(widget.album, isAdmin: widget.isAdmin),
-          secondaryActions: <Widget>[
-            IconSlideAction(
-              color: Theme.of(context).colorScheme.primary,// _theme.iconTheme.color,
-              iconWidget: Icon(Icons.edit, size: 38, color: Colors.white),
-              onTap: _onEditAlbum,
-            ),
-            IconSlideAction(
-              color: Color(0xFF4B4B4B),
-              iconWidget: Icon(Icons.reply, size: 38, color: Colors.white),
-              onTap: _onMoveAlbum,
-            ),
-            IconSlideAction(
-              color: Colors.red, // _theme.errorColor,
-              iconWidget: Icon(Icons.delete, size: 38, color: Colors.white),
-              onTap: _onDeleteAlbum,
-              closeOnTap: true,
-            ),
-          ],
+          endActionPane: ActionPane(
+            motion: DrawerMotion(),
+            children: [
+              CustomSlidableAction(
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                onPressed: (_) {
+                  _onEditAlbum();
+                },
+                child: Center(
+                  child: Icon(Icons.edit, size: 38, color: Colors.white),
+                ),
+              ),
+              CustomSlidableAction(
+                backgroundColor: Color(0xFF4B4B4B),
+                child: Center(
+                  child: Icon(Icons.reply, size: 38, color: Colors.white),
+                ),
+                onPressed: (_) {
+                  _onMoveAlbum();
+                },
+              ),
+              CustomSlidableAction(
+                backgroundColor: Colors.red,
+                child: Center(
+                  child: Icon(Icons.delete, size: 38, color: Colors.white),
+                ),
+                autoClose: true,
+                onPressed: (_) {
+                  _onDeleteAlbum();
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:piwigo_ng/constants/SettingsConstants.dart';
 import 'package:piwigo_ng/views/LoginViewPage.dart';
 import 'package:piwigo_ng/api/API.dart';
@@ -23,6 +24,7 @@ class _SettingsPageState extends State<SettingsPage> {
   String _thumbnailDerivative;
   String _fsDerivative;
   double kExpandedHeight = 100.0;
+  ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -36,8 +38,10 @@ class _SettingsPageState extends State<SettingsPage> {
     ThemeData _theme = Theme.of(context);
     return Scaffold(
       body: CustomScrollView(
+        controller: _scrollController,
         slivers: <Widget>[
           AppBarExpandable(
+            scrollController: _scrollController,
             leading: IconButton(
               onPressed: Navigator.of(context).pop,
               icon: Icon(Icons.check, color: _theme.iconTheme.color),
@@ -263,7 +267,18 @@ class _SettingsPageState extends State<SettingsPage> {
                               ),
                               TableCell(
                                 Text(appStrings(context).settings_appName, style: TextStyle(color: Colors.black, fontSize: 16)),
-                                Text(dotenv.env['APP_VERSION'], overflow: TextOverflow.ellipsis, softWrap: false, style: TextStyle(color: Colors.grey.shade600, fontSize: 14)),
+                                FutureBuilder<PackageInfo>(
+                                  future: PackageInfo.fromPlatform(),
+                                  builder: (context, snapshot) {
+                                    if(snapshot.hasData) {
+                                      return Text(snapshot.data.version,
+                                        overflow: TextOverflow.ellipsis, softWrap: false,
+                                        style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
+                                      );
+                                    }
+                                    return SizedBox();
+                                  },
+                                ),
                                 isEnd: true,
                               ),
                             ],
