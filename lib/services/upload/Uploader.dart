@@ -4,8 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:images_picker/images_picker.dart';
-import 'package:multi_image_picker/multi_image_picker.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:piwigo_ng/api/API.dart';
 import 'package:piwigo_ng/constants/SettingsConstants.dart';
 import 'package:piwigo_ng/views/components/snackbars.dart';
@@ -42,7 +41,7 @@ class Uploader {
     );
   }
 
-  Future<void> uploadPhotos(List<Media> photos, String category, Map<String, dynamic> info) async {
+  Future<void> uploadPhotos(List<XFile> photos, String category, Map<String, dynamic> info) async {
     Map<String, dynamic> result = {
       'isSuccess': true,
       'filePath': null,
@@ -67,13 +66,10 @@ class Uploader {
     await _showUploadNotification(result);
   }
 
-  void upload(Media photo, String category) async {
+  void upload(XFile photo, String category) async {
     Map<String, String> queries = {"format":"json", "method": "pwg.images.upload"};
 
-    var asset = Asset(photo.path, photo.path.split('/').last, photo.size.ceil(), photo.size.ceil());
-
-    ByteData byteData = await asset.getByteData();
-    List<int> imageData = byteData.buffer.asUint8List();
+    List<int> imageData = await photo.readAsBytes();
 
     Dio dio = new Dio(
       BaseOptions(
@@ -103,7 +99,7 @@ class Uploader {
       print("Request failed: ${response.statusCode}");
     }
   }
-  Future<Response> uploadChunk(Media photo, String category, Map<String, dynamic> info) async {
+  Future<Response> uploadChunk(XFile photo, String category, Map<String, dynamic> info) async {
     Map<String, String> queries = {
       "format":"json",
       "method": "pwg.images.uploadAsync"

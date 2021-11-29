@@ -1,8 +1,9 @@
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
-import 'package:images_picker/images_picker.dart';
+import 'package:image_picker/image_picker.dart';
 import 'dart:async';
 
 import 'package:piwigo_ng/api/API.dart';
@@ -423,15 +424,26 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
           foregroundColor: _theme.floatingActionButtonTheme.foregroundColor,
           onTap: () async {
             try {
-              List<Media> mediaList = await ImagesPicker.pick(
-                count: 100,
-                pickType: PickType.all,
-                quality: 1.0,
-              );
-              print(mediaList[0].path);
-              if(mediaList.isNotEmpty) {
+              ScaffoldMessenger.of(context).removeCurrentSnackBar();
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text('Loading files'),
+                    CircularProgressIndicator(),
+                  ],
+                ),
+                duration: Duration(days: 365),
+              ));
+              final List<XFile> images = ((await FilePicker.platform.pickFiles(
+                type: FileType.media,
+                allowMultiple: true,
+              )) ?.files ?? []).map<XFile>((e) => XFile(e.path, name: e.name, bytes: e.bytes)).toList();
+              ScaffoldMessenger.of(context).removeCurrentSnackBar();
+              if(images.isNotEmpty) {
                 Navigator.push(context, MaterialPageRoute(
-                    builder: (context) => UploadGalleryViewPage(imageData: mediaList, category: widget.category)
+                    builder: (context) => UploadGalleryViewPage(imageData: images, category: widget.category)
                 )).whenComplete(() {
                   setState(() {
                     // API.uploader.createDio();
@@ -440,7 +452,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
                 });
               }
             } catch (e) {
-              print('Dio error ${e.toString()}');
+              print('${e.toString()}');
             }
           }
         ),
@@ -452,14 +464,10 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
             foregroundColor: _theme.floatingActionButtonTheme.foregroundColor,
             onTap: () async {
               try {
-                List<Media> mediaList = await ImagesPicker.openCamera(
-                  pickType: PickType.image,
-                  quality: 1.0,
-                );
-                print(mediaList[0].path);
-                if(mediaList.isNotEmpty) {
+                final XFile image = await ImagePicker().pickImage(source: ImageSource.camera);
+                if(image != null) {
                   Navigator.push(context, MaterialPageRoute(
-                      builder: (context) => UploadGalleryViewPage(imageData: mediaList, category: widget.category)
+                      builder: (context) => UploadGalleryViewPage(imageData: [image], category: widget.category)
                   )).whenComplete(() {
                     setState(() {
                       print('After upload'); // refresh
