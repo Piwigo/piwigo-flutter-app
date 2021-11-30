@@ -33,7 +33,7 @@ class _PrivacyPolicyViewPageState extends State<PrivacyPolicyViewPage> {
 
   @override
   Widget build(BuildContext context) {
-    _url = '${dotenv.env['PRIVACY_POLICIES']}${appStrings(context).settings_privacyUrl}';
+    _url = '${Constants.privacyPoliciesUrl}${appStrings(context).settings_privacyUrl}';
     return Scaffold(
       appBar: AppBar(
         title: Text(appStrings(context).settings_privacy),

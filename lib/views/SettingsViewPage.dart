@@ -383,8 +383,8 @@ class _ImageRowCountSlidersState extends State<ImageRowCountSliders> {
                   constraints: BoxConstraints(maxWidth: 300.0),
                   child: PiwigoSlider(
                     label: '${API.prefs.getDouble("portrait_image_count").ceil()}/6',
-                    min: Constants.PORTRAIT_IMAGE_COUNT_MIN,
-                    max: Constants.PORTRAIT_IMAGE_COUNT_MAX,
+                    min: Constants.portraitImageCountMin,
+                    max: Constants.portraitImageCountMax,
                     value: API.prefs.getDouble("portrait_image_count"),
                     onChangeEnd: (i) {
                       setState(() {
@@ -413,8 +413,8 @@ class _ImageRowCountSlidersState extends State<ImageRowCountSliders> {
                   height: 30.0,
                   child: PiwigoSlider(
                     label: '${API.prefs.getDouble("landscape_image_count").ceil()}/10',
-                    min: Constants.LANDSCAPE_IMAGE_COUNT_MIN,
-                    max: Constants.LANDSCAPE_IMAGE_COUNT_MAX,
+                    min: Constants.landscapeImageCountMin,
+                    max: Constants.landscapeImageCountMax,
                     value: API.prefs.getDouble("landscape_image_count"),
                     onChangeEnd: (i) {
                       setState(() {
