@@ -132,8 +132,8 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
   }
 
   Widget _albumGrid(dynamic albums) {
-    int albumCrossAxisCount = MediaQuery.of(context).size.width <= Constants.ALBUM_MIN_WIDTH ? 1
-        : (MediaQuery.of(context).size.width/Constants.ALBUM_MIN_WIDTH).floor();
+    int albumCrossAxisCount = MediaQuery.of(context).size.width <= Constants.albumMinWidth ? 1
+        : (MediaQuery.of(context).size.width/Constants.albumMinWidth).floor();
 
     return GridView.builder(
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(

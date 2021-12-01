@@ -486,8 +486,8 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
   Widget createPageContent(dynamic albums, int nbImages) {
     ThemeData _theme = Theme.of(context);
 
-    int albumCrossAxisCount = MediaQuery.of(context).size.width <= Constants.ALBUM_MIN_WIDTH ? 1
-        : (MediaQuery.of(context).size.width/Constants.ALBUM_MIN_WIDTH).floor();
+    int albumCrossAxisCount = MediaQuery.of(context).size.width <= Constants.albumMinWidth ? 1
+        : (MediaQuery.of(context).size.width/Constants.albumMinWidth).floor();
 
     return RefreshIndicator(
       displacement: 20,

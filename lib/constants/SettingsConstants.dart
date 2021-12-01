@@ -31,14 +31,16 @@ class Constants {
     8: 'Admins',
   };
 
-  static double CONFIRM_DIALOG_MAX_WIDTH = 500.0;
+  static double confirmDialogMaxWidth = 500.0;
 
-  static double ALBUM_MIN_WIDTH = 400.0;
+  static double albumMinWidth = 400.0;
 
-  static double PORTRAIT_IMAGE_COUNT_MIN = 1.0;
-  static double PORTRAIT_IMAGE_COUNT_MAX = 6.0;
-  static double LANDSCAPE_IMAGE_COUNT_MIN = 4.0;
-  static double LANDSCAPE_IMAGE_COUNT_MAX = 10.0;
+  static double portraitImageCountMin = 1.0;
+  static double portraitImageCountMax = 6.0;
+  static double landscapeImageCountMin = 4.0;
+  static double landscapeImageCountMax = 10.0;
+
+  static String privacyPoliciesUrl = "https://piwigo.org/mobile-apps-privacy-policy&webview";
 }
 
 AppLocalizations appStrings(context) {

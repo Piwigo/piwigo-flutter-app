@@ -16,10 +16,10 @@ class PiwigoDialog extends StatelessWidget {
 
   double _getWidth(context) {
     if(isPortrait(context)) {
-      return MediaQuery.of(context).size.width > Constants.CONFIRM_DIALOG_MAX_WIDTH ?
+      return MediaQuery.of(context).size.width > Constants.confirmDialogMaxWidth ?
       MediaQuery.of(context).size.width*3/4 : MediaQuery.of(context).size.width;
     }
-    return MediaQuery.of(context).size.height > Constants.CONFIRM_DIALOG_MAX_WIDTH ?
+    return MediaQuery.of(context).size.height > Constants.confirmDialogMaxWidth ?
       MediaQuery.of(context).size.height*3/4 : MediaQuery.of(context).size.height;
   }
 
