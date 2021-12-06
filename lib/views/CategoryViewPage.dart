@@ -430,7 +430,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text('Loading files'),
+                    Text(appStrings(context).loadingHUD_label),
                     CircularProgressIndicator(),
                   ],
                 ),
@@ -446,7 +446,6 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
                     builder: (context) => UploadGalleryViewPage(imageData: images, category: widget.category)
                 )).whenComplete(() {
                   setState(() {
-                    // API.uploader.createDio();
                     print('After upload'); // refresh
                   });
                 });
@@ -464,7 +463,20 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
             foregroundColor: _theme.floatingActionButtonTheme.foregroundColor,
             onTap: () async {
               try {
+                ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(appStrings(context).loadingHUD_label),
+                      CircularProgressIndicator(),
+                    ],
+                  ),
+                  duration: Duration(days: 365),
+                ));
                 final XFile image = await ImagePicker().pickImage(source: ImageSource.camera);
+                ScaffoldMessenger.of(context).removeCurrentSnackBar();
                 if(image != null) {
                   Navigator.push(context, MaterialPageRoute(
                       builder: (context) => UploadGalleryViewPage(imageData: [image], category: widget.category)

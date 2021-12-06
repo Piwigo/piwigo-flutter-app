@@ -64,7 +64,7 @@ class Uploader {
     } catch (e) {
       print(e);
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
-      ScaffoldMessenger.of(context).showSnackBar(errorSnackBar(context, "An error occurred while uploading"));
+      ScaffoldMessenger.of(context).showSnackBar(errorSnackBar(context, appStrings(context).uploadError_title));
     }
 
     await _showUploadNotification(result);
@@ -72,7 +72,6 @@ class Uploader {
 
   void upload(XFile photo, String category) async {
     Map<String, String> queries = {"format":"json", "method": "pwg.images.upload"};
-
     List<int> imageData = await photo.readAsBytes();
 
     Dio dio = new Dio(
@@ -143,7 +142,7 @@ class Uploader {
     } on DioError catch (e) {
       print('Dio upload chunk error $e');
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
-      ScaffoldMessenger.of(context).showSnackBar(errorSnackBar(context, "An error occurred while uploading"));
+      ScaffoldMessenger.of(context).showSnackBar(errorSnackBar(context, appStrings(context).uploadError_title));
       return Future.value(null);
     }
   }
