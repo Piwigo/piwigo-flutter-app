@@ -42,6 +42,8 @@ class Uploader {
   }
 
   Future<void> uploadPhotos(List<XFile> photos, String category, Map<String, dynamic> info) async {
+    print(API.prefs.getString('user_status'));
+    print(API.prefs.getString('status'));
     Map<String, dynamic> result = {
       'isSuccess': true,
       'filePath': null,
@@ -50,18 +52,20 @@ class Uploader {
 
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
 
-    for(var element in photos) {
-      Response response = await uploadChunk(element, category, info);
+    try {
+      for(var element in photos) {
+        Response response = await uploadChunk(element, category, info);
 
-      if(json.decode(response.data)["stat"] == "fail") {
-        print("Request failed: ${response.statusCode}");
-
-        ScaffoldMessenger.of(context).hideCurrentSnackBar();
-        ScaffoldMessenger.of(context).showSnackBar(errorSnackBar(context, response.data));
+        if(json.decode(response.data)["stat"] == "fail") {
+          ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          ScaffoldMessenger.of(context).showSnackBar(errorSnackBar(context, response.data));
+        }
       }
+    } catch (e) {
+      print(e);
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      ScaffoldMessenger.of(context).showSnackBar(errorSnackBar(context, "An error occurred while uploading"));
     }
-
-    print('new status');
 
     await _showUploadNotification(result);
   }
@@ -138,6 +142,8 @@ class Uploader {
       return response;
     } on DioError catch (e) {
       print('Dio upload chunk error $e');
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      ScaffoldMessenger.of(context).showSnackBar(errorSnackBar(context, "An error occurred while uploading"));
       return Future.value(null);
     }
   }
