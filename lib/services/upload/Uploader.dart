@@ -7,6 +7,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:images_picker/images_picker.dart';
 import 'package:multi_image_picker/multi_image_picker.dart';
 import 'package:piwigo_ng/api/API.dart';
+import 'package:piwigo_ng/api/ImageAPI.dart';
 import 'package:piwigo_ng/constants/SettingsConstants.dart';
 import 'package:piwigo_ng/views/components/snackbars.dart';
 
@@ -53,7 +54,7 @@ class Uploader {
 
     for(var element in photos) {
       Response response = await uploadChunk(element, category, info);
-
+      print(response.data);
       if(json.decode(response.data)["stat"] == "fail") {
         print("Request failed: ${response.statusCode}");
 
@@ -63,6 +64,9 @@ class Uploader {
     }
 
     print('new status');
+
+    uploadCompleted([], int.parse(category));
+    communityUploadCompleted([], int.parse(category));
 
     await _showUploadNotification(result);
   }
