@@ -4,8 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:images_picker/images_picker.dart';
-import 'package:multi_image_picker/multi_image_picker.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:piwigo_ng/api/API.dart';
 import 'package:piwigo_ng/api/ImageAPI.dart';
 import 'package:piwigo_ng/constants/SettingsConstants.dart';
@@ -43,7 +42,9 @@ class Uploader {
     );
   }
 
-  Future<void> uploadPhotos(List<Media> photos, String category, Map<String, dynamic> info) async {
+  Future<void> uploadPhotos(List<XFile> photos, String category, Map<String, dynamic> info) async {
+    print(API.prefs.getString('user_status'));
+    print(API.prefs.getString('status'));
     Map<String, dynamic> result = {
       'isSuccess': true,
       'filePath': null,
@@ -52,18 +53,20 @@ class Uploader {
 
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
 
-    for(var element in photos) {
-      Response response = await uploadChunk(element, category, info);
-      print(response.data);
-      if(json.decode(response.data)["stat"] == "fail") {
-        print("Request failed: ${response.statusCode}");
+    try {
+      for(var element in photos) {
+        Response response = await uploadChunk(element, category, info);
 
-        ScaffoldMessenger.of(context).hideCurrentSnackBar();
-        ScaffoldMessenger.of(context).showSnackBar(errorSnackBar(context, response.data));
+        if(json.decode(response.data)["stat"] == "fail") {
+          ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          ScaffoldMessenger.of(context).showSnackBar(errorSnackBar(context, response.data));
+        }
       }
+    } catch (e) {
+      print(e);
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      ScaffoldMessenger.of(context).showSnackBar(errorSnackBar(context, appStrings(context).uploadError_title));
     }
-
-    print('new status');
 
     uploadCompleted([], int.parse(category));
     communityUploadCompleted([], int.parse(category));
@@ -71,13 +74,9 @@ class Uploader {
     await _showUploadNotification(result);
   }
 
-  void upload(Media photo, String category) async {
+  void upload(XFile photo, String category) async {
     Map<String, String> queries = {"format":"json", "method": "pwg.images.upload"};
-
-    var asset = Asset(photo.path, photo.path.split('/').last, photo.size.ceil(), photo.size.ceil());
-
-    ByteData byteData = await asset.getByteData();
-    List<int> imageData = byteData.buffer.asUint8List();
+    List<int> imageData = await photo.readAsBytes();
 
     Dio dio = new Dio(
       BaseOptions(
@@ -107,7 +106,7 @@ class Uploader {
       print("Request failed: ${response.statusCode}");
     }
   }
-  Future<Response> uploadChunk(Media photo, String category, Map<String, dynamic> info) async {
+  Future<Response> uploadChunk(XFile photo, String category, Map<String, dynamic> info) async {
     Map<String, String> queries = {
       "format":"json",
       "method": "pwg.images.uploadAsync"
@@ -146,6 +145,8 @@ class Uploader {
       return response;
     } on DioError catch (e) {
       print('Dio upload chunk error $e');
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      ScaffoldMessenger.of(context).showSnackBar(errorSnackBar(context, appStrings(context).uploadError_title));
       return Future.value(null);
     }
   }

@@ -1,7 +1,6 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:piwigo_ng/constants/SettingsConstants.dart';
@@ -24,6 +23,7 @@ class _SettingsPageState extends State<SettingsPage> {
   String _thumbnailDerivative;
   String _fsDerivative;
   double kExpandedHeight = 100.0;
+  ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -37,8 +37,10 @@ class _SettingsPageState extends State<SettingsPage> {
     ThemeData _theme = Theme.of(context);
     return Scaffold(
       body: CustomScrollView(
+        controller: _scrollController,
         slivers: <Widget>[
           AppBarExpandable(
+            scrollController: _scrollController,
             leading: IconButton(
               onPressed: Navigator.of(context).pop,
               icon: Icon(Icons.check, color: _theme.iconTheme.color),
@@ -380,8 +382,8 @@ class _ImageRowCountSlidersState extends State<ImageRowCountSliders> {
                   constraints: BoxConstraints(maxWidth: 300.0),
                   child: PiwigoSlider(
                     label: '${API.prefs.getDouble("portrait_image_count").ceil()}/6',
-                    min: Constants.PORTRAIT_IMAGE_COUNT_MIN,
-                    max: Constants.PORTRAIT_IMAGE_COUNT_MAX,
+                    min: Constants.portraitImageCountMin,
+                    max: Constants.portraitImageCountMax,
                     value: API.prefs.getDouble("portrait_image_count"),
                     onChangeEnd: (i) {
                       setState(() {
@@ -410,8 +412,8 @@ class _ImageRowCountSlidersState extends State<ImageRowCountSliders> {
                   height: 30.0,
                   child: PiwigoSlider(
                     label: '${API.prefs.getDouble("landscape_image_count").ceil()}/10',
-                    min: Constants.LANDSCAPE_IMAGE_COUNT_MIN,
-                    max: Constants.LANDSCAPE_IMAGE_COUNT_MAX,
+                    min: Constants.landscapeImageCountMin,
+                    max: Constants.landscapeImageCountMax,
                     value: API.prefs.getDouble("landscape_image_count"),
                     onChangeEnd: (i) {
                       setState(() {
