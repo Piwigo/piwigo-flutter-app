@@ -596,7 +596,7 @@ class _VideoItemState extends State<VideoItem> {
     super.initState();
     _controller = VideoPlayerController.file(File(widget.path))
       ..initialize().then((_) {
-        setState(() {});  //when your thumbnail will show.
+        setState(() {});
       });
   }
 

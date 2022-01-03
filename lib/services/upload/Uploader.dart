@@ -43,33 +43,40 @@ class Uploader {
   }
 
   Future<void> uploadPhotos(List<XFile> photos, String category, Map<String, dynamic> info) async {
-    print(API.prefs.getString('user_status'));
-    print(API.prefs.getString('status'));
     Map<String, dynamic> result = {
       'isSuccess': true,
       'filePath': null,
       'error': null,
     };
+    List<int> uploadedImages = [];
 
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
 
     try {
       for(var element in photos) {
         Response response = await uploadChunk(element, category, info);
-
-        if(json.decode(response.data)["stat"] == "fail") {
+        var data = json.decode(response.data);
+        print("upload ? $data");
+        if(data["stat"] == "fail") {
           ScaffoldMessenger.of(context).hideCurrentSnackBar();
           ScaffoldMessenger.of(context).showSnackBar(errorSnackBar(context, response.data));
+        } else if(data["result"]["id"] != null) {
+          uploadedImages.add(data["result"]["id"]);
         }
       }
-    } catch (e) {
-      print(e);
+    } on DioError catch (e) {
+      print(e.message);
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
       ScaffoldMessenger.of(context).showSnackBar(errorSnackBar(context, appStrings(context).uploadError_title));
     }
 
-    uploadCompleted([], int.parse(category));
-    communityUploadCompleted([], int.parse(category));
+    print(uploadedImages);
+    try {
+      await uploadCompleted(uploadedImages, int.parse(category));
+      await communityUploadCompleted(uploadedImages, int.parse(category));
+    } on DioError catch (e) {
+      print(e.message);
+    }
 
     await _showUploadNotification(result);
   }
@@ -129,7 +136,7 @@ class Uploader {
     ));
     print(await FlutterAbsolutePath.getAbsolutePath(photo.path));
     try {
-      Future<Response> response = chunkedUploader.upload(
+      return await chunkedUploader.upload(
         context: context,
         path: "/ws.php",
         filePath: await FlutterAbsolutePath.getAbsolutePath(photo.path),
@@ -139,10 +146,9 @@ class Uploader {
         data: fields,
         contentType: Headers.formUrlEncodedContentType,
         onUploadProgress: (value) {
-          // print('${photo.name} $progress');
+          print('${photo.name} $value');
         },
       );
-      return response;
     } on DioError catch (e) {
       print('Dio upload chunk error $e');
       ScaffoldMessenger.of(context).hideCurrentSnackBar();

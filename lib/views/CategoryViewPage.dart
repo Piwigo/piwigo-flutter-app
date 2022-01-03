@@ -353,24 +353,23 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
           if (albumSnapshot.hasData) {
             int nbImages = _nbImages;
             var albums = handleAlbumSnapshot(albumSnapshot, nbImages);
-            // print(albums);
             return FutureBuilder<Map<String,dynamic>>(
-                future: fetchImages(widget.category, 0), // Images of the list
-                builder: (BuildContext context, AsyncSnapshot imagesSnapshot) {
-                  if (imagesSnapshot.hasData) {
-                    if (imageList.isEmpty || _page == 0) {
-                      if(imagesSnapshot.data['stat'] == 'fail') {
-                        return Center(child: Text(appStrings(context).categoryImageList_noDataError));
-                      }
-                      handleImagesSnapshot(imagesSnapshot);
+              future: fetchImages(widget.category, 0),
+              builder: (BuildContext context, AsyncSnapshot imagesSnapshot) {
+                if (imagesSnapshot.hasData) {
+                  if (imageList.isEmpty || _page == 0) {
+                    if(imagesSnapshot.data['stat'] == 'fail') {
+                      return Center(child: Text(appStrings(context).categoryImageList_noDataError));
                     }
-                    return createPageContent(albums, nbImages);
-                  } else {
-                    return Center(
-                      child: CircularProgressIndicator(),
-                    );
+                    handleImagesSnapshot(imagesSnapshot);
                   }
+                  return createPageContent(albums, nbImages);
+                } else {
+                  return Center(
+                    child: CircularProgressIndicator(),
+                  );
                 }
+              },
             );
           } else {
             return Center(
