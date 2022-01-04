@@ -734,9 +734,16 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
                     Stack(
                       alignment: Alignment.center,
                       children: [
-                        CircularProgressIndicator(),
-                        Text("${uploadStatusProvider.current}",
-                          style: TextStyle(fontSize: 20),
+                        SizedBox(
+                          height: 55,
+                          width: 55,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 5,
+                            value: uploadStatusProvider.progress,
+                          ),
+                        ),
+                        Text("${uploadStatusProvider.getRemaining()}",
+                          style: TextStyle(fontSize: 16),
                         ),
                       ],
                     ) :

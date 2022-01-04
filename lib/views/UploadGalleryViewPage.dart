@@ -145,9 +145,9 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
         _isLoading = false;
         widget.imageData.clear();
       });
-    }
 
-    Navigator.of(context).pop();
+      Navigator.of(context).pop();
+    }
   }
 
   @override

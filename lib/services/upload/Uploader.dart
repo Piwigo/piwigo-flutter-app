@@ -48,9 +48,9 @@ class Uploader {
     List<int> uploadedImages = [];
     final uploadStatusProvider = Provider.of<UploadStatusNotifier>(context, listen: false);
 
-    uploadStatusProvider.toggleStatus(true);
+    uploadStatusProvider.status = true;
     uploadStatusProvider.max = photos.length;
-    uploadStatusProvider.current = photos.length;
+    uploadStatusProvider.current = 1;
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -61,18 +61,23 @@ class Uploader {
 
     try {
       for(var element in photos) {
-        uploadStatusProvider.toggleStatus(true);
+        uploadStatusProvider.status = true;
 
-        Response response = await uploadChunk(context, element, category, info);
+        Response response = await uploadChunk(context, element, category, info,
+            (progress) {
+              print(progress);
+              uploadStatusProvider.progress = progress;
+            },
+        );
         var data = json.decode(response.data);
-        print("upload ? $data");
+
         if(data["stat"] == "fail") {
           ScaffoldMessenger.of(context).hideCurrentSnackBar();
           ScaffoldMessenger.of(context).showSnackBar(errorSnackBar(context, response.data));
         } else if(data["result"]["id"] != null) {
           uploadedImages.add(data["result"]["id"]);
         }
-        uploadStatusProvider.current--;
+        uploadStatusProvider.current++;
       }
     } on DioError catch (e) {
       print(e.message);
@@ -80,7 +85,6 @@ class Uploader {
       ScaffoldMessenger.of(context).showSnackBar(errorSnackBar(context, appStrings(context).uploadError_title));
     }
 
-    print(uploadedImages);
     try {
       await uploadCompleted(uploadedImages, int.parse(category));
       await communityUploadCompleted(uploadedImages, int.parse(category));
@@ -88,7 +92,7 @@ class Uploader {
       print(e.message);
     }
 
-    uploadStatusProvider.toggleStatus(false);
+    uploadStatusProvider.status = false;
     uploadStatusProvider.max = 0;
     uploadStatusProvider.current = 0;
 
@@ -127,7 +131,10 @@ class Uploader {
       print("Request failed: ${response.statusCode}");
     }
   }
-  Future<Response> uploadChunk(BuildContext context, XFile photo, String category, Map<String, dynamic> info) async {
+  Future<Response> uploadChunk(BuildContext context, XFile photo,
+    String category, Map<String, dynamic> info,
+    Function(double) onProgress,
+  ) async {
     Map<String, String> queries = {
       "format":"json",
       "method": "pwg.images.uploadAsync"
@@ -148,7 +155,7 @@ class Uploader {
         baseUrl: API.prefs.getString("base_url"),
       ),
     ));
-    print(await FlutterAbsolutePath.getAbsolutePath(photo.path));
+
     try {
       return await chunkedUploader.upload(
         context: context,
@@ -159,9 +166,7 @@ class Uploader {
         method: 'POST',
         data: fields,
         contentType: Headers.formUrlEncodedContentType,
-        onUploadProgress: (value) {
-          print('${photo.name} $value');
-        },
+        onUploadProgress: (value) => onProgress(value),
       );
     } on DioError catch (e) {
       print('Dio upload chunk error $e');
