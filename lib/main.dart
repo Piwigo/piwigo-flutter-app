@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:piwigo_ng/services/ThemeProvider.dart';
+import 'package:piwigo_ng/services/UploadStatusProvider.dart';
 import 'package:piwigo_ng/views/RootCategoryViewPage.dart';
 import 'package:piwigo_ng/api/API.dart';
 import 'package:provider/provider.dart';
@@ -18,7 +19,19 @@ void main() async {
   await getSharedPreferences();
   initLocalNotifications();
 
-  runApp(MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => ThemeNotifier(),
+      builder: (context, _) {
+        return ChangeNotifierProvider(
+          create: (context) => UploadStatusNotifier(),
+          builder: (context, _) {
+            return MyApp();
+          },
+        );
+      },
+    ),
+  );
 }
 
 Future<void> getSharedPreferences() async {
@@ -37,37 +50,19 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => ThemeNotifier(),
-      child: Consumer<ThemeNotifier>(
-        builder: (context, ThemeNotifier notifier, child) {
-          return MaterialApp(
-            title: "Piwigo NG",
-            // theme: notifier.darkTheme ? dark : light,
-            localizationsDelegates: AppLocalizations.localizationsDelegates,
-            supportedLocales: AppLocalizations.supportedLocales,
-            /*
-            localizationsDelegates: [
-              AppLocalizations.delegate,
-              GlobalMaterialLocalizations.delegate,
-              GlobalWidgetsLocalizations.delegate,
-              GlobalCupertinoLocalizations.delegate,
-            ],
-            supportedLocales: [
-              const Locale('en', ''), // English, no country code
-              const Locale('fr', ''), // Spanish, no country code
-            ],
-             */
-            theme: light,
-            initialRoute: '/',
-            onGenerateRoute: (settings) {
-              if(settings.name == '/') return MaterialPageRoute(builder: (context) => LoginViewPage());
-              if(settings.name == '/root') return MaterialPageRoute(builder: (context) => RootCategoryViewPage(isAdmin: settings.arguments));
-              return MaterialPageRoute(builder: (context) => Container());
-            },
-          );
-        }
-      ),
+    final themeProvider = Provider.of<ThemeNotifier>(context);
+    return MaterialApp(
+      title: "Piwigo NG",
+      // theme: themeProvider.darkTheme ? dark : light,
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      theme: light,
+      initialRoute: '/',
+      onGenerateRoute: (settings) {
+        if(settings.name == '/') return MaterialPageRoute(builder: (context) => LoginViewPage());
+        if(settings.name == '/root') return MaterialPageRoute(builder: (context) => RootCategoryViewPage(isAdmin: settings.arguments));
+        return MaterialPageRoute(builder: (context) => Container());
+      },
     );
   }
 }

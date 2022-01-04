@@ -111,3 +111,24 @@ void savePreferences(Map<String, dynamic> status, {
   if(API.prefs.getBool("show_thumbnail_title") == null) API.prefs.setBool("show_thumbnail_title", false);
   saveStatus(status);
 }
+
+Future<Map<String, dynamic>> getMethods() async {
+  Map<String, String> queries = {
+    'format': 'json',
+    'method': 'reflection.getMethodList'
+  };
+
+  try {
+    Response response = await API().dio.get('ws.php', queryParameters: queries);
+    return json.decode(response.data);
+  } catch (e) {
+    print('Dio error $e');
+    return {"stat": "KO"};
+  }
+}
+
+Future<bool> methodExist(String method) async {
+  var result = await getMethods();
+
+  return result["result"]["methods"].contains(method);
+}

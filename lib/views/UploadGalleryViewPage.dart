@@ -138,12 +138,16 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
     setState(() {
       _isLoading = true;
     });
-    await API.uploader.uploadPhotos(widget.imageData, widget.category, getImagesInfo());
-    setState(() {
-      _isLoading = false;
-      widget.imageData.clear();
-    });
-    Navigator.of(context).pop();
+    await API.uploader.uploadPhotos(context, widget.imageData, widget.category, getImagesInfo());
+
+    if(mounted) {
+      setState(() {
+        _isLoading = false;
+        widget.imageData.clear();
+      });
+
+      Navigator.of(context).pop();
+    }
   }
 
   @override
@@ -596,7 +600,7 @@ class _VideoItemState extends State<VideoItem> {
     super.initState();
     _controller = VideoPlayerController.file(File(widget.path))
       ..initialize().then((_) {
-        setState(() {});  //when your thumbnail will show.
+        setState(() {});
       });
   }
 

@@ -2,6 +2,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:async';
@@ -11,12 +12,14 @@ import 'package:piwigo_ng/api/CategoryAPI.dart';
 import 'package:piwigo_ng/api/ImageAPI.dart';
 import 'package:piwigo_ng/constants/SettingsConstants.dart';
 import 'package:piwigo_ng/services/OrientationService.dart';
+import 'package:piwigo_ng/services/UploadStatusProvider.dart';
 import 'package:piwigo_ng/views/components/list_item.dart';
 import 'package:piwigo_ng/views/components/snackbars.dart';
 
 import 'package:piwigo_ng/views/ImageViewPage.dart';
 import 'package:piwigo_ng/views/UploadGalleryViewPage.dart';
 import 'package:piwigo_ng/views/components/dialogs/dialogs.dart';
+import 'package:provider/provider.dart';
 
 
 class CategoryViewPage extends StatefulWidget {
@@ -353,24 +356,23 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
           if (albumSnapshot.hasData) {
             int nbImages = _nbImages;
             var albums = handleAlbumSnapshot(albumSnapshot, nbImages);
-            // print(albums);
             return FutureBuilder<Map<String,dynamic>>(
-                future: fetchImages(widget.category, 0), // Images of the list
-                builder: (BuildContext context, AsyncSnapshot imagesSnapshot) {
-                  if (imagesSnapshot.hasData) {
-                    if (imageList.isEmpty || _page == 0) {
-                      if(imagesSnapshot.data['stat'] == 'fail') {
-                        return Center(child: Text(appStrings(context).categoryImageList_noDataError));
-                      }
-                      handleImagesSnapshot(imagesSnapshot);
+              future: fetchImages(widget.category, 0),
+              builder: (BuildContext context, AsyncSnapshot imagesSnapshot) {
+                if (imagesSnapshot.hasData) {
+                  if (imageList.isEmpty || _page == 0) {
+                    if(imagesSnapshot.data['stat'] == 'fail') {
+                      return Center(child: Text(appStrings(context).categoryImageList_noDataError));
                     }
-                    return createPageContent(albums, nbImages);
-                  } else {
-                    return Center(
-                      child: CircularProgressIndicator(),
-                    );
+                    handleImagesSnapshot(imagesSnapshot);
                   }
+                  return createPageContent(albums, nbImages);
+                } else {
+                  return Center(
+                    child: CircularProgressIndicator(),
+                  );
                 }
+              },
             );
           } else {
             return Center(
@@ -710,6 +712,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
   }
 
   Widget createFloatingActionButton() {
+    final uploadStatusProvider = Provider.of<UploadStatusNotifier>(context);
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Stack(
@@ -727,7 +730,24 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
                 onPressed: () {
                   Navigator.of(context).popUntil((route) => route.isFirst);
                 },
-                child: Icon(Icons.home, color: Colors.grey.shade200, size: 30),
+                child: uploadStatusProvider.status ?
+                    Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        SizedBox(
+                          height: 55,
+                          width: 55,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 5,
+                            value: uploadStatusProvider.progress,
+                          ),
+                        ),
+                        Text("${uploadStatusProvider.getRemaining()}",
+                          style: TextStyle(fontSize: 16),
+                        ),
+                      ],
+                    ) :
+                    Icon(Icons.home, color: Colors.grey.shade200, size: 30),
               ),
             ),
           ),

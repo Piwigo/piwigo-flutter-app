@@ -480,3 +480,68 @@ Future<dynamic> renameImage(int imageId, String name) async {
     };
   }
 }
+
+Future<dynamic> uploadCompleted(List<int> imageId, int categoryId) async {
+  Map<String, String> queries = {
+    "format": "json",
+    "method": "pwg.images.uploadCompleted",
+  };
+  FormData formData =  FormData.fromMap({
+    "image_id": imageId,
+    "pwg_token": API.prefs.getString("pwg_token"),
+    "category_id": categoryId,
+  });
+  try {
+    Response response = await API().dio.post('ws.php',
+        data: formData,
+        queryParameters: queries
+    );
+    if (response.statusCode == 200) {
+      print(response.data);
+      return json.decode(response.data);
+    } else {
+      return {
+        'stat': 'fail',
+        'result': response.statusMessage
+      };
+    }
+  } catch (e) {
+    var error = e as DioError;
+    return {
+      'stat': 'fail',
+      'result': error.message
+    };
+  }
+}
+Future<dynamic> communityUploadCompleted(List<int> imageId, int categoryId) async {
+  Map<String, String> queries = {
+    "format": "json",
+    "method": "community.images.uploadCompleted",
+  };
+  FormData formData =  FormData.fromMap({
+    "image_id": imageId,
+    "pwg_token": API.prefs.getString("pwg_token"),
+    "category_id": categoryId,
+  });
+  try {
+    Response response = await API().dio.post('ws.php',
+        data: formData,
+        queryParameters: queries
+    );
+    if (response.statusCode == 200) {
+      print(response.data);
+      return json.decode(response.data);
+    } else {
+      return {
+        'stat': 'fail',
+        'result': response.statusMessage
+      };
+    }
+  } catch (e) {
+    var error = e as DioError;
+    return {
+      'stat': 'fail',
+      'result': error.message
+    };
+  }
+}
