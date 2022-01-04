@@ -48,6 +48,9 @@ class Uploader {
     List<int> uploadedImages = [];
     final uploadStatusProvider = Provider.of<UploadStatusNotifier>(context, listen: false);
 
+    uploadStatusProvider.toggleStatus(true);
+    uploadStatusProvider.max = photos.length;
+    uploadStatusProvider.current = photos.length;
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -56,10 +59,10 @@ class Uploader {
       ),
     );
 
-    uploadStatusProvider.toggleStatus(true);
-
     try {
       for(var element in photos) {
+        uploadStatusProvider.toggleStatus(true);
+
         Response response = await uploadChunk(context, element, category, info);
         var data = json.decode(response.data);
         print("upload ? $data");
@@ -69,6 +72,7 @@ class Uploader {
         } else if(data["result"]["id"] != null) {
           uploadedImages.add(data["result"]["id"]);
         }
+        uploadStatusProvider.current--;
       }
     } on DioError catch (e) {
       print(e.message);
@@ -85,6 +89,8 @@ class Uploader {
     }
 
     uploadStatusProvider.toggleStatus(false);
+    uploadStatusProvider.max = 0;
+    uploadStatusProvider.current = 0;
 
     await _showUploadNotification(result);
   }

@@ -2,6 +2,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:async';
@@ -712,7 +713,6 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
 
   Widget createFloatingActionButton() {
     final uploadStatusProvider = Provider.of<UploadStatusNotifier>(context);
-    print("upload status: ${uploadStatusProvider.status}");
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Stack(
@@ -731,7 +731,15 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
                   Navigator.of(context).popUntil((route) => route.isFirst);
                 },
                 child: uploadStatusProvider.status ?
-                    CircularProgressIndicator() :
+                    Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        CircularProgressIndicator(),
+                        Text("${uploadStatusProvider.current}",
+                          style: TextStyle(fontSize: 20),
+                        ),
+                      ],
+                    ) :
                     Icon(Icons.home, color: Colors.grey.shade200, size: 30),
               ),
             ),
