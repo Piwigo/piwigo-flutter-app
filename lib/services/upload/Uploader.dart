@@ -81,6 +81,7 @@ class Uploader {
       }
     } on DioError catch (e) {
       print(e.message);
+      uploadStatusProvider.status = false;
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
       ScaffoldMessenger.of(context).showSnackBar(errorSnackBar(context, appStrings(context).uploadError_title));
     }
@@ -90,6 +91,7 @@ class Uploader {
       await communityUploadCompleted(uploadedImages, int.parse(category));
     } on DioError catch (e) {
       print(e.message);
+      uploadStatusProvider.status = false;
     }
 
     uploadStatusProvider.status = false;
