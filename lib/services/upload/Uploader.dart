@@ -9,19 +9,16 @@ import 'package:piwigo_ng/api/API.dart';
 import 'package:piwigo_ng/api/ImageAPI.dart';
 import 'package:piwigo_ng/constants/SettingsConstants.dart';
 import 'package:piwigo_ng/views/components/snackbars.dart';
+import 'package:provider/provider.dart';
 
+import '../UploadStatusProvider.dart';
 import 'chunked_uploader.dart';
 
 class Uploader {
-  BuildContext context;
-  SnackBar snackBar;
+  BuildContext mainContext;
 
-  Uploader(this.context) {
-    snackBar = SnackBar(
-      content: Text(appStrings(context).imageUploadTableCell_uploading),
-      duration: Duration(seconds: 2),
-    );
-  }
+
+  Uploader(this.mainContext);
 
   Future<void> _showUploadNotification(Map<String, dynamic> downloadStatus) async {
     final android = AndroidNotificationDetails(
@@ -37,24 +34,33 @@ class Uploader {
     await API.localNotification.show(
       1,
       isSuccess ? 'Success' : 'Failure',
-      isSuccess ? appStrings(context).imageUploadCompleted_message : appStrings(context).uploadError_message,
+      isSuccess ? appStrings(mainContext).imageUploadCompleted_message : appStrings(mainContext).uploadError_message,
       platform,
     );
   }
 
-  Future<void> uploadPhotos(List<XFile> photos, String category, Map<String, dynamic> info) async {
+  Future<void> uploadPhotos(BuildContext context, List<XFile> photos, String category, Map<String, dynamic> info) async {
     Map<String, dynamic> result = {
       'isSuccess': true,
       'filePath': null,
       'error': null,
     };
     List<int> uploadedImages = [];
+    final uploadStatusProvider = Provider.of<UploadStatusNotifier>(context, listen: false);
 
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(appStrings(context).imageUploadTableCell_uploading),
+        duration: Duration(seconds: 2),
+      ),
+    );
+
+    uploadStatusProvider.toggleStatus(true);
 
     try {
       for(var element in photos) {
-        Response response = await uploadChunk(element, category, info);
+        Response response = await uploadChunk(context, element, category, info);
         var data = json.decode(response.data);
         print("upload ? $data");
         if(data["stat"] == "fail") {
@@ -77,6 +83,8 @@ class Uploader {
     } on DioError catch (e) {
       print(e.message);
     }
+
+    uploadStatusProvider.toggleStatus(false);
 
     await _showUploadNotification(result);
   }
@@ -113,7 +121,7 @@ class Uploader {
       print("Request failed: ${response.statusCode}");
     }
   }
-  Future<Response> uploadChunk(XFile photo, String category, Map<String, dynamic> info) async {
+  Future<Response> uploadChunk(BuildContext context, XFile photo, String category, Map<String, dynamic> info) async {
     Map<String, String> queries = {
       "format":"json",
       "method": "pwg.images.uploadAsync"

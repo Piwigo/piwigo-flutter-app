@@ -11,12 +11,14 @@ import 'package:piwigo_ng/api/CategoryAPI.dart';
 import 'package:piwigo_ng/api/ImageAPI.dart';
 import 'package:piwigo_ng/constants/SettingsConstants.dart';
 import 'package:piwigo_ng/services/OrientationService.dart';
+import 'package:piwigo_ng/services/UploadStatusProvider.dart';
 import 'package:piwigo_ng/views/components/list_item.dart';
 import 'package:piwigo_ng/views/components/snackbars.dart';
 
 import 'package:piwigo_ng/views/ImageViewPage.dart';
 import 'package:piwigo_ng/views/UploadGalleryViewPage.dart';
 import 'package:piwigo_ng/views/components/dialogs/dialogs.dart';
+import 'package:provider/provider.dart';
 
 
 class CategoryViewPage extends StatefulWidget {
@@ -709,6 +711,8 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
   }
 
   Widget createFloatingActionButton() {
+    final uploadStatusProvider = Provider.of<UploadStatusNotifier>(context);
+    print("upload status: ${uploadStatusProvider.status}");
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Stack(
@@ -726,7 +730,9 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
                 onPressed: () {
                   Navigator.of(context).popUntil((route) => route.isFirst);
                 },
-                child: Icon(Icons.home, color: Colors.grey.shade200, size: 30),
+                child: uploadStatusProvider.status ?
+                    CircularProgressIndicator() :
+                    Icon(Icons.home, color: Colors.grey.shade200, size: 30),
               ),
             ),
           ),

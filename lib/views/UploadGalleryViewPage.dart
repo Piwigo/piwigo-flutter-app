@@ -138,7 +138,7 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
     setState(() {
       _isLoading = true;
     });
-    await API.uploader.uploadPhotos(widget.imageData, widget.category, getImagesInfo());
+    await API.uploader.uploadPhotos(context, widget.imageData, widget.category, getImagesInfo());
     setState(() {
       _isLoading = false;
       widget.imageData.clear();
