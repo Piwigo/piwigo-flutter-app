@@ -36,7 +36,7 @@ class _PiwigoSliderState extends State<PiwigoSlider> {
     return Slider(
       label: widget.label,
       activeColor: Theme.of(context).colorScheme.primary,
-      inactiveColor: Color(0xffeeeeee),
+      inactiveColor: Theme.of(context).scaffoldBackgroundColor,
       divisions: _divisions,
       min: widget.min,
       max: widget.max,

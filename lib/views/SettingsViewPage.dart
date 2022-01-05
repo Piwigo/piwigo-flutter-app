@@ -68,7 +68,7 @@ class _SettingsPageState extends State<SettingsPage> {
                         Container(
                           decoration: BoxDecoration(
                             border: Border.symmetric(horizontal: BorderSide(width: 0.5, color: Colors.grey)),
-                            color: Colors.white,
+                            color: Theme.of(context).cardColor,
                           ),
                           child: Column(
                             children: [
@@ -89,7 +89,7 @@ class _SettingsPageState extends State<SettingsPage> {
                           width: double.infinity,
                           decoration: BoxDecoration(
                             border: Border.symmetric(horizontal: BorderSide(width: 0.5, color: Colors.grey)),
-                            color: Colors.white,
+                            color: Theme.of(context).cardColor,
                           ),
                           child: TextButton(
                             style: ButtonStyle(
@@ -125,13 +125,14 @@ class _SettingsPageState extends State<SettingsPage> {
                         Container(
                           decoration: BoxDecoration(
                             border: Border.symmetric(horizontal: BorderSide(width: 0.5, color: Colors.grey)),
-                            color: Colors.white,
+                            color: Theme.of(context).cardColor,
                           ),
                           child: Column(
                             children: [
                               TableCell(
                                 Text(appStrings(context).settings_displayTitles, style: TextStyle(color: Colors.black, fontSize: 16)),
                                 Switch(
+                                  activeColor: Theme.of(context).colorScheme.primary,
                                   value: API.prefs.getBool('show_thumbnail_title'),
                                   onChanged: (bool) {
                                     setState(() {
@@ -207,7 +208,7 @@ class _SettingsPageState extends State<SettingsPage> {
                         Container(
                           decoration: BoxDecoration(
                             border: Border.symmetric(horizontal: BorderSide(width: 0.5, color: Colors.grey)),
-                            color: Colors.white,
+                            color: Theme.of(context).cardColor,
                           ),
                           child: Column(
                             children: [
@@ -314,8 +315,7 @@ class TableCell extends StatelessWidget {
       margin: EdgeInsets.only(left: 10),
       padding: EdgeInsets.symmetric(horizontal: 10),
       decoration: BoxDecoration(
-        border: isEnd ? Border.all(width: 0, color: Colors.white) : Border(bottom: BorderSide(width: 0.5, color: Colors.grey)),
-        color: Colors.white,
+        border: isEnd ? Border.all(width: 0, color: Theme.of(context).cardColor) : Border(bottom: BorderSide(width: 0.5, color: Colors.grey)),
       ),
       child: Center(
         child: Row(
@@ -342,8 +342,7 @@ class TableCellSingle extends StatelessWidget {
       margin: EdgeInsets.only(left: 10, top: 5),
       padding: EdgeInsets.symmetric(horizontal: 10),
       decoration: BoxDecoration(
-        border: isEnd ? Border.all(width: 0, color: Colors.white) : Border(bottom: BorderSide(width: 0.5, color: Colors.grey)),
-        color: Colors.white,
+        border: isEnd ? Border.all(width: 0, color: Theme.of(context).cardColor) : Border(bottom: BorderSide(width: 0.5, color: Colors.grey)),
       ),
       child: Center(
         child: content,

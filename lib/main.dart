@@ -53,10 +53,10 @@ class MyApp extends StatelessWidget {
     final themeProvider = Provider.of<ThemeNotifier>(context);
     return MaterialApp(
       title: "Piwigo NG",
-      // theme: themeProvider.darkTheme ? dark : light,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       theme: light,
+      // theme: themeProvider.darkTheme ? dark : light,
       initialRoute: '/',
       onGenerateRoute: (settings) {
         if(settings.name == '/') return MaterialPageRoute(builder: (context) => LoginViewPage());
