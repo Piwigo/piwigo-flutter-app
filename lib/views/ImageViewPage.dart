@@ -234,7 +234,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
           color: Theme.of(context).iconTheme.color, //change your color here
         ),
         centerTitle: true,
-        title: Text('${images[_page]['name']}',
+        title: Text('${images[_page]['name'] ?? ""}',
           overflow: TextOverflow.ellipsis,
         ),
         leading: IconButton(
