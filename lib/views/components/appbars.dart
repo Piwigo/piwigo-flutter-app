@@ -161,7 +161,7 @@ class _AppBarExpandableSearchState extends State<AppBarExpandableSearch> {
                 TextFieldSearch(
                   controller: widget.textController,
                   hint: "Search...",
-                  padding: EdgeInsets.symmetric(vertical: 0),
+                  margin: EdgeInsets.symmetric(horizontal: 10),
                 )
               ],
               crossAxisAlignment: CrossAxisAlignment.start,
