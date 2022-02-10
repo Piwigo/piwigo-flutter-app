@@ -46,8 +46,10 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
       body: NestedScrollView(
         controller: _scrollController,
         headerSliverBuilder: (context, innerBoxScrolled) => [
-          AppBarExpandable(
+          // AppBarExpandable(
+          AppBarExpandableSearch(
             scrollController: _scrollController,
+            textController: _searchController,
             leading: IconButton(
               onPressed: () {
                 Navigator.of(context).push(
