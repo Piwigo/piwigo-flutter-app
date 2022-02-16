@@ -7,7 +7,7 @@
     <uses-permission android:name="android.permission.INTERNET"/>
 
    <application
-        android:label="piwigo_ng"
+        android:label="Piwigo NG"
         android:usesCleartextTraffic="true"
         android:requestLegacyExternalStorage="true"
         android:icon="@mipmap/ic_launcher">
