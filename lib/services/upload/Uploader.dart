@@ -4,24 +4,21 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:images_picker/images_picker.dart';
-import 'package:multi_image_picker/multi_image_picker.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:piwigo_ng/api/API.dart';
+import 'package:piwigo_ng/api/ImageAPI.dart';
 import 'package:piwigo_ng/constants/SettingsConstants.dart';
 import 'package:piwigo_ng/views/components/snackbars.dart';
+import 'package:provider/provider.dart';
 
+import '../UploadStatusProvider.dart';
 import 'chunked_uploader.dart';
 
 class Uploader {
-  BuildContext context;
-  SnackBar snackBar;
+  BuildContext mainContext;
 
-  Uploader(this.context) {
-    snackBar = SnackBar(
-      content: Text(appStrings(context).imageUploadTableCell_uploading),
-      duration: Duration(seconds: 2),
-    );
-  }
+
+  Uploader(this.mainContext);
 
   Future<void> _showUploadNotification(Map<String, dynamic> downloadStatus) async {
     final android = AndroidNotificationDetails(
@@ -37,43 +34,76 @@ class Uploader {
     await API.localNotification.show(
       1,
       isSuccess ? 'Success' : 'Failure',
-      isSuccess ? appStrings(context).imageUploadCompleted_message : appStrings(context).uploadError_message,
+      isSuccess ? appStrings(mainContext).imageUploadCompleted_message : appStrings(mainContext).uploadError_message,
       platform,
     );
   }
 
-  Future<void> uploadPhotos(List<Media> photos, String category, Map<String, dynamic> info) async {
+  Future<void> uploadPhotos(BuildContext context, List<XFile> photos, String category, Map<String, dynamic> info) async {
     Map<String, dynamic> result = {
       'isSuccess': true,
       'filePath': null,
       'error': null,
     };
+    List<int> uploadedImages = [];
+    final uploadStatusProvider = Provider.of<UploadStatusNotifier>(context, listen: false);
 
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    uploadStatusProvider.status = true;
+    uploadStatusProvider.max = photos.length;
+    uploadStatusProvider.current = 1;
 
-    for(var element in photos) {
-      Response response = await uploadChunk(element, category, info);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(appStrings(context).imageUploadTableCell_uploading),
+        duration: Duration(seconds: 2),
+      ),
+    );
 
-      if(json.decode(response.data)["stat"] == "fail") {
-        print("Request failed: ${response.statusCode}");
+    try {
+      for(var element in photos) {
+        uploadStatusProvider.status = true;
 
-        ScaffoldMessenger.of(context).hideCurrentSnackBar();
-        ScaffoldMessenger.of(context).showSnackBar(errorSnackBar(context, response.data));
+        Response response = await uploadChunk(context, element, category, info,
+            (progress) {
+              print(progress);
+              uploadStatusProvider.progress = progress;
+            },
+        );
+        var data = json.decode(response.data);
+
+        if(data["stat"] == "fail") {
+          ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          ScaffoldMessenger.of(context).showSnackBar(errorSnackBar(context, response.data));
+        } else if(data["result"]["id"] != null) {
+          uploadedImages.add(data["result"]["id"]);
+        }
+        uploadStatusProvider.current++;
       }
+    } on DioError catch (e) {
+      print(e.message);
+      uploadStatusProvider.status = false;
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      ScaffoldMessenger.of(context).showSnackBar(errorSnackBar(context, appStrings(context).uploadError_title));
     }
 
-    print('new status');
+    try {
+      await uploadCompleted(uploadedImages, int.parse(category));
+      await communityUploadCompleted(uploadedImages, int.parse(category));
+    } on DioError catch (e) {
+      print(e.message);
+      uploadStatusProvider.status = false;
+    }
+
+    uploadStatusProvider.status = false;
+    uploadStatusProvider.max = 0;
+    uploadStatusProvider.current = 0;
 
     await _showUploadNotification(result);
   }
 
-  void upload(Media photo, String category) async {
+  void upload(XFile photo, String category) async {
     Map<String, String> queries = {"format":"json", "method": "pwg.images.upload"};
-
-    var asset = Asset(photo.path, photo.path.split('/').last, photo.size.ceil(), photo.size.ceil());
-
-    ByteData byteData = await asset.getByteData();
-    List<int> imageData = byteData.buffer.asUint8List();
+    List<int> imageData = await photo.readAsBytes();
 
     Dio dio = new Dio(
       BaseOptions(
@@ -103,7 +133,10 @@ class Uploader {
       print("Request failed: ${response.statusCode}");
     }
   }
-  Future<Response> uploadChunk(Media photo, String category, Map<String, dynamic> info) async {
+  Future<Response> uploadChunk(BuildContext context, XFile photo,
+    String category, Map<String, dynamic> info,
+    Function(double) onProgress,
+  ) async {
     Map<String, String> queries = {
       "format":"json",
       "method": "pwg.images.uploadAsync"
@@ -124,9 +157,9 @@ class Uploader {
         baseUrl: API.prefs.getString("base_url"),
       ),
     ));
-    print(await FlutterAbsolutePath.getAbsolutePath(photo.path));
+
     try {
-      Future<Response> response = chunkedUploader.upload(
+      return await chunkedUploader.upload(
         context: context,
         path: "/ws.php",
         filePath: await FlutterAbsolutePath.getAbsolutePath(photo.path),
@@ -135,13 +168,12 @@ class Uploader {
         method: 'POST',
         data: fields,
         contentType: Headers.formUrlEncodedContentType,
-        onUploadProgress: (value) {
-          // print('${photo.name} $progress');
-        },
+        onUploadProgress: (value) => onProgress(value),
       );
-      return response;
     } on DioError catch (e) {
       print('Dio upload chunk error $e');
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      ScaffoldMessenger.of(context).showSnackBar(errorSnackBar(context, appStrings(context).uploadError_title));
       return Future.value(null);
     }
   }

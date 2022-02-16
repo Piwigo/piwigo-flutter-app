@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:piwigo_ng/constants/SettingsConstants.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
@@ -33,7 +32,7 @@ class _PrivacyPolicyViewPageState extends State<PrivacyPolicyViewPage> {
 
   @override
   Widget build(BuildContext context) {
-    _url = '${dotenv.env['PRIVACY_POLICIES']}${appStrings(context).settings_privacyUrl}';
+    _url = '${Constants.privacyPoliciesUrl}${appStrings(context).settings_privacyUrl}';
     return Scaffold(
       appBar: AppBar(
         title: Text(appStrings(context).settings_privacy),

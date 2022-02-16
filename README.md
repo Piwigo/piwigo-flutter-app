@@ -100,3 +100,9 @@ The connection to the server is made with the Piwigo's API.
 ## Upload
 
 For the upload, we are using the **uploadAsync** method of the API. This method requires to **chunk** the image with a size given by the server. All chunks are uploaded simultaneously and reorganized by the server.
+
+
+# Licence
+
+Piwigo is a free software, it can be redistributed it and / or modified under the terms of the GNU General Public License
+[see more here](./LICENCE.txt)

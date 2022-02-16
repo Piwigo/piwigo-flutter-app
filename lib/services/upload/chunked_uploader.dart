@@ -71,7 +71,7 @@ class UploadRequest {
   }
 
   Future<Response> upload() async {
-    Future<Response> finalResponse;
+    Response finalResponse;
     String originalSum;
     List<String> chunkSums = [];
     originalSum = (await crypto.md5.bind(_file.openRead()).first).toString();
@@ -97,7 +97,7 @@ class UploadRequest {
         if (data != null) ...data
       });
       try {
-        finalResponse = dio.request(
+        finalResponse = await dio.request(
           path,
           data: formData,
           queryParameters: params,

@@ -1,8 +1,10 @@
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
-import 'package:images_picker/images_picker.dart';
+import 'package:image_picker/image_picker.dart';
 import 'dart:async';
 
 import 'package:piwigo_ng/api/API.dart';
@@ -10,12 +12,14 @@ import 'package:piwigo_ng/api/CategoryAPI.dart';
 import 'package:piwigo_ng/api/ImageAPI.dart';
 import 'package:piwigo_ng/constants/SettingsConstants.dart';
 import 'package:piwigo_ng/services/OrientationService.dart';
+import 'package:piwigo_ng/services/UploadStatusProvider.dart';
 import 'package:piwigo_ng/views/components/list_item.dart';
 import 'package:piwigo_ng/views/components/snackbars.dart';
 
 import 'package:piwigo_ng/views/ImageViewPage.dart';
 import 'package:piwigo_ng/views/UploadGalleryViewPage.dart';
 import 'package:piwigo_ng/views/components/dialogs/dialogs.dart';
+import 'package:provider/provider.dart';
 
 
 class CategoryViewPage extends StatefulWidget {
@@ -352,24 +356,23 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
           if (albumSnapshot.hasData) {
             int nbImages = _nbImages;
             var albums = handleAlbumSnapshot(albumSnapshot, nbImages);
-            // print(albums);
             return FutureBuilder<Map<String,dynamic>>(
-                future: fetchImages(widget.category, 0), // Images of the list
-                builder: (BuildContext context, AsyncSnapshot imagesSnapshot) {
-                  if (imagesSnapshot.hasData) {
-                    if (imageList.isEmpty || _page == 0) {
-                      if(imagesSnapshot.data['stat'] == 'fail') {
-                        return Center(child: Text(appStrings(context).categoryImageList_noDataError));
-                      }
-                      handleImagesSnapshot(imagesSnapshot);
+              future: fetchImages(widget.category, 0),
+              builder: (BuildContext context, AsyncSnapshot imagesSnapshot) {
+                if (imagesSnapshot.hasData) {
+                  if (imageList.isEmpty || _page == 0) {
+                    if(imagesSnapshot.data['stat'] == 'fail') {
+                      return Center(child: Text(appStrings(context).categoryImageList_noDataError));
                     }
-                    return createPageContent(albums, nbImages);
-                  } else {
-                    return Center(
-                      child: CircularProgressIndicator(),
-                    );
+                    handleImagesSnapshot(imagesSnapshot);
                   }
+                  return createPageContent(albums, nbImages);
+                } else {
+                  return Center(
+                    child: CircularProgressIndicator(),
+                  );
                 }
+              },
             );
           } else {
             return Center(
@@ -423,24 +426,34 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
           foregroundColor: _theme.floatingActionButtonTheme.foregroundColor,
           onTap: () async {
             try {
-              List<Media> mediaList = await ImagesPicker.pick(
-                count: 100,
-                pickType: PickType.all,
-                quality: 1.0,
-              );
-              print(mediaList[0].path);
-              if(mediaList.isNotEmpty) {
+              ScaffoldMessenger.of(context).removeCurrentSnackBar();
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(appStrings(context).loadingHUD_label),
+                    CircularProgressIndicator(),
+                  ],
+                ),
+                duration: Duration(days: 365),
+              ));
+              final List<XFile> images = ((await FilePicker.platform.pickFiles(
+                type: FileType.media,
+                allowMultiple: true,
+              )) ?.files ?? []).map<XFile>((e) => XFile(e.path, name: e.name, bytes: e.bytes)).toList();
+              ScaffoldMessenger.of(context).removeCurrentSnackBar();
+              if(images.isNotEmpty) {
                 Navigator.push(context, MaterialPageRoute(
-                    builder: (context) => UploadGalleryViewPage(imageData: mediaList, category: widget.category)
+                    builder: (context) => UploadGalleryViewPage(imageData: images, category: widget.category)
                 )).whenComplete(() {
                   setState(() {
-                    // API.uploader.createDio();
                     print('After upload'); // refresh
                   });
                 });
               }
             } catch (e) {
-              print('Dio error ${e.toString()}');
+              print('${e.toString()}');
             }
           }
         ),
@@ -452,14 +465,23 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
             foregroundColor: _theme.floatingActionButtonTheme.foregroundColor,
             onTap: () async {
               try {
-                List<Media> mediaList = await ImagesPicker.openCamera(
-                  pickType: PickType.image,
-                  quality: 1.0,
-                );
-                print(mediaList[0].path);
-                if(mediaList.isNotEmpty) {
+                ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(appStrings(context).loadingHUD_label),
+                      CircularProgressIndicator(),
+                    ],
+                  ),
+                  duration: Duration(days: 365),
+                ));
+                final XFile image = await ImagePicker().pickImage(source: ImageSource.camera);
+                ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                if(image != null) {
                   Navigator.push(context, MaterialPageRoute(
-                      builder: (context) => UploadGalleryViewPage(imageData: mediaList, category: widget.category)
+                      builder: (context) => UploadGalleryViewPage(imageData: [image], category: widget.category)
                   )).whenComplete(() {
                     setState(() {
                       print('After upload'); // refresh
@@ -478,8 +500,8 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
   Widget createPageContent(dynamic albums, int nbImages) {
     ThemeData _theme = Theme.of(context);
 
-    int albumCrossAxisCount = MediaQuery.of(context).size.width <= Constants.ALBUM_MIN_WIDTH ? 1
-        : (MediaQuery.of(context).size.width/Constants.ALBUM_MIN_WIDTH).floor();
+    int albumCrossAxisCount = MediaQuery.of(context).size.width <= Constants.albumMinWidth ? 1
+        : (MediaQuery.of(context).size.width/Constants.albumMinWidth).floor();
 
     return RefreshIndicator(
       displacement: 20,
@@ -690,6 +712,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
   }
 
   Widget createFloatingActionButton() {
+    final uploadStatusProvider = Provider.of<UploadStatusNotifier>(context);
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Stack(
@@ -707,7 +730,24 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
                 onPressed: () {
                   Navigator.of(context).popUntil((route) => route.isFirst);
                 },
-                child: Icon(Icons.home, color: Colors.grey.shade200, size: 30),
+                child: uploadStatusProvider.status ?
+                    Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        SizedBox(
+                          height: 55,
+                          width: 55,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 5,
+                            value: uploadStatusProvider.progress,
+                          ),
+                        ),
+                        Text("${uploadStatusProvider.getRemaining()}",
+                          style: TextStyle(fontSize: 16),
+                        ),
+                      ],
+                    ) :
+                    Icon(Icons.home, color: Colors.grey.shade200, size: 30),
               ),
             ),
           ),

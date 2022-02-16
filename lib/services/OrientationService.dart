@@ -30,31 +30,31 @@ int getImageCrossAxisCount(BuildContext context) {
   return API.prefs.getDouble("landscape_image_count").ceil();
 }
 void setImageCrossAxisCount(BuildContext context, double value) {
-  if(isPortrait(context) && value <= Constants.PORTRAIT_IMAGE_COUNT_MAX && value >= Constants.PORTRAIT_IMAGE_COUNT_MIN) {
+  if(isPortrait(context) && value <= Constants.portraitImageCountMax && value >= Constants.portraitImageCountMin) {
     API.prefs.setDouble("portrait_image_count", value);
     print('Set Portrait image count ${API.prefs.getDouble("portrait_image_count")}');
-  } else if (value <= Constants.LANDSCAPE_IMAGE_COUNT_MAX && value >= Constants.LANDSCAPE_IMAGE_COUNT_MIN) {
+  } else if (value <= Constants.landscapeImageCountMax && value >= Constants.landscapeImageCountMin) {
     API.prefs.setDouble("landscape_image_count", value);
     print('Set Landscape image count ${API.prefs.getDouble("landscape_image_count")}');
   }
 }
 void incrementImageCrossAxisCount(BuildContext context) {
-  if(isPortrait(context) && API.prefs.getDouble("portrait_image_count") < Constants.PORTRAIT_IMAGE_COUNT_MAX) {
+  if(isPortrait(context) && API.prefs.getDouble("portrait_image_count") < Constants.portraitImageCountMax) {
     int value = API.prefs.getDouble("portrait_image_count").ceil()+1;
     API.prefs.setDouble("portrait_image_count", value.toDouble());
     print('increment: ${API.prefs.getDouble("portrait_image_count")}');
-  } else if (API.prefs.getDouble("landscape_image_count") < Constants.LANDSCAPE_IMAGE_COUNT_MAX) {
+  } else if (API.prefs.getDouble("landscape_image_count") < Constants.landscapeImageCountMax) {
     int value = API.prefs.getDouble("landscape_image_count").ceil()+1;
     API.prefs.setDouble("landscape_image_count", value.toDouble());
     print('increment: ${API.prefs.getDouble("landscape_image_count")}');
   }
 }
 void decrementImageCrossAxisCount(BuildContext context) {
-  if(isPortrait(context) && API.prefs.getDouble("portrait_image_count") > Constants.PORTRAIT_IMAGE_COUNT_MIN) {
+  if(isPortrait(context) && API.prefs.getDouble("portrait_image_count") > Constants.portraitImageCountMin) {
     int value = API.prefs.getDouble("portrait_image_count").ceil()-1;
     API.prefs.setDouble("portrait_image_count", value.toDouble());
     print('decrement: ${API.prefs.getDouble("portrait_image_count")}');
-  } else if (API.prefs.getDouble("landscape_image_count") > Constants.LANDSCAPE_IMAGE_COUNT_MIN) {
+  } else if (API.prefs.getDouble("landscape_image_count") > Constants.landscapeImageCountMin) {
     int value = API.prefs.getDouble("landscape_image_count").ceil()-1;
     API.prefs.setDouble("landscape_image_count", value.toDouble());
     print('decrement: ${API.prefs.getDouble("landscape_image_count")}');
