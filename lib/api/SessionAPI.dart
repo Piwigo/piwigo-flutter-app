@@ -38,8 +38,8 @@ Future<String> loginUser(String url, String username, String password) async {
       return 'Invalid username / password';
     }
 
-  } catch(e) {
-    return 'Dio: Invalid url';
+  } on DioError catch(e) {
+    return e.message;
   }
   return 'Something happened';
 }
@@ -47,13 +47,17 @@ Future<String> loginGuest(String url) async {
 
   API().dio.options.baseUrl = url;
 
-  var status = await sessionStatus();
+  try {
+    var status = await sessionStatus();
 
-  if(status["stat"] == "ok") {
-    savePreferences(status["result"], url: url, username: "", password: "", isLogged: true, isGuest: true);
-    return null;
+    if(status["stat"] == "ok") {
+      savePreferences(status["result"], url: url, username: "", password: "", isLogged: true, isGuest: true);
+      return null;
+    }
+    return status["message"];
+  } on DioError catch(e) {
+    return e.message;
   }
-  return 'Invalid url';
 }
 
 Future<Map<String, dynamic>> sessionStatus() async {
@@ -65,9 +69,11 @@ Future<Map<String, dynamic>> sessionStatus() async {
   try {
     Response response = await API().dio.get('ws.php', queryParameters: queries);
     return json.decode(response.data);
-  } catch (e) {
+  } on DioError catch (e) {
     print('Dio error $e');
-    return {"stat": "KO"};
+    return {"stat": "KO",
+      "message": e.message,
+    };
   }
 }
 
