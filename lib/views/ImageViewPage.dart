@@ -11,6 +11,7 @@ import 'package:path/path.dart' as Path;
 
 import 'package:piwigo_ng/views/VideoPlayerViewPage.dart';
 import 'package:piwigo_ng/views/components/dialogs/dialogs.dart';
+import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 
 class ImageViewPage extends StatefulWidget {
@@ -26,14 +27,15 @@ class ImageViewPage extends StatefulWidget {
   @override
   _ImageViewPageState createState() => _ImageViewPageState();
 }
-class _ImageViewPageState extends State<ImageViewPage> {
+class _ImageViewPageState extends State<ImageViewPage> with SingleTickerProviderStateMixin {
   String _derivative;
   PageController _pageController;
   ScrollPhysics _pageViewPhysic = BouncingScrollPhysics();
   int _page;
   int _imagePage;
-  List<dynamic> images = [];
-  bool showToolBar = true;
+  List<dynamic> _images = [];
+  bool _showToolBar = true;
+  double _slideOffset = 0.0;
 
   @override
   void initState() {
@@ -43,13 +45,11 @@ class _ImageViewPageState extends State<ImageViewPage> {
     _derivative = API.prefs.getString('full_screen_image_size');
     _page = widget.index;
     _imagePage = (widget.images.length/100).ceil()-1;
-    images.addAll(widget.images);
+    _images.addAll(widget.images);
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      if(widget.index == images.length-1) {
+      if(widget.index == _images.length-1) {
         await nextPage();
-        setState(() {
-          print(images.length);
-        });
+        setState(() {});
       }
     });
   }
@@ -68,7 +68,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
           errorSnackBar(context, response['result'])
       );
     } else {
-      images.addAll(response['result']['images']);
+      _images.addAll(response['result']['images']);
     }
   }
 
@@ -76,7 +76,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
     Navigator.of(context).push(
       MaterialPageRoute(builder: (_) => EditImagesPage(
         catId: int.parse(widget.category),
-        images: [images[_page]],
+        images: [_images[_page]],
       ))
     );
   }
@@ -84,8 +84,6 @@ class _ImageViewPageState extends State<ImageViewPage> {
     if(await confirmDownloadDialog(context,
       content: appStrings(context).downloadImage_confirmation(1),
     )) {
-      print('Download $_page');
-
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Row(
@@ -96,7 +94,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
           ],
         ),
       ));
-      await downloadSingleImage(images[_page]);
+      await downloadSingleImage(_images[_page]);
     }
   }
   void _onMoveCopyImage() async {
@@ -107,15 +105,15 @@ class _ImageViewPageState extends State<ImageViewPage> {
           builder: (context) {
             return MoveOrCopyDialog(
               title: appStrings(context).moveImage_title,
-              subtitle: appStrings(context).moveImage_selectAlbum(1, images[_page]['name']),
+              subtitle: appStrings(context).moveImage_selectAlbum(1, _images[_page]['name']),
               catId: widget.category,
               catName: widget.title,
               isImage: true,
               onSelected: (item) async {
                 if(await confirmMoveDialog(context,
-                  content: appStrings(context).moveImage_message(1, images[_page]['name'], item.name),
+                  content: appStrings(context).moveImage_message(1, _images[_page]['name'], item.name),
                 )) {
-                  var response = await moveImage(images[_page]['id'], [int.parse(item.id)]);
+                  var response = await moveImage(_images[_page]['id'], [int.parse(item.id)]);
                   if(response['stat'] == 'fail') {
                     ScaffoldMessenger.of(context).showSnackBar(
                         errorSnackBar(context, response['result']));
@@ -137,15 +135,15 @@ class _ImageViewPageState extends State<ImageViewPage> {
           builder: (context) {
             return MoveOrCopyDialog(
               title: appStrings(context).copyImage_title,
-              subtitle: appStrings(context).copyImage_selectAlbum(1, images[_page]['name']),
+              subtitle: appStrings(context).copyImage_selectAlbum(1, _images[_page]['name']),
               catId: widget.category,
               catName: widget.title,
               isImage: true,
               onSelected: (item) async {
                 if(await confirmAssignDialog(context,
-                  content: appStrings(context).copyImage_message(1, images[_page]['name'], item.name),
+                  content: appStrings(context).copyImage_message(1, _images[_page]['name'], item.name),
                 )) {
-                  var response = await assignImage(images[_page]['id'], [int.parse(item.id)]);
+                  var response = await assignImage(_images[_page]['id'], [int.parse(item.id)]);
                   if (response['stat'] == 'fail') {
                     ScaffoldMessenger.of(context).showSnackBar(
                         errorSnackBar(context, response['result']));
@@ -175,7 +173,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
     if(choice != -1) {
       switch(choice) {
         case 0:
-          var response = await deleteImage(images[_page]['id']);
+          var response = await deleteImage(_images[_page]['id']);
           if(response['stat'] == 'fail') {
             ScaffoldMessenger.of(context).showSnackBar(
                 errorSnackBar(context, '${response['result']}')
@@ -187,7 +185,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
           }
           break;
         case 1:
-          var response = await removeImage(images[_page]['id'], widget.category);
+          var response = await removeImage(_images[_page]['id'], widget.category);
           if(response['stat'] == 'fail') {
             ScaffoldMessenger.of(context).showSnackBar(
                 errorSnackBar(context, '${response['result']}')
@@ -202,7 +200,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
       }
 
       int page = _page;
-      if(page == images.length-1) {
+      if(page == _images.length-1) {
         if (page == 0) {
           Navigator.of(context).pop();
         } else {
@@ -214,7 +212,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
           });
         }
       }
-      images.removeAt(page);
+      _images.removeAt(page);
       setState(() {});
     }
   }
@@ -222,19 +220,17 @@ class _ImageViewPageState extends State<ImageViewPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      primary: true,
-      backgroundColor: showToolBar ?
+      extendBodyBehindAppBar: false,
+      extendBody: true,
+      backgroundColor: _showToolBar ?
         Theme.of(context).scaffoldBackgroundColor :
         Colors.black,
-      resizeToAvoidBottomInset: true,
-      extendBodyBehindAppBar: true,
-      extendBody: true,
-      appBar: showToolBar ? AppBar(
+      appBar: AppBar(
         iconTheme: IconThemeData(
           color: Theme.of(context).iconTheme.color, //change your color here
         ),
         centerTitle: true,
-        title: Text('${images[_page]['name'] ?? ""}',
+        title: Text('${_images[_page]['name'] ?? ""}',
           overflow: TextOverflow.ellipsis,
         ),
         leading: IconButton(
@@ -243,41 +239,214 @@ class _ImageViewPageState extends State<ImageViewPage> {
           },
           icon: Icon(Icons.chevron_left),
         ),
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      ) : AppBar(
-        elevation: 0,
-        leading: SizedBox(),
-        backgroundColor: Colors.transparent
+        backgroundColor: _showToolBar ? Theme.of(context).scaffoldBackgroundColor : Colors.black,
+        toolbarHeight: _showToolBar ? kToolbarHeight : 0,
+        actions: MediaQuery.of(context).orientation == Orientation.landscape ? [
+          IconButton(
+            onPressed: _onEditImage,
+            icon: Icon(Icons.edit),
+          ),
+          IconButton(
+            onPressed: _onDownloadImage,
+            icon: Icon(Icons.download),
+          ),
+          IconButton(
+            onPressed: _onMoveCopyImage,
+            icon: Icon(Icons.reply),
+          ),
+          IconButton(
+            onPressed: _onDeleteImage,
+            icon: Icon(Icons.delete, color: Theme.of(context).errorColor,),
+          ),
+        ] : [],
       ),
-      body: Container(
-        child: GestureDetector(
-          onTap: () {
-            print('tap');
-            setState(() {
-              showToolBar = !showToolBar;
-            });
-          },
-          child: PageView.builder(
+      body: GestureDetector(
+        onTap: () => setState(() {
+          if(_slideOffset == 0.0) {
+            _showToolBar = !_showToolBar;
+          }
+        }),
+        child: PageView.builder(
             physics: _pageViewPhysic,
-            itemCount: images.length,
+            itemCount: _images.length,
             controller: _pageController,
             onPageChanged: (newPage) async {
-              if(newPage == images.length-1) {
+              if(newPage == _images.length-1) {
                 await nextPage();
               }
               setState(() {
                 _page = newPage;
-                // showToolBar = true;
               });
             },
             itemBuilder: (context, index) {
-              var image = images[index];
-              if(Path.extension(image['element_url']) == '.mp4') {
-                return _displayVideo(image);
-              }
-              return _displayImage(image);
+              var image = _images[index];
+              print(image);
+              return LayoutBuilder(
+                builder: (context, constraints) {
+                  double panelHeight = 0.0;
+                  if(_showToolBar && widget.isAdmin) {
+                    if(MediaQuery.of(context).orientation == Orientation.portrait) {
+                      panelHeight = kBottomNavigationBarHeight + 40.0;
+                    }
+                  }
+                  return SlidingUpPanel(
+                    minHeight: panelHeight,
+                    maxHeight: constraints.maxHeight,
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(30.0 * (1 - _slideOffset)),
+                    ),
+                    color: Theme.of(context).scaffoldBackgroundColor,
+                    onPanelSlide: (slide) => setState(() {
+                      _slideOffset = slide;
+                    }),
+                    panel: Column(
+                      children: [
+                        SizedBox(
+                          height: kToolbarHeight,
+                          child: Center(
+                            child: Container(
+                              width: 100,
+                              height: 5,
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(30.0),
+                                  color: Colors.grey.shade600
+                              ),
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: ListView(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(10.0),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    SizedBox.square(
+                                      dimension: MediaQuery.of(context).size.width/3,
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(10.0),
+                                        child: Image.network(image["derivatives"][_derivative]["url"],
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: Container(
+                                          padding: const EdgeInsets.all(5.0),
+                                          height: MediaQuery.of(context).size.width/3-30,
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.horizontal(right: Radius.circular(10.0)),
+                                            color: Theme.of(context).inputDecorationTheme.fillColor,
+                                          ),
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            mainAxisAlignment: MainAxisAlignment.start,
+                                            children: [
+                                              Text(image['file'], softWrap: true,),
+                                              Text('${image['width']}x${image['height']} pixels'),
+                                              Text(image['date_available']),
+                                            ],
+                                          )
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Center(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(20.0),
+                                  child: Text(image['name'], style: TextStyle(
+                                    fontSize: 20,
+                                  ), softWrap: true,),
+                                ),
+                              ),
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(20.0),
+                                child: Container(
+                                  padding: const EdgeInsets.all(10.0),
+                                  color: Theme.of(context).cardColor,
+                                  child: Column(
+                                    children: [
+                                      imageInfoRow(
+                                        title: appStrings(context).editImageDetails_author,
+                                        content: image['author'] ?? ''
+                                      ),
+                                      Divider(),
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(appStrings(context).editImageDetails_author,
+                                            style: TextStyle(fontSize: 16),
+                                          ),
+                                          Expanded(
+                                            child: Text(image['comment'] ?? "no description",
+                                              overflow: TextOverflow.ellipsis,
+                                              textAlign: TextAlign.end,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      Divider(),
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(appStrings(context).editImageDetails_author),
+                                          Expanded(
+                                            child: Text(image['comment'] ?? "no description",
+                                              overflow: TextOverflow.ellipsis,
+                                              textAlign: TextAlign.end,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      Divider(),
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(appStrings(context).editImageDetails_author),
+                                          Expanded(
+                                            child: Text(image['comment'] ?? "no description",
+                                              overflow: TextOverflow.ellipsis,
+                                              textAlign: TextAlign.end,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      Divider(),
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(appStrings(context).editImageDetails_author),
+                                          Expanded(
+                                            child: Text(image['comment'] ?? "no description",
+                                              overflow: TextOverflow.ellipsis,
+                                              textAlign: TextAlign.end,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    body: Builder(
+                      builder: (context) {
+                        if(Path.extension(image['element_url']) == '.mp4') {
+                          return _displayVideo(image);
+                        }
+                        return _displayImage(image);
+                      },
+                    ),
+                  );
+                },
+              );
             }
-          ),
         ),
       ),
       bottomNavigationBar: _bottomNavigationBar(),
@@ -312,13 +481,12 @@ class _ImageViewPageState extends State<ImageViewPage> {
       ],
     );
   }
-
   Widget _displayImage(dynamic image) {
     return PhotoView(
       imageProvider: NetworkImage(image["derivatives"][_derivative]["url"]),
       minScale: PhotoViewComputedScale.contained,
       backgroundDecoration: BoxDecoration(
-        color: showToolBar ?
+        color: _showToolBar ?
         Theme.of(context).scaffoldBackgroundColor :
         Colors.black,
       ),
@@ -337,58 +505,52 @@ class _ImageViewPageState extends State<ImageViewPage> {
   }
 
   Widget _bottomNavigationBar() {
-    return widget.isAdmin && showToolBar? BottomNavigationBar(
-      onTap: (index) async {
-        switch (index) {
-          case 0:
-            _onEditImage();
-            break;
-          case 1:
-            _onDownloadImage();
-            break;
-          case 2:
-            _onMoveCopyImage();
-            break;
-          case 3:
-            _onDeleteImage();
-            break;
-          default:
-            break;
-        }
-      },
-      items: <BottomNavigationBarItem>[
-        BottomNavigationBarItem(
-          icon: Icon(Icons.edit, color: Theme.of(context).iconTheme.color),
-          label: appStrings(context).imageOptions_edit,
+    if(MediaQuery.of(context).orientation == Orientation.portrait
+        && widget.isAdmin && _showToolBar) {
+      return BottomAppBar(
+        elevation: 0.0,
+        color: Theme.of(context).scaffoldBackgroundColor,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            IconButton(
+              onPressed: _onEditImage,
+              icon: Icon(Icons.edit),
+            ),
+            IconButton(
+              onPressed: _onDownloadImage,
+              icon: Icon(Icons.download),
+            ),
+            IconButton(
+              onPressed: _onMoveCopyImage,
+              icon: Icon(Icons.reply),
+            ),
+            IconButton(
+              onPressed: _onDeleteImage,
+              icon: Icon(Icons.delete, color: Theme.of(context).errorColor,),
+            ),
+          ],
         ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.download_rounded, color: Theme.of(context).iconTheme.color),
-          label: appStrings(context).imageOptions_download,
+      );
+    }
+    return SizedBox();
+  }
+
+  Widget imageInfoRow({String title = '', String content = ''}) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(title,
+          style: TextStyle(fontSize: 16),
         ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.reply_outlined, color: Theme.of(context).iconTheme.color),
-          label: appStrings(context).moveImage_title,
-        ),
-        /*
-          BottomNavigationBarItem(
-            icon: Icon(Icons.attach_file, color: Theme.of(context).iconTheme.color),
-            label: "Attach",
-            // TODO: implement attach thumbnail
+        Expanded(
+          child: Text(content,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.end,
+            style: TextStyle(fontSize: 16),
           ),
-          */
-        BottomNavigationBarItem(
-          icon: Icon(Icons.delete_outline, color: Theme.of(context).errorColor),
-          label: appStrings(context).deleteImage_delete,
         ),
       ],
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      type: BottomNavigationBarType.fixed,
-      selectedFontSize: 14,
-      unselectedFontSize: 14,
-      showSelectedLabels: false,
-      showUnselectedLabels: false,
-      selectedItemColor: Theme.of(context).primaryColorLight,
-      unselectedItemColor: Theme.of(context).primaryColorLight,
-    ) : SizedBox();
+    );
   }
 }
