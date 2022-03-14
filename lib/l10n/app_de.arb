@@ -60,52 +60,52 @@
     "serverURLerror_message": "Bitte die Piwigo Web-Server-Adresse korrigieren.",
     "serverMethodsError_title": "Unbekannte Methoden",
     "serverMethodsError_message": "Fehler beim Abrufen der Servermethoden. Problem mit dem Piwigo Server?",
-    "serverInvalidMethodError_message": "Failed to call server method.",
-    "serverMissingParamError_message": "Failed to execute server method with missing parameter.",
-    "serverInvalidParamError_message": "Failed to call server method with provided parameters.",
-    "serverUnknownError_message": "Unexpected error encountered while calling server method with provided parameters.",
-    "loginError_title": "Login Fail",
-    "loginError_message": "The username and password don't match on the given web address",
-    "loginEmptyServer_title": "Enter a Web Address",
-    "loginEmptyServer_message": "Please select a protocol and enter a Piwigo web address in order to proceed.",
-    "serverConnectionError_title": "Connection Failed",
-    "serverConnectionError_message": "A secured HTTPS connection could not be established. Please check the address or try in unencrypted HTTP mode?",
-    "serverVersionNotCompatible_title": "Server Incompatible",
-    "serverVersionNotCompatible_message": "Your Piwigo server version is {version}. Piwigo NG only supports a version of at least 2.8. Please update your server to use Piwigo NG. Do you still want to continue?",
+    "serverInvalidMethodError_message": "Server-Methode konnte nicht abgerufen werden.",
+    "serverMissingParamError_message": "Ausführung der Servermethode mit fehlendem Parameter fehlgeschlagen.",
+    "serverInvalidParamError_message": "Fehler beim Aufruf der Servermethode mit den angegebenen Parametern.",
+    "serverUnknownError_message": "Beim Aufrufen der Servermethode mit den angegebenen Parametern ist ein unerwarteter Fehler aufgetreten.",
+    "loginError_title": "Login fehlgeschlagen",
+    "loginError_message": "Benutzername und Passwort stimmen für die angegebene Webadresse nicht überein",
+    "loginEmptyServer_title": "Webadresse eingeben",
+    "loginEmptyServer_message": "Bitte ein Protokoll auswählen und eine Piwigo Web-Adresse eingeben, um fortzufahren.",
+    "serverConnectionError_title": "Verbindung fehlgeschlagen",
+    "serverConnectionError_message": "Eine gesicherte HTTPS-Verbindung konnte nicht hergestellt werden. Bitte Adresse überprüfen oder erneut im unverschlüsselten HTTP-Modus verbinden?",
+    "serverVersionNotCompatible_title": "Server nicht kompatibel",
+    "serverVersionNotCompatible_message": "Ihre Piwigo Serverversion ist {version}. Piwigo NG unterstützt nur Versionen ab 2.8. Bitte Server aktualisieren, um Piwigo Mobile verwenden zu können. Trotzdem fortfahren?",
     "@serverVersionNotCompatible_message": {
         "placeholders": {
             "version": {}
         }
     },
-    "sessionStatusError_title": "Authentication Fail",
-    "sessionStatusError_message": "Failed to authenticate with the server. Try logging in again.",
-    "serverCommunityError_title": "Community Error",
-    "serverCommunityError_message": "Failed to get Community extension parameters. Try logging in again.",
-    "logoutConfirmation_title": "Logout",
-    "logoutConfirmation_message": "Are you sure you want to logout?",
-    "logoutFail_title": "Logout Failed",
-    "albumCount": "{count, plural, =0{0 albums} =1{1 album} other{{count} albums}}",
+    "sessionStatusError_title": "Authentifizierung fehlgeschlagen",
+    "sessionStatusError_message": "Fehler bei der Authentifizierung mit dem Server. Erneute Anmeldung versuchen.",
+    "serverCommunityError_title": "Community Fehler",
+    "serverCommunityError_message": "Parameter der Community-Erweiterung konnten nicht abgerufen werden. Erneute Anmeldung versuchen.",
+    "logoutConfirmation_title": "Abmelden",
+    "logoutConfirmation_message": "Wollen Sie sich wirklich abmelden?",
+    "logoutFail_title": "Abmeldung fehlgeschlagen",
+    "albumCount": "{count, plural, one {} =0{0 Alben} =1{1 Album} other{{count} Alben}}",
     "@albumCount": {
         "placeholders": {
             "count": {}
         }
     },
-    "subAlbumCount": "{count, plural,=0{0 sub-albums} =1{1 sub-album} other{{count} sub-albums}}",
+    "subAlbumCount": "{count, plural, one {}=0{0 Unteralben} =1{1 Unteralbum} other{{count} Unteralben}}",
     "@subAlbumCount": {
         "placeholders": {
             "count": {}
         }
     },
-    "showMore": "Show more… ({count})",
+    "showMore": "Mehr anzeigen... ({count})",
     "@showMore": {
         "placeholders": {
             "count": {}
         }
     },
-    "showPhotos": "Show Photos",
-    "categoryMainEmtpy": "No albums in your Piwigo yet.\rYou may pull down to refresh or re-login.",
-    "categoryImageList_selectButton": "Select",
-    "categoryImageList_deselectButton": "Deselect",
+    "showPhotos": "Fotos anzeigen",
+    "categoryMainEmtpy": "Bislang keine Alben in Piwigo vorhanden.\nZur Aktualisierung nach unten wischen oder erneut anmelden.",
+    "categoryImageList_selectButton": "Auswählen",
+    "categoryImageList_deselectButton": "Auswahl aufheben",
     "categoryImageList_noDataError": "Error No Data",
     "categoryDiscover_title": "Discover",
     "categoryDiscoverVisits_title": "Most visited",
