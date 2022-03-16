@@ -100,9 +100,8 @@ void savePreferences(Map<String, dynamic> status, {
   bool isLogged,
   bool isGuest
 }) async {
-  API.prefs.setString('username', url);
-  API.prefs.setString('username', username);
-  API.prefs.setString('password', password);
+  API.storage.write(key: 'username', value: username);
+  API.storage.write(key: 'password', value: password);
   API.prefs.setBool("is_logged", isLogged);
   API.prefs.setBool("is_guest", isGuest);
   API.prefs.setString("user_status", status["status"]);

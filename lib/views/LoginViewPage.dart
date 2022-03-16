@@ -34,6 +34,10 @@ class _LoginViewPageState extends State<LoginViewPage> {
   TextEditingController passwordController = TextEditingController();
 
   void createDio() async {
+    // Migration to flutter secure storage
+    API.prefs.remove('username');
+    API.prefs.remove('password');
+
     API().dio = Dio();
     API.cookieJar = CookieJar();
     API().dio.interceptors.add(CookieManager(API.cookieJar));
@@ -44,7 +48,11 @@ class _LoginViewPageState extends State<LoginViewPage> {
       API().dio.options.baseUrl = API.prefs.getString("base_url");
       String message;
       if(API.prefs.getBool("is_guest") != null && !API.prefs.getBool("is_guest")) {
-        message = await loginUser(API.prefs.getString("base_url"), API.prefs.getString("username"), API.prefs.getString("password"));
+        print(await API.storage.read(key: "password"));
+        message = await loginUser(API.prefs.getString("base_url"),
+          await API.storage.read(key: "username"),
+          await API.storage.read(key: "password"),
+        );
         if(message == null) {
           Navigator.of(context).pushReplacementNamed("/root",
             arguments: true,
@@ -81,11 +89,10 @@ class _LoginViewPageState extends State<LoginViewPage> {
       String url = API.prefs.getString("base_url");
       url = url.split('//')[1];
       url = url.substring(0, url.lastIndexOf('/'));
-      setState(() {
-        urlController.text = url;
-        usernameController.text = API.prefs.getString("username") == null? '' : API.prefs.getString("username");
-        passwordController.text = API.prefs.getString("password") == null? '' : API.prefs.getString("password");
-      });
+      urlController.text = url;
+      usernameController.text = await API.storage.read(key: "username") ?? '';
+      passwordController.text = '';
+      if(mounted) setState(() {});
     }
   }
 
