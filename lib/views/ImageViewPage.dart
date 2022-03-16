@@ -1,6 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:icon_shadow/icon_shadow.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:piwigo_ng/api/API.dart';
@@ -11,7 +10,6 @@ import 'package:path/path.dart' as Path;
 
 import 'package:piwigo_ng/views/VideoPlayerViewPage.dart';
 import 'package:piwigo_ng/views/components/dialogs/dialogs.dart';
-import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 
 class ImageViewPage extends StatefulWidget {
@@ -28,6 +26,9 @@ class ImageViewPage extends StatefulWidget {
   _ImageViewPageState createState() => _ImageViewPageState();
 }
 class _ImageViewPageState extends State<ImageViewPage> with SingleTickerProviderStateMixin {
+  AnimationController _animationController;
+  Animation<Color> _backgroundAnimation;
+  Animation<double> _heightAnimation;
   String _derivative;
   PageController _pageController;
   ScrollPhysics _pageViewPhysic = BouncingScrollPhysics();
@@ -35,12 +36,17 @@ class _ImageViewPageState extends State<ImageViewPage> with SingleTickerProvider
   int _imagePage;
   List<dynamic> _images = [];
   bool _showToolBar = true;
-  double _slideOffset = 0.0;
 
   @override
   void initState() {
     super.initState();
-    // SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive, overlays: [SystemUiOverlay.bottom]);
+    _animationController = AnimationController(vsync: this,
+      duration: const Duration(milliseconds: 200),
+    )..addListener(() => setState(() {}));
+    _heightAnimation = Tween<double>(begin: 1, end: 0)
+        .animate(_animationController);
+    _backgroundAnimation = ColorTween(begin: Colors.grey.shade900, end: Colors.black)
+        .animate(_animationController);
     _pageController = PageController(initialPage: widget.index);
     _derivative = API.prefs.getString('full_screen_image_size');
     _page = widget.index;
@@ -56,7 +62,6 @@ class _ImageViewPageState extends State<ImageViewPage> with SingleTickerProvider
 
   @override
   void dispose() {
-    // SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge, overlays: SystemUiOverlay.values);
     super.dispose();
   }
 
@@ -219,54 +224,63 @@ class _ImageViewPageState extends State<ImageViewPage> with SingleTickerProvider
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      extendBodyBehindAppBar: false,
-      extendBody: true,
-      backgroundColor: _showToolBar ?
-        Theme.of(context).scaffoldBackgroundColor :
-        Colors.black,
-      appBar: AppBar(
-        iconTheme: IconThemeData(
-          color: Theme.of(context).iconTheme.color, //change your color here
+    return SafeArea(
+      child: Scaffold(
+        extendBodyBehindAppBar: true,
+        extendBody: true,
+        resizeToAvoidBottomInset: true,
+        backgroundColor: _backgroundAnimation.value,
+        appBar: PreferredSize(
+          preferredSize: Size.fromHeight(kToolbarHeight * _heightAnimation.value),
+          child: Transform.translate(
+            offset: Offset(0, -kToolbarHeight*(1-_heightAnimation.value)),
+            child: AppBar(
+              iconTheme: IconThemeData(
+                color: Theme.of(context).iconTheme.color, //change your color here
+              ),
+              backgroundColor: Colors.black.withOpacity(0.5),
+              centerTitle: true,
+              title: Text('${_images[_page]['name'] ?? ''}',
+                overflow: TextOverflow.ellipsis, style: TextStyle(color: Colors.white),
+              ),
+              leading: IconButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                icon: Icon(Icons.chevron_left),
+              ),
+              toolbarHeight: kToolbarHeight*_heightAnimation.value,
+              actions: MediaQuery.of(context).orientation == Orientation.landscape ? [
+                IconButton(
+                  onPressed: _onEditImage,
+                  icon: Icon(Icons.edit),
+                ),
+                IconButton(
+                  onPressed: _onDownloadImage,
+                  icon: Icon(Icons.download),
+                ),
+                IconButton(
+                  onPressed: _onMoveCopyImage,
+                  icon: Icon(Icons.reply),
+                ),
+                IconButton(
+                  onPressed: _onDeleteImage,
+                  icon: Icon(Icons.delete, color: Theme.of(context).errorColor,),
+                ),
+              ] : [],
+            ),
+          ),
         ),
-        centerTitle: true,
-        title: Text('${_images[_page]['name'] ?? ""}',
-          overflow: TextOverflow.ellipsis,
-        ),
-        leading: IconButton(
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-          icon: Icon(Icons.chevron_left),
-        ),
-        backgroundColor: _showToolBar ? Theme.of(context).scaffoldBackgroundColor : Colors.black,
-        toolbarHeight: _showToolBar ? kToolbarHeight : 0,
-        actions: MediaQuery.of(context).orientation == Orientation.landscape ? [
-          IconButton(
-            onPressed: _onEditImage,
-            icon: Icon(Icons.edit),
-          ),
-          IconButton(
-            onPressed: _onDownloadImage,
-            icon: Icon(Icons.download),
-          ),
-          IconButton(
-            onPressed: _onMoveCopyImage,
-            icon: Icon(Icons.reply),
-          ),
-          IconButton(
-            onPressed: _onDeleteImage,
-            icon: Icon(Icons.delete, color: Theme.of(context).errorColor,),
-          ),
-        ] : [],
-      ),
-      body: GestureDetector(
-        onTap: () => setState(() {
-          if(_slideOffset == 0.0) {
+        body: GestureDetector(
+          onTap: () => setState(() {
+            if(_showToolBar) {
+              _animationController.forward();
+            } else {
+              _animationController.reverse();
+            }
             _showToolBar = !_showToolBar;
-          }
-        }),
-        child: PageView.builder(
+          }),
+          child: PageView.builder(
             physics: _pageViewPhysic,
             itemCount: _images.length,
             controller: _pageController,
@@ -280,15 +294,48 @@ class _ImageViewPageState extends State<ImageViewPage> with SingleTickerProvider
             },
             itemBuilder: (context, index) {
               var image = _images[index];
-              print(image);
               if(Path.extension(image['element_url']) == '.mp4') {
                 return _displayVideo(image);
               }
               return _displayImage(image);
-            }
+            },
+          ),
         ),
+        bottomNavigationBar: Builder(builder: (context) {
+          if(MediaQuery.of(context).orientation == Orientation.portrait
+              && widget.isAdmin) {
+            return Transform.translate(
+              offset: Offset(0, (1-_heightAnimation.value) * kBottomNavigationBarHeight),
+              child: Container(
+                height: kBottomNavigationBarHeight*_heightAnimation.value,
+                color: Colors.black.withOpacity(0.5),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    IconButton(
+                      onPressed: _onEditImage,
+                      icon: Icon(Icons.edit),
+                    ),
+                    IconButton(
+                      onPressed: _onDownloadImage,
+                      icon: Icon(Icons.download),
+                    ),
+                    IconButton(
+                      onPressed: _onMoveCopyImage,
+                      icon: Icon(Icons.reply),
+                    ),
+                    IconButton(
+                      onPressed: _onDeleteImage,
+                      icon: Icon(Icons.delete, color: Theme.of(context).errorColor,),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
+          return SizedBox();
+        }),
       ),
-      bottomNavigationBar: _bottomNavigationBar(),
     );
   }
 
@@ -325,9 +372,7 @@ class _ImageViewPageState extends State<ImageViewPage> with SingleTickerProvider
       imageProvider: NetworkImage(image["derivatives"][_derivative]["url"]),
       minScale: PhotoViewComputedScale.contained,
       backgroundDecoration: BoxDecoration(
-        color: _showToolBar ?
-        Theme.of(context).scaffoldBackgroundColor :
-        Colors.black,
+        color: Colors.transparent,
       ),
       scaleStateChangedCallback: (scale) {
         if(scale.isScaleStateZooming) {
@@ -343,37 +388,6 @@ class _ImageViewPageState extends State<ImageViewPage> with SingleTickerProvider
     );
   }
 
-  Widget _bottomNavigationBar() {
-    if(MediaQuery.of(context).orientation == Orientation.portrait
-        && widget.isAdmin && _showToolBar) {
-      return BottomAppBar(
-        elevation: 0.0,
-        color: Theme.of(context).scaffoldBackgroundColor,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            IconButton(
-              onPressed: _onEditImage,
-              icon: Icon(Icons.edit),
-            ),
-            IconButton(
-              onPressed: _onDownloadImage,
-              icon: Icon(Icons.download),
-            ),
-            IconButton(
-              onPressed: _onMoveCopyImage,
-              icon: Icon(Icons.reply),
-            ),
-            IconButton(
-              onPressed: _onDeleteImage,
-              icon: Icon(Icons.delete, color: Theme.of(context).errorColor,),
-            ),
-          ],
-        ),
-      );
-    }
-    return SizedBox();
-  }
 
   Widget imageInfoRow({String title = '', String content = ''}) {
     return Row(
