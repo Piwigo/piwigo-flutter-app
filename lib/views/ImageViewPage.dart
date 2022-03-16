@@ -1,3 +1,4 @@
+import 'package:better_player/better_player.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:icon_shadow/icon_shadow.dart';
@@ -45,7 +46,7 @@ class _ImageViewPageState extends State<ImageViewPage> with SingleTickerProvider
     )..addListener(() => setState(() {}));
     _heightAnimation = Tween<double>(begin: 1, end: 0)
         .animate(_animationController);
-    _backgroundAnimation = ColorTween(begin: Colors.grey.shade900, end: Colors.black)
+    _backgroundAnimation = ColorTween(begin: Color(0xFF101010), end: Colors.black)
         .animate(_animationController);
     _pageController = PageController(initialPage: widget.index);
     _derivative = API.prefs.getString('full_screen_image_size');
@@ -385,25 +386,6 @@ class _ImageViewPageState extends State<ImageViewPage> with SingleTickerProvider
           });
         }
       },
-    );
-  }
-
-
-  Widget imageInfoRow({String title = '', String content = ''}) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(title,
-          style: TextStyle(fontSize: 16),
-        ),
-        Expanded(
-          child: Text(content,
-            overflow: TextOverflow.ellipsis,
-            textAlign: TextAlign.end,
-            style: TextStyle(fontSize: 16),
-          ),
-        ),
-      ],
     );
   }
 }
