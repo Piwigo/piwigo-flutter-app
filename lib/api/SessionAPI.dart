@@ -27,9 +27,7 @@ Future<String> loginUser(String url, String username, String password) async {
     if(response.statusCode == 200) {
       if(json.decode(response.data)['stat'] == 'ok') {
         var status = await sessionStatus();
-        print(status);
         if(status["stat"] == "ok") {
-          print("$url, $username");
           savePreferences(status["result"], url: url, username: username, password: password, isLogged: true, isGuest: false);
           return null;
         }
@@ -78,7 +76,6 @@ Future<Map<String, dynamic>> sessionStatus() async {
 }
 
 void saveStatus(Map<String, dynamic> status) async {
-  print(status);
   API.prefs.setString("account_username", status["username"]);
   API.prefs.setString('pwg_token', status['pwg_token']);
   API.prefs.setString("status", status["status"]);

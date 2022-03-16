@@ -48,7 +48,6 @@ class _LoginViewPageState extends State<LoginViewPage> {
       API().dio.options.baseUrl = API.prefs.getString("base_url");
       String message;
       if(API.prefs.getBool("is_guest") != null && !API.prefs.getBool("is_guest")) {
-        print(await API.storage.read(key: "password"));
         message = await loginUser(API.prefs.getString("base_url"),
           await API.storage.read(key: "username"),
           await API.storage.read(key: "password"),
@@ -121,9 +120,7 @@ class _LoginViewPageState extends State<LoginViewPage> {
       }
     });
     urlFieldFocus.addListener(() {
-      setState(() {
-        print("Has focus: ${urlFieldFocus.hasFocus}");
-      });
+      setState(() {});
     });
     getSharedPrefs();
     WidgetsBinding.instance.addPostFrameCallback((_) => createDio());
