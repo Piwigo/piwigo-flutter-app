@@ -1,5 +1,5 @@
 name: piwigo_ng
-description: Proof of concept for Piwigo
+description: A Piwigo Android application
 
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.1+102
