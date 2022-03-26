@@ -160,7 +160,7 @@ class _AppBarExpandableSearchState extends State<AppBarExpandableSearch> {
                 textTitle,
                 TextFieldSearch(
                   controller: widget.textController,
-                  hint: "Search...",
+                  hint: "Search...", // TODO Localization
                   margin: EdgeInsets.symmetric(horizontal: 10),
                 )
               ],
