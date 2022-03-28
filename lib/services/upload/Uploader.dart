@@ -79,9 +79,10 @@ class Uploader {
         }
         uploadStatusProvider.current++;
       }
+      uploadStatusProvider.reset();
     } on DioError catch (e) {
       print(e.message);
-      uploadStatusProvider.status = false;
+      uploadStatusProvider.reset();
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
       ScaffoldMessenger.of(context).showSnackBar(errorSnackBar(context, appStrings(context).uploadError_title));
     }
@@ -91,48 +92,11 @@ class Uploader {
       await communityUploadCompleted(uploadedImages, int.parse(category));
     } on DioError catch (e) {
       print(e.message);
-      uploadStatusProvider.status = false;
     }
-
-    uploadStatusProvider.status = false;
-    uploadStatusProvider.max = 0;
-    uploadStatusProvider.current = 0;
 
     await _showUploadNotification(result);
   }
 
-  void upload(XFile photo, String category) async {
-    Map<String, String> queries = {"format":"json", "method": "pwg.images.upload"};
-    List<int> imageData = await photo.readAsBytes();
-
-    Dio dio = new Dio(
-      BaseOptions(
-        baseUrl: API.prefs.getString("base_url"),
-      ),
-    );
-
-    FormData formData =  FormData.fromMap({
-      "category": category,
-      "pwg_token": API.prefs.getString("pwg_token"),
-      "file": MultipartFile.fromBytes(
-        imageData,
-        filename: photo.path.split('/').last,
-      ),
-      "name": photo.path.split('/').last,
-    });
-
-    Response response = await dio.post("ws.php",
-      data: formData,
-      queryParameters: queries,
-    );
-
-    if (response.statusCode == 200) {
-      print('Upload ${response.data}');
-      if(json.decode(response.data)["stat"] == "ok") {}
-    } else {
-      print("Request failed: ${response.statusCode}");
-    }
-  }
   Future<Response> uploadChunk(BuildContext context, XFile photo,
     String category, Map<String, dynamic> info,
     Function(double) onProgress,
@@ -142,8 +106,8 @@ class Uploader {
       "method": "pwg.images.uploadAsync"
     };
     Map<String, dynamic> fields = {
-      'username': API.prefs.getString("username"),
-      'password': API.prefs.getString("password"),
+      'username': await API.storage.read(key: "username"),
+      'password': await API.storage.read(key: "password"),
       'filename': photo.path.split('/').last,
       'category': category,
     };
