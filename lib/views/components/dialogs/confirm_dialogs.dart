@@ -11,11 +11,11 @@ class ConfirmDialog extends StatelessWidget {
 
   double _getWidth(context) {
     if(isPortrait(context)) {
-      return MediaQuery.of(context).size.width > Constants.CONFIRM_DIALOG_MAX_WIDTH
-          ? Constants.CONFIRM_DIALOG_MAX_WIDTH : MediaQuery.of(context).size.width;
+      return MediaQuery.of(context).size.width > Constants.confirmDialogMaxWidth
+          ? Constants.confirmDialogMaxWidth : MediaQuery.of(context).size.width;
     }
-    return MediaQuery.of(context).size.height > Constants.CONFIRM_DIALOG_MAX_WIDTH
-        ? Constants.CONFIRM_DIALOG_MAX_WIDTH : MediaQuery.of(context).size.height;
+    return MediaQuery.of(context).size.height > Constants.confirmDialogMaxWidth
+        ? Constants.confirmDialogMaxWidth : MediaQuery.of(context).size.height;
   }
 
   @override
@@ -93,11 +93,11 @@ class MultiConfirmDialog extends StatelessWidget {
 
   double _getWidth(context) {
     if(isPortrait(context)) {
-      return MediaQuery.of(context).size.width > Constants.CONFIRM_DIALOG_MAX_WIDTH ?
-      Constants.CONFIRM_DIALOG_MAX_WIDTH : MediaQuery.of(context).size.width;
+      return MediaQuery.of(context).size.width > Constants.confirmDialogMaxWidth ?
+      Constants.confirmDialogMaxWidth : MediaQuery.of(context).size.width;
     }
-    return MediaQuery.of(context).size.height > Constants.CONFIRM_DIALOG_MAX_WIDTH ?
-    Constants.CONFIRM_DIALOG_MAX_WIDTH : MediaQuery.of(context).size.height;
+    return MediaQuery.of(context).size.height > Constants.confirmDialogMaxWidth ?
+    Constants.confirmDialogMaxWidth : MediaQuery.of(context).size.height;
   }
 
   @override
@@ -195,11 +195,11 @@ class _ConfirmBottomSheetState extends State<ConfirmBottomSheet> with TickerProv
 
   double _getWidth(context) {
     if(isPortrait(context)) {
-      return MediaQuery.of(context).size.width > Constants.CONFIRM_DIALOG_MAX_WIDTH ?
-      Constants.CONFIRM_DIALOG_MAX_WIDTH : MediaQuery.of(context).size.width;
+      return MediaQuery.of(context).size.width > Constants.confirmDialogMaxWidth ?
+      Constants.confirmDialogMaxWidth : MediaQuery.of(context).size.width;
     }
-    return MediaQuery.of(context).size.height > Constants.CONFIRM_DIALOG_MAX_WIDTH ?
-    Constants.CONFIRM_DIALOG_MAX_WIDTH : MediaQuery.of(context).size.height;
+    return MediaQuery.of(context).size.height > Constants.confirmDialogMaxWidth ?
+    Constants.confirmDialogMaxWidth : MediaQuery.of(context).size.height;
   }
 
   @override
@@ -294,11 +294,11 @@ class _MultiConfirmBottomSheetState extends State<MultiConfirmBottomSheet> with 
 
   double _getWidth(context) {
     if(isPortrait(context)) {
-      return MediaQuery.of(context).size.width > Constants.CONFIRM_DIALOG_MAX_WIDTH ?
-      Constants.CONFIRM_DIALOG_MAX_WIDTH : MediaQuery.of(context).size.width;
+      return MediaQuery.of(context).size.width > Constants.confirmDialogMaxWidth ?
+      Constants.confirmDialogMaxWidth : MediaQuery.of(context).size.width;
     }
-    return MediaQuery.of(context).size.height > Constants.CONFIRM_DIALOG_MAX_WIDTH ?
-    Constants.CONFIRM_DIALOG_MAX_WIDTH : MediaQuery.of(context).size.height;
+    return MediaQuery.of(context).size.height > Constants.confirmDialogMaxWidth ?
+    Constants.confirmDialogMaxWidth : MediaQuery.of(context).size.height;
   }
 
   @override

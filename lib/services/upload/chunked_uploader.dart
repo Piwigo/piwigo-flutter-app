@@ -71,7 +71,7 @@ class UploadRequest {
   }
 
   Future<Response> upload() async {
-    Future<Response> finalResponse;
+    Response finalResponse;
     String originalSum;
     List<String> chunkSums = [];
     originalSum = (await crypto.md5.bind(_file.openRead()).first).toString();
@@ -83,7 +83,6 @@ class UploadRequest {
     }
 
     for (int i = 0; i < _chunksCount; i++) {
-      // print("${i+1} | $_chunksCount");
       final start = _getChunkStart(i);
       final end = _getChunkEnd(i);
       final chunkStream = _getChunkStream(start, end);
@@ -96,20 +95,13 @@ class UploadRequest {
         "file": MultipartFile(chunkStream, end - start, filename: fileName),
         if (data != null) ...data
       });
-      try {
-        finalResponse = dio.request(
-          path,
-          data: formData,
-          queryParameters: params,
-          options: Options(
-              method: method,
-              contentType: contentType
-          ),
-          onSendProgress: (current, total) => _updateProgress(i, current, total),
-        );
-      } catch (e) {
-        print(e);
-      }
+      finalResponse = await dio.request(
+        path,
+        data: formData,
+        queryParameters: params,
+        options: Options(method: method, contentType: contentType),
+        onSendProgress: (current, total) => _updateProgress(i, current, total),
+      );
     }
     return finalResponse;
   }

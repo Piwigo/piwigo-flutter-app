@@ -1,8 +1,10 @@
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
-import 'package:images_picker/images_picker.dart';
+import 'package:image_picker/image_picker.dart';
 import 'dart:async';
 
 import 'package:piwigo_ng/api/API.dart';
@@ -10,12 +12,14 @@ import 'package:piwigo_ng/api/CategoryAPI.dart';
 import 'package:piwigo_ng/api/ImageAPI.dart';
 import 'package:piwigo_ng/constants/SettingsConstants.dart';
 import 'package:piwigo_ng/services/OrientationService.dart';
+import 'package:piwigo_ng/services/UploadStatusProvider.dart';
 import 'package:piwigo_ng/views/components/list_item.dart';
 import 'package:piwigo_ng/views/components/snackbars.dart';
 
 import 'package:piwigo_ng/views/ImageViewPage.dart';
 import 'package:piwigo_ng/views/UploadGalleryViewPage.dart';
 import 'package:piwigo_ng/views/components/dialogs/dialogs.dart';
+import 'package:provider/provider.dart';
 
 
 class CategoryViewPage extends StatefulWidget {
@@ -29,6 +33,9 @@ class CategoryViewPage extends StatefulWidget {
   _CategoryViewPageState createState() => _CategoryViewPageState();
 }
 class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerProviderStateMixin {
+  Future<Map<String,dynamic>> _albumsFuture;
+  Future<Map<String,dynamic>> _imagesFuture;
+
   bool _isEditMode;
   int _page;
   int _nbImages;
@@ -36,16 +43,19 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
   ScrollController _controller = ScrollController();
   List<dynamic> imageList = [];
 
-  // TODO: zoom in/out grid
-  double _scaleFactor = 1.0;
-  double _baseScaleFactor = 1.0;
 
   @override
   void initState() {
+    _getData();
     super.initState();
     _page = 0;
     _nbImages = widget.nbImages;
     _isEditMode = false;
+  }
+
+  void _getData() {
+    _albumsFuture = fetchAlbums(widget.category);
+    _imagesFuture = fetchImages(widget.category, 0);
   }
 
   @override
@@ -73,6 +83,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
     }
     setState(() {
       print('Fetch images of page $_page');
+      _getData();
     });
   }
   openEditMode() {
@@ -90,6 +101,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
   Future<void> _onRefresh() {
     setState(() {
       _page = 0;
+      _getData();
     });
     return Future.delayed(Duration(milliseconds: 500));
   }
@@ -162,6 +174,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
           setState(() {
             _selectedItems.clear();
             _isEditMode = false;
+            _getData();
           });
         });
         break;
@@ -191,6 +204,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
           setState(() {
             _selectedItems.clear();
             _isEditMode = false;
+            _getData();
           });
         });
         break;
@@ -214,9 +228,9 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
       int nbSuccess = 0;
       switch(choice) {
         case 0: nbSuccess = await deleteImages(context, selection);
-        break;
+          break;
         case 1: nbSuccess = await removeImages(context, selection, widget.category);
-        break;
+          break;
         default: break;
       }
 
@@ -224,7 +238,9 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
         content: Text(appStrings(context).deleteImageSuccess_message(nbSuccess)),
       ));
 
-      setState(() {});
+      setState(() {
+        _getData();
+      });
     }
   }
 
@@ -242,9 +258,6 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
 
 
   handleAlbumSnapshot(AsyncSnapshot albumSnapshot, int nbImages) {
-    if(albumSnapshot.data['stat'] == 'fail') {
-      return Center(child: Text(appStrings(context).categoryMainEmtpy));
-    }
     var albums = albumSnapshot.data['result']['categories'];
     int nbImages = _nbImages;
     if(albums.length > 0 && albums[0]["id"].toString() == widget.category) {
@@ -327,49 +340,39 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
         }
         return true;
       },
-      child: GestureDetector(
-        /*
-        onScaleStart: (details) {
-          _scaleFactor = getImageCrossAxisCount(context).toDouble();
-          _baseScaleFactor = _scaleFactor;
-        },
-        onScaleUpdate: (details) {
-          setState(() {
-            _scaleFactor = _baseScaleFactor / details.scale;
-            setImageCrossAxisCount(context, _scaleFactor.ceil().toDouble());
-          });
-        },
-        */
-        child: child,
-      ),
+      child: child,
     );
   }
 
   Widget createFutureBuilders() {
     return FutureBuilder<Map<String,dynamic>>(
-        future: fetchAlbums(widget.category), // Albums of the list
+        future: _albumsFuture, // Albums of the list
         builder: (BuildContext context, AsyncSnapshot albumSnapshot) {
           if (albumSnapshot.hasData) {
             int nbImages = _nbImages;
+            if(albumSnapshot.data['stat'] == 'fail') {
+              return Center(
+                child: Text(appStrings(context).categoryImageList_noDataError),
+              );
+            }
             var albums = handleAlbumSnapshot(albumSnapshot, nbImages);
-            // print(albums);
             return FutureBuilder<Map<String,dynamic>>(
-                future: fetchImages(widget.category, 0), // Images of the list
-                builder: (BuildContext context, AsyncSnapshot imagesSnapshot) {
-                  if (imagesSnapshot.hasData) {
-                    if (imageList.isEmpty || _page == 0) {
-                      if(imagesSnapshot.data['stat'] == 'fail') {
-                        return Center(child: Text(appStrings(context).categoryImageList_noDataError));
-                      }
-                      handleImagesSnapshot(imagesSnapshot);
+              future: _imagesFuture,
+              builder: (BuildContext context, AsyncSnapshot imagesSnapshot) {
+                if (imagesSnapshot.hasData) {
+                  if (imageList.isEmpty || _page == 0) {
+                    if(imagesSnapshot.data['stat'] == 'fail') {
+                      return Center(child: Text(appStrings(context).categoryImageList_noDataError));
                     }
-                    return createPageContent(albums, nbImages);
-                  } else {
-                    return Center(
-                      child: CircularProgressIndicator(),
-                    );
+                    handleImagesSnapshot(imagesSnapshot);
                   }
+                  return createPageContent(albums, nbImages);
+                } else {
+                  return Center(
+                    child: CircularProgressIndicator(),
+                  );
                 }
+              },
             );
           } else {
             return Center(
@@ -410,7 +413,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
               }
             ).whenComplete(() {
               setState(() {
-                print('refresh');
+                _getData();
               });
             });
           },
@@ -423,24 +426,34 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
           foregroundColor: _theme.floatingActionButtonTheme.foregroundColor,
           onTap: () async {
             try {
-              List<Media> mediaList = await ImagesPicker.pick(
-                count: 100,
-                pickType: PickType.all,
-                quality: 1.0,
-              );
-              print(mediaList[0].path);
-              if(mediaList.isNotEmpty) {
+              ScaffoldMessenger.of(context).removeCurrentSnackBar();
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(appStrings(context).loadingHUD_label),
+                    CircularProgressIndicator(),
+                  ],
+                ),
+                duration: Duration(days: 365),
+              ));
+              final List<XFile> images = ((await FilePicker.platform.pickFiles(
+                type: FileType.media,
+                allowMultiple: true,
+              )) ?.files ?? []).map<XFile>((e) => XFile(e.path, name: e.name, bytes: e.bytes)).toList();
+              ScaffoldMessenger.of(context).removeCurrentSnackBar();
+              if(images.isNotEmpty) {
                 Navigator.push(context, MaterialPageRoute(
-                    builder: (context) => UploadGalleryViewPage(imageData: mediaList, category: widget.category)
+                    builder: (context) => UploadGalleryViewPage(imageData: images, category: widget.category)
                 )).whenComplete(() {
                   setState(() {
-                    // API.uploader.createDio();
                     print('After upload'); // refresh
                   });
                 });
               }
             } catch (e) {
-              print('Dio error ${e.toString()}');
+              print('${e.toString()}');
             }
           }
         ),
@@ -452,14 +465,23 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
             foregroundColor: _theme.floatingActionButtonTheme.foregroundColor,
             onTap: () async {
               try {
-                List<Media> mediaList = await ImagesPicker.openCamera(
-                  pickType: PickType.image,
-                  quality: 1.0,
-                );
-                print(mediaList[0].path);
-                if(mediaList.isNotEmpty) {
+                ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(appStrings(context).loadingHUD_label),
+                      CircularProgressIndicator(),
+                    ],
+                  ),
+                  duration: Duration(days: 365),
+                ));
+                final XFile image = await ImagePicker().pickImage(source: ImageSource.camera);
+                ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                if(image != null) {
                   Navigator.push(context, MaterialPageRoute(
-                      builder: (context) => UploadGalleryViewPage(imageData: mediaList, category: widget.category)
+                      builder: (context) => UploadGalleryViewPage(imageData: [image], category: widget.category)
                   )).whenComplete(() {
                     setState(() {
                       print('After upload'); // refresh
@@ -478,8 +500,8 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
   Widget createPageContent(dynamic albums, int nbImages) {
     ThemeData _theme = Theme.of(context);
 
-    int albumCrossAxisCount = MediaQuery.of(context).size.width <= Constants.ALBUM_MIN_WIDTH ? 1
-        : (MediaQuery.of(context).size.width/Constants.ALBUM_MIN_WIDTH).floor();
+    int albumCrossAxisCount = MediaQuery.of(context).size.width <= Constants.albumMinWidth ? 1
+        : (MediaQuery.of(context).size.width/Constants.albumMinWidth).floor();
 
     return RefreshIndicator(
       displacement: 20,
@@ -507,7 +529,9 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
                 return AlbumListItem(album,
                   isAdmin: widget.isAdmin,
                   onClose: () {
-                    setState(() {});
+                    setState(() {
+                      _getData();
+                    });
                   },
                   onOpen: closeEditMode,
                 );
@@ -554,7 +578,9 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
                         category: widget.category,
                       )),
                     ).whenComplete(() {
-                      setState(() {});
+                      setState(() {
+                        _getData();
+                      });
                     });
                   },
                   child: AnimatedContainer(
@@ -690,6 +716,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
   }
 
   Widget createFloatingActionButton() {
+    final uploadStatusProvider = Provider.of<UploadStatusNotifier>(context);
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Stack(
@@ -707,7 +734,24 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
                 onPressed: () {
                   Navigator.of(context).popUntil((route) => route.isFirst);
                 },
-                child: Icon(Icons.home, color: Colors.grey.shade200, size: 30),
+                child: uploadStatusProvider.status ?
+                    Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        SizedBox(
+                          height: 55,
+                          width: 55,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 5,
+                            value: uploadStatusProvider.progress,
+                          ),
+                        ),
+                        Text("${uploadStatusProvider.getRemaining()}",
+                          style: TextStyle(fontSize: 16),
+                        ),
+                      ],
+                    ) :
+                    Icon(Icons.home, color: Colors.grey.shade200, size: 30),
               ),
             ),
           ),

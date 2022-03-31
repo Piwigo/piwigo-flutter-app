@@ -1,6 +1,8 @@
 import 'dart:io';
 
-import 'package:images_picker/images_picker.dart';
+import 'package:video_player/video_player.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:piwigo_ng/constants/SettingsConstants.dart';
 import 'package:piwigo_ng/services/OrientationService.dart';
 import 'package:piwigo_ng/api/API.dart';
@@ -12,7 +14,7 @@ import 'package:piwigo_ng/views/components/textfields.dart';
 import 'package:piwigo_ng/views/components/dialogs/dialogs.dart';
 
 class UploadGalleryViewPage extends StatefulWidget {
-  final List<Media> imageData;
+  final List<XFile> imageData;
   final String category;
 
   UploadGalleryViewPage({Key key, this.imageData, this.category}) : super(key: key);
@@ -34,10 +36,12 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
   PageController _pageController;
   bool _displayGrid = false;
 
+  bool _isFilesLoading = false;
+
   @override
   void initState() {
     super.initState();
-
+    imageCache.clear();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       privacyLevels(context).forEach((key, value) {
         _levelItems.add(DropdownMenuItem<int>(
@@ -58,9 +62,7 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
   }
 
   int getGridColumns(int nbElements) {
-    if(nbElements < 4) return nbElements;
-    if(nbElements < 10) return 3;
-    return 4;
+    return (MediaQuery.of(context).size.width/200).ceil();
   }
 
   Map<String, dynamic> getImagesInfo() {
@@ -75,44 +77,48 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
     };
   }
 
-  BoxShadow _switchIconShadow() {
-    return BoxShadow(
-      color: Colors.grey.withOpacity(0.5),
-      spreadRadius: 1,
-      blurRadius: 3,
-      offset: Offset(0, 1), // changes position of shadow
-    );
-  }
-
   addFiles() async {
+    setState(() {
+      _isFilesLoading = true;
+    });
     try {
-      List<Media> mediaList = await ImagesPicker.pick(
-        count: 100,
-        pickType: PickType.all,
-        quality: 0.8,
-      );
-      print(mediaList[0].path);
+      List<XFile> mediaList = ((await FilePicker.platform.pickFiles(
+        type: FileType.media,
+        allowMultiple: true,
+      )) ?.files ?? []).map<XFile>((e) => XFile(
+        e.path,
+        name: e.name,
+        bytes: e.bytes,
+      )).toList();
       if(mediaList.isNotEmpty) {
-        widget.imageData.addAll(mediaList);
+        setState(() {
+          widget.imageData.addAll(mediaList);
+        });
       }
     } catch (e) {
-      print('Dio error ${e.toString()}');
+      print('${e.toString()}');
     }
+    setState(() {
+      _isFilesLoading = false;
+    });
   }
-
   takePhoto() async {
+    setState(() {
+      _isFilesLoading = true;
+    });
     try {
-      List<Media> mediaList = await ImagesPicker.openCamera(
-        pickType: PickType.image,
-        quality: 0.8,
-      );
-      print(mediaList[0].path);
-      if(mediaList.isNotEmpty) {
-        widget.imageData.addAll(mediaList);
+      final XFile image = await ImagePicker().pickImage(source: ImageSource.camera);
+      if(image != null) {
+        setState(() {
+          widget.imageData.add(image);
+        });
       }
     } catch (e) {
       print('Dio error ${e.toString()}');
     }
+    setState(() {
+      _isFilesLoading = false;
+    });
   }
 
   onRemoveFile() async {
@@ -128,16 +134,20 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
       });
     }
   }
-
   onUpload() async {
     setState(() {
       _isLoading = true;
     });
-    await API.uploader.uploadPhotos(widget.imageData, widget.category, getImagesInfo());
-    setState(() {
-      _isLoading = false;
-    });
-    Navigator.of(context).pop();
+    await API.uploader.uploadPhotos(context, widget.imageData, widget.category, getImagesInfo());
+
+    if(mounted) {
+      setState(() {
+        _isLoading = false;
+        widget.imageData.clear();
+      });
+
+      Navigator.of(context).pop();
+    }
   }
 
   @override
@@ -147,6 +157,10 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
     } else {
       _pageController = PageController(viewportFraction: 2/4);
     }
+
+    List<Widget> horizontalList = widget.imageData.map<Widget>(
+      (image) => _buildHorizontalListItem(image),
+    ).toList();
 
     return Scaffold(
       appBar: AppBar(
@@ -161,16 +175,7 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
         title: Text(appStrings(context).categoryUpload_images),
         actions: [
           IconButton(
-            onPressed: () async {
-              setState(() {
-                _isLoading = true;
-              });
-              await API.uploader.uploadPhotos(widget.imageData, widget.category, getImagesInfo());
-              setState(() {
-                _isLoading = false;
-              });
-              Navigator.of(context).pop();
-            },
+            onPressed: onUpload,
             icon: Icon(Icons.upload_file),
           ),
         ],
@@ -227,58 +232,27 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
                   ],
                 ),
               ),
-
+              _isFilesLoading ?
+                LinearProgressIndicator():
+                SizedBox(),
               _displayGrid ?
                 Container(
                   padding: EdgeInsets.all(10),
-                  child: GridView.builder( // Put images on a grid
+                  child: GridView.builder(
+                    cacheExtent: 999999,
                     physics: NeverScrollableScrollPhysics(),
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: getGridColumns(widget.imageData.length),
                     ),
-                    itemCount: widget.imageData.length,
+                    itemCount: widget.imageData.length + (_isFilesLoading ? 1 : 0),
                     scrollDirection: Axis.vertical,
                     shrinkWrap: true,
                     itemBuilder: (BuildContext context, int index) {
-                      Media image = widget.imageData[index];
-                      return Container(
-                        child: Stack(
-                          children: [
-                            Container(
-                              width: double.infinity,
-                              height: double.infinity,
-                              child: Card(
-                                elevation: 0,
-                                semanticContainer: true,
-                                child: GridTile(
-                                  child: Container(
-                                    child: Image.file(File(image.thumbPath),
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            Positioned(
-                                bottom: -5,
-                                right: -5,
-                                child: InkWell(
-                                  onTap: onRemoveFile,
-                                  child: Container(
-                                    padding: EdgeInsets.all(3),
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.only(topLeft: Radius.circular(15)),
-                                      // shape: BoxShape.circle,
-                                      color: Theme.of(context).scaffoldBackgroundColor,
-                                    ),
-                                    child: Icon(Icons.remove_circle_outline, color: Theme.of(context).errorColor),
-                                  ),
-                                )
-                            ),
-                          ],
-                        ),
-                      );
-                    }
+                      if(_isFilesLoading && index == widget.imageData.length)
+                        return CircularProgressIndicator();
+                      XFile image = widget.imageData[index];
+                      return _buildGridItem(image);
+                    },
                   ),
                 ) :
                 Container(
@@ -292,75 +266,9 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
                     },
                     scrollDirection: Axis.horizontal,
                     physics: PageScrollPhysics(),
-                    children: widget.imageData.map<Widget>((image) {
-                      return Container(
-                        padding: EdgeInsets.symmetric(horizontal: 5),
-                        child: Stack(
-                          children: [
-                            Padding(
-                              padding: EdgeInsets.symmetric(vertical: 10),
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Container(
-                                    height: 130,
-                                    width: 130,
-                                    padding: EdgeInsets.all(5),
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
-                                      color: Theme.of(context).inputDecorationTheme.fillColor,
-                                    ),
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(7),
-                                      child: Image.file(File(image.thumbPath),
-                                        fit: BoxFit.cover,
-                                      ),
-                                    ),
-                                  ),
-                                  Expanded(
-                                    child: Container(
-                                      height: 110,
-                                      padding: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.only(
-                                          topRight: Radius.circular(10),
-                                          bottomRight: Radius.circular(10),
-                                        ),
-                                        color: Theme.of(context).inputDecorationTheme.fillColor,
-                                      ),
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Text('${image.path.split('/').last}', style: Theme.of(context).textTheme.bodyText2, overflow: TextOverflow.fade),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Positioned(
-                                bottom: 0,
-                                right: 10,
-                                child: InkWell(
-                                  onTap: onRemoveFile,
-                                  child: Container(
-                                    padding: EdgeInsets.all(3),
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: Theme.of(context).scaffoldBackgroundColor,
-                                    ),
-                                    child: Icon(Icons.remove_circle_outline, color: Theme.of(context).errorColor),
-                                  ),
-                                )
-                            ),
-                          ],
-                        ),
-                      );
-                    }).toList(),
+                    children: horizontalList,
                   ),
                 ),
-
               Divider(
                 thickness: 1,
               ),
@@ -527,6 +435,120 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
     );
   }
 
+  Widget _buildHorizontalListItem(XFile image) {
+    String expansion = image.path.split('.').last;
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 5),
+      child: Stack(
+        children: [
+          Padding(
+            padding: EdgeInsets.symmetric(vertical: 10),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Container(
+                  height: 130,
+                  width: 130,
+                  padding: EdgeInsets.all(5),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color: Theme.of(context).inputDecorationTheme.fillColor,
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(7),
+                    child: expansion == 'mp4'
+                        ? VideoItem(path: image.path)
+                        : Image.file(File(image.path),
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Container(
+                    height: 110,
+                    padding: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.only(
+                        topRight: Radius.circular(10),
+                        bottomRight: Radius.circular(10),
+                      ),
+                      color: Theme.of(context).inputDecorationTheme.fillColor,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('${image.path.split('/').last}', style: Theme.of(context).textTheme.bodyText2, overflow: TextOverflow.fade),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Positioned(
+              bottom: 0,
+              right: 10,
+              child: InkWell(
+                onTap: onRemoveFile,
+                child: Container(
+                  padding: EdgeInsets.all(3),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Theme.of(context).scaffoldBackgroundColor,
+                  ),
+                  child: Icon(Icons.remove_circle_outline, color: Theme.of(context).errorColor),
+                ),
+              )
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildGridItem(XFile image) {
+    String expansion = image.path.split('.').last;
+    return Container(
+      child: Stack(
+        children: [
+          Container(
+            width: double.infinity,
+            height: double.infinity,
+            child: Card(
+              elevation: 0,
+              semanticContainer: true,
+              child: GridTile(
+                child: Container(
+                  child: expansion == 'mp4'
+                      ? VideoItem(path: image.path)
+                      : Image.file(File(image.path),
+                    fit: BoxFit.cover,
+                    filterQuality: FilterQuality.low,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+              bottom: -5,
+              right: -5,
+              child: InkWell(
+                onTap: onRemoveFile,
+                child: Container(
+                  padding: EdgeInsets.all(3),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.only(topLeft: Radius.circular(15)),
+                    // shape: BoxShape.circle,
+                    color: Theme.of(context).scaffoldBackgroundColor,
+                  ),
+                  child: Icon(Icons.remove_circle_outline, color: Theme.of(context).errorColor),
+                ),
+              )
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget tagItem(dynamic tag, Animation<double> animation, {BorderRadius borderRadius, Border border}) {
     return SizeTransition(
       axis: Axis.vertical,
@@ -559,5 +581,56 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
         ),
       ),
     );
+  }
+}
+
+class VideoItem extends StatefulWidget {
+  const VideoItem({Key key, this.path}) : super(key: key);
+
+  final String path;
+
+  @override
+  _VideoItemState createState() => _VideoItemState();
+}
+class _VideoItemState extends State<VideoItem> {
+  VideoPlayerController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = VideoPlayerController.file(File(widget.path))
+      ..initialize().then((_) {
+        setState(() {});
+      });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _controller.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if(_controller.value.isInitialized) {
+      return FittedBox(
+        fit: BoxFit.cover,
+        child: GestureDetector(
+          onTap: () {
+            setState(() {
+              _controller.value.isPlaying
+                  ? _controller.pause()
+                  : _controller.play();
+            });
+          },
+          child: SizedBox(
+            width: _controller.value.size?.width ?? 0,
+            height: _controller.value.size?.height ?? 0,
+            child: VideoPlayer(_controller),
+          ),
+        ),
+      );
+    }
+    return CircularProgressIndicator();
   }
 }

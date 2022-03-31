@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:ext_storage/ext_storage.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:path_provider/path_provider.dart';
@@ -76,7 +75,6 @@ Future<dynamic> getImageInfo(int imageId) async {
 
 Future<bool> _requestPermissions() async {
   var permission = await Permission.storage.status;
-  print(permission.isGranted);
   if (permission != PermissionStatus.granted) {
     await Permission.storage.request();
     permission = await Permission.storage.status;
@@ -176,7 +174,6 @@ Future<int> deleteImages(BuildContext context, List<int> imageIdList) async {
   for(int id in imageIdList) {
     var response = await deleteImage(id);
     if(response['stat'] == 'fail') {
-      print(response);
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
       ScaffoldMessenger.of(context).showSnackBar(
         errorSnackBar(context, '${response['result']}'),
@@ -225,7 +222,6 @@ Future<int> removeImages(BuildContext context, List<int> imageIdList, String cat
   for(int id in imageIdList) {
     var response = await removeImage(id, catId);
     if(response['stat'] == 'fail') {
-      print(response);
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
       ScaffoldMessenger.of(context).showSnackBar(
         errorSnackBar(context, '${response['result']}'),
@@ -265,8 +261,6 @@ Future<dynamic> removeImage(int imageId, String catId) async {
         data: formData,
         queryParameters: queries
     );
-
-    print(response.data);
 
     if (response.statusCode == 200) {
       return json.decode(response.data);
@@ -464,6 +458,69 @@ Future<dynamic> renameImage(int imageId, String name) async {
         queryParameters: queries
     );
 
+    if (response.statusCode == 200) {
+      return json.decode(response.data);
+    } else {
+      return {
+        'stat': 'fail',
+        'result': response.statusMessage
+      };
+    }
+  } catch (e) {
+    var error = e as DioError;
+    return {
+      'stat': 'fail',
+      'result': error.message
+    };
+  }
+}
+
+Future<dynamic> uploadCompleted(List<int> imageId, int categoryId) async {
+  Map<String, String> queries = {
+    "format": "json",
+    "method": "pwg.images.uploadCompleted",
+  };
+  FormData formData =  FormData.fromMap({
+    "image_id": imageId,
+    "pwg_token": API.prefs.getString("pwg_token"),
+    "category_id": categoryId,
+  });
+  try {
+    Response response = await API().dio.post('ws.php',
+        data: formData,
+        queryParameters: queries
+    );
+    if (response.statusCode == 200) {
+      return json.decode(response.data);
+    } else {
+      return {
+        'stat': 'fail',
+        'result': response.statusMessage
+      };
+    }
+  } catch (e) {
+    var error = e as DioError;
+    return {
+      'stat': 'fail',
+      'result': error.message
+    };
+  }
+}
+Future<dynamic> communityUploadCompleted(List<int> imageId, int categoryId) async {
+  Map<String, String> queries = {
+    "format": "json",
+    "method": "community.images.uploadCompleted",
+  };
+  FormData formData =  FormData.fromMap({
+    "image_id": imageId,
+    "pwg_token": API.prefs.getString("pwg_token"),
+    "category_id": categoryId,
+  });
+  try {
+    Response response = await API().dio.post('ws.php',
+        data: formData,
+        queryParameters: queries
+    );
     if (response.statusCode == 200) {
       return json.decode(response.data);
     } else {
