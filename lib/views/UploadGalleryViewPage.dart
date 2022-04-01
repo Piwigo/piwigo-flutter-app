@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:piwigo_ng/constants/SettingsConstants.dart';
 import 'package:piwigo_ng/services/OrientationService.dart';
 import 'package:piwigo_ng/api/API.dart';
+import 'package:mime_type/mime_type.dart';
 
 import 'package:flutter/material.dart';
 
@@ -436,7 +437,7 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
   }
 
   Widget _buildHorizontalListItem(XFile image) {
-    String expansion = image.path.split('.').last;
+    String mimeType = mime(image.path);
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 5),
       child: Stack(
@@ -456,7 +457,7 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
                   ),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(7),
-                    child: expansion == 'mp4'
+                    child: mimeType.startsWith('video')
                         ? VideoItem(path: image.path)
                         : Image.file(File(image.path),
                       fit: BoxFit.cover,
@@ -506,7 +507,7 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
   }
 
   Widget _buildGridItem(XFile image) {
-    String expansion = image.path.split('.').last;
+    String mimeType = mime(image.path);
     return Container(
       child: Stack(
         children: [
@@ -518,7 +519,7 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
               semanticContainer: true,
               child: GridTile(
                 child: Container(
-                  child: expansion == 'mp4'
+                  child: mimeType.startsWith('video')
                       ? VideoItem(path: image.path)
                       : Image.file(File(image.path),
                     fit: BoxFit.cover,
