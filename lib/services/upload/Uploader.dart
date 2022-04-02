@@ -142,8 +142,8 @@ class Uploader {
       "method": "pwg.images.uploadAsync"
     };
     Map<String, dynamic> fields = {
-      'username': API.prefs.getString("username"),
-      'password': API.prefs.getString("password"),
+      'username': await API.storage.read(key: "username"),
+      'password': await API.storage.read(key: "password"),
       'filename': photo.path.split('/').last,
       'category': category,
     };
