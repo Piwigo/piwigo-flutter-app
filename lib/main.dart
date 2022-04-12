@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:piwigo_ng/routes/PageRouter.dart';
+import 'package:piwigo_ng/routes/RoutePaths.dart';
 import 'package:piwigo_ng/services/ThemeProvider.dart';
 import 'package:piwigo_ng/services/UploadStatusProvider.dart';
-import 'package:piwigo_ng/views/RootCategoryViewPage.dart';
 import 'package:piwigo_ng/api/API.dart';
 import 'package:provider/provider.dart';
-import 'package:piwigo_ng/views/LoginViewPage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -57,12 +57,8 @@ class MyApp extends StatelessWidget {
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       theme: light,
-      initialRoute: '/',
-      onGenerateRoute: (settings) {
-        if(settings.name == '/') return MaterialPageRoute(builder: (context) => LoginViewPage());
-        if(settings.name == '/root') return MaterialPageRoute(builder: (context) => RootCategoryViewPage(isAdmin: settings.arguments));
-        return MaterialPageRoute(builder: (context) => Container());
-      },
+      initialRoute: RoutePaths.Login,
+      onGenerateRoute: PageRouter.generateRoute,
     );
   }
 }
