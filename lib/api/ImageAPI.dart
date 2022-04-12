@@ -41,6 +41,35 @@ Future<Map<String,dynamic>> fetchCategoryImages(String albumID, int page) async 
   }
 }
 
+Future<Map<String,dynamic>> fetchTagImages(String tagID, int page) async {
+  Map<String, String> queries = {
+    "format": "json",
+    "method": "pwg.tags.getImages",
+    "tag_id": tagID,
+    "per_page": "100",
+    "page": page.toString(),
+  };
+
+  try {
+    Response response = await API().dio.get('ws.php', queryParameters: queries);
+
+    if (response.statusCode == 200) {
+      return json.decode(response.data);
+    } else {
+      return {
+        'stat': 'fail',
+        'result': response.statusMessage
+      };
+    }
+  } catch(e) {
+    var error = e as DioError;
+    return {
+      'stat': 'fail',
+      'result': error.message
+    };
+  }
+}
+
 Future<dynamic> getImageInfo(int imageId) async {
   Map<String, String> queries = {
     "format": "json",
