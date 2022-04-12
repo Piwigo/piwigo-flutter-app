@@ -14,6 +14,7 @@ import 'package:piwigo_ng/constants/SettingsConstants.dart';
 import 'package:piwigo_ng/services/OrientationService.dart';
 import 'package:piwigo_ng/services/UploadStatusProvider.dart';
 import 'package:piwigo_ng/views/components/list_item.dart';
+import 'package:piwigo_ng/views/components/sidedrawer.dart';
 import 'package:piwigo_ng/views/components/snackbars.dart';
 
 import 'package:piwigo_ng/views/ImageViewPage.dart';
@@ -279,6 +280,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
     return Scaffold(
       resizeToAvoidBottomInset: true,
       extendBody: true,
+      drawer: SideDrawer(view: 'album'),
       body: createListeners(
         NestedScrollView(
           controller: _controller,
@@ -305,12 +307,12 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
       iconTheme: IconThemeData(
         color: _theme.iconTheme.color,
       ),
-      leading: IconButton(
-        onPressed: () {
-          Navigator.of(context).pop();
-        },
-        icon: Icon(Icons.chevron_left),
-      ),
+      // leading: IconButton(
+      //   onPressed: () {
+      //     Navigator.of(context).pop();
+      //   },
+      //   icon: Icon(Icons.chevron_left),
+      // ),
       title: _isEditMode ?
       Text("${_selectedPhotos()}", overflow: TextOverflow.fade, softWrap: true) :
       Text(widget.title),

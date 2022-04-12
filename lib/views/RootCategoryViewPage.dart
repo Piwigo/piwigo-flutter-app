@@ -12,6 +12,7 @@ import 'package:piwigo_ng/views/SettingsViewPage.dart';
 
 import 'package:piwigo_ng/views/components/appbars.dart';
 import 'package:piwigo_ng/views/components/dialogs/dialogs.dart';
+import 'package:piwigo_ng/views/components/sidedrawer.dart';
 
 class RootCategoryViewPage extends StatefulWidget {
   static const String routeName = '/categories';
@@ -44,19 +45,20 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
     ThemeData _theme = Theme.of(context);
     return Scaffold(
       resizeToAvoidBottomInset: true,
+      drawer: SideDrawer(view: 'album'),
       body: NestedScrollView(
         controller: _scrollController,
         headerSliverBuilder: (context, innerBoxScrolled) => [
           AppBarExpandable(
             scrollController: _scrollController,
-            leading: IconButton(
+            actions: [IconButton(
               onPressed: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(builder: (context) => SettingsPage()),
                 );
               },
               icon: Icon(Icons.settings, color: _theme.iconTheme.color),
-            ),
+            )],
             title: appStrings(context).tabBar_albums,
           ),
         ],
