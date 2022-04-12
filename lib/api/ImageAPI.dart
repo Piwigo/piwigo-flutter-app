@@ -12,7 +12,7 @@ import 'package:piwigo_ng/views/components/snackbars.dart';
 
 import 'API.dart';
 
-Future<Map<String,dynamic>> fetchImages(String albumID, int page) async {
+Future<Map<String,dynamic>> fetchCategoryImages(String albumID, int page) async {
   Map<String, String> queries = {
     "format":"json",
     "method": "pwg.categories.getImages",

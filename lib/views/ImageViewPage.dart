@@ -67,7 +67,7 @@ class _ImageViewPageState extends State<ImageViewPage> with SingleTickerProvider
 
   Future<void> nextPage() async {
     _imagePage++;
-    var response = await fetchImages(widget.category, _imagePage);
+    var response = await fetchCategoryImages(widget.category, _imagePage);
     if(response['stat'] == 'fail') {
       ScaffoldMessenger.of(context).showSnackBar(
           errorSnackBar(context, response['result'])

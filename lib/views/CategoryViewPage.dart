@@ -55,7 +55,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
 
   void _getData() {
     _albumsFuture = fetchAlbums(widget.category);
-    _imagesFuture = fetchImages(widget.category, 0);
+    _imagesFuture = fetchCategoryImages(widget.category, 0);
   }
 
   @override
@@ -72,7 +72,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
 
   showMore() async {
     _page++;
-    var response = await fetchImages(widget.category, _page);
+    var response = await fetchCategoryImages(widget.category, _page);
     if(response['stat'] == 'fail') {
       ScaffoldMessenger.of(context).showSnackBar(
           errorSnackBar(context, response['result'])
