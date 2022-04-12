@@ -1,5 +1,6 @@
 {
     "tabBar_albums": "Albums",
+    "tabBar_tags": "Tags",
     "tabBar_upload": "Upload",
     "tabBar_preferences": "Settings",
 
@@ -26,6 +27,9 @@
     "uploadRights_title": "Upload Rights Needed",
     "uploadRights_message": "You must have upload rights to be able to upload photos or videos.",
 
+    "sidebar_albums": "Photo Albums",
+    "sidebar_tags": "Tagged Photos",
+    "sidebar_favorites": "Your Favorites",
 
     "internetErrorGeneral_title": "Connection Error",
     "internetErrorGeneral_broken": "Sorry, the communication was broken. Try logging in again.",
