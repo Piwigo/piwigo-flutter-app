@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 import 'package:piwigo_ng/constants/SettingsConstants.dart';
+import 'package:piwigo_ng/routes/RoutePaths.dart';
 import 'package:piwigo_ng/views/PrivacyPolicyViewPage.dart';
 import 'package:piwigo_ng/views/components/buttons.dart';
 
@@ -17,6 +18,7 @@ import 'components/dialogs/error_dialog.dart';
 
 
 class LoginViewPage extends StatefulWidget {
+  static const String routeName = '/login';
   LoginViewPage({Key key}) : super(key: key);
 
   @override
@@ -53,7 +55,7 @@ class _LoginViewPageState extends State<LoginViewPage> {
           await API.storage.read(key: "password"),
         );
         if(message == null) {
-          Navigator.of(context).pushReplacementNamed("/root",
+          Navigator.of(context).pushReplacementNamed(RoutePaths.Categories,
             arguments: true,
           );
           return;
@@ -61,7 +63,7 @@ class _LoginViewPageState extends State<LoginViewPage> {
       } else {
         message = await loginGuest(API.prefs.getString("base_url"));
         if(message == null) {
-          Navigator.of(context).pushReplacementNamed("/root",
+          Navigator.of(context).pushReplacementNamed(RoutePaths.Categories,
             arguments: false,
           );
           return;
@@ -158,7 +160,7 @@ class _LoginViewPageState extends State<LoginViewPage> {
         _isLoading = false;
       });
       if(errorMessage == null) {
-        Navigator.of(context).pushReplacementNamed("/root",
+        Navigator.of(context).pushReplacementNamed(RoutePaths.Categories,
           arguments: false,
         );
         return;
@@ -169,7 +171,7 @@ class _LoginViewPageState extends State<LoginViewPage> {
         _isLoading = false;
       });
       if(errorMessage == null) {
-        Navigator.of(context).pushReplacementNamed("/root",
+        Navigator.of(context).pushReplacementNamed(RoutePaths.Categories,
           arguments: true,
         );
         return;

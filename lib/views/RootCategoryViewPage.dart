@@ -14,6 +14,7 @@ import 'package:piwigo_ng/views/components/appbars.dart';
 import 'package:piwigo_ng/views/components/dialogs/dialogs.dart';
 
 class RootCategoryViewPage extends StatefulWidget {
+  static const String routeName = '/categories';
   final bool isAdmin;
 
   const RootCategoryViewPage({Key key, this.isAdmin = false}) : super(key: key);

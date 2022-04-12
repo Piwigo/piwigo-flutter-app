@@ -14,6 +14,8 @@ import 'package:piwigo_ng/views/components/sliders.dart';
 
 
 class SettingsPage extends StatefulWidget {
+  static const String routeName = '/settings';
+
   @override
   _SettingsPageState createState() => _SettingsPageState();
 }
