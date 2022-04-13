@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 import 'package:piwigo_ng/constants/SettingsConstants.dart';
+import 'package:piwigo_ng/model/PageArguments.dart';
 import 'package:piwigo_ng/routes/RoutePaths.dart';
 import 'package:piwigo_ng/views/PrivacyPolicyViewPage.dart';
 import 'package:piwigo_ng/views/components/buttons.dart';
@@ -56,7 +57,7 @@ class _LoginViewPageState extends State<LoginViewPage> {
         );
         if(message == null) {
           Navigator.of(context).pushReplacementNamed(RoutePaths.Categories,
-            arguments: true,
+            arguments: PageArguments(isAdmin: true),
           );
           return;
         }
@@ -64,7 +65,7 @@ class _LoginViewPageState extends State<LoginViewPage> {
         message = await loginGuest(API.prefs.getString("base_url"));
         if(message == null) {
           Navigator.of(context).pushReplacementNamed(RoutePaths.Categories,
-            arguments: false,
+            arguments: PageArguments(isAdmin: false),
           );
           return;
         }
@@ -161,7 +162,7 @@ class _LoginViewPageState extends State<LoginViewPage> {
       });
       if(errorMessage == null) {
         Navigator.of(context).pushReplacementNamed(RoutePaths.Categories,
-          arguments: false,
+          arguments: PageArguments(isAdmin: false),
         );
         return;
       }
@@ -172,7 +173,7 @@ class _LoginViewPageState extends State<LoginViewPage> {
       });
       if(errorMessage == null) {
         Navigator.of(context).pushReplacementNamed(RoutePaths.Categories,
-          arguments: true,
+          arguments: PageArguments(isAdmin: true),
         );
         return;
       }

@@ -11,19 +11,21 @@ import 'package:piwigo_ng/api/API.dart';
 import 'package:piwigo_ng/api/CategoryAPI.dart';
 import 'package:piwigo_ng/api/ImageAPI.dart';
 import 'package:piwigo_ng/constants/SettingsConstants.dart';
+import 'package:piwigo_ng/model/PageArguments.dart';
+import 'package:piwigo_ng/routes/RoutePaths.dart';
 import 'package:piwigo_ng/services/OrientationService.dart';
 import 'package:piwigo_ng/services/UploadStatusProvider.dart';
 import 'package:piwigo_ng/views/components/list_item.dart';
 import 'package:piwigo_ng/views/components/sidedrawer.dart';
 import 'package:piwigo_ng/views/components/snackbars.dart';
 
-import 'package:piwigo_ng/views/ImageViewPage.dart';
 import 'package:piwigo_ng/views/UploadGalleryViewPage.dart';
 import 'package:piwigo_ng/views/components/dialogs/dialogs.dart';
 import 'package:provider/provider.dart';
 
 
 class CategoryViewPage extends StatefulWidget {
+  static const String routeName = '/category';
   CategoryViewPage({Key key, this.title, this.category, this.isAdmin, this.nbImages}) : super(key: key);
   final bool isAdmin;
   final String title;
@@ -572,13 +574,13 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
                       _selectedItems.remove(image['id']) :
                       _selectedItems.putIfAbsent(image['id'], () => image);
                     }) :
-                    Navigator.of(context).push(
-                      MaterialPageRoute(builder: (context) => ImageViewPage(
+                    Navigator.of(context).pushNamed(RoutePaths.ImageView,
+                      arguments: PageArguments(
                         images: imageList,
                         index: index,
                         isAdmin: widget.isAdmin,
                         category: widget.category,
-                      )),
+                      ),
                     ).whenComplete(() {
                       setState(() {
                         _getData();
