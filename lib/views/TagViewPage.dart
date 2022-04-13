@@ -573,7 +573,7 @@ class _TagViewPageState extends State<TagViewPage> with SingleTickerProviderStat
                         Container(
                           width: double.infinity,
                           height: double.infinity,
-                          child: Image.network(imageList[index]["derivatives"][API.prefs.getString('thumbnail_size')]["url"],
+                          child: Image.network(image["derivatives"][API.prefs.getString('thumbnail_size')]["url"],
                             fit: BoxFit.cover,
                           ),
                         ),
@@ -607,6 +607,10 @@ class _TagViewPageState extends State<TagViewPage> with SingleTickerProviderStat
                               textAlign: TextAlign.center,
                             ),
                           ),
+                        ) : Center(),
+
+                        image["is_favorite"] == 1 ? Icon(
+                            Icons.favorite, color: Colors.red
                         ) : Center(),
                       ],
                     ),

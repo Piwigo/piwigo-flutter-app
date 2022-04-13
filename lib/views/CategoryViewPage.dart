@@ -636,6 +636,12 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
                             ),
                           ),
                         ) : Center(),
+
+                        image["is_favorite"] == 1 ? Positioned(
+                          left: 0,
+                          top: 0,
+                          child: Icon(Icons.favorite, color: Colors.red)
+                        ) : Center(),
                       ],
                     ),
                   ),
