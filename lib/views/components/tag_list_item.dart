@@ -2,9 +2,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:piwigo_ng/constants/SettingsConstants.dart';
+import 'package:piwigo_ng/model/PageArguments.dart';
+import 'package:piwigo_ng/routes/RoutePaths.dart';
 import 'package:piwigo_ng/services/OrientationService.dart';
 import 'package:piwigo_ng/views/CategoryViewPage.dart';
 import 'package:piwigo_ng/api/CategoryAPI.dart';
+import 'package:piwigo_ng/views/TagViewPage.dart';
 
 import 'package:piwigo_ng/views/components/dialogs/dialogs.dart';
 import 'package:piwigo_ng/views/components/snackbars.dart';
@@ -125,17 +128,29 @@ class _TagListItemState extends State<TagListItem> {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        // if(widget.onOpen != null) widget.onOpen();
+        if(widget.onOpen != null) widget.onOpen();
+
+        Navigator.of(context).pushReplacementNamed(RoutePaths.TagContent,
+          arguments: PageArguments(
+            tag: widget.tag['id'].toString(),
+            title: widget.tag['name'],
+            isAdmin: widget.isAdmin,
+          )
+        );
+
         // Navigator.of(context).push(
-        //   MaterialPageRoute(builder: (context) => CategoryViewPage(
-        //     title: widget.album["name"],
-        //     category: widget.album["id"].toString(),
+        //   MaterialPageRoute(builder: (context) => TagViewPage(
+        //     title: widget.tag["name"],
+        //     tag: widget.tag["id"].toString(),
         //     isAdmin: widget.isAdmin,
-        //     nbImages: widget.album["nb_images"],
+        //     // nbImages: widget.tag["nb_images"],
         //   )),
         // ).whenComplete(() {
         //   widget.onClose();
         // });
+
+
+
       },
       child: ClipRRect(
         borderRadius: BorderRadius.circular(10),
