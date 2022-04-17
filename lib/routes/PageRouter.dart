@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:piwigo_ng/model/PageArguments.dart';
 import 'package:piwigo_ng/routes/RoutePaths.dart';
 import 'package:piwigo_ng/views/CategoryViewPage.dart';
+import 'package:piwigo_ng/views/FavoritesViewPage.dart';
 import 'package:piwigo_ng/views/ImageViewPage.dart';
 import 'package:piwigo_ng/views/LoginViewPage.dart';
 import 'package:piwigo_ng/views/RootCategoryViewPage.dart';
@@ -28,10 +29,12 @@ class PageRouter {
               isAdmin: args.isAdmin, tag: args.tag, title: args.title
           )
         );
+      case RoutePaths.Favorites:
+        return MaterialPageRoute(builder: (_) => FavoritesViewPage( isAdmin: args.isAdmin ?? false));
       case RoutePaths.Tags:
-        return MaterialPageRoute(builder: (_) => RootTagViewPage());
+        return MaterialPageRoute(builder: (_) => RootTagViewPage(isAdmin: args.isAdmin ?? false));
       case RoutePaths.Categories:
-        return MaterialPageRoute(builder: (context) => RootCategoryViewPage(isAdmin: args.isAdmin));
+        return MaterialPageRoute(builder: (context) => RootCategoryViewPage(isAdmin: args?.isAdmin ?? false));
       case RoutePaths.Settings:
         return MaterialPageRoute (builder: (context) => SettingsPage());
       case RoutePaths.Login:
