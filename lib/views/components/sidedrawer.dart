@@ -1,20 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:piwigo_ng/constants/SettingsConstants.dart';
+import 'package:piwigo_ng/model/PageArguments.dart';
 import 'package:piwigo_ng/routes/RoutePaths.dart';
-import 'package:piwigo_ng/views/RootCategoryViewPage.dart';
-import 'package:piwigo_ng/views/RootTagViewPage.dart';
 
 class SideDrawer extends StatefulWidget {
   const SideDrawer({
-    Key key, this.leading, this.title = '', this.actions, this.scrollController,
-    this.view
+    Key key, this.leading, this.title = '', this.scrollController,
+    this.view, this.isAdmin
   }) : super(key: key);
 
   final ScrollController scrollController;
   final Widget leading;
   final String title;
   final String view;
-  final List<Widget> actions;
+  final bool isAdmin;
 
   @override
   _SideDrawerState createState() => _SideDrawerState();
@@ -75,7 +74,11 @@ class _SideDrawerState extends State<SideDrawer> {
             leading: Icon(Icons.photo_album, color: _theme.iconTheme.color),
             selected: widget.view == 'album',
             onTap: () {
-              Navigator.of(context).pushReplacementNamed(RoutePaths.Categories);
+              Navigator.of(context).pushReplacementNamed(RoutePaths.Categories,
+                arguments: PageArguments(
+                  isAdmin: widget.isAdmin,
+                ),
+              );
               // Navigator.of(context).pushReplacement(
               //     MaterialPageRoute(builder: (context) => RootCategoryViewPage())
               // );
@@ -86,7 +89,11 @@ class _SideDrawerState extends State<SideDrawer> {
             leading: Icon(Icons.collections_bookmark, color: _theme.iconTheme.color),
             selected: widget.view == 'tag',
             onTap: () {
-              Navigator.of(context).pushReplacementNamed(RoutePaths.Tags);
+              Navigator.of(context).pushReplacementNamed(RoutePaths.Tags,
+                arguments: PageArguments(
+                  isAdmin: widget.isAdmin,
+                ),
+              );
               // Navigator.of(context).pushReplacement(
               //   MaterialPageRoute(builder: (context) => RootTagViewPage())
               // );
@@ -99,6 +106,11 @@ class _SideDrawerState extends State<SideDrawer> {
             leading: Icon(Icons.favorite , color: _theme.iconTheme.color),
             selected: widget.view == 'favorite',
             onTap: () {
+              Navigator.of(context).pushReplacementNamed(RoutePaths.Favorites,
+                arguments: PageArguments(
+                  isAdmin: widget.isAdmin,
+                ),
+              );
               // Update the state of the app.
               // ...
             },
