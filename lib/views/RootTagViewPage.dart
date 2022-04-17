@@ -45,7 +45,7 @@ class _RootTagViewPageState extends State<RootTagViewPage> with SingleTickerProv
     ThemeData _theme = Theme.of(context);
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      drawer: SideDrawer(view: 'tag'),
+      drawer: SideDrawer(view: 'tag', isAdmin: widget.isAdmin),
       body: NestedScrollView(
         controller: _scrollController,
         headerSliverBuilder: (context, innerBoxScrolled) => [
