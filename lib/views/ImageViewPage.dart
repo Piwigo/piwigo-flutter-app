@@ -16,12 +16,13 @@ class ImageViewPage extends StatefulWidget {
   static const String routeName = '/images';
   ImageViewPage({
     Key key, this.images, this.index = 0, this.isAdmin = false, this.category = "0",
-    this.tag = "0", this.title = "Album", this.page = 0
+    this.tag = "0", this.title = "Album", this.favorites = false, this.page = 0
   }) : super(key: key);
 
   final int index;
   final List<dynamic> images;
   final bool isAdmin;
+  final bool favorites;
   final String category;
   final String title;
   final String tag;
@@ -73,7 +74,9 @@ class _ImageViewPageState extends State<ImageViewPage> with SingleTickerProvider
   Future<void> nextPage() async {
     _imagePage++;
     var response;
-    if (widget.tag != null && widget.tag != "0") {
+    if (widget.favorites) {
+      response = await fetchFavoriteImages(_imagePage);
+    } else if (widget.tag != null && widget.tag != "0") {
       response = await fetchTagImages(widget.tag, _imagePage);
     } else {
       response = await fetchCategoryImages(widget.category, _imagePage);

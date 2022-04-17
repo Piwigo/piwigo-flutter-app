@@ -18,7 +18,7 @@ class PageRouter {
       case RoutePaths.ImageView:
         return MaterialPageRoute(builder: (_) => ImageViewPage(
             images: args.images, index: args.index, isAdmin: args.isAdmin,
-            category: args.category, tag: args.tag,
+            category: args.category, tag: args.tag, favorites: args.isFavorites
           )
         );
       case RoutePaths.CategoryContent:

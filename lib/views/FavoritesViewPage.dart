@@ -553,6 +553,7 @@ class _FavoritesViewPageState extends State<FavoritesViewPage> with SingleTicker
                         images: imageList,
                         index: index,
                         isAdmin: widget.isAdmin,
+                        isFavorites: true
                         // tag: widget.tag,
                       ),
                     ).whenComplete(() {
