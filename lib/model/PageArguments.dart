@@ -6,6 +6,6 @@ class PageArguments {
   final int index;
   final List<dynamic> images;
   PageArguments({
-    this.isAdmin, this.tag, this.category, this.title, this.index, this.images
+    this.isAdmin = false, this.tag, this.category, this.title, this.index, this.images
   });
 }
