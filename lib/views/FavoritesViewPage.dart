@@ -278,7 +278,7 @@ class _FavoritesViewPageState extends State<FavoritesViewPage> with SingleTicker
     return Scaffold(
       resizeToAvoidBottomInset: true,
       extendBody: true,
-      drawer: SideDrawer(view: 'favorite'),
+      drawer: SideDrawer(view: 'favorite', isLoggedIn: widget.isAdmin),
       body: createListeners(
         NestedScrollView(
           controller: _controller,

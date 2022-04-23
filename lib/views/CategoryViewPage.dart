@@ -282,7 +282,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
     return Scaffold(
       resizeToAvoidBottomInset: true,
       extendBody: true,
-      drawer: SideDrawer(view: 'album', isAdmin: widget.isAdmin),
+      drawer: SideDrawer(view: 'album', isAdmin: widget.isAdmin, isLoggedIn: widget.isAdmin),
       body: createListeners(
         NestedScrollView(
           controller: _controller,
