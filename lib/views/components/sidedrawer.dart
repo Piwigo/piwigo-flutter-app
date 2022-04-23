@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:piwigo_ng/api/API.dart';
 import 'package:piwigo_ng/constants/SettingsConstants.dart';
 import 'package:piwigo_ng/model/PageArguments.dart';
 import 'package:piwigo_ng/routes/RoutePaths.dart';
@@ -60,15 +61,20 @@ class _SideDrawerState extends State<SideDrawer> {
       // Add a ListView to the drawer. This ensures the user can scroll
       // through the options in the drawer if there isn't enough vertical
       // space to fit everything.
-      child: ListView(
+      child: Column(
         // Important: Remove any padding from the ListView.
-        padding: EdgeInsets.zero,
-        children: [
-          DrawerHeader(
-            decoration: BoxDecoration(
-              color: Colors.blue,
-            ),
-            child: Text(widget.view),
+        // padding: EdgeInsets.zero,
+        mainAxisSize: MainAxisSize.max,
+        children: <Widget>[
+          // DrawerHeader(
+          //   decoration: BoxDecoration(
+          //     color: Colors.blue,
+          //   ),
+          //   child: Text(widget.view),
+          // ),
+          Padding(
+            padding: EdgeInsets.fromLTRB(50, 50, 50, 10),
+            child: Image.asset('assets/logo/piwigo_logo.png'),
           ),
           ListTile(
             title: Text(appStrings(context).tabBar_albums),
@@ -80,9 +86,6 @@ class _SideDrawerState extends State<SideDrawer> {
                   isAdmin: widget.isAdmin,
                 ),
               );
-              // Navigator.of(context).pushReplacement(
-              //     MaterialPageRoute(builder: (context) => RootCategoryViewPage())
-              // );
             },
           ),
           ListTile(
@@ -95,11 +98,6 @@ class _SideDrawerState extends State<SideDrawer> {
                   isAdmin: widget.isAdmin,
                 ),
               );
-              // Navigator.of(context).pushReplacement(
-              //   MaterialPageRoute(builder: (context) => RootTagViewPage())
-              // );
-              // Update the state of the app.
-              // ...
             },
           ),
           (widget.isLoggedIn != null && widget.isLoggedIn) ? ListTile(
@@ -112,10 +110,21 @@ class _SideDrawerState extends State<SideDrawer> {
                   isAdmin: widget.isAdmin,
                 ),
               );
-              // Update the state of the app.
-              // ...
             },
           ) : Container(),
+          Expanded(
+            child: Align(
+              alignment: Alignment.bottomCenter,
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(0, 0, 0, 10),
+                child: Text(appStrings(context).settingsHeader_server(API.prefs.getString('version')),
+                  style: Theme.of(context).textTheme.caption.merge(TextStyle(fontStyle: FontStyle.italic)),
+                  overflow: TextOverflow.fade,
+                  textAlign: TextAlign.left,
+                )
+              ),
+            ),
+          ),
         ],
       ),
     );
