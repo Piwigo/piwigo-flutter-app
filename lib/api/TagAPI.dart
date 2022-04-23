@@ -81,3 +81,28 @@ Future<dynamic> createTag(String tagName) async {
     };
   }
 }
+
+Future<dynamic> editTag(int tagId, String tagName) async {
+  Map<String, String> queries = {
+    "format": "json",
+    "method": "pwg.tags.rename",
+  };
+  FormData formData = FormData.fromMap({
+    "tag_id": tagId,
+    "new_name": tagName,
+  });
+  try {
+    Response response = await API().dio.post(
+        'ws.php',
+        data: formData,
+        queryParameters: queries
+    );
+
+    if (response.statusCode == 200) {
+      return json.decode(response.data);
+    }
+  } catch (e) {
+    print('Rename tag error $e');
+    return e;
+  }
+}
