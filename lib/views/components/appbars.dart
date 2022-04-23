@@ -52,7 +52,7 @@ class _AppBarExpandableState extends State<AppBarExpandable> {
       pinned: true,
       expandedHeight: 120,
       backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
-      leading: widget.leading ?? SizedBox(),
+      // leading: widget.leading ?? SizedBox(),
       actions: widget.actions ?? [],
       flexibleSpace: FlexibleSpaceBar(
         title: Text(widget.title),
