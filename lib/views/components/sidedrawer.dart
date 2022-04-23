@@ -70,7 +70,7 @@ class _SideDrawerState extends State<SideDrawer> {
             child: Text(widget.view),
           ),
           ListTile(
-            title: Text(appStrings(context).sidebar_albums),
+            title: Text(appStrings(context).tabBar_albums),
             leading: Icon(Icons.photo_album, color: _theme.iconTheme.color),
             selected: widget.view == 'album',
             onTap: () {
@@ -85,7 +85,7 @@ class _SideDrawerState extends State<SideDrawer> {
             },
           ),
           ListTile(
-            title: Text(appStrings(context).sidebar_tags),
+            title: Text(appStrings(context).tabBar_tags),
             leading: Icon(Icons.collections_bookmark, color: _theme.iconTheme.color),
             selected: widget.view == 'tag',
             onTap: () {
