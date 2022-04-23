@@ -6,7 +6,7 @@ import 'package:piwigo_ng/routes/RoutePaths.dart';
 class SideDrawer extends StatefulWidget {
   const SideDrawer({
     Key key, this.leading, this.title = '', this.scrollController,
-    this.view, this.isAdmin
+    this.view, this.isAdmin, this.isLoggedIn
   }) : super(key: key);
 
   final ScrollController scrollController;
@@ -14,6 +14,7 @@ class SideDrawer extends StatefulWidget {
   final String title;
   final String view;
   final bool isAdmin;
+  final bool isLoggedIn;
 
   @override
   _SideDrawerState createState() => _SideDrawerState();
@@ -101,8 +102,8 @@ class _SideDrawerState extends State<SideDrawer> {
               // ...
             },
           ),
-          ListTile(
-            title: Text(appStrings(context).sidebar_favorites),
+          (widget.isLoggedIn != null && widget.isLoggedIn) ? ListTile(
+            title: Text(appStrings(context).categoryDiscoverFavorites_title),
             leading: Icon(Icons.favorite , color: _theme.iconTheme.color),
             selected: widget.view == 'favorite',
             onTap: () {
@@ -114,7 +115,7 @@ class _SideDrawerState extends State<SideDrawer> {
               // Update the state of the app.
               // ...
             },
-          ),
+          ) : Container(),
         ],
       ),
     );
