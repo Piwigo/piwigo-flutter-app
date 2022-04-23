@@ -40,7 +40,6 @@ class PageRouter {
       case RoutePaths.Login:
       default:
         return MaterialPageRoute (builder: (context) => LoginViewPage());
-      //   return MaterialPageRoute(builder: (context) => Container());
     }
   }
 }
