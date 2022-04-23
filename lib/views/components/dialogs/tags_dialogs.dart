@@ -478,3 +478,127 @@ class _TagItemState extends State<TagItem> with SingleTickerProviderStateMixin {
     );
   }
 }
+
+class EditTagDialog extends StatefulWidget {
+  final int tagId;
+  final String tagName;
+
+  const EditTagDialog({Key key, this.tagId, this.tagName}) : super(key: key);
+
+  @override
+  _EditTagDialogState createState() => _EditTagDialogState();
+}
+class _EditTagDialogState extends State<EditTagDialog> {
+  final _formKey = GlobalKey<FormState>();
+  TextEditingController _editTagNameController;
+  bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _editTagNameController = TextEditingController(text: widget.tagName);
+
+    _editTagNameController.addListener(() {
+      setState(() {});
+    });
+  }
+
+  bool _isNameEmpty() {
+    return _editTagNameController.text.toString() == ''
+        || _editTagNameController.text == null;
+  }
+
+  void onEditAlbum() async {
+    if (_isNameEmpty()) return null;
+    if (_formKey.currentState.validate()) {
+      _formKey.currentState.save();
+      setState(() {
+        _isLoading = true;
+      });
+      try {
+        var result = await editTag(
+            widget.tagId,
+            _editTagNameController.text
+        );
+
+        if(result['stat'] == 'fail') {
+          setState(() {
+            _isLoading = false;
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+              errorSnackBar(context, result['result'])
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+              albumEditedSnackBar(context)
+          );
+          _editTagNameController.text = "";
+          Navigator.of(context).pop();
+        }
+      } catch (e) {
+        setState(() {
+          _isLoading = false;
+        });
+        print(e);
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return PiwigoDialog(
+      title: appStrings(context).renameCategory_title,
+      content: Form(
+        key: _formKey,
+        child: Column(
+          children: <Widget>[
+            Center(
+              child: Text(appStrings(context).renameCategory_message,
+                style: Theme.of(context).textTheme.subtitle1,
+              ),
+            ),
+            SizedBox(height: 10),
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                color: Theme.of(context).inputDecorationTheme.fillColor,
+              ),
+              child: Column(
+                children: [
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 10),
+                    child: TextField(
+                      maxLines: 1,
+                      controller: _editTagNameController,
+                      style: Theme.of(context).inputDecorationTheme.labelStyle,
+                      textAlignVertical: TextAlignVertical.top,
+                      decoration: InputDecoration(
+                        contentPadding: EdgeInsets.zero,
+                        border: InputBorder.none,
+                        hintText: appStrings(context).createNewAlbum_placeholder,
+                        hintStyle: Theme.of(context).inputDecorationTheme.hintStyle,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(height: 10),
+            DialogButton(
+              child: _isLoading?
+              CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white)
+              ) : Text(appStrings(context).categoryCellOption_rename,
+                  style: TextStyle(fontSize: 16, color: Colors.white)
+              ),
+              style: _isNameEmpty() ?
+              dialogButtonStyleDisabled(context) :
+              dialogButtonStyle(context),
+              onPressed: onEditAlbum,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
