@@ -56,8 +56,11 @@ class _LoginViewPageState extends State<LoginViewPage> {
           await API.storage.read(key: "password"),
         );
         if(message == null) {
+
+          // TODO: Check if logged in user is an admin
+
           Navigator.of(context).pushReplacementNamed(RoutePaths.Categories,
-            arguments: PageArguments(isAdmin: true),
+            arguments: PageArguments(isAdmin: true, isLoggedIn: true),
           );
           return;
         }
@@ -65,7 +68,7 @@ class _LoginViewPageState extends State<LoginViewPage> {
         message = await loginGuest(API.prefs.getString("base_url"));
         if(message == null) {
           Navigator.of(context).pushReplacementNamed(RoutePaths.Categories,
-            arguments: PageArguments(isAdmin: false),
+            arguments: PageArguments(isAdmin: false, isLoggedIn: false),
           );
           return;
         }
@@ -162,7 +165,7 @@ class _LoginViewPageState extends State<LoginViewPage> {
       });
       if(errorMessage == null) {
         Navigator.of(context).pushReplacementNamed(RoutePaths.Categories,
-          arguments: PageArguments(isAdmin: false),
+          arguments: PageArguments(isAdmin: false, isLoggedIn: false),
         );
         return;
       }
@@ -173,7 +176,7 @@ class _LoginViewPageState extends State<LoginViewPage> {
       });
       if(errorMessage == null) {
         Navigator.of(context).pushReplacementNamed(RoutePaths.Categories,
-          arguments: PageArguments(isAdmin: true),
+          arguments: PageArguments(isAdmin: true, isLoggedIn: true),
         );
         return;
       }
