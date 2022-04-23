@@ -23,14 +23,12 @@ class RootTagViewPage extends StatefulWidget {
   _RootTagViewPageState createState() => _RootTagViewPageState();
 }
 class _RootTagViewPageState extends State<RootTagViewPage> with SingleTickerProviderStateMixin {
-  String _rootCategory;
   TextEditingController _searchController = TextEditingController();
   ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
-    _rootCategory = "0";
     WidgetsBinding.instance.addPostFrameCallback((_) {
       API.uploader = Uploader(context);
     });
@@ -45,7 +43,7 @@ class _RootTagViewPageState extends State<RootTagViewPage> with SingleTickerProv
     ThemeData _theme = Theme.of(context);
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      drawer: SideDrawer(view: 'tag', isAdmin: widget.isAdmin),
+      drawer: SideDrawer(view: 'tag', isAdmin: widget.isAdmin, isLoggedIn: widget.isAdmin),
       body: NestedScrollView(
         controller: _scrollController,
         headerSliverBuilder: (context, innerBoxScrolled) => [
@@ -77,7 +75,7 @@ class _RootTagViewPageState extends State<RootTagViewPage> with SingleTickerProv
                     ); //appStrings(context).categoryMainEmtpy
                   }
                   var tags = albumSnapshot.data['result']['tags'];
-                  int nbPhotos = 0;
+                  // int nbPhotos = 0;
                   // albums.forEach((cat) => nbPhotos+=cat["total_nb_images"]);
                   // albums.removeWhere((category) => (
                   //     category["id"].toString() == _rootCategory
@@ -97,12 +95,6 @@ class _RootTagViewPageState extends State<RootTagViewPage> with SingleTickerProv
                       child: Column(
                         children: [
                           _tagGrid(tags),
-                          Center(
-                            child: Container(
-                              padding: EdgeInsets.all(10),
-                              child: Text(appStrings(context).imageCount(nbPhotos), style: TextStyle(fontSize: 20, color: _theme.textTheme.bodyText2.color, fontWeight: FontWeight.w300)),
-                            ),
-                          ),
                         ],
                       ),
                     ),
@@ -143,7 +135,7 @@ class _RootTagViewPageState extends State<RootTagViewPage> with SingleTickerProv
         crossAxisCount: albumCrossAxisCount,
         mainAxisSpacing: 10,
         crossAxisSpacing: 10,
-        childAspectRatio: albumGridAspectRatio(context),
+        childAspectRatio: 5,
       ),
       padding: EdgeInsets.all(10),
       itemCount: tags.length,

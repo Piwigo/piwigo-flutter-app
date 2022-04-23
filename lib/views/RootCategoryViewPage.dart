@@ -45,7 +45,7 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
     ThemeData _theme = Theme.of(context);
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      drawer: SideDrawer(view: 'album', isAdmin: widget.isAdmin),
+      drawer: SideDrawer(view: 'album', isAdmin: widget.isAdmin, isLoggedIn: widget.isAdmin),
       body: NestedScrollView(
         controller: _scrollController,
         headerSliverBuilder: (context, innerBoxScrolled) => [
