@@ -10,6 +10,7 @@ import 'package:piwigo_ng/api/CategoryAPI.dart';
 import 'package:piwigo_ng/views/TagViewPage.dart';
 
 import 'package:piwigo_ng/views/components/dialogs/dialogs.dart';
+import 'package:piwigo_ng/views/components/dialogs/tags_dialogs.dart';
 import 'package:piwigo_ng/views/components/snackbars.dart';
 import 'package:piwigo_ng/views/components/custom_shapes.dart';
 
@@ -23,7 +24,9 @@ import 'package:piwigo_ng/views/components/custom_shapes.dart';
 // }
 
 class TagListItem extends StatefulWidget {
-  const TagListItem(this.tag, {Key key, this.isAdmin = false, this.onClose, this.onOpen}) : super(key: key);
+  const TagListItem(this.tag, {Key key,
+    this.isAdmin = false, this.onClose, this.onOpen
+  }) : super(key: key);
 
   final dynamic tag;
   final bool isAdmin;
@@ -35,20 +38,18 @@ class TagListItem extends StatefulWidget {
 }
 class _TagListItemState extends State<TagListItem> {
 
-  void _onEditAlbum() async {
-    // showDialog(
-    //     context: context,
-    //     builder: (BuildContext context) {
-    //       return EditCategoryDialog(
-    //           catId: widget.album['id'],
-    //           catName: widget.album['name'],
-    //           catDesc: widget.album['comment'],
-    //           privacy: widget.album['status'] == 'private' ? true : false
-    //       );
-    //     }
-    // ).whenComplete(() {
-    //   widget.onClose();
-    // });
+  void _onRenameTag() async {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return EditTagDialog(
+              tagId: widget.tag['id'],
+              tagName: widget.tag['name']
+          );
+        }
+    ).whenComplete(() {
+      widget.onClose();
+    });
   }
   void _onMoveAlbum() async {
     // showDialog(
@@ -84,7 +85,7 @@ class _TagListItemState extends State<TagListItem> {
     // });
     // widget.onClose();
   }
-  void _onDeleteAlbum() async {
+  void _onDeleteTag() async {
     // if(widget.album["total_nb_images"] > 0) {
     //   int choice = await confirmDeleteAlbumWithImagesDialog(context,
     //     content: appStrings(context).deleteCategory_message(widget.album["total_nb_images"], widget.album["name"]),
@@ -130,7 +131,7 @@ class _TagListItemState extends State<TagListItem> {
       onTap: () {
         if(widget.onOpen != null) widget.onOpen();
 
-        Navigator.of(context).pushReplacementNamed(RoutePaths.TagContent,
+        Navigator.of(context).pushNamed(RoutePaths.TagContent,
           arguments: PageArguments(
             tag: widget.tag['id'].toString(),
             title: widget.tag['name'],
@@ -163,7 +164,7 @@ class _TagListItemState extends State<TagListItem> {
               CustomSlidableAction(
                 backgroundColor: Theme.of(context).colorScheme.primary,
                 onPressed: (_) {
-                  _onEditAlbum();
+                  _onRenameTag();
                 },
                 child: Center(
                   child: Icon(Icons.edit, size: 38, color: Colors.white),
@@ -185,7 +186,7 @@ class _TagListItemState extends State<TagListItem> {
                 ),
                 autoClose: true,
                 onPressed: (_) {
-                  _onDeleteAlbum();
+                  _onDeleteTag();
                 },
               ),
             ],
@@ -207,10 +208,10 @@ class TagListCard extends StatelessWidget {
     return Row(
       children: [
         // albumThumbnail(context, tag),
-        albumItemSeparator(context),
+        // albumItemSeparator(context),
         tagInfo(context, tag),
         Container(
-          height: albumGridItemHeight(context),
+          height: 80,
           decoration: BoxDecoration(
             color: Theme.of(context).backgroundColor,
             borderRadius: BorderRadius.only(
@@ -221,7 +222,7 @@ class TagListCard extends StatelessWidget {
           child: isAdmin? Center(
             child: Container(
               width: 10,
-              height: 60,
+              height: 50,
               decoration: BoxDecoration(
                 border: Border.all(width: 1, color: Theme.of(context).iconTheme.color),
                 borderRadius: BorderRadius.only(
@@ -246,13 +247,14 @@ class TagListCard extends StatelessWidget {
           color: Theme.of(context).backgroundColor,
         ),
         padding: EdgeInsets.all(5),
-        height: albumGridItemHeight(context),
+        height: 80,
         child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text('${tag["name"]}',
-                  style: Theme.of(context).textTheme.headline6,
-                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.headline4,
+                  textAlign: TextAlign.left,
                   overflow: TextOverflow.ellipsis,
                   softWrap: false,
                   maxLines: 1
@@ -268,9 +270,10 @@ class TagListCard extends StatelessWidget {
                   // ),
                   Container(
                     padding: EdgeInsets.all(5),
-                    child: Text(tag["counter"].toString(),
+                    child: Text(appStrings(context).imageCount(tag["counter"]),
                       style: Theme.of(context).textTheme.bodyText2,
                       overflow: TextOverflow.fade,
+                      textAlign: TextAlign.left,
                     ),
                   ),
                 ],
@@ -307,15 +310,15 @@ class TagListCard extends StatelessWidget {
   //     );
   //   });
   // }
-  Widget albumItemSeparator(BuildContext context) {
-    return Container(
-      decoration: ShapeDecoration(
-        shape: AlbumCardSeparatorShape(radius: 7),
-        color: Theme.of(context).backgroundColor,
-      ),
-      width: 14,
-      height: albumGridItemHeight(context),
-    );
-  }
+  // Widget albumItemSeparator(BuildContext context) {
+  //   return Container(
+  //     decoration: ShapeDecoration(
+  //       shape: AlbumCardSeparatorShape(radius: 7),
+  //       color: Theme.of(context).backgroundColor,
+  //     ),
+  //     width: 14,
+  //     height: 80,
+  //   );
+  // }
 }
 
