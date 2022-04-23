@@ -313,8 +313,7 @@ class _FavoritesViewPageState extends State<FavoritesViewPage> with SingleTicker
       // ),
       title: _isEditMode ?
       Text("${_selectedPhotos()}", overflow: TextOverflow.fade, softWrap: true) :
-      Text("Your Favorites"),
-      // Text(appStrings(context).categoryImageList_noDataError),
+      Text(appStrings(context).categoryDiscoverFavorites_title),
       actions: [
         _isEditMode ? IconButton(
           onPressed: _onSelectAll,
