@@ -115,16 +115,28 @@ class _SideDrawerState extends State<SideDrawer> {
           Expanded(
             child: Align(
               alignment: Alignment.bottomCenter,
-              child: Padding(
-                padding: EdgeInsets.fromLTRB(0, 0, 0, 10),
-                child: Text(appStrings(context).settingsHeader_server(API.prefs.getString('version')),
-                  style: Theme.of(context).textTheme.caption.merge(TextStyle(fontStyle: FontStyle.italic)),
-                  overflow: TextOverflow.fade,
-                  textAlign: TextAlign.left,
-                )
+              child: ListTile(
+                title: Text(appStrings(context).settingsHeader_general),
+                leading: Icon(Icons.settings, color: _theme.iconTheme.color),
+                onTap: () {
+                  Navigator.of(context).pushNamed(RoutePaths.Settings);
+                },
               ),
             ),
           ),
+          Padding(
+            padding: EdgeInsets.fromLTRB(0, 0, 0, 10),
+            child: Text(appStrings(context).settingsHeader_server(API.prefs.getString('version')),
+              style: Theme.of(context).textTheme.caption.merge(TextStyle(fontStyle: FontStyle.italic)),
+              overflow: TextOverflow.fade,
+              textAlign: TextAlign.left,
+            )
+          ),
+
+
+
+
+
         ],
       ),
     );
