@@ -10,7 +10,7 @@ If you face trouble please [create tickets](https://github.com/Piwigo/piwigo-flu
 
 # Installation
 
-For now, this application is in Beta. You can download the latest version either from Github or from Google Play Store:
+You can download the latest version either from Github or from Google Play Store:
 
 ## Download from Play Store
 
@@ -87,7 +87,7 @@ With Piwigo NG, you can upload images from the phone.
 
 # Flutter
 
-This application is made with [Google's Flutter](https://flutter.dev/?gclid=Cj0KCQjwvYSEBhDjARIsAJMn0lj-G1Ly0oznQeMGvyTYBY2TZfxFpkb9WYp4dsyMSwKIUsmTwE-SltIaAsjFEALw_wcB&gclsrc=aw.ds)
+This application is made with [Flutter](https://flutter.dev/?gclid=Cj0KCQjwvYSEBhDjARIsAJMn0lj-G1Ly0oznQeMGvyTYBY2TZfxFpkb9WYp4dsyMSwKIUsmTwE-SltIaAsjFEALw_wcB&gclsrc=aw.ds)
 
 A UI toolkit for building beautiful, natively compiled applications for [mobile](https://flutter.dev/docs), [web](https://flutter.dev/web), and [desktop](https://flutter.dev/desktop) from a single codebase.
 
