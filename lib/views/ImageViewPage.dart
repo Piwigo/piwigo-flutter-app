@@ -6,7 +6,7 @@ import 'package:piwigo_ng/api/API.dart';
 import 'package:piwigo_ng/api/ImageAPI.dart';
 import 'package:piwigo_ng/constants/SettingsConstants.dart';
 import 'package:piwigo_ng/views/components/snackbars.dart';
-import 'package:path/path.dart' as Path;
+import 'package:mime_type/mime_type.dart';
 
 import 'package:piwigo_ng/views/VideoPlayerViewPage.dart';
 import 'package:piwigo_ng/views/components/dialogs/dialogs.dart';
@@ -294,7 +294,8 @@ class _ImageViewPageState extends State<ImageViewPage> with SingleTickerProvider
             },
             itemBuilder: (context, index) {
               var image = _images[index];
-              if(Path.extension(image['element_url']) == '.mp4') {
+              String mimeType = mime(image['element_url']);
+              if(mimeType.startsWith('video')) {
                 return _displayVideo(image);
               }
               return _displayImage(image);

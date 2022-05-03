@@ -57,6 +57,7 @@ dependencies:
   cached_network_image: ^3.0.0
   better_player: ^0.0.79
   wakelock: ^0.5.6
+  mime_type: ^1.0.0
 
 dev_dependencies:
   flutter_test:
