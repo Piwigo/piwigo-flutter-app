@@ -163,6 +163,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 Text(appStrings(context).settings_displayTitles, style: TextStyle(color: Colors.black, fontSize: 16)),
                 Switch(
                   value: API.prefs.getBool('show_thumbnail_title'),
+                  activeColor: Theme.of(context).colorScheme.primary,
                   onChanged: (bool) {
                     setState(() {
                       API.prefs.setBool('show_thumbnail_title', bool);
@@ -252,6 +253,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 Text(appStrings(context).settings_stripGPSdata, style: TextStyle(color: Colors.black, fontSize: 16)),
                 Switch(
                   value: API.prefs.getBool('remove_metadata'),
+                  activeColor: Theme.of(context).colorScheme.primary,
                   onChanged: (bool) {
                     setState(() {
                       API.prefs.setBool('remove_metadata', bool);
