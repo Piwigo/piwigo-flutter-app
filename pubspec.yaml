@@ -32,6 +32,7 @@ dependencies:
   ext_storage: ^1.0.3 # Deprecated
   external_path: ^1.0.1
   flutter_local_notifications: ^9.1.2
+  flutter_image_compress: ^1.1.0
 
   # File pickers :
   image_picker: ^0.8.4+4
