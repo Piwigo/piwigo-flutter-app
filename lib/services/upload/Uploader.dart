@@ -66,8 +66,12 @@ class Uploader {
       for(var element in photos) {
         uploadStatusProvider.status = true;
 
-
-        XFile photo = await testCompressAndGetFile(element);
+        XFile photo;
+        if (API.prefs.getBool("remove_metadata")) {
+          photo = await testCompressAndGetFile(element);
+        } else {
+          photo = element;
+        }
 
         Response response = await uploadChunk(context, photo, category, info,
             (progress) {
