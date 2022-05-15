@@ -1,22 +1,16 @@
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:image_picker/image_picker.dart';
-import 'dart:async';
 
-import 'package:piwigo_ng/api/API.dart';
-import 'package:piwigo_ng/api/CategoryAPI.dart';
 import 'package:piwigo_ng/api/ImageAPI.dart';
 import 'package:piwigo_ng/constants/SettingsConstants.dart';
-import 'package:piwigo_ng/services/OrientationService.dart';
 import 'package:piwigo_ng/services/UploadStatusProvider.dart';
-import 'package:piwigo_ng/views/components/list_item.dart';
+import 'package:piwigo_ng/views/components/content_grid.dart';
 import 'package:piwigo_ng/views/components/snackbars.dart';
 
-import 'package:piwigo_ng/views/ImageViewPage.dart';
 import 'package:piwigo_ng/views/UploadGalleryViewPage.dart';
 import 'package:piwigo_ng/views/components/dialogs/dialogs.dart';
 import 'package:provider/provider.dart';
@@ -33,59 +27,32 @@ class CategoryViewPage extends StatefulWidget {
   _CategoryViewPageState createState() => _CategoryViewPageState();
 }
 class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerProviderStateMixin {
-  Future<Map<String,dynamic>> _albumsFuture;
-  Future<Map<String,dynamic>> _imagesFuture;
+  GlobalKey _key = GlobalKey();
 
   bool _isEditMode;
-  int _page;
-  int _nbImages;
   Map<int, dynamic> _selectedItems = Map();
   ScrollController _controller = ScrollController();
-  List<dynamic> imageList = [];
-
 
   @override
   void initState() {
-    _getData();
     super.initState();
-    _page = 0;
-    _nbImages = widget.nbImages;
     _isEditMode = false;
   }
 
   void _getData() {
-    _albumsFuture = fetchAlbums(widget.category);
-    _imagesFuture = fetchImages(widget.category, 0);
+    final ContentGridState contentGridState = _key.currentState;
+    contentGridState.reloadData();
   }
 
   @override
   void dispose() {
     super.dispose();
   }
-
-  bool _isSelected(int id) {
-    return _selectedItems.keys.contains(id);
-  }
+  
   int _selectedPhotos() {
     return _selectedItems.length;
   }
 
-  showMore() async {
-    _page++;
-    var response = await fetchImages(widget.category, _page);
-    if(response['stat'] == 'fail') {
-      ScaffoldMessenger.of(context).showSnackBar(
-          errorSnackBar(context, response['result'])
-      );
-    } else {
-      var newListPage = response['result']['images'];
-      imageList.addAll(newListPage);
-    }
-    setState(() {
-      print('Fetch images of page $_page');
-      _getData();
-    });
-  }
   openEditMode() {
     setState(() {
       _isEditMode = true;
@@ -96,14 +63,6 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
       _isEditMode = false;
     });
     _selectedItems.clear();
-  }
-
-  Future<void> _onRefresh() {
-    setState(() {
-      _page = 0;
-      _getData();
-    });
-    return Future.delayed(Duration(milliseconds: 500));
   }
 
   void _onEditSelection() async {
@@ -174,8 +133,8 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
           setState(() {
             _selectedItems.clear();
             _isEditMode = false;
-            _getData();
           });
+          _getData();
         });
         break;
       case 1: showDialog(context: context,
@@ -204,8 +163,8 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
           setState(() {
             _selectedItems.clear();
             _isEditMode = false;
-            _getData();
           });
+          _getData();
         });
         break;
       default: break;
@@ -238,40 +197,21 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
         content: Text(appStrings(context).deleteImageSuccess_message(nbSuccess)),
       ));
 
-      setState(() {
-        _getData();
-      });
+      _getData();
     }
   }
 
   void _onSelectAll() {
+    final ContentGridState contentGridState = _key.currentState;
     setState(() {
-      if(_selectedItems.length == imageList.length) {
+      if(_selectedItems.length == contentGridState.imageList.length) {
         _selectedItems.clear();
       } else {
-        imageList.forEach((image) {
+        contentGridState.imageList.forEach((image) {
           _selectedItems.putIfAbsent(image['id'], () => image);
         });
       }
     });
-  }
-
-
-  handleAlbumSnapshot(AsyncSnapshot albumSnapshot, int nbImages) {
-    var albums = albumSnapshot.data['result']['categories'];
-    int nbImages = _nbImages;
-    if(albums.length > 0 && albums[0]["id"].toString() == widget.category) {
-      nbImages = albums[0]["total_nb_images"];
-      _nbImages = nbImages;
-    }
-    albums.removeWhere((category) =>
-    (category["id"].toString() == widget.category)
-    );
-    return albums;
-  }
-  handleImagesSnapshot(AsyncSnapshot imagesSnapshot) {
-    imageList.clear();
-    imageList.addAll(imagesSnapshot.data['result']['images']);
   }
 
   @override
@@ -285,7 +225,38 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
           headerSliverBuilder: (context, innerBoxScrolled) => [
             createAppBar(),
           ],
-          body: createFutureBuilders(),
+          body: ContentGrid(
+              key: _key,
+              category: widget.category,
+              isAdmin: widget.isAdmin,
+              nbImages: widget.nbImages,
+              isEditMode: _isEditMode || false,
+              selectedItems: _selectedItems,
+              loadMoreImages: (int page) {
+                print('Loading page $page of category ${widget.category}');
+                return fetchImages(widget.category, page);
+              },
+              setEditMode: (bool isEditMode, {image}) => {
+                setState(() {
+                  _isEditMode = isEditMode;
+                  if (!_isEditMode) {
+                    _selectedItems.clear();
+                  } else if (image != null) {
+                    _selectedItems.putIfAbsent(image['id'], () => image);
+                  }
+                })
+              },
+              deselectItem: (dynamic image) {
+                setState(() {
+                  _selectedItems.remove(image['id']);
+                });
+              },
+              selectItem: (dynamic image) {
+                setState(() {
+                  _selectedItems.putIfAbsent(image['id'], () => image);
+                });
+              }
+          ),
         ),
       ),
       floatingActionButton: _isEditMode ?
@@ -297,6 +268,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
 
   Widget createAppBar() {
     ThemeData _theme = Theme.of(context);
+    final ContentGridState contentGridState = _key.currentState;
     return SliverAppBar(
       pinned: true,
       snap: false,
@@ -317,7 +289,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
       actions: [
         _isEditMode ? IconButton(
           onPressed: _onSelectAll,
-          icon: _selectedItems.length == imageList.length ?
+          icon: _selectedItems.length == contentGridState.imageList.length ?
             Icon(Icons.check_circle) : Icon(Icons.circle_outlined),
         ) : SizedBox(),
         _isEditMode ? IconButton(
@@ -341,45 +313,6 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
         return true;
       },
       child: child,
-    );
-  }
-
-  Widget createFutureBuilders() {
-    return FutureBuilder<Map<String,dynamic>>(
-        future: _albumsFuture, // Albums of the list
-        builder: (BuildContext context, AsyncSnapshot albumSnapshot) {
-          if (albumSnapshot.hasData) {
-            int nbImages = _nbImages;
-            if(albumSnapshot.data['stat'] == 'fail') {
-              return Center(
-                child: Text(appStrings(context).categoryImageList_noDataError),
-              );
-            }
-            var albums = handleAlbumSnapshot(albumSnapshot, nbImages);
-            return FutureBuilder<Map<String,dynamic>>(
-              future: _imagesFuture,
-              builder: (BuildContext context, AsyncSnapshot imagesSnapshot) {
-                if (imagesSnapshot.hasData) {
-                  if (imageList.isEmpty || _page == 0) {
-                    if(imagesSnapshot.data['stat'] == 'fail') {
-                      return Center(child: Text(appStrings(context).categoryImageList_noDataError));
-                    }
-                    handleImagesSnapshot(imagesSnapshot);
-                  }
-                  return createPageContent(albums, nbImages);
-                } else {
-                  return Center(
-                    child: CircularProgressIndicator(),
-                  );
-                }
-              },
-            );
-          } else {
-            return Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-        }
     );
   }
 
@@ -412,9 +345,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
                 return CreateCategoryDialog(catId: widget.category);
               }
             ).whenComplete(() {
-              setState(() {
-                _getData();
-              });
+              _getData();
             });
           },
         ),
@@ -494,173 +425,6 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
             }
         ),
       ],
-    );
-  }
-
-  Widget createPageContent(dynamic albums, int nbImages) {
-    ThemeData _theme = Theme.of(context);
-
-    int albumCrossAxisCount = MediaQuery.of(context).size.width <= Constants.albumMinWidth ? 1
-        : (MediaQuery.of(context).size.width/Constants.albumMinWidth).floor();
-
-    return RefreshIndicator(
-      displacement: 20,
-      notificationPredicate: (notification) {
-        return notification.metrics.atEdge;
-      },
-      onRefresh: _onRefresh,
-      child: SingleChildScrollView(
-        child: Column(
-          children: [
-            albums.length > 0 ?
-            GridView.builder(
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: albumCrossAxisCount,
-                mainAxisSpacing: 10,
-                crossAxisSpacing: 10,
-                childAspectRatio: albumGridAspectRatio(context),
-              ),
-              padding: EdgeInsets.all(10),
-              itemCount: albums.length,
-              shrinkWrap: true,
-              physics: NeverScrollableScrollPhysics(),
-              itemBuilder: (BuildContext context, int index) {
-                var album = albums[index];
-                return AlbumListItem(album,
-                  isAdmin: widget.isAdmin,
-                  onClose: () {
-                    setState(() {
-                      _getData();
-                    });
-                  },
-                  onOpen: closeEditMode,
-                );
-              },
-            ) : Center(),
-            imageList.length > 0 ?
-            GridView.builder(
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: getImageCrossAxisCount(context),
-                mainAxisSpacing: 3.0,
-                crossAxisSpacing: 3.0,
-              ),
-              padding: EdgeInsets.symmetric(horizontal: 5),
-              itemCount: imageList.length,
-              shrinkWrap: true,
-              physics: NeverScrollableScrollPhysics(),
-              itemBuilder: (BuildContext context, int index) {
-                var image = imageList[index];
-                return InkWell(
-                  onLongPress: _isEditMode ? () {
-                    setState(() {
-                      _isSelected(image['id']) ?
-                      _selectedItems.remove(image['id']) :
-                      _selectedItems.putIfAbsent(image['id'], () => image);
-                    });
-                  } : widget.isAdmin ? () {
-                    setState(() {
-                      _isEditMode = true;
-                      _selectedItems.putIfAbsent(image['id'], () => image);
-                    });
-                  } : () {},
-                  onTap: () {
-                    _isEditMode ?
-                    setState(() {
-                      _isSelected(image['id']) ?
-                      _selectedItems.remove(image['id']) :
-                      _selectedItems.putIfAbsent(image['id'], () => image);
-                    }) :
-                    Navigator.of(context).push(
-                      MaterialPageRoute(builder: (context) => ImageViewPage(
-                        images: imageList,
-                        index: index,
-                        isAdmin: widget.isAdmin,
-                        category: widget.category,
-                      )),
-                    ).whenComplete(() {
-                      setState(() {
-                        _getData();
-                      });
-                    });
-                  },
-                  child: AnimatedContainer(
-                    duration: Duration(milliseconds: 200),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      border: _isSelected(image['id']) ?
-                      Border.all(width: 5, color: _theme.colorScheme.primary) :
-                      Border.all(width: 0, color: Colors.white),
-                    ),
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        Container(
-                          width: double.infinity,
-                          height: double.infinity,
-                          child: Image.network(imageList[index]["derivatives"][API.prefs.getString('thumbnail_size')]["url"],
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                        _isSelected(image['id']) ? Container(
-                          width: double.infinity,
-                          height: double.infinity,
-                          color: Color(0x80000000),
-                        ) : Center(),
-                        /*
-                        _isEditMode? Align(
-                          alignment: Alignment.topRight,
-                          child: Padding(
-                            padding: EdgeInsets.all(5),
-                            child: _isSelected(image['id']) ?
-                              Icon(Icons.check_circle, color: _theme.floatingActionButtonTheme.backgroundColor) :
-                              Icon(Icons.check_circle_outline, color: _theme.disabledColor),
-                          ),
-                        ) : Center(),
-
-                         */
-                        API.prefs.getBool('show_thumbnail_title')? Align(
-                          alignment: Alignment.bottomCenter,
-                          child: Container(
-                            width: double.infinity,
-                            color: Color(0x80ffffff),
-                            child: AutoSizeText('${image['name']}',
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 1,
-                              style: TextStyle(fontSize: 12),
-                              maxFontSize: 14, minFontSize: 7,
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        ) : Center(),
-                      ],
-                    ),
-                  ),
-                );
-              },
-            ) : Center(),
-            nbImages > (_page+1)*100 ? GestureDetector(
-              onTap: () {
-                showMore();
-              },
-              child: Padding(
-                padding: EdgeInsets.all(10),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(appStrings(context).showMore(nbImages-((_page+1)*100)), style: TextStyle(fontSize: 14, color: _theme.disabledColor)),
-                  ],
-                ),
-              ),
-            ) : Center(),
-            Center(
-              child: Container(
-                padding: EdgeInsets.all(10),
-                child: Text(appStrings(context).imageCount(nbImages), style: TextStyle(fontSize: 20, color: _theme.textTheme.bodyText2.color, fontWeight: FontWeight.w300)),
-              ),
-            )
-          ],
-        ),
-      ),
     );
   }
 
