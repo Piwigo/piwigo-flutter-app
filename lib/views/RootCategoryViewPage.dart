@@ -12,6 +12,7 @@ import 'package:piwigo_ng/views/SettingsViewPage.dart';
 
 import 'package:piwigo_ng/views/components/appbars.dart';
 import 'package:piwigo_ng/views/components/dialogs/dialogs.dart';
+import 'package:piwigo_ng/views/components/view_menu_button.dart';
 
 class RootCategoryViewPage extends StatefulWidget {
   final bool isAdmin;
@@ -56,6 +57,9 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
               },
               icon: Icon(Icons.settings, color: _theme.iconTheme.color),
             ),
+            actions: [
+              ViewPopupMenuButton(isAdmin: widget.isAdmin),
+            ],
             title: appStrings(context).tabBar_albums,
           ),
         ],
