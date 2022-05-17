@@ -49,6 +49,7 @@ class _TreeViewNodeState extends State<TreeViewNode> with SingleTickerProviderSt
         AnimationController(duration: Duration(milliseconds: 200), vsync: this);
     _heightFactor = _controller.drive(CurveTween(curve: Curves.easeIn));
     _isExpanded = widget.isExpanded;
+    if(_isExpanded) _controller.forward();
     super.initState();
   }
 
@@ -188,6 +189,8 @@ class _TreeViewNodeState extends State<TreeViewNode> with SingleTickerProviderSt
               isImage: widget.isImage,
               onSelected: widget.onSelected,
               indentIndex: widget.indentIndex+1,
+              isExpanded: widget.node.children[index].children.length > 0 &&
+                  widget.node.children[index].id == widget.catId,
             );
           },
           separatorBuilder: (context, index) {
