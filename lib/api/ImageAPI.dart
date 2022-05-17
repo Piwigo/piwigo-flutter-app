@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
-import 'package:ext_storage/ext_storage.dart';
+import 'package:external_path/external_path.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:path_provider/path_provider.dart';
@@ -84,7 +84,7 @@ Future<bool> _requestPermissions() async {
 }
 Future<String> _getDownloadPath() async {
   if (Platform.isAndroid) {
-    return ExtStorage.getExternalStoragePublicDirectory(ExtStorage.DIRECTORY_PICTURES);
+    return ExternalPath.getExternalStoragePublicDirectory(ExternalPath.DIRECTORY_PICTURES);
   }
   return (await getApplicationDocumentsDirectory()).path;
 }
