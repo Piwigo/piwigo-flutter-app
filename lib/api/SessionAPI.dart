@@ -111,6 +111,7 @@ void savePreferences(Map<String, dynamic> status, {
   if(API.prefs.getDouble("portrait_image_count") == null) API.prefs.setDouble("portrait_image_count", 4);
   if(API.prefs.getDouble("landscape_image_count") == null) API.prefs.setDouble("landscape_image_count", 6);
   if(API.prefs.getBool("show_thumbnail_title") == null) API.prefs.setBool("show_thumbnail_title", false);
+  if(API.prefs.getBool("remove_metadata") == null) API.prefs.setBool("remove_metadata", false);
   saveStatus(status);
 }
 
