@@ -90,7 +90,7 @@ class Uploader {
         uploadStatusProvider.current++;
       }
       uploadStatusProvider.reset();
-    } on DioError catch (e) {
+    } catch (e) {
       debugPrint(e.message);
       uploadStatusProvider.reset();
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
@@ -151,24 +151,17 @@ class Uploader {
       ),
     ));
 
-    try {
-      return await chunkedUploader.upload(
-        context: context,
-        path: "/ws.php",
-        filePath: await FlutterAbsolutePath.getAbsolutePath(photo.path),
-        maxChunkSize: API.prefs.getInt("upload_form_chunk_size")*1000,
-        params: queries,
-        method: 'POST',
-        data: fields,
-        contentType: Headers.formUrlEncodedContentType,
-        onUploadProgress: (value) => onProgress(value),
-      );
-    } on DioError catch (e) {
-      debugPrint('Dio upload chunk error $e');
-      ScaffoldMessenger.of(context).hideCurrentSnackBar();
-      ScaffoldMessenger.of(context).showSnackBar(errorSnackBar(context, appStrings(context).uploadError_title));
-      return Future.value(null);
-    }
+    return await chunkedUploader.upload(
+      context: context,
+      path: "/ws.php",
+      filePath: await FlutterAbsolutePath.getAbsolutePath(photo.path),
+      maxChunkSize: API.prefs.getInt("upload_form_chunk_size")*1000,
+      params: queries,
+      method: 'POST',
+      data: fields,
+      contentType: Headers.formUrlEncodedContentType,
+      onUploadProgress: (value) => onProgress(value),
+    );
   }
 }
 
