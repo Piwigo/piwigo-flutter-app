@@ -84,7 +84,7 @@
     "logoutConfirmation_title": "Déconnexion",
     "logoutConfirmation_message": "Êtes-vous sûr de vouloir vous déconnecter ?",
     "logoutFail_title": "Echec de la Déconnexion",
-    "albumCount": "{count, plural, =0{0 albums} =1{1 album} other{{count} albums}}",
+    "albumCount": "{count, plural, one {} =0{0 albums} =1{1 album} other{{count} albums}}",
     "@albumCount": {
         "placeholders": {
             "count": {}
@@ -144,7 +144,7 @@
     "categoryUpload_mediaTypes": "Types de média",
     "categoryUpload_otherAlbums": "Autres albums",
     "categoryUpload_pasteboard": "Presse papiers",
-    "categoryUpload_loadSubCategories": "load",
+    "categoryUpload_loadSubCategories": "charger",
     "categoryUpload_images": "Transférer des photos",
     "categoryUpload_videos": "Transférer des Videos",
     "categoryUpload_take": "Prendre une photo",
@@ -173,11 +173,11 @@
     "renameCategory_button": "Renommer",
     "renameCategoryHUD_label": "Changement du Nom…",
     "renameCategoryHUD_renamed": "Album renommé",
-    "renameCategoryError_title": "Rename Fail",
-    "renameCategoryError_message": "Failed to rename your album",
+    "renameCategoryError_title": "Impossible de renommer",
+    "renameCategoryError_message": "Impossible de renommer l'album",
     "refreshCategoryHUD_label": "Rafraichissement en cours…",
-    "refreshCategoryError_title": "Refresh Fail",
-    "refreshCategoryError_message": "Failed to refresh your album representative",
+    "refreshCategoryError_title": "Impossible d'actualiser",
+    "refreshCategoryError_message": "Impossible d'actualiser la miniature de votre album",
     "deleteCategory_title": "EFFACER L'ALBUM",
     "deleteCategory_message": "{count, plural, =0{ÊTES VOUS SÛR DE VOULOIR SUPPRIMER L'ALBUM {album}} =1{ÊTES VOUS SÛR DE VOULOIR SUPPRIMER L'ALBUM {album} ET SA PHOTO} other{ÊTES VOUS SÛR DE VOULOIR SUPPRIMER L'ALBUM {album} ET SES {count} PHOTOS ?}",
     "@deleteCategory_message": {
@@ -247,7 +247,7 @@
     "categoryImageSetError_title": "Echec d'affectation",
     "categoryImageSetError_message": "Impossible de changer la photo de l’album",
     "singleImage": "Photo",
-    "imageCount": "{count, plural, =0{0 photos} =1{1 photo} other{{count} photos}}",
+    "imageCount": "{count, plural, one {} =0{0 photos} =1{1 photo} other{{count} photos}}",
     "@imageCount": {
         "placeholders": {
             "count": {}
@@ -314,7 +314,7 @@
     "none": "aucun",
     "tag": "Tag",
     "tags": "Tags",
-    "tagCount": "{count, plural, =0{0 tags} =1{1 tag} other{{count} tags}}",
+    "tagCount": "{count, plural, one {} =0{0 tags} =1{1 tag} other{{count} tags}}",
     "@tagCount": {
         "placeholders": {
             "count": {}
