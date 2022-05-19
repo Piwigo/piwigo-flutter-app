@@ -56,7 +56,7 @@ class ContentGridState extends State<ContentGrid> with SingleTickerProviderState
   }
 
   void _getData() {
-    if (widget.category.isNotEmpty) {
+    if (widget.category != null && widget.category.isNotEmpty) {
       _albumsFuture = fetchAlbums(widget.category);
     } else {
       _albumsFuture = Future<Map<String,dynamic>>.value({
@@ -120,21 +120,25 @@ class ContentGridState extends State<ContentGrid> with SingleTickerProviderState
     return Future.delayed(Duration(milliseconds: 500));
   }
 
-  handleAlbumSnapshot(AsyncSnapshot albumSnapshot, int nbImages) {
+  handleAlbumSnapshot(AsyncSnapshot albumSnapshot) {
     var albums = albumSnapshot.data['result']['categories'];
-    int nbImages = _nbImages;
+    // int nbImages = _nbImages;
     if(albums.length > 0 && albums[0]["id"].toString() == widget.category) {
-      nbImages = albums[0]["total_nb_images"];
-      _nbImages = nbImages;
+      // nbImages = albums[0]["total_nb_images"];
+      // _nbImages = nbImages;
+      _nbImages = albums[0]["total_nb_images"];
     }
     albums.removeWhere((category) =>
-    (category["id"].toString() == widget.category)
+      (category["id"].toString() == widget.category)
     );
     return albums;
   }
   handleImagesSnapshot(AsyncSnapshot imagesSnapshot) {
     imageList.clear();
     imageList.addAll(imagesSnapshot.data['result']['images']);
+    if (_nbImages == 0 && imagesSnapshot.data['result'].containsKey('paging')) {
+      _nbImages = imagesSnapshot.data['result']['paging']['count'];
+    }
   }
 
   @override
@@ -147,13 +151,12 @@ class ContentGridState extends State<ContentGrid> with SingleTickerProviderState
         future: _albumsFuture, // Albums of the list
         builder: (BuildContext context, AsyncSnapshot albumSnapshot) {
           if (albumSnapshot.hasData) {
-            int nbImages = _nbImages;
             if(albumSnapshot.data['stat'] == 'fail') {
               return Center(
                 child: Text(appStrings(context).categoryImageList_noDataError),
               );
             }
-            var albums = handleAlbumSnapshot(albumSnapshot, nbImages);
+            var albums = handleAlbumSnapshot(albumSnapshot);
             return FutureBuilder<Map<String,dynamic>>(
               future: _imagesFuture,
               builder: (BuildContext context, AsyncSnapshot imagesSnapshot) {
@@ -164,7 +167,7 @@ class ContentGridState extends State<ContentGrid> with SingleTickerProviderState
                     }
                     handleImagesSnapshot(imagesSnapshot);
                   }
-                  return createPageContent(albums, nbImages);
+                  return createPageContent(albums);
                 } else {
                   return Center(
                     child: CircularProgressIndicator(),
@@ -295,7 +298,7 @@ class ContentGridState extends State<ContentGrid> with SingleTickerProviderState
     );
   }
 
-  Widget createPageContent(dynamic albums, int nbImages) {
+  Widget createPageContent(dynamic albums) {
     ThemeData _theme = Theme.of(context);
 
     int albumCrossAxisCount = MediaQuery.of(context).size.width <= Constants.albumMinWidth ? 1
@@ -431,7 +434,7 @@ class ContentGridState extends State<ContentGrid> with SingleTickerProviderState
                 );
               },
             ) : Center(),
-            nbImages > (_page+1)*100 ? GestureDetector(
+            _nbImages > (_page+1)*100 ? GestureDetector(
               onTap: () {
                 showMore();
               },
@@ -440,7 +443,7 @@ class ContentGridState extends State<ContentGrid> with SingleTickerProviderState
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(appStrings(context).showMore(nbImages-((_page+1)*100)), style: TextStyle(fontSize: 14, color: _theme.disabledColor)),
+                    Text(appStrings(context).showMore(_nbImages-((_page+1)*100)), style: TextStyle(fontSize: 14, color: _theme.disabledColor)),
                   ],
                 ),
               ),
@@ -448,7 +451,7 @@ class ContentGridState extends State<ContentGrid> with SingleTickerProviderState
             Center(
               child: Container(
                 padding: EdgeInsets.all(10),
-                child: Text(appStrings(context).imageCount(nbImages), style: TextStyle(fontSize: 20, color: _theme.textTheme.bodyText2.color, fontWeight: FontWeight.w300)),
+                child: Text(appStrings(context).imageCount(_nbImages), style: TextStyle(fontSize: 20, color: _theme.textTheme.bodyText2.color, fontWeight: FontWeight.w300)),
               ),
             )
           ],
