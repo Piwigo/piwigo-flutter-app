@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:piwigo_ng/constants/SettingsConstants.dart';
 import 'package:piwigo_ng/views/FavoritesViewPage.dart';
+import 'package:piwigo_ng/views/components/RootTagViewPage.dart';
 
 enum ViewPopupMenuOptions { favorites, tags, top_viewed, top_rated }
 
@@ -66,8 +67,10 @@ class ViewPopupMenuButton extends StatelessWidget {
       route = MaterialPageRoute(builder: (context) => FavoritesViewPage(
         isAdmin: isAdmin,
       ));
-    } else if (value == ViewPopupMenuOptions.top_viewed.index) {
-      // _changeColorAccordingToMenuItem = Colors.green;
+    } else if (value == ViewPopupMenuOptions.tags.index) {
+      route = MaterialPageRoute(builder: (context) => RootTagViewPage(
+        isAdmin: isAdmin,
+      ));
     }
     if (route != null) Navigator.of(context).push(route);
   }
