@@ -23,7 +23,7 @@ class ContentGrid extends StatefulWidget {
   ContentGrid({Key key,
     this.title, this.category, this.isAdmin, this.nbImages, this.isEditMode,
     @required this.selectedItems, @required this.setEditMode, @required this.loadMoreImages,
-    @required this.selectItem, @required this.deselectItem,
+    @required this.selectItem, @required this.deselectItem, @required this.onImageTap,
   }) : super(key: key);
   final bool isAdmin;
   final String title;
@@ -33,6 +33,7 @@ class ContentGrid extends StatefulWidget {
   final Function(bool, {dynamic image}) setEditMode;
   final Function(dynamic) selectItem;
   final Function(dynamic) deselectItem;
+  final Function(List<dynamic>, int) onImageTap;
   final bool isEditMode;
   final Map<int, dynamic> selectedItems;
 
@@ -366,18 +367,7 @@ class ContentGridState extends State<ContentGrid> with SingleTickerProviderState
                       _isSelected(image['id']) ?
                       widget.deselectItem(image) :
                       widget.selectItem(image) :
-                    Navigator.of(context).push(
-                      MaterialPageRoute(builder: (context) => ImageViewPage(
-                        images: imageList,
-                        index: index,
-                        isAdmin: widget.isAdmin,
-                        category: widget.category,
-                      )),
-                    ).whenComplete(() {
-                      setState(() {
-                        _getData();
-                      });
-                    });
+                      widget.onImageTap(imageList, index);
                   },
                   child: AnimatedContainer(
                     duration: Duration(milliseconds: 200),
