@@ -8,6 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:piwigo_ng/api/ImageAPI.dart';
 import 'package:piwigo_ng/constants/SettingsConstants.dart';
 import 'package:piwigo_ng/services/UploadStatusProvider.dart';
+import 'package:piwigo_ng/views/ImageViewPage.dart';
 import 'package:piwigo_ng/views/components/content_grid.dart';
 import 'package:piwigo_ng/views/components/snackbars.dart';
 
@@ -255,7 +256,19 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
                 setState(() {
                   _selectedItems.putIfAbsent(image['id'], () => image);
                 });
-              }
+              },
+              onImageTap: (List<dynamic> images, int index) {
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => ImageViewPage(
+                    images: images,
+                    index: index,
+                    isAdmin: widget.isAdmin,
+                    category: widget.category,
+                  )),
+                ).whenComplete(() {
+                  _getData();
+                });
+              },
           ),
         ),
       ),
