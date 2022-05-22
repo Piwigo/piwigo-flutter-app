@@ -1,10 +1,13 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:piwigo_ng/api/API.dart';
 import 'package:piwigo_ng/api/ImageAPI.dart';
 import 'package:piwigo_ng/constants/SettingsConstants.dart';
@@ -39,7 +42,7 @@ class Uploader {
     );
   }
 
-  Future<void> uploadPhotos(BuildContext context, List<XFile> photos, String category, Map<String, dynamic> info) async {
+  Future<void> uploadPhotos(BuildContext context, List<XFile> photos, String category, Map<String, dynamic> info,) async {
     Map<String, dynamic> result = {
       'isSuccess': true,
       'filePath': null,
@@ -63,9 +66,16 @@ class Uploader {
       for(var element in photos) {
         uploadStatusProvider.status = true;
 
-        Response response = await uploadChunk(context, element, category, info,
+        XFile photo;
+        if (API.prefs.getBool("remove_metadata")) {
+          photo = await testCompressAndGetFile(element);
+        } else {
+          photo = element;
+        }
+
+        Response response = await uploadChunk(context, photo, category, info,
             (progress) {
-              print(progress);
+              debugPrint("$progress");
               uploadStatusProvider.progress = progress;
             },
         );
@@ -80,8 +90,8 @@ class Uploader {
         uploadStatusProvider.current++;
       }
       uploadStatusProvider.reset();
-    } on DioError catch (e) {
-      print(e.message);
+    } catch (e) {
+      debugPrint(e.message);
       uploadStatusProvider.reset();
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
       ScaffoldMessenger.of(context).showSnackBar(errorSnackBar(context, appStrings(context).uploadError_title));
@@ -90,11 +100,30 @@ class Uploader {
     try {
       await uploadCompleted(uploadedImages, int.parse(category));
       await communityUploadCompleted(uploadedImages, int.parse(category));
+
+      // cleanTempDirectory();
     } on DioError catch (e) {
-      print(e.message);
+      debugPrint(e.message);
     }
 
     await _showUploadNotification(result);
+  }
+
+  Future<XFile> testCompressAndGetFile(XFile file) async {
+
+    Directory cacheDir = await getTemporaryDirectory();
+
+    var result = await FlutterImageCompress.compressAndGetFile(
+      await FlutterAbsolutePath.getAbsolutePath(file.path),
+      cacheDir.absolute.path + file.name,
+    );
+
+    return XFile(result.path, name: file.name);
+  }
+
+  void cleanTempDirectory() async {
+    Directory cacheDir = await getTemporaryDirectory();
+    cacheDir.deleteSync(recursive: true);
   }
 
   Future<Response> uploadChunk(BuildContext context, XFile photo,
@@ -122,24 +151,17 @@ class Uploader {
       ),
     ));
 
-    try {
-      return await chunkedUploader.upload(
-        context: context,
-        path: "/ws.php",
-        filePath: await FlutterAbsolutePath.getAbsolutePath(photo.path),
-        maxChunkSize: API.prefs.getInt("upload_form_chunk_size")*1000,
-        params: queries,
-        method: 'POST',
-        data: fields,
-        contentType: Headers.formUrlEncodedContentType,
-        onUploadProgress: (value) => onProgress(value),
-      );
-    } on DioError catch (e) {
-      print('Dio upload chunk error $e');
-      ScaffoldMessenger.of(context).hideCurrentSnackBar();
-      ScaffoldMessenger.of(context).showSnackBar(errorSnackBar(context, appStrings(context).uploadError_title));
-      return Future.value(null);
-    }
+    return await chunkedUploader.upload(
+      context: context,
+      path: "/ws.php",
+      filePath: await FlutterAbsolutePath.getAbsolutePath(photo.path),
+      maxChunkSize: API.prefs.getInt("upload_form_chunk_size")*1000,
+      params: queries,
+      method: 'POST',
+      data: fields,
+      contentType: Headers.formUrlEncodedContentType,
+      onUploadProgress: (value) => onProgress(value),
+    );
   }
 }
 
