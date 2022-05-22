@@ -2,7 +2,7 @@ name: piwigo_ng
 description: A Piwigo Android application
 
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
-version: 1.0.2+103
+version: 1.0.3+104
 
 environment:
   sdk: ">=2.7.0 <3.0.0"
@@ -31,6 +31,7 @@ dependencies:
   permission_handler: ^8.3.0
   external_path: ^1.0.1
   flutter_local_notifications: ^9.1.2
+  flutter_image_compress: ^1.1.0
 
   # File pickers :
   image_picker: ^0.8.4+4
