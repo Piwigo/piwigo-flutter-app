@@ -177,9 +177,9 @@
     "renameCategoryError_message": "重命名相册失败",
     "refreshCategoryHUD_label": "正在刷新代表图像...",
     "refreshCategoryError_title": "刷新失败",
-    "refreshCategoryError_message": "无法刷新代表图像",
+    "refreshCategoryError_message": "无法刷新相册封面",
     "deleteCategory_title": "删除相册",
-    "deleteCategory_message": "{count, plural, =0{ARE YOU SURE YOU WANT TO DELETE THE ALBUM {album}} =1{ARE YOU SURE YOU WANT TO DELETE THE ALBUM {album} AND ITS PHOTO} other{ARE YOU SURE YOU WANT TO DELETE THE ALBUM {album} AND ALL {count} PHOTOS ?}",
+    "deleteCategory_message": "{count, plural, =0{是否确定删除相册 {album}} =1{是否确定删除相册 {album} AND ITS PHOTO} other{是否确定删除相册 {album} 和共计 {count} 张照片 ?}",
     "@deleteCategory_message": {
         "placeholders": {
             "count": {},
@@ -225,8 +225,8 @@
     },
     "moveCategoryHUD_moving": "移动相册中...",
     "moveCategoryHUD_moved": "相册已移动",
-    "moveCategoryError_title": "Move Fail",
-    "moveCategoryError_message": "Failed to move your album",
+    "moveCategoryError_title": "移动失败",
+    "moveCategoryError_message": "移动相册失败",
     "categorySelection_setThumbnail": "Please select the album which will use the photo {photo} as a thumbnail.",
     "@categorySelection_setThumbnail": {
         "placeholders": {
