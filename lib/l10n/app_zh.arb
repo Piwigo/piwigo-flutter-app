@@ -227,16 +227,16 @@
     "moveCategoryHUD_moved": "相册已移动",
     "moveCategoryError_title": "移动失败",
     "moveCategoryError_message": "移动相册失败",
-    "categorySelection_setThumbnail": "Please select the album which will use the photo {photo} as a thumbnail.",
+    "categorySelection_setThumbnail": "请选择要使用照片 {photo} 作为缩略图的相册。",
     "@categorySelection_setThumbnail": {
         "placeholders": {
             "photo": {}
         }
     },
-    "categorySelection_current": "Select the current album for this photo",
-    "categorySelection_one": "Select one of the albums containing this photo",
-    "categorySelection_other": "Or select another album for this photo",
-    "categoryImageSet_title": "Album Thumbnail",
+    "categorySelection_current": "为该照片选择相册",
+    "categorySelection_one": "选择包含该照片的相册",
+    "categorySelection_other": "或者为该照片选择另一个相册",
+    "categoryImageSet_title": "相册封面",
     "categoryImageSet_message": "Are you sure you want to apply this photo to the album {album} ?",
     "@categoryImageSet_message": {
         "placeholders": {
