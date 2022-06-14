@@ -57,233 +57,10 @@ class _SettingsPageState extends State<SettingsPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        Padding(
-                          padding: EdgeInsets.only(left: 10),
-                          child: Text(appStrings(context).settingsHeader_server(API.prefs.getString('version')), style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 18)),
-                        ),
-                        API.prefs.getString('base_url').substring(0, 4) != 'https' ? Text('') : Padding(
-                          padding: EdgeInsets.only(left: 10, bottom: 3),
-                          child: Text(appStrings(context).settingsHeader_notSecure, style: TextStyle(color: Colors.black, fontSize: 12)),
-                        ),
-                        Container(
-                          decoration: BoxDecoration(
-                            border: Border.symmetric(horizontal: BorderSide(width: 0.5, color: Colors.grey)),
-                            color: Theme.of(context).cardColor,
-                          ),
-                          child: Column(
-                            children: [
-                              TableCell(
-                                Text(appStrings(context).settings_server, style: TextStyle(color: Colors.black, fontSize: 16)),
-                                Text('${API.prefs.getString('base_url')}', overflow: TextOverflow.ellipsis, softWrap: false, style: TextStyle(color: Colors.grey.shade600, fontSize: 14)),
-                              ),
-                              TableCell(
-                                Text(appStrings(context).settings_username, style: TextStyle(color: Colors.black, fontSize: 16)),
-                                Text('${API.prefs.getString('account_username')}', overflow: TextOverflow.ellipsis, softWrap: false, style: TextStyle(color: Colors.grey.shade600, fontSize: 14)),
-                                isEnd: true,
-                              ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(height: 20),
-                        Container(
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            border: Border.symmetric(horizontal: BorderSide(width: 0.5, color: Colors.grey)),
-                            color: Theme.of(context).cardColor,
-                          ),
-                          child: TextButton(
-                            style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.all(Colors.transparent),
-                            ),
-                            onPressed: () {
-                              API.prefs.setBool("is_logged", false);
-                              Navigator.of(context).pushAndRemoveUntil(
-                                MaterialPageRoute(
-                                  builder: (BuildContext context) => LoginViewPage(),
-                                ),
-                                (Route route) => false,
-                              );
-                            },
-                            child: Text('${API.prefs.getBool('is_guest') ? appStrings(context).settings_notLoggedIn : appStrings(context).settings_logout }', style: TextStyle(color: Color(0xffff7700), fontSize: 20)),
-                          ),
-                        ),
-                        API.prefs.getString('user_status') == 'admin' || API.prefs.getString('user_status') == 'webmaster' ?
-                          Center(
-                            child: Container(
-                              padding: EdgeInsets.all(5),
-                              child: Text(appStrings(context).settingsFooter_formats(API.prefs.getString("file_types").replaceAll(",", ", ")),
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(color: Colors.black, fontSize: 12)),
-                            ),
-                          ) :
-                          Text(''),
-                        SizedBox(height: 20),
-                        Padding(
-                          padding: EdgeInsets.only(left: 10, bottom: 3),
-                          child: Text(appStrings(context).settingsHeader_images, style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 18)),
-                        ),
-                        Container(
-                          decoration: BoxDecoration(
-                            border: Border.symmetric(horizontal: BorderSide(width: 0.5, color: Colors.grey)),
-                            color: Theme.of(context).cardColor,
-                          ),
-                          child: Column(
-                            children: [
-                              TableCell(
-                                Text(appStrings(context).settings_displayTitles, style: TextStyle(color: Colors.black, fontSize: 16)),
-                                Switch(
-                                  activeColor: Theme.of(context).colorScheme.primary,
-                                  value: API.prefs.getBool('show_thumbnail_title'),
-                                  onChanged: (bool) {
-                                    setState(() {
-                                      API.prefs.setBool('show_thumbnail_title', bool);
-                                    });
-                                  },
-                                ),
-                              ),
-                              ImageRowCountSliders(),
-                              TableCell(
-                                Text(appStrings(context).defaultThumbnailSize320px, style: TextStyle(color: Colors.black, fontSize: 16)),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: [
-                                    DropdownButton<String>(
-                                      value: _thumbnailDerivative == null ? API.prefs.getString('thumbnail_size') : _thumbnailDerivative,
-                                      style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
-                                      underline: Container(),
-                                      icon: Icon(Icons.chevron_right, color: Colors.grey.shade600, size: 20),
-                                      onChanged: (String newValue) {
-                                        setState(() {
-                                          _thumbnailDerivative = newValue;
-                                          API.prefs.setString('thumbnail_size', _thumbnailDerivative);
-                                        });
-                                      },
-                                      items: API.prefs.getStringList('available_sizes').map<DropdownMenuItem<String>>((
-                                          String value) {
-                                        return DropdownMenuItem<String>(
-                                          value: value,
-                                          child: Text(thumbnailSize(context, value)),
-                                        );
-                                      }).toList(),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              TableCell(
-                                Text(appStrings(context).defaultImageSize320px, style: TextStyle(color: Colors.black, fontSize: 16)),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: [
-                                    DropdownButton<String>(
-                                      value: _fsDerivative == null ? API.prefs.getString('full_screen_image_size') : _fsDerivative,
-                                      style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
-                                      underline: Container(),
-                                      icon: Icon(Icons.chevron_right, color: Colors.grey.shade600, size: 20),
-                                      onChanged: (String newValue) {
-                                        setState(() {
-                                          _fsDerivative = newValue;
-                                          API.prefs.setString('full_screen_image_size', _fsDerivative);
-                                        });
-                                      },
-                                      items: API.prefs.getStringList('available_sizes').map<DropdownMenuItem<String>>((
-                                          String value) {
-                                        return DropdownMenuItem<String>(
-                                          value: value,
-                                          child: Text(photoSize(context, value)),
-                                        );
-                                      }).toList(),
-                                    ),
-                                  ],
-                                ),
-                                isEnd: true,
-                              ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(height: 20),
-                        Padding(
-                          padding: EdgeInsets.only(left: 10, bottom: 3),
-                          child: Text(appStrings(context).settingsHeader_about, style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 18)),
-                        ),
-                        Container(
-                          decoration: BoxDecoration(
-                            border: Border.symmetric(horizontal: BorderSide(width: 0.5, color: Colors.grey)),
-                            color: Theme.of(context).cardColor,
-                          ),
-                          child: Column(
-                            children: [
-                              GestureDetector(
-                                onTap: () async {
-                                  var url = appStrings(context).settings_twitterURL;
-                                  if (await canLaunch(url)) {
-                                    await launch(url);
-                                  } else {
-                                    throw 'Could not launch $url';
-                                  }
-                                },
-                                child: TableCell(
-                                  Text(appStrings(context).settings_twitter, style: TextStyle(color: Colors.black, fontSize: 16)),
-                                  FaIcon(FontAwesomeIcons.twitter, color: Colors.grey.shade600, size: 20),
-                                ),
-                              ),
-                              GestureDetector(
-                                onTap: () async {
-                                  var url = appStrings(context).settings_pwgForumURL;
-                                  if (await canLaunch(url)) {
-                                    await launch(url);
-                                  } else {
-                                    throw 'Could not launch $url';
-                                  }
-                                },
-                                child: TableCell(
-                                  Text(appStrings(context).settings_supportForum, style: TextStyle(color: Colors.black, fontSize: 16)),
-                                  FaIcon(FontAwesomeIcons.globe, color: Colors.grey.shade600, size: 20),
-                                ),
-                              ),
-                              GestureDetector(
-                                onTap: () async {
-                                  var url = appStrings(context).settings_crowdinURL;
-                                  if (await canLaunch(url)) {
-                                    await launch(url);
-                                  } else {
-                                    throw 'Could not launch $url';
-                                  }
-                                },
-                                child: TableCell(
-                                  Text(appStrings(context).settings_translateWithCrowdin, style: TextStyle(color: Colors.black, fontSize: 16)),
-                                  FaIcon(FontAwesomeIcons.language, color: Colors.grey.shade600, size: 20),
-                                ),
-                              ),
-                              GestureDetector(
-                                onTap: () {
-                                  Navigator.of(context).push(
-                                    MaterialPageRoute(builder: (_) => PrivacyPolicyViewPage())
-                                  );
-                                },
-                                child: TableCell(
-                                  Text(appStrings(context).settings_privacy, style: TextStyle(color: Colors.black, fontSize: 16)),
-                                  FaIcon(Icons.privacy_tip, color: Colors.grey.shade600, size: 20),
-                                ),
-                              ),
-                              TableCell(
-                                Text(appStrings(context).settings_appName, style: TextStyle(color: Colors.black, fontSize: 16)),
-                                FutureBuilder<PackageInfo>(
-                                  future: PackageInfo.fromPlatform(),
-                                  builder: (context, snapshot) {
-                                    if(snapshot.hasData) {
-                                      return Text(snapshot.data.version,
-                                        overflow: TextOverflow.ellipsis, softWrap: false,
-                                        style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
-                                      );
-                                    }
-                                    return SizedBox();
-                                  },
-                                ),
-                                isEnd: true,
-                              ),
-                            ],
-                          ),
-                        ),
+                        _buildServerSection(),
+                        _buildPhotosSection(),
+                        _buildUploadSection(),
+                        _buildInfoSection(),
                       ],
                     ),
                   );
@@ -294,6 +71,291 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildServerSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: EdgeInsets.only(left: 10),
+          child: Text(appStrings(context).settingsHeader_server(API.prefs.getString('version')), style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 18)),
+        ),
+        API.prefs.getString('base_url').substring(0, 4) != 'https' ? Text('') : Padding(
+          padding: EdgeInsets.only(left: 10, bottom: 3),
+          child: Text(appStrings(context).settingsHeader_notSecure, style: TextStyle(color: Colors.black, fontSize: 12)),
+        ),
+        Container(
+          decoration: BoxDecoration(
+            border: Border.symmetric(horizontal: BorderSide(width: 0.5, color: Colors.grey)),
+            color: Colors.white,
+          ),
+          child: Column(
+            children: [
+              TableCell(
+                Text(appStrings(context).settings_server, style: TextStyle(color: Colors.black, fontSize: 16)),
+                Text('${API.prefs.getString('base_url')}', overflow: TextOverflow.ellipsis, softWrap: false, style: TextStyle(color: Colors.grey.shade600, fontSize: 14)),
+              ),
+              TableCell(
+                Text(appStrings(context).settings_username, style: TextStyle(color: Colors.black, fontSize: 16)),
+                Text('${API.prefs.getString('account_username')}', overflow: TextOverflow.ellipsis, softWrap: false, style: TextStyle(color: Colors.grey.shade600, fontSize: 14)),
+                isEnd: true,
+              ),
+            ],
+          ),
+        ),
+        SizedBox(height: 20),
+        Container(
+          width: double.infinity,
+          decoration: BoxDecoration(
+            border: Border.symmetric(horizontal: BorderSide(width: 0.5, color: Colors.grey)),
+            color: Colors.white,
+          ),
+          child: TextButton(
+            style: ButtonStyle(
+              backgroundColor: MaterialStateProperty.all(Colors.transparent),
+            ),
+            onPressed: () {
+              API.prefs.setBool("is_logged", false);
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(
+                  builder: (BuildContext context) => LoginViewPage(),
+                ),
+                    (Route route) => false,
+              );
+            },
+            child: Text('${API.prefs.getBool('is_guest') ? appStrings(context).settings_notLoggedIn : appStrings(context).settings_logout }', style: TextStyle(color: Color(0xffff7700), fontSize: 20)),
+          ),
+        ),
+        API.prefs.getString('user_status') == 'admin' || API.prefs.getString('user_status') == 'webmaster' ?
+        Center(
+          child: Container(
+            padding: EdgeInsets.all(5),
+            child: Text(
+              appStrings(context).settingsFooter_formats(API.prefs.getString("file_types").replaceAll(",", ", ")),
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.black, fontSize: 12),
+            ),
+          ),
+        ) :
+        Text(''),
+      ],
+    );
+  }
+
+  Widget _buildPhotosSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: EdgeInsets.only(left: 10, bottom: 3, top: 20),
+          child: Text(appStrings(context).settingsHeader_images, style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 18)),
+        ),
+        Container(
+          decoration: BoxDecoration(
+            border: Border.symmetric(horizontal: BorderSide(width: 0.5, color: Colors.grey)),
+            color: Colors.white,
+          ),
+          child: Column(
+            children: [
+              TableCell(
+                Text(appStrings(context).settings_displayTitles, style: TextStyle(color: Colors.black, fontSize: 16)),
+                Switch(
+                  value: API.prefs.getBool('show_thumbnail_title'),
+                  activeColor: Theme.of(context).colorScheme.primary,
+                  onChanged: (bool) {
+                    setState(() {
+                      API.prefs.setBool('show_thumbnail_title', bool);
+                    });
+                  },
+                ),
+              ),
+              ImageRowCountSliders(),
+              TableCell(
+                Text(appStrings(context).defaultThumbnailSize320px, style: TextStyle(color: Colors.black, fontSize: 16)),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    DropdownButton<String>(
+                      value: _thumbnailDerivative == null ? API.prefs.getString('thumbnail_size') : _thumbnailDerivative,
+                      style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
+                      underline: Container(),
+                      icon: Icon(Icons.chevron_right, color: Colors.grey.shade600, size: 20),
+                      onChanged: (String newValue) {
+                        setState(() {
+                          _thumbnailDerivative = newValue;
+                          API.prefs.setString('thumbnail_size', _thumbnailDerivative);
+                        });
+                      },
+                      items: API.prefs.getStringList('available_sizes').map<DropdownMenuItem<String>>((
+                          String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(thumbnailSize(context, value)),
+                        );
+                      }).toList(),
+                    ),
+                  ],
+                ),
+              ),
+              TableCell(
+                Text(appStrings(context).defaultImageSize320px, style: TextStyle(color: Colors.black, fontSize: 16)),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    DropdownButton<String>(
+                      value: _fsDerivative == null ? API.prefs.getString('full_screen_image_size') : _fsDerivative,
+                      style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
+                      underline: Container(),
+                      icon: Icon(Icons.chevron_right, color: Colors.grey.shade600, size: 20),
+                      onChanged: (String newValue) {
+                        setState(() {
+                          _fsDerivative = newValue;
+                          API.prefs.setString('full_screen_image_size', _fsDerivative);
+                        });
+                      },
+                      items: API.prefs.getStringList('available_sizes').map<DropdownMenuItem<String>>((
+                          String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(photoSize(context, value)),
+                        );
+                      }).toList(),
+                    ),
+                  ],
+                ),
+                isEnd: true,
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildUploadSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: EdgeInsets.only(left: 10, bottom: 3, top: 20),
+          child: Text(appStrings(context).settingsHeader_upload, style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 18)),
+        ),
+        Container(
+          decoration: BoxDecoration(
+            border: Border.symmetric(horizontal: BorderSide(width: 0.5, color: Colors.grey)),
+            color: Colors.white,
+          ),
+          child: Column(
+            children: [
+              TableCell(
+                Text(appStrings(context).settings_stripGPSdata, style: TextStyle(color: Colors.black, fontSize: 16)),
+                Switch(
+                  value: API.prefs.getBool('remove_metadata'),
+                  activeColor: Theme.of(context).colorScheme.primary,
+                  onChanged: (bool) {
+                    setState(() {
+                      API.prefs.setBool('remove_metadata', bool);
+                    });
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildInfoSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: EdgeInsets.only(left: 10, bottom: 3, top: 20),
+          child: Text(appStrings(context).settingsHeader_about, style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 18)),
+        ),
+        Container(
+          decoration: BoxDecoration(
+            border: Border.symmetric(horizontal: BorderSide(width: 0.5, color: Colors.grey)),
+            color: Colors.white,
+          ),
+          child: Column(
+            children: [
+              GestureDetector(
+                onTap: () async {
+                  var url = appStrings(context).settings_twitterURL;
+                  if (await canLaunch(url)) {
+                    await launch(url);
+                  } else {
+                    throw 'Could not launch $url';
+                  }
+                },
+                child: TableCell(
+                  Text(appStrings(context).settings_twitter, style: TextStyle(color: Colors.black, fontSize: 16)),
+                  FaIcon(FontAwesomeIcons.twitter, color: Colors.grey.shade600, size: 20),
+                ),
+              ),
+              GestureDetector(
+                onTap: () async {
+                  var url = appStrings(context).settings_pwgForumURL;
+                  if (await canLaunch(url)) {
+                    await launch(url);
+                  } else {
+                    throw 'Could not launch $url';
+                  }
+                },
+                child: TableCell(
+                  Text(appStrings(context).settings_supportForum, style: TextStyle(color: Colors.black, fontSize: 16)),
+                  FaIcon(FontAwesomeIcons.globe, color: Colors.grey.shade600, size: 20),
+                ),
+              ),
+              GestureDetector(
+                onTap: () async {
+                  var url = appStrings(context).settings_crowdinURL;
+                  if (await canLaunch(url)) {
+                    await launch(url);
+                  } else {
+                    throw 'Could not launch $url';
+                  }
+                },
+                child: TableCell(
+                  Text(appStrings(context).settings_translateWithCrowdin, style: TextStyle(color: Colors.black, fontSize: 16)),
+                  FaIcon(FontAwesomeIcons.language, color: Colors.grey.shade600, size: 20),
+                ),
+              ),
+              GestureDetector(
+                onTap: () {
+                  Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) => PrivacyPolicyViewPage())
+                  );
+                },
+                child: TableCell(
+                  Text(appStrings(context).settings_privacy, style: TextStyle(color: Colors.black, fontSize: 16)),
+                  FaIcon(Icons.privacy_tip, color: Colors.grey.shade600, size: 20),
+                ),
+              ),
+              TableCell(
+                Text(appStrings(context).settings_appName, style: TextStyle(color: Colors.black, fontSize: 16)),
+                FutureBuilder<PackageInfo>(
+                  future: PackageInfo.fromPlatform(),
+                  builder: (context, snapshot) {
+                    if(snapshot.hasData) {
+                      return Text(snapshot.data.version,
+                        overflow: TextOverflow.ellipsis, softWrap: false,
+                        style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
+                      );
+                    }
+                    return SizedBox();
+                  },
+                ),
+                isEnd: true,
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
@@ -315,7 +377,8 @@ class TableCell extends StatelessWidget {
       margin: EdgeInsets.only(left: 10),
       padding: EdgeInsets.symmetric(horizontal: 10),
       decoration: BoxDecoration(
-        border: isEnd ? Border.all(width: 0, color: Theme.of(context).cardColor) : Border(bottom: BorderSide(width: 0.5, color: Colors.grey)),
+        border: isEnd ? Border.all(width: 0, color: Colors.white) : Border(bottom: BorderSide(width: 0.5, color: Colors.grey)),
+        color: Colors.white,
       ),
       child: Center(
         child: Row(
@@ -342,7 +405,8 @@ class TableCellSingle extends StatelessWidget {
       margin: EdgeInsets.only(left: 10, top: 5),
       padding: EdgeInsets.symmetric(horizontal: 10),
       decoration: BoxDecoration(
-        border: isEnd ? Border.all(width: 0, color: Theme.of(context).cardColor) : Border(bottom: BorderSide(width: 0.5, color: Colors.grey)),
+        border: isEnd ? Border.all(width: 0, color: Colors.white) : Border(bottom: BorderSide(width: 0.5, color: Colors.grey)),
+        color: Colors.white,
       ),
       child: Center(
         child: content,

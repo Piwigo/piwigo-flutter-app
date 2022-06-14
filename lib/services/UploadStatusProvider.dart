@@ -26,6 +26,13 @@ class UploadStatusNotifier extends ChangeNotifier {
     return "$_current/$_max";
   }
 
+  void reset() {
+    _max = 0;
+    _progress = 0;
+    _current = 0;
+    _status = false;
+  }
+
 
   set max(int value) {
     _max = value;

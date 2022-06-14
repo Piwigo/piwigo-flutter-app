@@ -2,8 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
-import 'package:ext_storage/ext_storage.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:external_path/external_path.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:path_provider/path_provider.dart';
@@ -76,7 +75,6 @@ Future<dynamic> getImageInfo(int imageId) async {
 
 Future<bool> _requestPermissions() async {
   var permission = await Permission.storage.status;
-  print(permission.isGranted);
   if (permission != PermissionStatus.granted) {
     await Permission.storage.request();
     permission = await Permission.storage.status;
@@ -86,7 +84,7 @@ Future<bool> _requestPermissions() async {
 }
 Future<String> _getDownloadPath() async {
   if (Platform.isAndroid) {
-    return ExtStorage.getExternalStoragePublicDirectory(ExtStorage.DIRECTORY_PICTURES);
+    return ExternalPath.getExternalStoragePublicDirectory(ExternalPath.DIRECTORY_PICTURES);
   }
   return (await getApplicationDocumentsDirectory()).path;
 }
@@ -176,7 +174,6 @@ Future<int> deleteImages(BuildContext context, List<int> imageIdList) async {
   for(int id in imageIdList) {
     var response = await deleteImage(id);
     if(response['stat'] == 'fail') {
-      print(response);
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
       ScaffoldMessenger.of(context).showSnackBar(
         errorSnackBar(context, '${response['result']}'),
@@ -225,7 +222,6 @@ Future<int> removeImages(BuildContext context, List<int> imageIdList, String cat
   for(int id in imageIdList) {
     var response = await removeImage(id, catId);
     if(response['stat'] == 'fail') {
-      print(response);
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
       ScaffoldMessenger.of(context).showSnackBar(
         errorSnackBar(context, '${response['result']}'),
@@ -265,8 +261,6 @@ Future<dynamic> removeImage(int imageId, String catId) async {
         data: formData,
         queryParameters: queries
     );
-
-    print(response.data);
 
     if (response.statusCode == 200) {
       return json.decode(response.data);
@@ -497,7 +491,6 @@ Future<dynamic> uploadCompleted(List<int> imageId, int categoryId) async {
         queryParameters: queries
     );
     if (response.statusCode == 200) {
-      print(response.data);
       return json.decode(response.data);
     } else {
       return {
@@ -529,7 +522,6 @@ Future<dynamic> communityUploadCompleted(List<int> imageId, int categoryId) asyn
         queryParameters: queries
     );
     if (response.statusCode == 200) {
-      print(response.data);
       return json.decode(response.data);
     } else {
       return {

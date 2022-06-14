@@ -24,10 +24,10 @@ Future<Map<String,dynamic>> fetchAlbums(String albumID) async {
       };
     }
   } catch(e) {
-    //var error = e as DioError;
+    var error = e as DioError;
     return {
       'stat': 'fail',
-      'result': e.toString(),
+      'result': error.message,
     };
   }
 }

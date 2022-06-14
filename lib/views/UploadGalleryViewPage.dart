@@ -1,11 +1,12 @@
 import 'dart:io';
 
-import 'package:video_player/video_player.dart';
+import 'package:better_player/better_player.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:piwigo_ng/constants/SettingsConstants.dart';
 import 'package:piwigo_ng/services/OrientationService.dart';
 import 'package:piwigo_ng/api/API.dart';
+import 'package:mime_type/mime_type.dart';
 
 import 'package:flutter/material.dart';
 
@@ -436,7 +437,7 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
   }
 
   Widget _buildHorizontalListItem(XFile image) {
-    String expansion = image.path.split('.').last;
+    String mimeType = mime(image.path);
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 5),
       child: Stack(
@@ -456,7 +457,7 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
                   ),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(7),
-                    child: expansion == 'mp4'
+                    child: mimeType.startsWith('video')
                         ? VideoItem(path: image.path)
                         : Image.file(File(image.path),
                       fit: BoxFit.cover,
@@ -506,7 +507,7 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
   }
 
   Widget _buildGridItem(XFile image) {
-    String expansion = image.path.split('.').last;
+    String mimeType = mime(image.path);
     return Container(
       child: Stack(
         children: [
@@ -518,7 +519,7 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
               semanticContainer: true,
               child: GridTile(
                 child: Container(
-                  child: expansion == 'mp4'
+                  child: mimeType.startsWith('video')
                       ? VideoItem(path: image.path)
                       : Image.file(File(image.path),
                     fit: BoxFit.cover,
@@ -593,15 +594,24 @@ class VideoItem extends StatefulWidget {
   _VideoItemState createState() => _VideoItemState();
 }
 class _VideoItemState extends State<VideoItem> {
-  VideoPlayerController _controller;
+  BetterPlayerController _controller;
 
   @override
   void initState() {
     super.initState();
-    _controller = VideoPlayerController.file(File(widget.path))
-      ..initialize().then((_) {
-        setState(() {});
-      });
+    BetterPlayerDataSource betterPlayerDataSource = BetterPlayerDataSource.file(widget.path);
+    _controller = BetterPlayerController(
+        BetterPlayerConfiguration(
+          aspectRatio: 1,
+          autoPlay: true,
+          looping: true,
+          fit: BoxFit.cover,
+          controlsConfiguration: BetterPlayerControlsConfiguration(
+            showControls: false
+          ),
+        ),
+        betterPlayerDataSource: betterPlayerDataSource);
+    setState(() {});
   }
 
   @override
@@ -612,25 +622,18 @@ class _VideoItemState extends State<VideoItem> {
 
   @override
   Widget build(BuildContext context) {
-    if(_controller.value.isInitialized) {
-      return FittedBox(
-        fit: BoxFit.cover,
-        child: GestureDetector(
-          onTap: () {
-            setState(() {
-              _controller.value.isPlaying
-                  ? _controller.pause()
-                  : _controller.play();
-            });
-          },
-          child: SizedBox(
-            width: _controller.value.size?.width ?? 0,
-            height: _controller.value.size?.height ?? 0,
-            child: VideoPlayer(_controller),
-          ),
-        ),
+      return GestureDetector(
+        onTap: () {
+          setState(() {
+            _controller.isPlaying()
+                ? _controller.pause()
+                : _controller.play();
+          });
+        },
+        child: AspectRatio(
+          aspectRatio: 1,
+          child: BetterPlayer(controller: _controller),
+        )
       );
-    }
-    return CircularProgressIndicator();
   }
 }
