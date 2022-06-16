@@ -4,6 +4,7 @@ import 'package:piwigo_ng/api/TagAPI.dart';
 import 'package:piwigo_ng/constants/SettingsConstants.dart';
 import 'package:piwigo_ng/model/TagModel.dart';
 import 'package:piwigo_ng/services/OrientationService.dart';
+import 'package:piwigo_ng/views/TagViewPage.dart';
 import 'package:piwigo_ng/views/components/buttons.dart';
 import 'package:piwigo_ng/views/components/textfields.dart';
 
@@ -81,10 +82,10 @@ class _SelectTagsPageState extends State<SelectTagsPage> {
           IconButton(
             onPressed: () {
               showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return CreateTagDialog();
-                }
+                  context: context,
+                  builder: (BuildContext context) {
+                    return CreateTagDialog();
+                  }
               ).whenComplete(() {
                 setState(() {});
               });
@@ -431,18 +432,18 @@ class _TagItemState extends State<TagItem> with SingleTickerProviderStateMixin {
       child: Column(
         children: [
           Container(
-          height: 40,
-          padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text('${widget.tag.name}',
-                  style: Theme.of(context).textTheme.subtitle1
-              ),
-              widget.icon ?? SizedBox(),
-            ],
+            height: 40,
+            padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('${widget.tag.name}',
+                    style: Theme.of(context).textTheme.subtitle1
+                ),
+                widget.icon ?? SizedBox(),
+              ],
+            ),
           ),
-        ),
           _isExpanded && !widget.isEnd ? Divider(
             indent: 10.0,
             endIndent: 0.0,
@@ -477,4 +478,155 @@ class _TagItemState extends State<TagItem> with SingleTickerProviderStateMixin {
       child: closed ? null : _buildTagItem(),
     );
   }
+}
+
+showChooseTagSheet(context, {content = ''}) async {
+  showModalBottomSheet<int>(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+    builder: (BuildContext context) {
+      return DraggableScrollableSheet(
+        key: UniqueKey(),
+        initialChildSize: 0.7,
+        maxChildSize: 0.93,
+        minChildSize: .5,
+        expand: false,
+        builder: (context, controller) => Column(
+          children: [
+            Container(
+                height: 55,
+                padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).primaryColor,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(20),
+                    topRight: Radius.circular(20),
+                  ),
+                ),
+                child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      appStrings(context).alertDismissButton,
+                      style: Theme.of(context).textTheme.headline4,
+                    )
+                )
+            ),
+            Expanded(
+                child: Ink(
+                  color: Theme.of(context).primaryColor,
+                  child: ListView(
+                    controller: controller,
+                    padding: EdgeInsets.symmetric(horizontal: 15),
+                    children: [
+                      SizedBox(height: 18),
+                      Align(
+                        alignment: Alignment.topLeft,
+                        child: Text(appStrings(context).tags,
+                            style: Theme.of(context).textTheme.headline1
+                        ),
+                      ),
+                      Align(
+                        alignment: Alignment.topLeft,
+                        child: Text(appStrings(context).tagsTitle_selectOne,
+                            style: Theme.of(context).textTheme.headline5
+                        ),
+                      ),
+                      SizedBox(height: 10),
+
+                      FutureBuilder<Map<String,dynamic>>(
+                          future: getTags(),
+                          builder: (BuildContext context, AsyncSnapshot tagsSnapshot) {
+                            if(tagsSnapshot.hasData){
+                              if(tagsSnapshot.data['stat'] == 'fail') {
+                                return Container(
+                                  padding: EdgeInsets.all(10),
+                                  child: Text(tagsSnapshot.data['result']),
+                                ); //appStrings(context).categoryMainEmtpy
+                              }
+                              var tags = tagsSnapshot.data['result']['tags'];
+                              tags.removeWhere((category) => (
+                                  category["counter"] == 0
+                              ));
+                              return Wrap(
+                                  direction: Axis.horizontal,
+                                  children: <Widget>[
+                                    ListView.separated(
+                                      scrollDirection: Axis.vertical,
+                                      shrinkWrap: true,
+                                      physics: ClampingScrollPhysics(),
+                                      clipBehavior: Clip.hardEdge,
+                                      padding: EdgeInsets.fromLTRB(0, 0, 0, 10),
+                                      // itemExtent: 40.0,
+                                      separatorBuilder: (BuildContext context, int index) {
+                                        return Divider(height: 1, color: Theme.of(context).primaryColor);
+                                      },
+                                      itemCount: tags.length,
+                                      itemBuilder: (context, index) {
+                                        var tag = tags[index];
+                                        var borderRadius = BorderRadius.circular(0);
+                                        var radius = Radius.circular(10);
+
+                                        if(index == tags.length - 1) {
+                                          borderRadius = BorderRadius.only(
+                                            bottomLeft: radius,
+                                            bottomRight: radius,
+                                          );
+                                        } else if (index == 0) {
+                                          borderRadius = BorderRadius.only(
+                                            topLeft: radius,
+                                            topRight: radius,
+                                          );
+                                        }
+
+                                        return ListTile(
+                                            shape: RoundedRectangleBorder(
+                                                borderRadius: borderRadius
+                                            ),
+                                            title: Text(
+                                                tag['name'] + ' (${ appStrings(context).imageCount(tag['counter']) })',
+                                                style: Theme.of(context).textTheme.bodyText1
+                                            ),
+                                            // title: Text(tag['name'], style: Theme.of(context).textTheme.bodyText1),
+                                            tileColor: Theme.of(context).backgroundColor,
+                                            contentPadding: EdgeInsets.symmetric(horizontal: 15),
+                                            dense: true,
+                                            onTap: () => {
+                                              Navigator.of(context).push(
+                                                  MaterialPageRoute(builder: (context) => TagViewPage(
+                                                      isAdmin: true,
+                                                      tag: tag['id'].toString(),
+                                                      title: tag['name']
+                                                  ))
+                                              )
+                                            }
+                                        );
+                                      },
+                                    ),
+                                    Align(
+                                      alignment: Alignment.center,
+                                      child: Text(
+                                          appStrings(context).tagCount(tags.length),
+                                          style: Theme.of(context).textTheme.subtitle2
+                                      ),
+                                    ),
+                                  ]
+                              );
+                            } else {
+                              return Center(
+                                child: CircularProgressIndicator(),
+                              );
+                            }
+                          }
+                      ),
+                      SizedBox(height: 10)
+                    ],
+                  ),
+                )
+            ),
+          ],
+        ),
+      );
+    },
+  );
 }
