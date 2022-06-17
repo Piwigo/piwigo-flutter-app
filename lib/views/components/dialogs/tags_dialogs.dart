@@ -505,11 +505,14 @@ showChooseTagSheet(context, {content = ''}) async {
                   ),
                 ),
                 child: Align(
-                    alignment: Alignment.centerLeft,
+                  alignment: Alignment.centerLeft,
+                  child: TextButton(
+                    onPressed: () => Navigator.of(context).pop(),
                     child: Text(
                       appStrings(context).alertDismissButton,
                       style: Theme.of(context).textTheme.headline4,
-                    )
+                    ),
+                  )
                 )
             ),
             Expanded(
