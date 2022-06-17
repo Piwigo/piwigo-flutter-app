@@ -268,8 +268,6 @@ class _FavoritesViewPageState extends State<FavoritesViewPage> with SingleTicker
           ),
         ),
       ),
-      // floatingActionButton: _isEditMode ?
-      // Center() : createFloatingActionButton(),
       bottomNavigationBar: _isEditMode ?
       createBottomBar() : Container(height: 0),
     );
@@ -325,118 +323,6 @@ class _FavoritesViewPageState extends State<FavoritesViewPage> with SingleTicker
     );
   }
 
-  // Widget createUploadActionButton() {
-  //   ThemeData _theme = Theme.of(context);
-  //   return SpeedDial(
-  //     spaceBetweenChildren: 10,
-  //     childMargin: EdgeInsets.only(bottom: 17, right: 10),
-  //     animatedIcon: AnimatedIcons.menu_close,
-  //     animatedIconTheme: IconThemeData(size: 22.0),
-  //     closeManually: false,
-  //     curve: Curves.bounceIn,
-  //     backgroundColor: _theme.floatingActionButtonTheme.backgroundColor,
-  //     foregroundColor: _theme.floatingActionButtonTheme.foregroundColor,
-  //     overlayColor: Colors.black,
-  //     elevation: 5.0,
-  //     overlayOpacity: 0.5,
-  //     shape: CircleBorder(),
-  //     children: [
-  //       SpeedDialChild(
-  //         elevation: 5,
-  //         labelWidget: Text(appStrings(context).createNewAlbum_title, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white)),
-  //         child: Icon(Icons.create_new_folder),
-  //         backgroundColor: _theme.floatingActionButtonTheme.backgroundColor,
-  //         foregroundColor: _theme.floatingActionButtonTheme.foregroundColor,
-  //         onTap: () async {
-  //           showDialog(
-  //               context: context,
-  //               builder: (BuildContext context) {
-  //                 return CreateCategoryDialog(catId: widget.category);
-  //               }
-  //           ).whenComplete(() {
-  //             _getData();
-  //           });
-  //         },
-  //       ),
-  //       SpeedDialChild(
-  //           elevation: 5,
-  //           labelWidget: Text(appStrings(context).categoryUpload_images, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white)),
-  //           child: Icon(Icons.add_to_photos),
-  //           backgroundColor: _theme.floatingActionButtonTheme.backgroundColor,
-  //           foregroundColor: _theme.floatingActionButtonTheme.foregroundColor,
-  //           onTap: () async {
-  //             try {
-  //               ScaffoldMessenger.of(context).removeCurrentSnackBar();
-  //               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-  //                 content: Row(
-  //                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //                   mainAxisSize: MainAxisSize.min,
-  //                   children: [
-  //                     Text(appStrings(context).loadingHUD_label),
-  //                     CircularProgressIndicator(),
-  //                   ],
-  //                 ),
-  //                 duration: Duration(days: 365),
-  //               ));
-  //               final List<XFile> images = ((await FilePicker.platform.pickFiles(
-  //                 type: FileType.media,
-  //                 allowMultiple: true,
-  //               )) ?.files ?? []).map<XFile>((e) => XFile(e.path, name: e.name, bytes: e.bytes)).toList();
-  //               ScaffoldMessenger.of(context).removeCurrentSnackBar();
-  //               if(images.isNotEmpty) {
-  //                 Navigator.push(context, MaterialPageRoute(
-  //                     builder: (context) => UploadGalleryViewPage(imageData: images, category: widget.category)
-  //                 )).whenComplete(() {
-  //                   setState(() {
-  //                     print('After upload'); // refresh
-  //                   });
-  //                 });
-  //               }
-  //             } catch (e) {
-  //               print('${e.toString()}');
-  //             }
-  //           }
-  //       ),
-  //       SpeedDialChild(
-  //           elevation: 5,
-  //           labelWidget: Text(appStrings(context).categoryUpload_take, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white)),
-  //           child: Icon(Icons.photo_camera_rounded),
-  //           backgroundColor: _theme.floatingActionButtonTheme.backgroundColor,
-  //           foregroundColor: _theme.floatingActionButtonTheme.foregroundColor,
-  //           onTap: () async {
-  //             try {
-  //               ScaffoldMessenger.of(context).removeCurrentSnackBar();
-  //               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-  //                 content: Row(
-  //                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //                   mainAxisSize: MainAxisSize.min,
-  //                   children: [
-  //                     Text(appStrings(context).loadingHUD_label),
-  //                     CircularProgressIndicator(),
-  //                   ],
-  //                 ),
-  //                 duration: Duration(days: 365),
-  //               ));
-  //               final XFile image = await ImagePicker().pickImage(source: ImageSource.camera);
-  //               ScaffoldMessenger.of(context).removeCurrentSnackBar();
-  //               if(image != null) {
-  //                 Navigator.push(context, MaterialPageRoute(
-  //                     builder: (context) => UploadGalleryViewPage(imageData: [image], category: widget.category)
-  //                 )).whenComplete(() {
-  //                   setState(() {
-  //                     print('After upload'); // refresh
-  //                   });
-  //                 });
-  //               }
-  //             } catch (e) {
-  //               print('Dio error ${e.toString()}');
-  //             }
-  //           }
-  //       ),
-  //     ],
-  //   );
-  // }
-
   Widget createBottomBar() {
     ThemeData _theme = Theme.of(context);
     return BottomNavigationBar(
@@ -444,16 +330,10 @@ class _FavoritesViewPageState extends State<FavoritesViewPage> with SingleTicker
         if(_selectedItems.length > 0) {
           switch (index) {
             case 0:
-              _onEditSelection();
-              break;
-            case 1:
               _onDownloadSelection();
               break;
             case 2:
               _onMoveCopySelection();
-              break;
-            case 3:
-              _onDeleteSelection();
               break;
             default:
               break;
@@ -462,20 +342,12 @@ class _FavoritesViewPageState extends State<FavoritesViewPage> with SingleTicker
       },
       items: <BottomNavigationBarItem>[
         BottomNavigationBarItem(
-          icon: Icon(Icons.edit, color: _theme.iconTheme.color),
-          label: appStrings(context).imageOptions_edit,
-        ),
-        BottomNavigationBarItem(
           icon: Icon(Icons.download_rounded, color: _theme.iconTheme.color),
           label: appStrings(context).imageOptions_download,
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.reply_outlined, color: _theme.iconTheme.color),
-          label: appStrings(context).moveImage_title,
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.delete_outline, color: _theme.errorColor),
-          label: appStrings(context).deleteImage_delete,
+          icon: Icon(Icons.favorite_border_rounded, color: _theme.errorColor),
+          label: "Remove from favorites",
         ),
       ],
       backgroundColor: _theme.scaffoldBackgroundColor,
@@ -487,45 +359,4 @@ class _FavoritesViewPageState extends State<FavoritesViewPage> with SingleTicker
       currentIndex: 0,
     );
   }
-
-  // Widget createFloatingActionButton() {
-  //   final uploadStatusProvider = Provider.of<UploadStatusNotifier>(context);
-  //   return Padding(
-  //     padding: const EdgeInsets.all(8.0),
-  //     child: Stack(
-  //       children: <Widget>[
-  //         Align(
-  //           alignment: Alignment.bottomRight,
-  //           child: Container(
-  //             margin: EdgeInsets.only(bottom: 0, right: widget.isAdmin? 70 : 0),
-  //             child: FloatingActionButton(
-  //               backgroundColor: Color(0xff868686),
-  //               onPressed: () {
-  //                 Navigator.of(context).popUntil((route) => route.isFirst);
-  //               },
-  //               child: uploadStatusProvider.status ?
-  //               Stack(
-  //                 alignment: Alignment.center,
-  //                 children: [
-  //                   SizedBox(
-  //                     height: 55,
-  //                     width: 55,
-  //                     child: CircularProgressIndicator(
-  //                       strokeWidth: 5,
-  //                       value: uploadStatusProvider.progress,
-  //                     ),
-  //                   ),
-  //                   Text("${uploadStatusProvider.getRemaining()}",
-  //                     style: TextStyle(fontSize: 16),
-  //                   ),
-  //                 ],
-  //               ) :
-  //               Icon(Icons.home, color: Colors.grey.shade200, size: 30),
-  //             ),
-  //           ),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
 }
