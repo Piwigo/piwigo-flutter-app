@@ -20,27 +20,25 @@ class ViewPopupMenuButton extends StatelessWidget {
       shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(10.0))
       ),
-      // padding: EdgeInsets.zero,
-      // offset: Offset(0, 50),
       itemBuilder: (ctx) => [
-         isAdmin ? _buildPopupMenuItem(
-          appStrings(context).categoryDiscoverFavorites_title, ViewPopupMenuOptions.favorites.index,
-          iconData: Icons.favorite_border
-        ) : null,
+        //  isAdmin ? _buildPopupMenuItem(
+        //   appStrings(context).categoryDiscoverFavorites_title, ViewPopupMenuOptions.favorites.index,
+        //   iconData: Icons.favorite_border
+        // ) : null,
         _buildPopupMenuItem(
           appStrings(context).tags, ViewPopupMenuOptions.tags.index,
           iconData: Icons.local_offer_outlined
         ),
-        _buildPopupMenuItem(
-          appStrings(context).categoryDiscoverVisits_title, ViewPopupMenuOptions.top_viewed.index,
-        ),
-        _buildPopupMenuItem(
-          appStrings(context).categoryDiscoverBest_title, ViewPopupMenuOptions.top_rated.index,
-        ),
-        _buildPopupMenuItem(
-          appStrings(context).categoryDiscoverRecent_title, ViewPopupMenuOptions.top_rated.index,
-            iconData: Icons.access_time_rounded
-        ),
+        // _buildPopupMenuItem(
+        //   appStrings(context).categoryDiscoverVisits_title, ViewPopupMenuOptions.top_viewed.index,
+        // ),
+        // _buildPopupMenuItem(
+        //   appStrings(context).categoryDiscoverBest_title, ViewPopupMenuOptions.top_rated.index,
+        // ),
+        // _buildPopupMenuItem(
+        //   appStrings(context).categoryDiscoverRecent_title, ViewPopupMenuOptions.top_rated.index,
+        //     iconData: Icons.access_time_rounded
+        // ),
       ],
     );
   }
