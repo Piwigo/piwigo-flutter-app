@@ -488,9 +488,9 @@ showChooseTagSheet(context, {content = ''}) async {
     builder: (BuildContext context) {
       return DraggableScrollableSheet(
         key: UniqueKey(),
-        initialChildSize: 0.7,
+        initialChildSize: 0.93,
         maxChildSize: 0.93,
-        minChildSize: .5,
+        // minChildSize: .5,
         expand: false,
         builder: (context, controller) => Column(
           children: [
