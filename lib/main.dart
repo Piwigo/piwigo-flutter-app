@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:piwigo_ng/services/ThemeProvider.dart';
 import 'package:piwigo_ng/services/UploadStatusProvider.dart';
 import 'package:piwigo_ng/views/RootCategoryViewPage.dart';
@@ -53,7 +54,12 @@ class MyApp extends StatelessWidget {
     final themeProvider = Provider.of<ThemeNotifier>(context);
     return MaterialApp(
       title: "Piwigo NG",
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      localizationsDelegates: [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
       supportedLocales: AppLocalizations.supportedLocales,
       theme: light,
       // theme: themeProvider.darkTheme ? dark : light,

@@ -1,5 +1,3 @@
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -285,9 +283,9 @@ class _SettingsPageState extends State<SettingsPage> {
             children: [
               GestureDetector(
                 onTap: () async {
-                  var url = appStrings(context).settings_twitterURL;
-                  if (await canLaunch(url)) {
-                    await launch(url);
+                  var url = Uri(path: appStrings(context).settings_twitterURL);
+                  if (await canLaunchUrl(url)) {
+                    await launchUrl(url);
                   } else {
                     throw 'Could not launch $url';
                   }
@@ -299,9 +297,9 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
               GestureDetector(
                 onTap: () async {
-                  var url = appStrings(context).settings_pwgForumURL;
-                  if (await canLaunch(url)) {
-                    await launch(url);
+                  var url = Uri(path: appStrings(context).settings_pwgForumURL);
+                  if (await canLaunchUrl(url)) {
+                    await launchUrl(url);
                   } else {
                     throw 'Could not launch $url';
                   }
@@ -313,9 +311,9 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
               GestureDetector(
                 onTap: () async {
-                  var url = appStrings(context).settings_crowdinURL;
-                  if (await canLaunch(url)) {
-                    await launch(url);
+                  var url = Uri(path: appStrings(context).settings_crowdinURL);
+                  if (await canLaunchUrl(url)) {
+                    await launchUrl(url);
                   } else {
                     throw 'Could not launch $url';
                   }
