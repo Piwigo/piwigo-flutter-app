@@ -89,23 +89,26 @@ class TextFieldSearch extends StatelessWidget {
     return Container(
       margin: margin ?? EdgeInsets.symmetric(horizontal: 0, vertical: 0),
       padding: padding ?? EdgeInsets.symmetric(horizontal: 5, vertical: 0),
-      constraints: BoxConstraints(maxHeight: 30),
-      // height: 20,
       decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
-          color: _theme.inputDecorationTheme.fillColor
+        borderRadius: BorderRadius.circular(20),
+        color: _theme.inputDecorationTheme.fillColor,
       ),
-      child: TextFormField(
-        controller: controller,
-        style: _theme.inputDecorationTheme.labelStyle,
-        textAlignVertical: TextAlignVertical.top,
-        decoration: InputDecoration(
-          prefixIcon: Icon(Icons.search, color: _theme.iconTheme.color),
-          // contentPadding: EdgeInsets.zero,
-          border: InputBorder.none,
-          hintText: hint,
-          hintStyle: _theme.inputDecorationTheme.hintStyle,
-        ),
+      child: Row(
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: Icon(Icons.search, color: _theme.iconTheme.color),
+          ),
+          Expanded(
+            child: TextFormField(
+              controller: controller,
+              decoration: InputDecoration(
+                border: InputBorder.none,
+                hintText: hint,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
