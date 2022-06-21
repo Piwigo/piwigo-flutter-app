@@ -72,3 +72,41 @@ class TextFieldDescription extends StatelessWidget {
     );
   }
 }
+
+
+class TextFieldSearch extends StatelessWidget {
+  const TextFieldSearch({Key key, this.controller, this.hint, this.padding, this.margin}) : super(key: key);
+
+  final TextEditingController controller;
+  final String hint;
+  final EdgeInsetsGeometry padding;
+  final EdgeInsetsGeometry margin;
+
+  @override
+  Widget build(BuildContext context) {
+    var _theme = Theme.of(context);
+
+    return Container(
+      margin: margin ?? EdgeInsets.symmetric(horizontal: 0, vertical: 0),
+      padding: padding ?? EdgeInsets.symmetric(horizontal: 5, vertical: 0),
+      constraints: BoxConstraints(maxHeight: 30),
+      // height: 20,
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10),
+          color: _theme.inputDecorationTheme.fillColor
+      ),
+      child: TextFormField(
+        controller: controller,
+        style: _theme.inputDecorationTheme.labelStyle,
+        textAlignVertical: TextAlignVertical.top,
+        decoration: InputDecoration(
+          prefixIcon: Icon(Icons.search, color: _theme.iconTheme.color),
+          // contentPadding: EdgeInsets.zero,
+          border: InputBorder.none,
+          hintText: hint,
+          hintStyle: _theme.inputDecorationTheme.hintStyle,
+        ),
+      ),
+    );
+  }
+}
