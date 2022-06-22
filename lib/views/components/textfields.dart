@@ -108,6 +108,14 @@ class TextFieldSearch extends StatelessWidget {
               ),
             ),
           ),
+          if(controller.text.isNotEmpty)
+            GestureDetector(
+              onTap: () => controller.clear(),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: Icon(Icons.close, color: _theme.iconTheme.color),
+              ),
+            ),
         ],
       ),
     );

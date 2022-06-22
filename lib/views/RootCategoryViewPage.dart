@@ -38,14 +38,15 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
     super.initState();
     _rootCategory = "0";
     _searchController.addListener(() {
-      _getData();
       setState(() {
         _isSearching = _searchController.text.length > 0;
+        _getData();
       });
     });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       API.uploader = Uploader(context);
     });
+    _getData();
   }
   @override
   void dispose() {
@@ -89,9 +90,11 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
           body: Builder(builder: (context) {
             if(_isSearching) {
               return FutureBuilder<Map<String,dynamic>>(
-                future: _imagesFuture, // Albums of the list
+                key: UniqueKey(),
+                future: _imagesFuture,
                 builder: (BuildContext context, AsyncSnapshot imagesSnapshot) {
                   if(imagesSnapshot.hasData){
+                    print("Images: ${imagesSnapshot.data}");
                     if(imagesSnapshot.data['stat'] == 'fail') {
                       return Center(
                         child: Text(appStrings(context).categoryImageList_noDataError),
@@ -134,9 +137,11 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
               );
             }
             return FutureBuilder<Map<String,dynamic>>(
+              key: UniqueKey(),
               future: _albumsFuture, // Albums of the list
               builder: (BuildContext context, AsyncSnapshot albumSnapshot) {
                 if(albumSnapshot.hasData){
+                  //print(albumSnapshot.data);
                   if(albumSnapshot.data['stat'] == 'fail') {
                     return Container(
                       padding: EdgeInsets.all(10),
@@ -147,7 +152,7 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
                   int nbPhotos = 0;
                   albums.forEach((cat) => nbPhotos+=cat["total_nb_images"]);
                   albums.removeWhere((category) => (
-                      category["id"].toString() == _rootCategory
+                    category["id"].toString() == _rootCategory
                   ));
                   return RefreshIndicator(
                     displacement: 20,
@@ -279,5 +284,4 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
       },
     );
   }
-
 }
