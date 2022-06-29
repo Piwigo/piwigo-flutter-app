@@ -54,6 +54,17 @@ class MyApp extends StatelessWidget {
     final themeProvider = Provider.of<ThemeNotifier>(context);
     return MaterialApp(
       title: "Piwigo NG",
+      // localeListResolutionCallback: (locales, supportedLocales) {
+      //   debugPrint('device locales=$locales supported locales=$supportedLocales');
+      //
+      //   for (Locale locale in locales) {
+      //     if (supportedLocales.contains(locale)) {
+      //       return locale;
+      //     }
+      //   }
+      //
+      //   return Locale('en', 'US');
+      // },
       localizationsDelegates: [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
@@ -61,6 +72,7 @@ class MyApp extends StatelessWidget {
         GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: AppLocalizations.supportedLocales,
+      locale: Locale('en', 'US'),
       theme: light,
       // theme: themeProvider.darkTheme ? dark : light,
       initialRoute: '/',

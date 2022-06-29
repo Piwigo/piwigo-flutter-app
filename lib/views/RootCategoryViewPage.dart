@@ -40,7 +40,7 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
     _searchController.addListener(() {
       setState(() {
         _isSearching = _searchController.text.length > 0;
-        _getData();
+        //_getData();
       });
     });
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -87,46 +87,75 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
               ),
             ];
           },
-          body: Builder(builder: (context) {
-            if(_isSearching) {
-              return FutureBuilder<Map<String,dynamic>>(
-                key: UniqueKey(),
-                future: _imagesFuture,
-                builder: (BuildContext context, AsyncSnapshot imagesSnapshot) {
-                  if(imagesSnapshot.hasData){
-                    print("Images: ${imagesSnapshot.data}");
-                    if(imagesSnapshot.data['stat'] == 'fail') {
+          body: RefreshIndicator(
+            displacement: 20,
+            notificationPredicate: (notification) {
+              return notification.metrics.atEdge;
+            },
+            onRefresh: () {
+              _getData();
+              return Future.delayed(Duration(milliseconds: 1000));
+            },
+            child: Builder(builder: (context) {
+              if(_isSearching) {
+                return FutureBuilder<Map<String,dynamic>>(
+                  key: UniqueKey(),
+                  future: _imagesFuture,
+                  builder: (BuildContext context, AsyncSnapshot imagesSnapshot) {
+                    if(imagesSnapshot.hasData){
+                      if(imagesSnapshot.data['stat'] == 'fail') {
+                        return Center(
+                          child: Text(appStrings(context).categoryImageList_noDataError),
+                        );
+                      }
+                      var images = imagesSnapshot.data['result']['images'];
+                      var nbImages = images.length;
+                      return Column(
+                        children: [
+                          _imageGrid(images),
+                          Center(
+                            child: Container(
+                              padding: EdgeInsets.all(10),
+                              child: Text(appStrings(context).imageCount(nbImages), style: TextStyle(fontSize: 20, color: _theme.textTheme.bodyText2.color, fontWeight: FontWeight.w300,),),
+                            ),
+                          ),
+                        ],
+                      );
+                    } else {
                       return Center(
-                        child: Text(appStrings(context).categoryImageList_noDataError),
+                        child: CircularProgressIndicator(),
                       );
                     }
-                    var images = imagesSnapshot.data['result']['images'];
-                    var nbImages = images.length;
-                    return RefreshIndicator(
-                      displacement: 20,
-                      notificationPredicate: (notification) {
-                        return notification.metrics.atEdge;
-                      },
-                      onRefresh: () {
-                        setState(() {
-                          print("refresh");
-                        });
-                        return Future.delayed(Duration(milliseconds: 1000));
-                      },
-                      child: SingleChildScrollView(
-                        physics: NeverScrollableScrollPhysics(),
-                        child: Column(
-                          children: [
-                            _imageGrid(images),
-                            Center(
-                              child: Container(
-                                padding: EdgeInsets.all(10),
-                                child: Text(appStrings(context).imageCount(nbImages), style: TextStyle(fontSize: 20, color: _theme.textTheme.bodyText2.color, fontWeight: FontWeight.w300)),
-                              ),
-                            ),
-                          ],
+                  },
+                );
+              }
+              return FutureBuilder<Map<String,dynamic>>(
+                key: UniqueKey(),
+                future: _albumsFuture, // Albums of the list
+                builder: (BuildContext context, AsyncSnapshot albumSnapshot) {
+                  if(albumSnapshot.hasData){
+                    if(albumSnapshot.data['stat'] == 'fail') {
+                      return Container(
+                        padding: EdgeInsets.all(10),
+                        child: Text(albumSnapshot.data['result']),
+                      ); //appStrings(context).categoryMainEmpty
+                    }
+                    var albums = albumSnapshot.data['result']['categories'];
+                    int nbPhotos = 0;
+                    albums.forEach((cat) => nbPhotos+=cat["total_nb_images"]);
+                    albums.removeWhere((category) => (
+                      category["id"].toString() == _rootCategory
+                    ));
+                    return Column(
+                      children: [
+                        _albumGrid(albums),
+                        Center(
+                          child: Container(
+                            padding: EdgeInsets.all(10),
+                            child: Text(appStrings(context).imageCount(nbPhotos), style: TextStyle(fontSize: 20, color: _theme.textTheme.bodyText2.color, fontWeight: FontWeight.w300,),),
+                          ),
                         ),
-                      ),
+                      ],
                     );
                   } else {
                     return Center(
@@ -135,59 +164,8 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
                   }
                 },
               );
-            }
-            return FutureBuilder<Map<String,dynamic>>(
-              key: UniqueKey(),
-              future: _albumsFuture, // Albums of the list
-              builder: (BuildContext context, AsyncSnapshot albumSnapshot) {
-                if(albumSnapshot.hasData){
-                  //print(albumSnapshot.data);
-                  if(albumSnapshot.data['stat'] == 'fail') {
-                    return Container(
-                      padding: EdgeInsets.all(10),
-                      child: Text(albumSnapshot.data['result']),
-                    ); //appStrings(context).categoryMainEmtpy
-                  }
-                  var albums = albumSnapshot.data['result']['categories'];
-                  int nbPhotos = 0;
-                  albums.forEach((cat) => nbPhotos+=cat["total_nb_images"]);
-                  albums.removeWhere((category) => (
-                    category["id"].toString() == _rootCategory
-                  ));
-                  return RefreshIndicator(
-                    displacement: 20,
-                    notificationPredicate: (notification) {
-                      return notification.metrics.atEdge;
-                    },
-                    onRefresh: () {
-                      setState(() {
-                        print("refresh");
-                      });
-                      return Future.delayed(Duration(milliseconds: 1000));
-                    },
-                    child: SingleChildScrollView(
-                      physics: NeverScrollableScrollPhysics(),
-                      child: Column(
-                        children: [
-                          _albumGrid(albums),
-                          Center(
-                            child: Container(
-                              padding: EdgeInsets.all(10),
-                              child: Text(appStrings(context).imageCount(nbPhotos), style: TextStyle(fontSize: 20, color: _theme.textTheme.bodyText2.color, fontWeight: FontWeight.w300)),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                } else {
-                  return Center(
-                    child: CircularProgressIndicator(),
-                  );
-                }
-              },
-            );
-          }),
+            }),
+          ),
         ),
       ),
       floatingActionButton: widget.isAdmin ? FloatingActionButton(
@@ -199,7 +177,7 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
             }
           ).whenComplete(() {
             setState(() {
-              print('refresh');
+              _getData();
             });
           });
         },
