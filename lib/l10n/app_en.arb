@@ -906,6 +906,7 @@
 
 
     "settings_appName": "Piwigo NG",
+    "settings_language": "Select language",
     "settingsHeader_about": "Information",
     "settings_twitter": "@piwigo",
     "settings_twitterURL": "https://twitter.com/piwigo",

@@ -23,6 +23,12 @@ class _AppBarExpandableState extends State<AppBarExpandable> {
     super.initState();
   }
 
+  @override
+  void dispose() {
+    widget.scrollController.dispose();
+    super.dispose();
+  }
+
   void refresh() {
     setState(() {
 
@@ -67,12 +73,15 @@ class _AppBarExpandableState extends State<AppBarExpandable> {
 
 
 class AppBarExpandableSearch extends StatefulWidget {
-  const AppBarExpandableSearch({Key key, this.leading, this.title = '', this.actions, this.textController}) : super(key: key);
+  const AppBarExpandableSearch({Key key, this.leading, this.title = '', this.actions, this.textController, this.onSubmit, this.onTap, this.focusNode,}) : super(key: key);
 
   final TextEditingController textController;
   final Widget leading;
   final String title;
   final List<Widget> actions;
+  final Function(String) onSubmit;
+  final Function() onTap;
+  final FocusNode focusNode;
 
   @override
   _AppBarExpandableSearchState createState() => _AppBarExpandableSearchState();
@@ -95,8 +104,11 @@ class _AppBarExpandableSearchState extends State<AppBarExpandableSearch> {
         background: Center(
           child: TextFieldSearch(
             controller: widget.textController,
+            focusNode: widget.focusNode,
             hint: "Search...", // TODO Localization
             margin: EdgeInsets.symmetric(horizontal: 10),
+            onTap: widget.onTap,
+            onSubmit: widget.onSubmit,
           ),
         ),
       ),

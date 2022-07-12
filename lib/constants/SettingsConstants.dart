@@ -47,6 +47,23 @@ AppLocalizations appStrings(context) {
   return AppLocalizations.of(context);
 }
 
+String getLanguageFromCode(String code) {
+  switch (code) {
+    case 'de': return 'Deutsch';
+    break;
+    case 'en': return 'English';
+    break;
+    case 'es': return 'Español';
+    break;
+    case 'fr': return 'Français';
+    break;
+    case 'zh': return '中国人';
+    break;
+    default: return code;
+      break;
+  }
+}
+
 Map<int, String> albumSort(context) {
   return {
     0: appStrings(context).categorySort_nameAscending,

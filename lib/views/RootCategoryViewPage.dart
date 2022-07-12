@@ -29,6 +29,7 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
   TextEditingController _searchController = TextEditingController();
   ScrollController _scrollController = ScrollController();
   bool _isSearching = false;
+  final FocusNode _focus = FocusNode();
 
   Future<Map<String,dynamic>> _albumsFuture;
   Future<Map<String,dynamic>> _imagesFuture;
@@ -37,11 +38,10 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
   void initState() {
     super.initState();
     _rootCategory = "0";
-    _searchController.addListener(() {
-      setState(() {
-        _isSearching = _searchController.text.length > 0;
-        //_getData();
-      });
+    _focus.addListener(() {
+      if(!_focus.hasFocus) {
+        setState(() {});
+      }
     });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       API.uploader = Uploader(context);
@@ -64,7 +64,7 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
     return Scaffold(
       body: GestureDetector(
         onTap: () {
-          FocusScope.of(context).unfocus();
+          _focus.unfocus();
         },
         child: NestedScrollView(
           controller: _scrollController,
@@ -84,6 +84,14 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
               ),
               AppBarExpandableSearch(
                 textController: _searchController,
+                onTap: () {},
+                focusNode: _focus,
+                onSubmit: (string) {
+                  setState(() {
+                    _isSearching = _searchController.text.length > 0;
+                    _getData();
+                  });
+                },
               ),
             ];
           },
@@ -96,27 +104,64 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
               _getData();
               return Future.delayed(Duration(milliseconds: 1000));
             },
-            child: Builder(builder: (context) {
-              if(_isSearching) {
-                return FutureBuilder<Map<String,dynamic>>(
-                  key: UniqueKey(),
-                  future: _imagesFuture,
-                  builder: (BuildContext context, AsyncSnapshot imagesSnapshot) {
-                    if(imagesSnapshot.hasData){
-                      if(imagesSnapshot.data['stat'] == 'fail') {
+            child: SingleChildScrollView(
+              child: Builder(builder: (context) {
+                if(_isSearching) {
+                  return FutureBuilder<Map<String,dynamic>>(
+                    key: UniqueKey(),
+                    future: _imagesFuture,
+                    builder: (BuildContext context, AsyncSnapshot imagesSnapshot) {
+                      if(imagesSnapshot.hasData){
+                        if(imagesSnapshot.data['stat'] == 'fail') {
+                          return Center(
+                            child: Text(appStrings(context).categoryImageList_noDataError),
+                          );
+                        }
+                        var images = imagesSnapshot.data['result']['images'];
+                        var nbImages = images.length;
+                        return Column(
+                          children: [
+                            _imageGrid(images),
+                            Center(
+                              child: Container(
+                                padding: EdgeInsets.all(10),
+                                child: Text(appStrings(context).imageCount(nbImages), style: TextStyle(fontSize: 20, color: _theme.textTheme.bodyText2.color, fontWeight: FontWeight.w300,),),
+                              ),
+                            ),
+                          ],
+                        );
+                      } else {
                         return Center(
-                          child: Text(appStrings(context).categoryImageList_noDataError),
+                          child: CircularProgressIndicator(),
                         );
                       }
-                      var images = imagesSnapshot.data['result']['images'];
-                      var nbImages = images.length;
+                    },
+                  );
+                }
+                return FutureBuilder<Map<String,dynamic>>(
+                  key: UniqueKey(),
+                  future: _albumsFuture, // Albums of the list
+                  builder: (BuildContext context, AsyncSnapshot albumSnapshot) {
+                    if(albumSnapshot.hasData){
+                      if(albumSnapshot.data['stat'] == 'fail') {
+                        return Container(
+                          padding: EdgeInsets.all(10),
+                          child: Text(albumSnapshot.data['result']),
+                        ); //appStrings(context).categoryMainEmpty
+                      }
+                      var albums = albumSnapshot.data['result']['categories'];
+                      int nbPhotos = 0;
+                      albums.forEach((cat) => nbPhotos+=cat["total_nb_images"]);
+                      albums.removeWhere((category) => (
+                        category["id"].toString() == _rootCategory
+                      ));
                       return Column(
                         children: [
-                          _imageGrid(images),
+                          _albumGrid(albums),
                           Center(
                             child: Container(
                               padding: EdgeInsets.all(10),
-                              child: Text(appStrings(context).imageCount(nbImages), style: TextStyle(fontSize: 20, color: _theme.textTheme.bodyText2.color, fontWeight: FontWeight.w300,),),
+                              child: Text(appStrings(context).imageCount(nbPhotos), style: TextStyle(fontSize: 20, color: _theme.textTheme.bodyText2.color, fontWeight: FontWeight.w300,),),
                             ),
                           ),
                         ],
@@ -128,43 +173,8 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
                     }
                   },
                 );
-              }
-              return FutureBuilder<Map<String,dynamic>>(
-                key: UniqueKey(),
-                future: _albumsFuture, // Albums of the list
-                builder: (BuildContext context, AsyncSnapshot albumSnapshot) {
-                  if(albumSnapshot.hasData){
-                    if(albumSnapshot.data['stat'] == 'fail') {
-                      return Container(
-                        padding: EdgeInsets.all(10),
-                        child: Text(albumSnapshot.data['result']),
-                      ); //appStrings(context).categoryMainEmpty
-                    }
-                    var albums = albumSnapshot.data['result']['categories'];
-                    int nbPhotos = 0;
-                    albums.forEach((cat) => nbPhotos+=cat["total_nb_images"]);
-                    albums.removeWhere((category) => (
-                      category["id"].toString() == _rootCategory
-                    ));
-                    return Column(
-                      children: [
-                        _albumGrid(albums),
-                        Center(
-                          child: Container(
-                            padding: EdgeInsets.all(10),
-                            child: Text(appStrings(context).imageCount(nbPhotos), style: TextStyle(fontSize: 20, color: _theme.textTheme.bodyText2.color, fontWeight: FontWeight.w300,),),
-                          ),
-                        ),
-                      ],
-                    );
-                  } else {
-                    return Center(
-                      child: CircularProgressIndicator(),
-                    );
-                  }
-                },
-              );
-            }),
+              }),
+            ),
           ),
         ),
       ),

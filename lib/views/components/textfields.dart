@@ -74,21 +74,31 @@ class TextFieldDescription extends StatelessWidget {
 }
 
 
-class TextFieldSearch extends StatelessWidget {
-  const TextFieldSearch({Key key, this.controller, this.hint, this.padding, this.margin}) : super(key: key);
+class TextFieldSearch extends StatefulWidget {
+  const TextFieldSearch({Key key, this.controller, this.hint, this.padding, this.margin, this.onSubmit, this.onTap, this.focusNode,}) : super(key: key);
 
   final TextEditingController controller;
   final String hint;
   final EdgeInsetsGeometry padding;
   final EdgeInsetsGeometry margin;
+  final Function(String) onSubmit;
+  final Function() onTap;
+  final FocusNode focusNode;
+
+  @override
+  State<TextFieldSearch> createState() => _TextFieldSearchState();
+}
+
+class _TextFieldSearchState extends State<TextFieldSearch> {
+  final FocusNode _focus = FocusNode();
 
   @override
   Widget build(BuildContext context) {
     var _theme = Theme.of(context);
 
     return Container(
-      margin: margin ?? EdgeInsets.symmetric(horizontal: 0, vertical: 0),
-      padding: padding ?? EdgeInsets.symmetric(horizontal: 5, vertical: 0),
+      margin: widget.margin ?? EdgeInsets.symmetric(horizontal: 0, vertical: 0),
+      padding: widget.padding ?? EdgeInsets.symmetric(horizontal: 5, vertical: 0),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
         color: _theme.inputDecorationTheme.fillColor,
@@ -101,16 +111,28 @@ class TextFieldSearch extends StatelessWidget {
           ),
           Expanded(
             child: TextFormField(
-              controller: controller,
+              controller: widget.controller,
+              focusNode: _focus,
+              onTap: widget.onTap,
+              onFieldSubmitted: widget.onSubmit,
+              onChanged: (string) {
+                setState(() {});
+              },
               decoration: InputDecoration(
                 border: InputBorder.none,
-                hintText: hint,
+                hintText: widget.hint,
               ),
             ),
           ),
-          if(controller.text.isNotEmpty)
+          if(widget.controller.text.isNotEmpty)
             GestureDetector(
-              onTap: () => controller.clear(),
+              onTap: () {
+                widget.controller.clear();
+                _focus.unfocus();
+                if(widget.onSubmit != null) {
+                  widget.onSubmit(widget.controller.text);
+                }
+              },
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
                 child: Icon(Icons.close, color: _theme.iconTheme.color),

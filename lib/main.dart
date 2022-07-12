@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:piwigo_ng/services/LocaleProvider.dart';
 import 'package:piwigo_ng/services/ThemeProvider.dart';
 import 'package:piwigo_ng/services/UploadStatusProvider.dart';
 import 'package:piwigo_ng/views/RootCategoryViewPage.dart';
@@ -27,7 +28,12 @@ void main() async {
         return ChangeNotifierProvider(
           create: (context) => UploadStatusNotifier(),
           builder: (context, _) {
-            return MyApp();
+            return ChangeNotifierProvider(
+              create: (context) => LocaleNotifier(),
+              builder: (context, _) {
+                return MyApp();
+              }
+            );
           },
         );
       },
@@ -52,6 +58,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeNotifier>(context);
+    final localeProvider = Provider.of<LocaleNotifier>(context);
     return MaterialApp(
       title: "Piwigo NG",
       // localeListResolutionCallback: (locales, supportedLocales) {
@@ -71,8 +78,12 @@ class MyApp extends StatelessWidget {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      supportedLocales: AppLocalizations.supportedLocales,
-      locale: Locale('en', 'US'),
+      supportedLocales: [
+        Locale('en'),
+        Locale('de'),
+        Locale('fr'),
+      ],
+      locale: localeProvider.locale,
       theme: light,
       // theme: themeProvider.darkTheme ? dark : light,
       initialRoute: '/',
