@@ -25,7 +25,10 @@ class _SettingsLanguageViewState extends State<SettingsLanguageView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        automaticallyImplyLeading: true,
+        title: Text(appStrings(context).settings_language),
+      ),
       body: ListView.builder(
         itemCount: _locales.length,
         itemBuilder: (context, index) {
