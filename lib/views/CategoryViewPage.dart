@@ -501,7 +501,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
     ThemeData _theme = Theme.of(context);
 
     int albumCrossAxisCount = MediaQuery.of(context).size.width <= Constants.albumMinWidth ? 1
-        : (MediaQuery.of(context).size.width/Constants.albumMinWidth).floor();
+        : (MediaQuery.of(context).size.width/Constants.albumMinWidth).round();
 
     return RefreshIndicator(
       displacement: 20,

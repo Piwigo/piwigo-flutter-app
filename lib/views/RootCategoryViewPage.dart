@@ -58,6 +58,18 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
     _imagesFuture = searchAlbums(_searchController.text);
   }
 
+  _onAddAlbum() async {
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return CreateCategoryDialog(catId: "0");
+      },
+    );
+    setState(() {
+      _getData();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     ThemeData _theme = Theme.of(context);
@@ -101,7 +113,9 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
               return notification.metrics.atEdge;
             },
             onRefresh: () {
-              _getData();
+              setState(() {
+                _getData();
+              });
               return Future.delayed(Duration(milliseconds: 1000));
             },
             child: SingleChildScrollView(
@@ -179,18 +193,7 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
         ),
       ),
       floatingActionButton: widget.isAdmin ? FloatingActionButton(
-        onPressed: () {
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return CreateCategoryDialog(catId: "0");
-            }
-          ).whenComplete(() {
-            setState(() {
-              _getData();
-            });
-          });
-        },
+        onPressed: _onAddAlbum,
         child: Icon(Icons.create_new_folder, color: _theme.primaryColorLight, size: 30),
       ) : null,
     );
@@ -198,7 +201,7 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
 
   Widget _albumGrid(dynamic albums) {
     int albumCrossAxisCount = MediaQuery.of(context).size.width <= Constants.albumMinWidth ? 1
-        : (MediaQuery.of(context).size.width/Constants.albumMinWidth).floor();
+        : (MediaQuery.of(context).size.width/Constants.albumMinWidth).round();
 
     return GridView.builder(
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -213,9 +216,14 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
       physics: NeverScrollableScrollPhysics(),
       itemBuilder: (BuildContext context, int index) {
         var album = albums[index];
-        return AlbumListItem(album, isAdmin: widget.isAdmin, onClose: () {
-          setState(() {});
-        });
+        return AlbumListItem(album,
+          isAdmin: widget.isAdmin,
+          onClose: () {
+            setState(() {
+              _getData();
+            });
+          },
+        );
       },
     );
   }

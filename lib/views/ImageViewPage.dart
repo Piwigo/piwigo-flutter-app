@@ -82,8 +82,8 @@ class _ImageViewPageState extends State<ImageViewPage> with SingleTickerProvider
       MaterialPageRoute(builder: (_) => EditImagesPage(
         catId: int.parse(widget.category),
         images: [_images[_page]],
-      ))
-    );
+      )),
+    ).then((value) => setState(() {}));
   }
   void _onDownloadImage() async {
     if(await confirmDownloadDialog(context,
@@ -100,6 +100,7 @@ class _ImageViewPageState extends State<ImageViewPage> with SingleTickerProvider
         ),
       ));
       await downloadSingleImage(_images[_page]);
+      setState(() {});
     }
   }
   void _onMoveCopyImage() async {
@@ -107,61 +108,61 @@ class _ImageViewPageState extends State<ImageViewPage> with SingleTickerProvider
 
     switch(choice) {
       case 0: showDialog(context: context,
-          builder: (context) {
-            return MoveOrCopyDialog(
-              title: appStrings(context).moveImage_title,
-              subtitle: appStrings(context).moveImage_selectAlbum(1, _images[_page]['name']),
-              catId: widget.category,
-              catName: widget.title,
-              isImage: true,
-              onSelected: (item) async {
-                if(await confirmMoveDialog(context,
-                  content: appStrings(context).moveImage_message(1, _images[_page]['name'], item.name),
-                )) {
-                  var response = await moveImage(_images[_page]['id'], [int.parse(item.id)]);
-                  if(response['stat'] == 'fail') {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                        errorSnackBar(context, response['result']));
-                    Navigator.of(context).pop();
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                        imagesMovedSnackBar(context, 1));
-                    Navigator.of(context).pop();
-                  }
+        builder: (context) {
+          return MoveOrCopyDialog(
+            title: appStrings(context).moveImage_title,
+            subtitle: appStrings(context).moveImage_selectAlbum(1, _images[_page]['name']),
+            catId: widget.category,
+            catName: widget.title,
+            isImage: true,
+            onSelected: (item) async {
+              if(await confirmMoveDialog(context,
+                content: appStrings(context).moveImage_message(1, _images[_page]['name'], item.name),
+              )) {
+                var response = await moveImage(_images[_page]['id'], [int.parse(item.id)]);
+                if(response['stat'] == 'fail') {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                      errorSnackBar(context, response['result']));
+                  Navigator.of(context).pop();
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                      imagesMovedSnackBar(context, 1));
+                  Navigator.of(context).pop();
                 }
-              },
-            );
-          }
+              }
+            },
+          );
+        },
       ).whenComplete(() {
         setState(() {});
       });
       break;
       case 1: showDialog(context: context,
-          builder: (context) {
-            return MoveOrCopyDialog(
-              title: appStrings(context).copyImage_title,
-              subtitle: appStrings(context).copyImage_selectAlbum(1, _images[_page]['name']),
-              catId: widget.category,
-              catName: widget.title,
-              isImage: true,
-              onSelected: (item) async {
-                if(await confirmAssignDialog(context,
-                  content: appStrings(context).copyImage_message(1, _images[_page]['name'], item.name),
-                )) {
-                  var response = await assignImage(_images[_page]['id'], [int.parse(item.id)]);
-                  if (response['stat'] == 'fail') {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                        errorSnackBar(context, response['result']));
-                    Navigator.of(context).pop();
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                        imagesAssignedSnackBar(context, 1));
-                    Navigator.of(context).pop();
-                  }
+        builder: (context) {
+          return MoveOrCopyDialog(
+            title: appStrings(context).copyImage_title,
+            subtitle: appStrings(context).copyImage_selectAlbum(1, _images[_page]['name']),
+            catId: widget.category,
+            catName: widget.title,
+            isImage: true,
+            onSelected: (item) async {
+              if(await confirmAssignDialog(context,
+                content: appStrings(context).copyImage_message(1, _images[_page]['name'], item.name),
+              )) {
+                var response = await assignImage(_images[_page]['id'], [int.parse(item.id)]);
+                if (response['stat'] == 'fail') {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                      errorSnackBar(context, response['result']));
+                  Navigator.of(context).pop();
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                      imagesAssignedSnackBar(context, 1));
+                  Navigator.of(context).pop();
                 }
-              },
-            );
-          }
+              }
+            },
+          );
+        },
       ).whenComplete(() {
         setState(() {});
       });
