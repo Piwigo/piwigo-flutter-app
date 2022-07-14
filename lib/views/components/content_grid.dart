@@ -14,7 +14,6 @@ import 'package:piwigo_ng/services/OrientationService.dart';
 import 'package:piwigo_ng/views/components/list_item.dart';
 import 'package:piwigo_ng/views/components/snackbars.dart';
 
-import 'package:piwigo_ng/views/ImageViewPage.dart';
 import 'package:piwigo_ng/views/UploadGalleryViewPage.dart';
 import 'package:piwigo_ng/views/components/dialogs/dialogs.dart';
 
@@ -311,7 +310,7 @@ class ContentGridState extends State<ContentGrid> with SingleTickerProviderState
     ThemeData _theme = Theme.of(context);
 
     int albumCrossAxisCount = MediaQuery.of(context).size.width <= Constants.albumMinWidth ? 1
-        : (MediaQuery.of(context).size.width/Constants.albumMinWidth).floor();
+        : (MediaQuery.of(context).size.width/Constants.albumMinWidth).round();
 
     return RefreshIndicator(
       displacement: 20,
