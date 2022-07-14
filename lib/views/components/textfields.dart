@@ -72,3 +72,74 @@ class TextFieldDescription extends StatelessWidget {
     );
   }
 }
+
+
+class TextFieldSearch extends StatefulWidget {
+  const TextFieldSearch({Key key, this.controller, this.hint, this.padding, this.margin, this.onSubmit, this.onTap, this.focusNode,}) : super(key: key);
+
+  final TextEditingController controller;
+  final String hint;
+  final EdgeInsetsGeometry padding;
+  final EdgeInsetsGeometry margin;
+  final Function(String) onSubmit;
+  final Function() onTap;
+  final FocusNode focusNode;
+
+  @override
+  State<TextFieldSearch> createState() => _TextFieldSearchState();
+}
+
+class _TextFieldSearchState extends State<TextFieldSearch> {
+  final FocusNode _focus = FocusNode();
+
+  @override
+  Widget build(BuildContext context) {
+    var _theme = Theme.of(context);
+
+    return Container(
+      margin: widget.margin ?? EdgeInsets.symmetric(horizontal: 0, vertical: 0),
+      padding: widget.padding ?? EdgeInsets.symmetric(horizontal: 5, vertical: 0),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        color: _theme.inputDecorationTheme.fillColor,
+      ),
+      child: Row(
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: Icon(Icons.search, color: _theme.iconTheme.color),
+          ),
+          Expanded(
+            child: TextFormField(
+              controller: widget.controller,
+              focusNode: _focus,
+              onTap: widget.onTap,
+              onFieldSubmitted: widget.onSubmit,
+              onChanged: (string) {
+                setState(() {});
+              },
+              decoration: InputDecoration(
+                border: InputBorder.none,
+                hintText: widget.hint,
+              ),
+            ),
+          ),
+          if(widget.controller.text.isNotEmpty)
+            GestureDetector(
+              onTap: () {
+                widget.controller.clear();
+                _focus.unfocus();
+                if(widget.onSubmit != null) {
+                  widget.onSubmit(widget.controller.text);
+                }
+              },
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: Icon(Icons.close, color: _theme.iconTheme.color),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}

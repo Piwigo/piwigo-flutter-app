@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:piwigo_ng/views/components/textfields.dart';
 
 
 class AppBarExpandable extends StatefulWidget {
@@ -20,6 +21,12 @@ class _AppBarExpandableState extends State<AppBarExpandable> {
   initState() {
     widget.scrollController.addListener(() => refresh());
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    widget.scrollController.dispose();
+    super.dispose();
   }
 
   void refresh() {
@@ -58,6 +65,51 @@ class _AppBarExpandableState extends State<AppBarExpandable> {
         title: Text(widget.title),
         titlePadding: EdgeInsets.symmetric(
           vertical: 16.0, horizontal: _horizontalTitlePadding,
+        ),
+      ),
+    );
+  }
+}
+
+
+class AppBarExpandableSearch extends StatefulWidget {
+  const AppBarExpandableSearch({Key key, this.leading, this.title = '', this.actions, this.textController, this.onSubmit, this.onTap, this.focusNode,}) : super(key: key);
+
+  final TextEditingController textController;
+  final Widget leading;
+  final String title;
+  final List<Widget> actions;
+  final Function(String) onSubmit;
+  final Function() onTap;
+  final FocusNode focusNode;
+
+  @override
+  _AppBarExpandableSearchState createState() => _AppBarExpandableSearchState();
+}
+
+class _AppBarExpandableSearchState extends State<AppBarExpandableSearch> {
+
+  @override
+  Widget build(BuildContext context) {
+    return SliverAppBar(
+      expandedHeight: 30,
+      toolbarHeight: 0,
+      floating: true,
+      snap: true,
+      pinned: true,
+      backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
+      leading: widget.leading ?? SizedBox(),
+      actions: widget.actions ?? [],
+      flexibleSpace: FlexibleSpaceBar(
+        background: Center(
+          child: TextFieldSearch(
+            controller: widget.textController,
+            focusNode: widget.focusNode,
+            hint: "Search...", // TODO Localization
+            margin: EdgeInsets.symmetric(horizontal: 10),
+            onTap: widget.onTap,
+            onSubmit: widget.onSubmit,
+          ),
         ),
       ),
     );

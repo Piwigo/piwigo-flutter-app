@@ -14,6 +14,8 @@ import 'package:piwigo_ng/views/components/buttons.dart';
 import 'package:piwigo_ng/views/components/textfields.dart';
 import 'package:piwigo_ng/views/components/dialogs/dialogs.dart';
 
+import '../model/TagModel.dart';
+
 class UploadGalleryViewPage extends StatefulWidget {
   final List<XFile> imageData;
   final String category;
@@ -30,7 +32,7 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
   TextEditingController _descController = TextEditingController();
 
   List<DropdownMenuItem<int>> _levelItems = [];
-  List<dynamic> _tags = [];
+  List<TagModel> _tags = [];
   int _page = 0;
   int _privacyLevel = -1;
   bool _isLoading = false;
@@ -68,7 +70,7 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
 
   Map<String, dynamic> getImagesInfo() {
     List<int> tagIds = _tags.map<int>((tag) {
-      return int.parse(tag['id']);
+      return tag.id;
     }).toList();
     return {
       'name': _nameController.text,
@@ -550,7 +552,7 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
     );
   }
 
-  Widget tagItem(dynamic tag, Animation<double> animation, {BorderRadius borderRadius, Border border}) {
+  Widget tagItem(TagModel tag, Animation<double> animation, {BorderRadius borderRadius, Border border}) {
     return SizeTransition(
       axis: Axis.vertical,
       sizeFactor: animation,
@@ -567,7 +569,7 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('${tag['name']}', style: Theme.of(context).textTheme.subtitle1),
+              Text('${tag.name}', style: Theme.of(context).textTheme.subtitle1),
               InkWell(
                 onTap: () async {
                   _listKey.currentState.removeItem(_tags.indexOf(tag), (context, animation) => tagItem(tag, animation));

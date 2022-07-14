@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:piwigo_ng/services/LocaleProvider.dart';
 import 'package:piwigo_ng/services/ThemeProvider.dart';
 import 'package:piwigo_ng/services/UploadStatusProvider.dart';
 import 'package:piwigo_ng/views/RootCategoryViewPage.dart';
@@ -26,7 +28,12 @@ void main() async {
         return ChangeNotifierProvider(
           create: (context) => UploadStatusNotifier(),
           builder: (context, _) {
-            return MyApp();
+            return ChangeNotifierProvider(
+              create: (context) => LocaleNotifier(),
+              builder: (context, _) {
+                return MyApp();
+              }
+            );
           },
         );
       },
@@ -51,12 +58,34 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeNotifier>(context);
+    final localeProvider = Provider.of<LocaleNotifier>(context);
     return MaterialApp(
       title: "Piwigo NG",
-      // theme: themeProvider.darkTheme ? dark : light,
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
-      supportedLocales: AppLocalizations.supportedLocales,
+      // localeListResolutionCallback: (locales, supportedLocales) {
+      //   debugPrint('device locales=$locales supported locales=$supportedLocales');
+      //
+      //   for (Locale locale in locales) {
+      //     if (supportedLocales.contains(locale)) {
+      //       return locale;
+      //     }
+      //   }
+      //
+      //   return Locale('en', 'US');
+      // },
+      localizationsDelegates: [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: [
+        Locale('en'),
+        Locale('de'),
+        Locale('fr'),
+      ],
+      locale: localeProvider.locale,
       theme: light,
+      // theme: themeProvider.darkTheme ? dark : light,
       initialRoute: '/',
       onGenerateRoute: (settings) {
         if(settings.name == '/') return MaterialPageRoute(builder: (context) => LoginViewPage());

@@ -48,28 +48,26 @@ class _CreateCategoryDialogState extends State<CreateCategoryDialog> {
       });
       try {
         var result = await addCategory(
-            _nameController.text,
-            _descController.text, widget.catId);
-
+          _nameController.text,
+          _descController.text,
+          widget.catId,
+        );
+        setState(() {
+          _isLoading = false;
+        });
         if(result['stat'] == 'fail') {
-          setState(() {
-            _isLoading = false;
-          });
           ScaffoldMessenger.of(context).showSnackBar(
-              errorSnackBar(context, result['result'])
+            errorSnackBar(context, result['result']),
           );
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-              albumAddedSnackBar(context)
+            albumAddedSnackBar(context),
           );
           _nameController.text = "";
           _descController.text = "";
           Navigator.of(context).pop();
         }
       } catch (e) {
-        setState(() {
-          _isLoading = false;
-        });
         print(e);
       }
     }

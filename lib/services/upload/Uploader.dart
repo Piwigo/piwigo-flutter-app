@@ -23,15 +23,16 @@ class Uploader {
 
   Uploader(this.mainContext);
 
-  Future<void> _showUploadNotification(Map<String, dynamic> downloadStatus) async {
+  Future<void> showUploadNotification(Map<String, dynamic> downloadStatus) async {
     final android = AndroidNotificationDetails(
         'channel id',
         'channel name',
         channelDescription: 'channel description',
         priority: Priority.high,
-        importance: Importance.max
+        importance: Importance.max,
     );
     final platform = NotificationDetails(android: android);
+    print(downloadStatus);
     final isSuccess = downloadStatus['isSuccess'];
 
     await API.localNotification.show(
@@ -95,6 +96,7 @@ class Uploader {
       uploadStatusProvider.reset();
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
       ScaffoldMessenger.of(context).showSnackBar(errorSnackBar(context, appStrings(context).uploadError_title));
+      result['isSuccess'] = false;
     }
 
     try {
@@ -106,7 +108,7 @@ class Uploader {
       debugPrint(e.message);
     }
 
-    await _showUploadNotification(result);
+    await showUploadNotification(result);
   }
 
   Future<XFile> testCompressAndGetFile(XFile file) async {
