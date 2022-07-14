@@ -33,22 +33,21 @@ class AlbumListItem extends StatefulWidget {
 class _AlbumListItemState extends State<AlbumListItem> {
 
   void _onEditAlbum() async {
-    showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return EditCategoryDialog(
-              catId: widget.album['id'],
-              catName: widget.album['name'],
-              catDesc: widget.album['comment'],
-              privacy: widget.album['status'] == 'private' ? true : false
-          );
-        }
-    ).whenComplete(() {
-      widget.onClose();
-    });
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return EditCategoryDialog(
+            catId: widget.album['id'],
+            catName: widget.album['name'],
+            catDesc: widget.album['comment'],
+            privacy: widget.album['status'] == 'private' ? true : false
+        );
+      },
+    );
+    widget.onClose();
   }
   void _onMoveAlbum() async {
-    showDialog(
+    await showDialog(
       context: context,
       builder: (BuildContext context) {
         return MoveOrCopyDialog(
@@ -76,9 +75,7 @@ class _AlbumListItemState extends State<AlbumListItem> {
           },
         );
       }
-    ).whenComplete(() {
-      widget.onClose();
-    });
+    );
     widget.onClose();
   }
   void _onDeleteAlbum() async {

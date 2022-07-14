@@ -1,5 +1,3 @@
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -7,6 +5,8 @@ import 'package:piwigo_ng/constants/SettingsConstants.dart';
 import 'package:piwigo_ng/views/LoginViewPage.dart';
 import 'package:piwigo_ng/api/API.dart';
 import 'package:piwigo_ng/views/PrivacyPolicyViewPage.dart';
+import 'package:piwigo_ng/views/components/SectionItem.dart';
+import 'package:piwigo_ng/views/settings/SettingsLanguagesView.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:piwigo_ng/views/components/appbars.dart';
@@ -93,11 +93,11 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
           child: Column(
             children: [
-              TableCell(
+              SectionItem(
                 Text(appStrings(context).settings_server, style: TextStyle(color: Colors.black, fontSize: 16)),
                 Text('${API.prefs.getString('base_url')}', overflow: TextOverflow.ellipsis, softWrap: false, style: TextStyle(color: Colors.grey.shade600, fontSize: 14)),
               ),
-              TableCell(
+              SectionItem(
                 Text(appStrings(context).settings_username, style: TextStyle(color: Colors.black, fontSize: 16)),
                 Text('${API.prefs.getString('account_username')}', overflow: TextOverflow.ellipsis, softWrap: false, style: TextStyle(color: Colors.grey.shade600, fontSize: 14)),
                 isEnd: true,
@@ -159,7 +159,7 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
           child: Column(
             children: [
-              TableCell(
+              SectionItem(
                 Text(appStrings(context).settings_displayTitles, style: TextStyle(color: Colors.black, fontSize: 16)),
                 Switch(
                   value: API.prefs.getBool('show_thumbnail_title'),
@@ -172,7 +172,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
               ),
               ImageRowCountSliders(),
-              TableCell(
+              SectionItem(
                 Text(appStrings(context).defaultThumbnailSize320px, style: TextStyle(color: Colors.black, fontSize: 16)),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
@@ -199,7 +199,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   ],
                 ),
               ),
-              TableCell(
+              SectionItem(
                 Text(appStrings(context).defaultImageSize320px, style: TextStyle(color: Colors.black, fontSize: 16)),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
@@ -249,7 +249,7 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
           child: Column(
             children: [
-              TableCell(
+              SectionItem(
                 Text(appStrings(context).settings_stripGPSdata, style: TextStyle(color: Colors.black, fontSize: 16)),
                 Switch(
                   value: API.prefs.getBool('remove_metadata'),
@@ -260,6 +260,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     });
                   },
                 ),
+                isEnd: true,
               ),
             ],
           ),
@@ -283,60 +284,63 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
           child: Column(
             children: [
-              GestureDetector(
+              SectionItem(
+                Text(appStrings(context).settings_twitter, style: TextStyle(color: Colors.black, fontSize: 16)),
+                FaIcon(FontAwesomeIcons.twitter, color: Colors.grey.shade600, size: 20),
                 onTap: () async {
-                  var url = appStrings(context).settings_twitterURL;
-                  if (await canLaunch(url)) {
-                    await launch(url);
+                  var url = Uri(path: appStrings(context).settings_twitterURL);
+                  if (await canLaunchUrl(url)) {
+                    await launchUrl(url);
                   } else {
                     throw 'Could not launch $url';
                   }
                 },
-                child: TableCell(
-                  Text(appStrings(context).settings_twitter, style: TextStyle(color: Colors.black, fontSize: 16)),
-                  FaIcon(FontAwesomeIcons.twitter, color: Colors.grey.shade600, size: 20),
-                ),
               ),
-              GestureDetector(
+              SectionItem(
+                Text(appStrings(context).settings_supportForum, style: TextStyle(color: Colors.black, fontSize: 16)),
+                FaIcon(FontAwesomeIcons.globe, color: Colors.grey.shade600, size: 20),
                 onTap: () async {
-                  var url = appStrings(context).settings_pwgForumURL;
-                  if (await canLaunch(url)) {
-                    await launch(url);
+                  var url = Uri(path: appStrings(context).settings_pwgForumURL);
+                  if (await canLaunchUrl(url)) {
+                    await launchUrl(url);
                   } else {
                     throw 'Could not launch $url';
                   }
                 },
-                child: TableCell(
-                  Text(appStrings(context).settings_supportForum, style: TextStyle(color: Colors.black, fontSize: 16)),
-                  FaIcon(FontAwesomeIcons.globe, color: Colors.grey.shade600, size: 20),
-                ),
               ),
-              GestureDetector(
+              SectionItem(
+                Text(appStrings(context).settings_translateWithCrowdin, style: TextStyle(color: Colors.black, fontSize: 16)),
+                FaIcon(FontAwesomeIcons.edit, color: Colors.grey.shade600, size: 20),
                 onTap: () async {
-                  var url = appStrings(context).settings_crowdinURL;
-                  if (await canLaunch(url)) {
-                    await launch(url);
+                  var url = Uri(path: appStrings(context).settings_crowdinURL);
+                  if (await canLaunchUrl(url)) {
+                    await launchUrl(url);
                   } else {
                     throw 'Could not launch $url';
                   }
                 },
-                child: TableCell(
-                  Text(appStrings(context).settings_translateWithCrowdin, style: TextStyle(color: Colors.black, fontSize: 16)),
-                  FaIcon(FontAwesomeIcons.language, color: Colors.grey.shade600, size: 20),
-                ),
               ),
-              GestureDetector(
+              SectionItem(
+                Text(appStrings(context).settings_language, style: TextStyle(color: Colors.black, fontSize: 16)),
+                FaIcon(FontAwesomeIcons.language, color: Colors.grey.shade600, size: 20),
                 onTap: () {
                   Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => PrivacyPolicyViewPage())
+                    MaterialPageRoute(builder: (_) => SettingsLanguageView(),
+                    ),
                   );
                 },
-                child: TableCell(
-                  Text(appStrings(context).settings_privacy, style: TextStyle(color: Colors.black, fontSize: 16)),
-                  FaIcon(Icons.privacy_tip, color: Colors.grey.shade600, size: 20),
-                ),
               ),
-              TableCell(
+              SectionItem(
+                Text(appStrings(context).settings_privacy, style: TextStyle(color: Colors.black, fontSize: 16)),
+                FaIcon(Icons.privacy_tip, color: Colors.grey.shade600, size: 20),
+                onTap: () {
+                  Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) => PrivacyPolicyViewPage(),
+                    ),
+                  );
+                },
+              ),
+              SectionItem(
                 Text(appStrings(context).settings_appName, style: TextStyle(color: Colors.black, fontSize: 16)),
                 FutureBuilder<PackageInfo>(
                   future: PackageInfo.fromPlatform(),
@@ -361,61 +365,6 @@ class _SettingsPageState extends State<SettingsPage> {
 }
 
 
-
-class TableCell extends StatelessWidget {
-  const TableCell(this.left, this.right, {Key key, this.options, this.isEnd = false}) : super(key: key);
-
-  final Widget left;
-  final Widget right;
-  final List<Widget> options;
-  final bool isEnd;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 40,
-      margin: EdgeInsets.only(left: 10),
-      padding: EdgeInsets.symmetric(horizontal: 10),
-      decoration: BoxDecoration(
-        border: isEnd ? Border.all(width: 0, color: Colors.white) : Border(bottom: BorderSide(width: 0.5, color: Colors.grey)),
-        color: Colors.white,
-      ),
-      child: Center(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            left,
-            right,
-          ] + (options ?? []),
-        ),
-      ),
-    );
-  }
-}
-
-class TableCellSingle extends StatelessWidget {
-  const TableCellSingle(this.content, {Key key, this.isEnd = false}) : super(key: key);
-
-  final Widget content;
-  final bool isEnd;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.only(left: 10, top: 5),
-      padding: EdgeInsets.symmetric(horizontal: 10),
-      decoration: BoxDecoration(
-        border: isEnd ? Border.all(width: 0, color: Colors.white) : Border(bottom: BorderSide(width: 0.5, color: Colors.grey)),
-        color: Colors.white,
-      ),
-      child: Center(
-        child: content,
-      ),
-    );
-  }
-}
-
-
 class ImageRowCountSliders extends StatefulWidget {
   const ImageRowCountSliders({Key key}) : super(key: key);
 
@@ -425,7 +374,7 @@ class ImageRowCountSliders extends StatefulWidget {
 class _ImageRowCountSlidersState extends State<ImageRowCountSliders> {
   @override
   Widget build(BuildContext context) {
-    return TableCellSingle(
+    return SectionItemSingle(
       Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -500,4 +449,3 @@ class _ImageRowCountSlidersState extends State<ImageRowCountSliders> {
     );
   }
 }
-
