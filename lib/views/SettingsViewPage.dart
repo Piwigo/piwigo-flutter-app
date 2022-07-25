@@ -288,7 +288,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 Text(appStrings(context).settings_twitter, style: TextStyle(color: Colors.black, fontSize: 16)),
                 FaIcon(FontAwesomeIcons.twitter, color: Colors.grey.shade600, size: 20),
                 onTap: () async {
-                  var url = Uri(path: appStrings(context).settings_twitterURL);
+                  var url = Uri.https("twitter.com", "/piwigo");
                   if (await canLaunchUrl(url)) {
                     await launchUrl(url);
                   } else {
@@ -300,7 +300,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 Text(appStrings(context).settings_supportForum, style: TextStyle(color: Colors.black, fontSize: 16)),
                 FaIcon(FontAwesomeIcons.globe, color: Colors.grey.shade600, size: 20),
                 onTap: () async {
-                  var url = Uri(path: appStrings(context).settings_pwgForumURL);
+                  var url = Uri.https("piwigo.org", "/forum");
                   if (await canLaunchUrl(url)) {
                     await launchUrl(url);
                   } else {
@@ -312,7 +312,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 Text(appStrings(context).settings_translateWithCrowdin, style: TextStyle(color: Colors.black, fontSize: 16)),
                 FaIcon(FontAwesomeIcons.edit, color: Colors.grey.shade600, size: 20),
                 onTap: () async {
-                  var url = Uri(path: appStrings(context).settings_crowdinURL);
+                  var url = Uri.https("crowdin.com", "/project/piwigo-ng");
                   if (await canLaunchUrl(url)) {
                     await launchUrl(url);
                   } else {
