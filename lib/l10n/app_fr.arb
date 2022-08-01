@@ -744,6 +744,7 @@
         }
     },
     "settings_appName": "Piwigo NG",
+    "settings_language": "Choisir la langue",
     "settingsHeader_about": "Informations",
     "settings_twitter": "@piwigo",
     "settings_twitterURL": "https://twitter.com/piwigo",
