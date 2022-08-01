@@ -41,6 +41,63 @@ Future<Map<String,dynamic>> fetchImages(String albumID, int page) async {
   }
 }
 
+Future<Map<String,dynamic>> fetchTagImages(String tagID, int page) async {
+  Map<String, String> queries = {
+    "format": "json",
+    "method": "pwg.tags.getImages",
+    "tag_id": tagID,
+    "per_page": "100",
+    "page": page.toString(),
+  };
+
+  try {
+    Response response = await API().dio.get('ws.php', queryParameters: queries);
+
+    if (response.statusCode == 200) {
+      return json.decode(response.data);
+    } else {
+      return {
+        'stat': 'fail',
+        'result': response.statusMessage
+      };
+    }
+  } catch(e) {
+    var error = e as DioError;
+    return {
+      'stat': 'fail',
+      'result': error.message
+    };
+  }
+}
+
+Future<Map<String,dynamic>> fetchFavoriteImages(int page) async {
+  Map<String, String> queries = {
+    "format": "json",
+    "method": "pwg.users.favorites.getList",
+    "per_page": "100",
+    "page": page.toString(),
+  };
+
+  try {
+    Response response = await API().dio.get('ws.php', queryParameters: queries);
+
+    if (response.statusCode == 200) {
+      return json.decode(response.data);
+    } else {
+      return {
+        'stat': 'fail',
+        'result': response.statusMessage
+      };
+    }
+  } catch(e) {
+    var error = e as DioError;
+    return {
+      'stat': 'fail',
+      'result': error.message
+    };
+  }
+}
+
 Future<dynamic> getImageInfo(int imageId) async {
   Map<String, String> queries = {
     "format": "json",
@@ -238,7 +295,7 @@ Future<dynamic> removeImage(int imageId, String catId) async {
   if(imageInfo['stat'] == 'fail') return imageInfo;
 
   List<String> categories = imageInfo['result']['categories'].map<String>(
-      (cat) => cat['id'].toString()
+          (cat) => cat['id'].toString()
   ).toList();
   categories.removeWhere((cat) => cat == catId);
 
@@ -309,9 +366,9 @@ Future<dynamic> moveImage(int imageId, List<int> categories) async {
 
   try {
     Response response = await API().dio.post(
-      'ws.php',
-      data: formData,
-      queryParameters: queries
+        'ws.php',
+        data: formData,
+        queryParameters: queries
     );
 
     if (response.statusCode == 200) {
