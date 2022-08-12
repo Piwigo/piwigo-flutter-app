@@ -237,16 +237,16 @@
     "categorySelection_one": "选择包含该照片的相册",
     "categorySelection_other": "或者为该照片选择另一个相册",
     "categoryImageSet_title": "相册封面",
-    "categoryImageSet_message": "Are you sure you want to apply this photo to the album {album} ?",
+    "categoryImageSet_message": "你确定要把该照片应用到相册 {album} 中吗？",
     "@categoryImageSet_message": {
         "placeholders": {
             "album": {}
         }
     },
     "categoryImageSetHUD_updating": "Updating Album Thumbnail…",
-    "categoryImageSetError_title": "Photo Set Error",
-    "categoryImageSetError_message": "Failed to set the album photo",
-    "singleImage": "Photo",
+    "categoryImageSetError_title": "照片设置出错",
+    "categoryImageSetError_message": "设置相册照片失败",
+    "singleImage": "照片",
     "imageCount": "{count, plural,=0{0 photos} =1{1 photo} other{{count} sub-albums}}",
     "@imageCount": {
         "placeholders": {
