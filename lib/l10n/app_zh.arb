@@ -309,11 +309,11 @@
     "privacyLevel_adminFamily": "Admins, Family",
     "privacyLevel_adminsFamilyFriends": "Admins, Family, Friends",
     "privacyLevel_adminsFamilyFriendsContacts": "Admins, Family, Friends, Contacts",
-    "privacyLevel_everybody": "Everybody",
-    "privacyLevel_unchanged": "Unchanged",
-    "none": "none",
-    "tag": "Tag",
-    "tags": "Tags",
+    "privacyLevel_everybody": "任何人",
+    "privacyLevel_unchanged": "未更改",
+    "none": "无",
+    "tag": "标签",
+    "tags": "标签",
     "tagCount": "{count, plural, =0{0 tags} =1{1 tag} other{{count} tags}}",
     "@tagCount": {
         "placeholders": {
