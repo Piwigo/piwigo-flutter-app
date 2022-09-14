@@ -320,43 +320,43 @@
             "count": {}
         }
     },
-    "tagsTitle_selectOne": "Select a Tag",
-    "tagsHeader_selected": "Selected",
-    "tagsHeader_notSelected": "Not Selected",
-    "tagsHeader_all": "All",
-    "tagsAdd_title": "Add Tag",
-    "tagsAdd_message": "Enter a name for this new tag",
-    "tagsAdd_placeholder": "New tag",
-    "tagsAddHUD_label": "Creating Tag…",
-    "tagsAddHUD_created": "Tag Created",
-    "tagsAddError_message": "Failed to create new tag",
-    "tagsAddError_title": "Create Fail",
-    "selectImages": "Select Photos",
+    "tagsTitle_selectOne": "选择一个标签",
+    "tagsHeader_selected": "已选中",
+    "tagsHeader_notSelected": "未选中",
+    "tagsHeader_all": "全部",
+    "tagsAdd_title": "添加标签",
+    "tagsAdd_message": "命名该标签",
+    "tagsAdd_placeholder": "新标签",
+    "tagsAddHUD_label": "创建标签中...",
+    "tagsAddHUD_created": "标签已创建",
+    "tagsAddError_message": "无法创建新标签",
+    "tagsAddError_title": "创建失败",
+    "selectImages": "选择图片",
     "selectImageSelectedCount": "{count, plural, =0{0 Photos Selected} =1{1 Photo Selected} other{{count} Photos Selected}}",
     "@selectImageSelectedCount": {
         "placeholders": {
             "count": {}
         }
     },
-    "selectAll": "Select All",
-    "selectLimit": "Selection limit reached",
-    "renameImage_title": "Original File",
-    "renameImage_message": "Enter a new file name for this photo \"{file}\"",
+    "selectAll": "全选",
+    "selectLimit": "达到选择上限",
+    "renameImage_title": "原始文件",
+    "renameImage_message": "为照片“{file}”输入一个新的名字",
     "@renameImage_message": {
         "placeholders": {
             "file": {}
         }
     },
-    "renameImageHUD_label": "Renaming File…",
+    "renameImageHUD_label": "重命名文件中...",
     "renameImageHUD_renamed": "{count, plural, =0{0 Files Renamed} =1{File Renamed} other{{count} Files Renamed}}",
     "@renameImageHUD_renamed": {
         "placeholders": {
             "count": {}
         }
     },
-    "renameImageError_message": "Failed to rename photo file",
-    "deleteImage_delete": "Delete",
-    "deleteImageProgress_title": "Deleting {progress}% Done",
+    "renameImageError_message": "重命名文件失败",
+    "deleteImage_delete": "删除",
+    "deleteImageProgress_title": "删除任务已完成 {progress} %",
     "@deleteImageProgress_title": {
         "placeholders": {
             "count": {}
@@ -374,30 +374,30 @@
             "count": {}
         }
     },
-    "removeSingleImage_title": "Remove from Album",
+    "removeSingleImage_title": "从相册中移除",
     "removeImageHUD_removing": "{count, plural, =0{Removing Photos…} =1{Removing Photo…} other{Removing Photos…}}",
     "@removeImageHUD_removing": {
         "placeholders": {
             "count": {}
         }
     },
-    "deleteImage_message": "{count, plural, =1{Are you sure you want to delete this photo? This cannot be undone!} other{Are you sure you want to delete the selected {count} photos? This cannot be undone!}}",
+    "deleteImage_message": "{count, plural,=1{你确定要删除这张照片？此操作无法撤销！}other{你确定要删除选中的 {count} 张照片？此操作无法撤销！}}",
     "@deleteImage_message": {
         "placeholders": {
             "count": {}
         }
     },
-    "deleteImageFail_title": "Delete Failed",
-    "deleteImageFail_message": "Photo could not be deleted.",
-    "deleteImageSuccess_message": "{count, plural, =0{Successfully deleted 0 photos} =1{Successfully deleted 1 photo} other{Successfully deleted {count} photos}}",
+    "deleteImageFail_title": "删除失败",
+    "deleteImageFail_message": "无法删除该照片",
+    "deleteImageSuccess_message": "{count, plural,=0{成功删除了 0 张照片}=1{成功删除了 1 张照片}other{成功删除了 {count} 张照片}}",
     "@deleteImageSuccess_message": {
         "placeholders": {
             "count": {}
         }
     },
-    "removeSelectedImage_title": "Remove Selected Image",
-    "removeSelectedImage_message": "Are you sure you want to remove this image from the selection ?",
-    "downloadImage_title": "{count, plural, =0{Download Photos} =1{Download Photo} other{Download {count} Photos}}",
+    "removeSelectedImage_title": "删除选中的图片",
+    "removeSelectedImage_message": "你确定要从选择集中移除该照片？",
+    "downloadImage_title": "{count, plural,=0{下载照片}=1{下载照片}other{下载 {count} 张照片}}",
     "@downloadImage_title": {
         "placeholders": {
             "count": {}
