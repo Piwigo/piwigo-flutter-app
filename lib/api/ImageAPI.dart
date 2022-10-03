@@ -1,14 +1,14 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:dio/dio.dart';
-import 'package:external_path/external_path.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:path/path.dart' as path;
 import 'package:piwigo_ng/views/components/snackbars.dart';
+import 'package:share_plus/share_plus.dart';
 
 import 'API.dart';
 
@@ -82,76 +82,75 @@ Future<bool> _requestPermissions() async {
 
   return permission == PermissionStatus.granted;
 }
-Future<String> _getDownloadPath() async {
-  if (Platform.isAndroid) {
-    return ExternalPath.getExternalStoragePublicDirectory(ExternalPath.DIRECTORY_PICTURES);
-  }
-  return (await getApplicationDocumentsDirectory()).path;
+Future<String> _pickDirectoryPath() async {
+  return await FilePicker.platform.getDirectoryPath();
 }
-Future<void> _showNotification(Map<String, dynamic> downloadStatus) async {
+Future<void> _showNotification({bool success = true, String payload}) async {
   final android = AndroidNotificationDetails(
-      'channel id',
-      'channel name',
-      channelDescription: 'channel description',
-      priority: Priority.high,
-      importance: Importance.max
+    'id',
+    'Piwigo NG Download',
+    channelDescription: 'piwigo_ng',
+    priority: Priority.defaultPriority,
+    importance: Importance.defaultImportance,
   );
   final platform = NotificationDetails(android: android);
-  final isSuccess = downloadStatus['isSuccess'];
 
   await API.localNotification.show(
     0,
-    isSuccess ? 'Success' : 'Failure',
-    isSuccess ? 'All files has been downloaded successfully!' : 'There was an error while downloading the file.',
+    success ? 'Success' : 'Failure',
+    success ? 'All files has been downloaded successfully!' : 'There was an error while downloading the file.',
     platform,
+    payload: payload,
   );
 }
 
-Future<void> downloadSingleImage(dynamic image) async {
+Future<void> share(List<dynamic> images) async {
+  List<String> filesPath = await downloadImages(images,
+    showNotification: false,
+    cached: true,
+  );
+  print(filesPath);
+  if(filesPath == null) return;
+  if(filesPath.isNotEmpty) {
+    Share.shareFiles(filesPath);
+  }
+}
+
+Future<List<String>> downloadImages(List<dynamic> images, {bool showNotification = true, bool cached = false}) async {
   final isPermissionStatusGranted = await _requestPermissions();
-  final dirPath = await _getDownloadPath();
+  if (!isPermissionStatusGranted) return null;
 
-  Map<String, dynamic> result = {
-    'isSuccess': true,
-    'filePath': null,
-    'error': null,
-  };
+  final dirPath = cached
+      ? (await getTemporaryDirectory()).path
+      : await _pickDirectoryPath();
+  if(dirPath == null) return null;
 
-  if (isPermissionStatusGranted) {
-    await downloadImage(
+  final List<String> filesPath = [];
+
+  await Future.forEach(images, (image) async {
+    String filePath = await downloadImage(
       dirPath,
       image['element_url'],
       image['file'],
     );
-    await _showNotification(result);
-  } else {
-    print('No storage Permission');
-  }
-}
-Future<void> downloadImages(List<dynamic> images) async {
-  final isPermissionStatusGranted = await _requestPermissions();
-  final dirPath = await _getDownloadPath();
+    if(filePath != null) {
+      filesPath.add(filePath);
+    }
+  });
 
-  Map<String, dynamic> result = {
-    'isSuccess': true,
-    'filePath': null,
-    'error': null,
-  };
-
-  if (isPermissionStatusGranted) {
-    await Future.forEach(images, (image) async {
-      await downloadImage(
-        dirPath,
-        image['element_url'],
-        image['file'],
+  if(showNotification) {
+    if(filesPath.isNotEmpty) {
+      await _showNotification(
+        success: true,
+        payload: filesPath.length == 1 ? filesPath.first : '$dirPath\\',
       );
-    });
-    await _showNotification(result);
-  } else {
-    print('No storage Permission');
+    } else {
+      await _showNotification(success: false);
+    }
   }
+  return filesPath;
 }
-Future<dynamic> downloadImage(String dirPath, String url, String file) async {
+Future<String> downloadImage(String dirPath, String url, String file) async {
 
   var localPath = path.join(dirPath, file);
   try {
@@ -159,13 +158,10 @@ Future<dynamic> downloadImage(String dirPath, String url, String file) async {
       url,
       localPath,
     );
-    // result['isSuccess'] = response.statusCode == 200;
-    // result['filePath'] = localPath;
+    return localPath;
   } catch (e) {
     print(e);
-    // result['error'] = e.toString();
-  } finally {
-
+    return null;
   }
 }
 

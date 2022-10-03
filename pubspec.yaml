@@ -32,6 +32,8 @@ dependencies:
   external_path: ^1.0.1
   flutter_local_notifications: ^9.1.2
   flutter_image_compress: ^1.1.0
+  share_plus: ^4.4.0
+  open_file: ^3.2.1
 
   # File pickers :
   image_picker: ^0.8.4+4

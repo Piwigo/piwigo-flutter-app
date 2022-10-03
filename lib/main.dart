@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:open_file/open_file.dart';
 import 'package:piwigo_ng/services/LocaleProvider.dart';
 import 'package:piwigo_ng/services/ThemeProvider.dart';
 import 'package:piwigo_ng/services/UploadStatusProvider.dart';
@@ -11,6 +12,7 @@ import 'package:provider/provider.dart';
 import 'package:piwigo_ng/views/LoginViewPage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 
 void main() async {
@@ -49,7 +51,16 @@ void initLocalNotifications() {
   API.localNotification = FlutterLocalNotificationsPlugin();
   final android = AndroidInitializationSettings('@mipmap/ic_launcher');
   final initSettings = InitializationSettings(android: android);
-  API.localNotification.initialize(initSettings);
+  API.localNotification.initialize(initSettings, onSelectNotification: onSelectNotification,);
+}
+
+Future<void> onSelectNotification(String payload) async {
+  print("Payload: $payload");
+  if(payload.contains('\\')) {
+    launchUrl(Uri());
+  }
+  OpenResult result = await OpenFile.open(payload);
+  print(result.message);
 }
 
 

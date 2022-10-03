@@ -115,32 +115,25 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
     );
   }
   void _onDownloadSelection() async {
-    if (await confirmDownloadDialog(context,
-      content: appStrings(context)
-          .downloadImage_title(_selectedItems.length),
-    )) {
-      print('Download ${_selectedItems.keys.toList()}');
+    final int option = await confirmDownloadDialog(context,
+      nbImages: _selectedItems.length,
+    );
+    if(option == -1) return;
 
-      List<dynamic> selection = [];
-      selection.addAll(_selectedItems.values.toList());
+    List<dynamic> selection = [];
+    selection.addAll(_selectedItems.values.toList());
 
-      setState(() {
-        _isEditMode = false;
-        _selectedItems.clear();
-      });
-      ScaffoldMessenger.of(context).hideCurrentSnackBar();
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(appStrings(context).downloadingImages(selection.length)),
-            CircularProgressIndicator(),
-          ],
-        ),
-      ));
-
-      await downloadImages(selection);
+    switch (option) {
+      case 0: share(selection);
+        break;
+      case 1: downloadImages(selection);
+        break;
     }
+
+    setState(() {
+      _isEditMode = false;
+      _selectedItems.clear();
+    });
   }
   void _onMoveCopySelection() async {
     int choice = await chooseMoveCopyImage(context,
@@ -697,7 +690,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
           label: appStrings(context).imageOptions_download,
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.reply_outlined, color: _theme.iconTheme.color),
+          icon: Icon(Icons.drive_file_move, color: _theme.iconTheme.color),
           label: appStrings(context).moveImage_title,
         ),
         BottomNavigationBarItem(

@@ -1,6 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:icon_shadow/icon_shadow.dart';
+import 'package:open_file/open_file.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:piwigo_ng/api/API.dart';
 import 'package:piwigo_ng/api/ImageAPI.dart';
@@ -86,21 +88,16 @@ class _ImageViewPageState extends State<ImageViewPage> with SingleTickerProvider
     ).then((value) => setState(() {}));
   }
   void _onDownloadImage() async {
-    if(await confirmDownloadDialog(context,
-      content: appStrings(context).downloadImage_confirmation(1),
-    )) {
-      ScaffoldMessenger.of(context).hideCurrentSnackBar();
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(appStrings(context).downloadingImages(1)),
-            CircularProgressIndicator(),
-          ],
-        ),
-      ));
-      await downloadSingleImage(_images[_page]);
-      setState(() {});
+    final int option = await confirmDownloadDialog(context, nbImages: 1);
+    if(option == -1) return;
+
+    List<dynamic> selection = [_images[_page]];
+
+    switch (option) {
+      case 0: await share(selection);
+      break;
+      case 1: await downloadImages(selection);
+      break;
     }
   }
   void _onMoveCopyImage() async {
@@ -325,7 +322,7 @@ class _ImageViewPageState extends State<ImageViewPage> with SingleTickerProvider
                     ),
                     IconButton(
                       onPressed: _onMoveCopyImage,
-                      icon: Icon(Icons.reply),
+                      icon: Icon(Icons.drive_file_move),
                     ),
                     IconButton(
                       onPressed: _onDeleteImage,

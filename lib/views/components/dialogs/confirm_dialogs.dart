@@ -402,7 +402,7 @@ class DialogButtonText extends StatelessWidget {
 }
 
 
-Future<bool> confirmDeleteDialog(context, {content = ''}) async {
+Future<bool> confirmDeleteDialog(BuildContext context, {content = ''}) async {
   final bool isConfirm = await showModalBottomSheet<bool>(
     context: context,
     isScrollControlled: true,
@@ -417,7 +417,7 @@ Future<bool> confirmDeleteDialog(context, {content = ''}) async {
   return (isConfirm != null) ? isConfirm : false;
 }
 
-Future<int> confirmDeleteAlbumWithImagesDialog(context, {content = '', count = 0}) async {
+Future<int> confirmDeleteAlbumWithImagesDialog(BuildContext context, {content = '', count = 0}) async {
   final int confirm = await showModalBottomSheet<int>(
     context: context,
     isScrollControlled: true,
@@ -437,7 +437,7 @@ Future<int> confirmDeleteAlbumWithImagesDialog(context, {content = '', count = 0
   return (confirm != null) ? confirm : -1;
 }
 
-Future<int> confirmRemoveImagesFromAlbumDialog(context, {content = '', count = 0}) async {
+Future<int> confirmRemoveImagesFromAlbumDialog(BuildContext context, {content = '', count = 0}) async {
   final int confirm = await showModalBottomSheet<int>(
     context: context,
     isScrollControlled: true,
@@ -456,7 +456,7 @@ Future<int> confirmRemoveImagesFromAlbumDialog(context, {content = '', count = 0
   return (confirm != null) ? confirm : -1;
 }
 
-Future<bool> confirmRemoveSelectionDialog(context, {content = ''}) async {
+Future<bool> confirmRemoveSelectionDialog(BuildContext context, {content = ''}) async {
   final bool isConfirm = await showDialog<bool>(
     context: context,
     builder: (_) => ConfirmDialog(
@@ -470,23 +470,27 @@ Future<bool> confirmRemoveSelectionDialog(context, {content = ''}) async {
   return (isConfirm != null) ? isConfirm : false;
 }
 
-Future<bool> confirmDownloadDialog(context, {content = ''}) async {
-  final bool isConfirm = await showModalBottomSheet<bool>(
+Future<int> confirmDownloadDialog(BuildContext context, {int nbImages = 1}) async {
+  final int confirm = await showModalBottomSheet<int>(
     context: context,
     isScrollControlled: true,
-    builder: (_) => ConfirmBottomSheet(
-      content: content,
-      yes: DialogButtonText(appStrings(context).imageOptions_download,
-          color: Theme.of(context).colorScheme.primary),
+    builder: (_) => MultiConfirmBottomSheet(
+      content: appStrings(context).downloadImage_title(nbImages),
+      actions: [
+        DialogButtonText(appStrings(context).imageOptions_share,
+            color: Theme.of(context).colorScheme.primary),
+        DialogButtonText(appStrings(context).imageOptions_download,
+            color: Theme.of(context).colorScheme.primary),
+      ],
       no: DialogButtonText(appStrings(context).alertCancelButton,
           color: Theme.of(context).disabledColor),
     ),
   );
 
-  return (isConfirm != null) ? isConfirm : false;
+  return (confirm != null) ? confirm : -1;
 }
 
-Future<bool> confirmMoveDialog(context, {content = ''}) async {
+Future<bool> confirmMoveDialog(BuildContext context, {content = ''}) async {
   final bool isConfirm = await showDialog<bool>(
     context: context,
     builder: (_) => ConfirmDialog(
@@ -501,7 +505,7 @@ Future<bool> confirmMoveDialog(context, {content = ''}) async {
   return (isConfirm != null) ? isConfirm : false;
 }
 
-Future<bool> confirmAssignDialog(context, {content = ''}) async {
+Future<bool> confirmAssignDialog(BuildContext context, {content = ''}) async {
   final bool isConfirm = await showDialog<bool>(
     context: context,
     builder: (_) => ConfirmDialog(
@@ -516,7 +520,7 @@ Future<bool> confirmAssignDialog(context, {content = ''}) async {
   return (isConfirm != null) ? isConfirm : false;
 }
 
-Future<int> chooseMoveCopyImage(context, {content = ''}) async {
+Future<int> chooseMoveCopyImage(BuildContext context, {content = ''}) async {
   final int confirm = await showModalBottomSheet<int>(
     context: context,
     isScrollControlled: true,
