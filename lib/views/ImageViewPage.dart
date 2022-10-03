@@ -240,6 +240,7 @@ class _ImageViewPageState extends State<ImageViewPage> with SingleTickerProvider
                 color: Theme.of(context).iconTheme.color, //change your color here
               ),
               backgroundColor: Colors.black.withOpacity(0.5),
+              elevation: 0.0,
               centerTitle: true,
               title: Text('${_images[_page]['name'] ?? ''}',
                 overflow: TextOverflow.ellipsis, style: TextStyle(color: Colors.white),
