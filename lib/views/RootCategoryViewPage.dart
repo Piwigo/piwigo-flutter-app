@@ -48,6 +48,7 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
     });
     _getData();
   }
+
   @override
   void dispose() {
     super.dispose();
@@ -55,7 +56,9 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
 
   _getData() {
     _albumsFuture = fetchAlbums(_rootCategory);
-    _imagesFuture = searchAlbums(_searchController.text);
+    if(_searchController.text.isNotEmpty) {
+      _imagesFuture = searchAlbums(_searchController.text);
+    }
   }
 
   _onAddAlbum() async {
@@ -78,12 +81,18 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
         onTap: () {
           _focus.unfocus();
         },
-        child: NestedScrollView(
-          controller: _scrollController,
-          headerSliverBuilder: (context, bool) {
-            return [
-              AppBarExpandable(
-                scrollController: _scrollController,
+        child: RefreshIndicator(
+          onRefresh: () {
+            setState(() {
+              _getData();
+            });
+            return Future.delayed(Duration(milliseconds: 1000));
+          },
+          child: CustomScrollView(
+            slivers: [
+              SliverAppBar(
+                pinned: true,
+                backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
                 leading: IconButton(
                   onPressed: () {
                     Navigator.of(context).push(
@@ -92,9 +101,9 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
                   },
                   icon: Icon(Icons.settings, color: _theme.iconTheme.color),
                 ),
-                title: appStrings(context).tabBar_albums,
+                title: Text(appStrings(context).tabBar_albums),
               ),
-              AppBarExpandableSearch(
+              AppBarSearch(
                 textController: _searchController,
                 onTap: () {},
                 focusNode: _focus,
@@ -105,41 +114,64 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
                   });
                 },
               ),
-            ];
-          },
-          body: RefreshIndicator(
-            displacement: 20,
-            notificationPredicate: (notification) {
-              return notification.metrics.atEdge;
-            },
-            onRefresh: () {
-              setState(() {
-                _getData();
-              });
-              return Future.delayed(Duration(milliseconds: 1000));
-            },
-            child: SingleChildScrollView(
-              child: Builder(builder: (context) {
-                if(_isSearching) {
-                  return FutureBuilder<Map<String,dynamic>>(
-                    key: UniqueKey(),
-                    future: _imagesFuture,
-                    builder: (BuildContext context, AsyncSnapshot imagesSnapshot) {
-                      if(imagesSnapshot.hasData){
-                        if(imagesSnapshot.data['stat'] == 'fail') {
+              SliverToBoxAdapter(
+                child: Builder(builder: (context) {
+                  if(_isSearching) {
+                    return FutureBuilder<Map<String,dynamic>>(
+                      key: UniqueKey(),
+                      future: _imagesFuture,
+                      builder: (BuildContext context, AsyncSnapshot imagesSnapshot) {
+                        if(imagesSnapshot.hasData){
+                          if(imagesSnapshot.data['stat'] == 'fail') {
+                            return Center(
+                              child: Text(appStrings(context).categoryImageList_noDataError),
+                            );
+                          }
+                          var images = imagesSnapshot.data['result']['images'];
+                          var nbImages = images.length;
+                          return Column(
+                            children: [
+                              _imageGrid(images),
+                              Center(
+                                child: Container(
+                                  padding: EdgeInsets.all(10),
+                                  child: Text(appStrings(context).imageCount(nbImages), style: TextStyle(fontSize: 20, color: _theme.textTheme.bodyText2.color, fontWeight: FontWeight.w300,),),
+                                ),
+                              ),
+                            ],
+                          );
+                        } else {
                           return Center(
-                            child: Text(appStrings(context).categoryImageList_noDataError),
+                            child: CircularProgressIndicator(),
                           );
                         }
-                        var images = imagesSnapshot.data['result']['images'];
-                        var nbImages = images.length;
+                      },
+                    );
+                  }
+                  return FutureBuilder<Map<String,dynamic>>(
+                    key: UniqueKey(),
+                    future: _albumsFuture, // Albums of the list
+                    builder: (BuildContext context, AsyncSnapshot albumSnapshot) {
+                      if(albumSnapshot.hasData){
+                        if(albumSnapshot.data['stat'] == 'fail') {
+                          return Container(
+                            padding: EdgeInsets.all(10),
+                            child: Text(albumSnapshot.data['result']),
+                          ); //appStrings(context).categoryMainEmpty
+                        }
+                        var albums = albumSnapshot.data['result']['categories'];
+                        int nbPhotos = 0;
+                        albums.forEach((cat) => nbPhotos+=cat["total_nb_images"]);
+                        albums.removeWhere((category) => (
+                            category["id"].toString() == _rootCategory
+                        ));
                         return Column(
                           children: [
-                            _imageGrid(images),
+                            _albumGrid(albums),
                             Center(
                               child: Container(
                                 padding: EdgeInsets.all(10),
-                                child: Text(appStrings(context).imageCount(nbImages), style: TextStyle(fontSize: 20, color: _theme.textTheme.bodyText2.color, fontWeight: FontWeight.w300,),),
+                                child: Text(appStrings(context).imageCount(nbPhotos), style: TextStyle(fontSize: 20, color: _theme.textTheme.bodyText2.color, fontWeight: FontWeight.w300,),),
                               ),
                             ),
                           ],
@@ -151,44 +183,9 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
                       }
                     },
                   );
-                }
-                return FutureBuilder<Map<String,dynamic>>(
-                  key: UniqueKey(),
-                  future: _albumsFuture, // Albums of the list
-                  builder: (BuildContext context, AsyncSnapshot albumSnapshot) {
-                    if(albumSnapshot.hasData){
-                      if(albumSnapshot.data['stat'] == 'fail') {
-                        return Container(
-                          padding: EdgeInsets.all(10),
-                          child: Text(albumSnapshot.data['result']),
-                        ); //appStrings(context).categoryMainEmpty
-                      }
-                      var albums = albumSnapshot.data['result']['categories'];
-                      int nbPhotos = 0;
-                      albums.forEach((cat) => nbPhotos+=cat["total_nb_images"]);
-                      albums.removeWhere((category) => (
-                        category["id"].toString() == _rootCategory
-                      ));
-                      return Column(
-                        children: [
-                          _albumGrid(albums),
-                          Center(
-                            child: Container(
-                              padding: EdgeInsets.all(10),
-                              child: Text(appStrings(context).imageCount(nbPhotos), style: TextStyle(fontSize: 20, color: _theme.textTheme.bodyText2.color, fontWeight: FontWeight.w300,),),
-                            ),
-                          ),
-                        ],
-                      );
-                    } else {
-                      return Center(
-                        child: CircularProgressIndicator(),
-                      );
-                    }
-                  },
-                );
-              }),
-            ),
+                }),
+              ),
+            ],
           ),
         ),
       ),

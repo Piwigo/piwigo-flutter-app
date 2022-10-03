@@ -1,21 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:piwigo_ng/constants/SettingsConstants.dart';
 import 'package:piwigo_ng/views/components/textfields.dart';
 
 
 class AppBarExpandable extends StatefulWidget {
-  const AppBarExpandable({Key key, this.leading, this.title = '', this.actions, this.scrollController}) : super(key: key);
+  const AppBarExpandable({Key key,
+    this.leading,
+    this.title = '',
+    this.actions,
+    this.scrollController,
+    this.forceElevated = false,
+  }) : super(key: key);
 
   final ScrollController scrollController;
   final Widget leading;
   final String title;
   final List<Widget> actions;
+  final bool forceElevated;
 
   @override
   _AppBarExpandableState createState() => _AppBarExpandableState();
 }
 
 class _AppBarExpandableState extends State<AppBarExpandable> {
-
 
   @override
   initState() {
@@ -72,8 +79,8 @@ class _AppBarExpandableState extends State<AppBarExpandable> {
 }
 
 
-class AppBarExpandableSearch extends StatefulWidget {
-  const AppBarExpandableSearch({Key key, this.leading, this.title = '', this.actions, this.textController, this.onSubmit, this.onTap, this.focusNode,}) : super(key: key);
+class AppBarSearch extends StatelessWidget {
+  const AppBarSearch({Key key, this.leading, this.title = '', this.actions, this.textController, this.onSubmit, this.onTap, this.focusNode,}) : super(key: key);
 
   final TextEditingController textController;
   final Widget leading;
@@ -84,31 +91,23 @@ class AppBarExpandableSearch extends StatefulWidget {
   final FocusNode focusNode;
 
   @override
-  _AppBarExpandableSearchState createState() => _AppBarExpandableSearchState();
-}
-
-class _AppBarExpandableSearchState extends State<AppBarExpandableSearch> {
-
-  @override
   Widget build(BuildContext context) {
     return SliverAppBar(
       expandedHeight: 30,
-      toolbarHeight: 0,
+      toolbarHeight: 0.0,
       floating: true,
       snap: true,
       pinned: true,
       backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
-      leading: widget.leading ?? SizedBox(),
-      actions: widget.actions ?? [],
       flexibleSpace: FlexibleSpaceBar(
         background: Center(
           child: TextFieldSearch(
-            controller: widget.textController,
-            focusNode: widget.focusNode,
+            controller: textController,
+            focusNode: focusNode,
             hint: "Search...", // TODO Localization
             margin: EdgeInsets.symmetric(horizontal: 10),
-            onTap: widget.onTap,
-            onSubmit: widget.onSubmit,
+            onTap: onTap,
+            onSubmit: onSubmit,
           ),
         ),
       ),
