@@ -1,8 +1,6 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:async';
@@ -40,7 +38,6 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
   int _page;
   int _nbImages;
   Map<int, dynamic> _selectedItems = Map();
-  ScrollController _controller = ScrollController();
   List<dynamic> imageList = [];
 
 
@@ -66,11 +63,8 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
   bool _isSelected(int id) {
     return _selectedItems.keys.contains(id);
   }
-  int _selectedPhotos() {
-    return _selectedItems.length;
-  }
 
-  showMore() async {
+  Future<void> showMore() async {
     _page++;
     var response = await fetchImages(widget.category, _page);
     if(response['stat'] == 'fail') {
@@ -86,19 +80,19 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
       _getData();
     });
   }
-  openEditMode() {
+  void openEditMode() {
     setState(() {
       _isEditMode = true;
     });
   }
-  closeEditMode() {
+  void closeEditMode() {
     setState(() {
       _isEditMode = false;
     });
     _selectedItems.clear();
   }
 
-  Future<void> _onRefresh() {
+  Future<void> _onRefresh() async {
     setState(() {
       _page = 0;
       _getData();
@@ -106,7 +100,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
     return Future.delayed(Duration(milliseconds: 500));
   }
 
-  void _onEditSelection() async {
+  Future<void> _onEditSelection() async {
     Navigator.of(context).push(
         MaterialPageRoute(builder: (_) => EditImagesPage(
           catId: int.parse(widget.category),
@@ -114,7 +108,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
         ))
     );
   }
-  void _onDownloadSelection() async {
+  Future<void> _onDownloadSelection() async {
     final int option = await confirmDownloadDialog(context,
       nbImages: _selectedItems.length,
     );
@@ -135,7 +129,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
       _selectedItems.clear();
     });
   }
-  void _onMoveCopySelection() async {
+  Future<void> _onMoveCopySelection() async {
     int choice = await chooseMoveCopyImage(context,
       content: appStrings(context).moveOrCopyImage_title(_selectedItems.length)
     );
@@ -204,7 +198,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
       default: break;
     }
   }
-  void _onDeleteSelection() async {
+  Future<void> _onDeleteSelection() async {
     int choice = await confirmRemoveImagesFromAlbumDialog(context,
       content: appStrings(context).deleteImage_message(_selectedItems.length),
       count: _selectedItems.length,
@@ -248,7 +242,57 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
       }
     });
   }
+  void _onSelectDeselect(Map<String, dynamic> image) {
+    if(_isSelected(image['id'])) {
+      _selectedItems.remove(image['id']);
+      if(_selectedItems.isEmpty) {
+        _isEditMode = false;
+      }
+    } else {
+      _selectedItems.putIfAbsent(image['id'], () => image);
+    }
+  }
+  void _onLongPressImage(Map<String, dynamic> image) {
+    if(_isEditMode) {
+      setState(() {
+        _onSelectDeselect(image);
+      });
+    } else if(widget.isAdmin) {
+      setState(() {
+        _isEditMode = true;
+        _selectedItems.putIfAbsent(image['id'], () => image);
+      });
+    }
+  }
+  void _onTapImage(Map<String, dynamic> image, int index) {
+    if(_isEditMode) {
+      setState(() {
+        _onSelectDeselect(image);
+      });
+    } else {
+      Navigator.of(context).push(
+        MaterialPageRoute(builder: (context) =>
+            ImageViewPage(
+              images: imageList,
+              index: index,
+              isAdmin: widget.isAdmin,
+              category: widget.category,
+            )),
+      ).whenComplete(() {
+        setState(() {
+          _getData();
+        });
+      });
+    }
+  }
 
+  Future<bool> _onBack() async {
+    if(_isEditMode) {
+      closeEditMode();
+      return false;
+    }
+    return true;
+  }
 
   handleAlbumSnapshot(AsyncSnapshot albumSnapshot, int nbImages) {
     var albums = albumSnapshot.data['result']['categories'];
@@ -269,31 +313,34 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      resizeToAvoidBottomInset: true,
-      extendBody: true,
-      body: createListeners(
-        NestedScrollView(
-          controller: _controller,
-          headerSliverBuilder: (context, innerBoxScrolled) => [
-            createAppBar(),
-          ],
-          body: createFutureBuilders(),
+    return WillPopScope(
+      onWillPop: _onBack,
+      child: Scaffold(
+        resizeToAvoidBottomInset: true,
+        extendBody: true,
+        body: RefreshIndicator(
+          onRefresh: _onRefresh,
+          child: CustomScrollView(
+            slivers: [
+              _createAppBar,
+              SliverToBoxAdapter(child: _createFutureBuilders,),
+            ],
+          ),
         ),
+        floatingActionButton: _isEditMode
+            ? const SizedBox()
+            : _createFloatingActionButton,
+        bottomNavigationBar: _isEditMode
+            ? _createBottomBar
+            : const SizedBox(),
       ),
-      floatingActionButton: _isEditMode ?
-        Center() : createFloatingActionButton(),
-      bottomNavigationBar: _isEditMode ?
-        createBottomBar() : Container(height: 0),
     );
   }
 
-  Widget createAppBar() {
+  Widget get _createAppBar {
     ThemeData _theme = Theme.of(context);
     return SliverAppBar(
       pinned: true,
-      snap: false,
-      floating: false,
       centerTitle: true,
       iconTheme: IconThemeData(
         color: _theme.iconTheme.color,
@@ -305,7 +352,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
         icon: Icon(Icons.chevron_left),
       ),
       title: _isEditMode ?
-      Text("${_selectedPhotos()}", overflow: TextOverflow.fade, softWrap: true) :
+      Text("${_selectedItems.length}", overflow: TextOverflow.fade, softWrap: true) :
       Text(widget.title),
       actions: [
         _isEditMode ? IconButton(
@@ -324,20 +371,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
     );
   }
 
-  Widget createListeners(Widget child) {
-    return WillPopScope(
-      onWillPop: () async {
-        if(_isEditMode) {
-          closeEditMode();
-          return false;
-        }
-        return true;
-      },
-      child: child,
-    );
-  }
-
-  Widget createFutureBuilders() {
+  Widget get _createFutureBuilders {
     return FutureBuilder<Map<String,dynamic>>(
         future: _albumsFuture, // Albums of the list
         builder: (BuildContext context, AsyncSnapshot albumSnapshot) {
@@ -359,7 +393,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
                     }
                     handleImagesSnapshot(imagesSnapshot);
                   }
-                  return createPageContent(albums, nbImages);
+                  return _createPageContent(albums, nbImages);
                 } else {
                   return Center(
                     child: CircularProgressIndicator(),
@@ -376,7 +410,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
     );
   }
 
-  Widget createUploadActionButton() {
+  Widget get _createUploadActionButton {
     ThemeData _theme = Theme.of(context);
     return SpeedDial(
       spaceBetweenChildren: 10,
@@ -490,174 +524,126 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
     );
   }
 
-  Widget createPageContent(dynamic albums, int nbImages) {
+  Widget _createPageContent(dynamic albums, int nbImages) {
     ThemeData _theme = Theme.of(context);
 
     int albumCrossAxisCount = MediaQuery.of(context).size.width <= Constants.albumMinWidth ? 1
         : (MediaQuery.of(context).size.width/Constants.albumMinWidth).round();
 
-    return RefreshIndicator(
-      displacement: 20,
-      notificationPredicate: (notification) {
-        return notification.metrics.atEdge;
-      },
-      onRefresh: _onRefresh,
-      child: SingleChildScrollView(
-        child: Column(
-          children: [
-            albums.length > 0 ?
-            GridView.builder(
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: albumCrossAxisCount,
-                mainAxisSpacing: 10,
-                crossAxisSpacing: 10,
-                childAspectRatio: albumGridAspectRatio(context),
-              ),
-              padding: EdgeInsets.all(10),
-              itemCount: albums.length,
-              shrinkWrap: true,
-              physics: NeverScrollableScrollPhysics(),
-              itemBuilder: (BuildContext context, int index) {
-                var album = albums[index];
-                return AlbumListItem(album,
-                  isAdmin: widget.isAdmin,
-                  onClose: () {
-                    setState(() {
-                      _getData();
-                    });
-                  },
-                  onOpen: closeEditMode,
-                );
+    return Column(
+      children: [
+        albums.length > 0 ?
+        GridView.builder(
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: albumCrossAxisCount,
+            mainAxisSpacing: 10,
+            crossAxisSpacing: 10,
+            childAspectRatio: albumGridAspectRatio(context),
+          ),
+          padding: EdgeInsets.all(10),
+          itemCount: albums.length,
+          shrinkWrap: true,
+          physics: NeverScrollableScrollPhysics(),
+          itemBuilder: (BuildContext context, int index) {
+            var album = albums[index];
+            return AlbumListItem(album,
+              isAdmin: widget.isAdmin,
+              onClose: () {
+                setState(() {
+                  _getData();
+                });
               },
-            ) : Center(),
-            imageList.length > 0 ?
-            GridView.builder(
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: getImageCrossAxisCount(context),
-                mainAxisSpacing: 3.0,
-                crossAxisSpacing: 3.0,
-              ),
-              padding: EdgeInsets.symmetric(horizontal: 5),
-              itemCount: imageList.length,
-              shrinkWrap: true,
-              physics: NeverScrollableScrollPhysics(),
-              itemBuilder: (BuildContext context, int index) {
-                var image = imageList[index];
-                return InkWell(
-                  onLongPress: _isEditMode ? () {
-                    setState(() {
-                      _isSelected(image['id']) ?
-                      _selectedItems.remove(image['id']) :
-                      _selectedItems.putIfAbsent(image['id'], () => image);
-                    });
-                  } : widget.isAdmin ? () {
-                    setState(() {
-                      _isEditMode = true;
-                      _selectedItems.putIfAbsent(image['id'], () => image);
-                    });
-                  } : () {},
-                  onTap: () {
-                    _isEditMode ?
-                    setState(() {
-                      _isSelected(image['id']) ?
-                      _selectedItems.remove(image['id']) :
-                      _selectedItems.putIfAbsent(image['id'], () => image);
-                    }) :
-                    Navigator.of(context).push(
-                      MaterialPageRoute(builder: (context) => ImageViewPage(
-                        images: imageList,
-                        index: index,
-                        isAdmin: widget.isAdmin,
-                        category: widget.category,
-                      )),
-                    ).whenComplete(() {
-                      setState(() {
-                        _getData();
-                      });
-                    });
-                  },
-                  child: AnimatedContainer(
-                    duration: Duration(milliseconds: 200),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      border: _isSelected(image['id']) ?
-                      Border.all(width: 5, color: _theme.colorScheme.primary) :
-                      Border.all(width: 0, color: Colors.white),
-                    ),
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        Container(
-                          width: double.infinity,
-                          height: double.infinity,
-                          child: Image.network(imageList[index]["derivatives"][API.prefs.getString('thumbnail_size')]["url"],
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                        _isSelected(image['id']) ? Container(
-                          width: double.infinity,
-                          height: double.infinity,
-                          color: Color(0x80000000),
-                        ) : Center(),
-                        /*
-                        _isEditMode? Align(
-                          alignment: Alignment.topRight,
-                          child: Padding(
-                            padding: EdgeInsets.all(5),
-                            child: _isSelected(image['id']) ?
-                              Icon(Icons.check_circle, color: _theme.floatingActionButtonTheme.backgroundColor) :
-                              Icon(Icons.check_circle_outline, color: _theme.disabledColor),
-                          ),
-                        ) : Center(),
-
-                         */
-                        API.prefs.getBool('show_thumbnail_title')? Align(
-                          alignment: Alignment.bottomCenter,
-                          child: Container(
-                            width: double.infinity,
-                            color: Color(0x80ffffff),
-                            child: AutoSizeText('${image['name']}',
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 1,
-                              style: TextStyle(fontSize: 12),
-                              maxFontSize: 14, minFontSize: 7,
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        ) : Center(),
-                      ],
-                    ),
+              onOpen: closeEditMode,
+            );
+          },
+        ) : Center(),
+        imageList.length > 0 ?
+        GridView.builder(
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: getImageCrossAxisCount(context),
+            mainAxisSpacing: 3.0,
+            crossAxisSpacing: 3.0,
+          ),
+          padding: EdgeInsets.symmetric(horizontal: 5),
+          itemCount: imageList.length,
+          shrinkWrap: true,
+          physics: NeverScrollableScrollPhysics(),
+          itemBuilder: (BuildContext context, int index) {
+            var image = imageList[index];
+            bool selected = _isSelected(image['id']);
+            return InkWell(
+              onLongPress: () => _onLongPressImage(image),
+              onTap: () => _onTapImage(image, index),
+              child: AnimatedContainer(
+                duration: Duration(milliseconds: 200),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  border: Border.all(
+                    width: selected ? 5 : 0,
+                    color: selected ? _theme.colorScheme.primary : Colors.transparent,
                   ),
-                );
-              },
-            ) : Center(),
-            nbImages > (_page+1)*100 ? GestureDetector(
-              onTap: () {
-                showMore();
-              },
-              child: Padding(
-                padding: EdgeInsets.all(10),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                ),
+                child: Stack(
+                  alignment: Alignment.center,
                   children: [
-                    Text(appStrings(context).showMore(nbImages-((_page+1)*100)), style: TextStyle(fontSize: 14, color: _theme.disabledColor)),
+                    Container(
+                      width: double.infinity,
+                      height: double.infinity,
+                      child: Image.network(
+                        imageList[index]["derivatives"][API.prefs.getString('thumbnail_size')]["url"],
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    selected ? Container(
+                      width: double.infinity,
+                      height: double.infinity,
+                      color: Color(0x80000000),
+                    ) : const SizedBox(),
+                    API.prefs.getBool('show_thumbnail_title')? Align(
+                      alignment: Alignment.bottomCenter,
+                      child: Container(
+                        width: double.infinity,
+                        color: Color(0x80ffffff),
+                        child: AutoSizeText('${image['name']}',
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                          style: TextStyle(fontSize: 12),
+                          maxFontSize: 14, minFontSize: 7,
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ) : const SizedBox(),
                   ],
                 ),
               ),
-            ) : Center(),
-            Center(
-              child: Container(
-                padding: EdgeInsets.all(10),
-                child: Text(appStrings(context).imageCount(nbImages), style: TextStyle(fontSize: 20, color: _theme.textTheme.bodyText2.color, fontWeight: FontWeight.w300)),
-              ),
-            )
-          ],
-        ),
-      ),
+            );
+          },
+        ) : Center(),
+        nbImages > (_page+1)*100 ? GestureDetector(
+          onTap: () {
+            showMore();
+          },
+          child: Padding(
+            padding: EdgeInsets.all(10),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(appStrings(context).showMore(nbImages-((_page+1)*100)), style: TextStyle(fontSize: 14, color: _theme.disabledColor)),
+              ],
+            ),
+          ),
+        ) : Center(),
+        Center(
+          child: Container(
+            padding: EdgeInsets.all(10),
+            child: Text(appStrings(context).imageCount(nbImages), style: TextStyle(fontSize: 20, color: _theme.textTheme.bodyText2.color, fontWeight: FontWeight.w300)),
+          ),
+        )
+      ],
     );
   }
 
-  Widget createBottomBar() {
+  Widget get _createBottomBar {
     ThemeData _theme = Theme.of(context);
     return BottomNavigationBar(
       onTap: (index) async {
@@ -708,7 +694,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
     );
   }
 
-  Widget createFloatingActionButton() {
+  Widget get _createFloatingActionButton {
     final uploadStatusProvider = Provider.of<UploadStatusNotifier>(context);
     return Padding(
       padding: const EdgeInsets.all(8.0),
@@ -716,7 +702,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
         children: <Widget>[
           widget.isAdmin? Align(
             alignment: Alignment.bottomRight,
-            child: createUploadActionButton(),
+            child: _createUploadActionButton,
           ) : Container(),
           Align(
             alignment: Alignment.bottomRight,

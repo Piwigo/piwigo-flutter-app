@@ -101,7 +101,9 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
                   },
                   icon: Icon(Icons.settings, color: _theme.iconTheme.color),
                 ),
-                title: Text(appStrings(context).tabBar_albums),
+                title: Text(appStrings(context).tabBar_albums,
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+                ),
               ),
               AppBarSearch(
                 textController: _searchController,
