@@ -14,6 +14,7 @@ import 'package:piwigo_ng/constants/SettingsConstants.dart';
 import 'package:piwigo_ng/views/components/snackbars.dart';
 import 'package:provider/provider.dart';
 
+import '../../views/RootCategoryViewPage.dart';
 import '../UploadStatusProvider.dart';
 import 'chunked_uploader.dart';
 
@@ -23,32 +24,27 @@ class Uploader {
 
   Uploader(this.mainContext);
 
-  Future<void> showUploadNotification(Map<String, dynamic> downloadStatus) async {
+  Future<void> _showUploadNotification({bool success = true}) async {
+    if(!(API.prefs.getBool('upload_notification') ?? false)) return;
     final android = AndroidNotificationDetails(
-        'channel id',
-        'channel name',
-        channelDescription: 'channel description',
+        'piwigo-ng-upload',
+        'Piwigo NG Upload',
+        channelDescription: 'piwigo-ng',
         priority: Priority.high,
-        importance: Importance.max,
+        importance: Importance.high,
     );
     final platform = NotificationDetails(android: android);
-    print(downloadStatus);
-    final isSuccess = downloadStatus['isSuccess'];
-
     await API.localNotification.show(
       1,
-      isSuccess ? 'Success' : 'Failure',
-      isSuccess ? appStrings(mainContext).imageUploadCompleted_message : appStrings(mainContext).uploadError_message,
+      success ? 'Success' : 'Failure',
+      success ? appStrings(mainContext).imageUploadCompleted_message
+          : appStrings(mainContext).uploadError_message,
       platform,
     );
   }
 
-  Future<void> uploadPhotos(BuildContext context, List<XFile> photos, String category, Map<String, dynamic> info,) async {
-    Map<String, dynamic> result = {
-      'isSuccess': true,
-      'filePath': null,
-      'error': null,
-    };
+  Future<void> uploadPhotos(List<XFile> photos, String category, Map<String, dynamic> info,) async {
+    BuildContext context = RootCategoryViewPage.rootKey.currentContext;
     List<int> uploadedImages = [];
     final uploadStatusProvider = Provider.of<UploadStatusNotifier>(context, listen: false);
 
@@ -57,10 +53,7 @@ class Uploader {
     uploadStatusProvider.current = 1;
 
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(appStrings(context).imageUploadTableCell_uploading),
-        duration: Duration(seconds: 2),
-      ),
+      infoSnackBar(context, appStrings(context).imageUploadTableCell_uploading),
     );
 
     try {
@@ -91,12 +84,21 @@ class Uploader {
         uploadStatusProvider.current++;
       }
       uploadStatusProvider.reset();
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      ScaffoldMessenger.of(context).showSnackBar(successSnackBar(
+        context,
+        appStrings(context).imageUploadCompleted_title,
+      ));
+      await _showUploadNotification(success: true);
     } catch (e) {
       debugPrint(e.message);
       uploadStatusProvider.reset();
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
-      ScaffoldMessenger.of(context).showSnackBar(errorSnackBar(context, appStrings(context).uploadError_title));
-      result['isSuccess'] = false;
+      ScaffoldMessenger.of(context).showSnackBar(errorSnackBar(
+        context,
+        appStrings(context).uploadError_title,
+      ));
+      await _showUploadNotification(success: false);
     }
 
     try {
@@ -107,8 +109,6 @@ class Uploader {
     } on DioError catch (e) {
       debugPrint(e.message);
     }
-
-    await showUploadNotification(result);
   }
 
   Future<XFile> testCompressAndGetFile(XFile file) async {

@@ -36,40 +36,35 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget build(BuildContext context) {
     ThemeData _theme = Theme.of(context);
     return Scaffold(
-      body: CustomScrollView(
-        controller: _scrollController,
-        slivers: <Widget>[
-          AppBarExpandable(
-            scrollController: _scrollController,
-            leading: IconButton(
-              onPressed: Navigator.of(context).pop,
-              icon: Icon(Icons.check, color: _theme.iconTheme.color),
+      body: SafeArea(
+        child: CustomScrollView(
+          controller: _scrollController,
+          slivers: <Widget>[
+            AppBarExpandable(
+              scrollController: _scrollController,
+              leading: IconButton(
+                onPressed: Navigator.of(context).pop,
+                icon: Icon(Icons.check, color: _theme.iconTheme.color),
+              ),
+              title: appStrings(context).tabBar_preferences,
             ),
-            title: appStrings(context).tabBar_preferences,
-          ),
-          SliverPadding(
-            padding: EdgeInsets.only(top: 30),
-            sliver: SliverList(
-              delegate: SliverChildBuilderDelegate((BuildContext context, int index) {
-                  return Container(
-                    padding: EdgeInsets.zero,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        _buildServerSection(),
-                        _buildPhotosSection(),
-                        _buildUploadSection(),
-                        _buildInfoSection(),
-                      ],
-                    ),
-                  );
-                },
-                childCount: 1,
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.only(top: 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    _buildServerSection(),
+                    _buildPhotosSection(),
+                    _buildUploadSection(),
+                    _buildInfoSection(),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -257,6 +252,18 @@ class _SettingsPageState extends State<SettingsPage> {
                   onChanged: (bool) {
                     setState(() {
                       API.prefs.setBool('remove_metadata', bool);
+                    });
+                  },
+                ),
+              ),
+              SectionItem(
+                Text(appStrings(context).settings_uploadNotification, style: TextStyle(color: Colors.black, fontSize: 16)),
+                Switch(
+                  value: API.prefs.getBool('upload_notification') ?? false,
+                  activeColor: Theme.of(context).colorScheme.primary,
+                  onChanged: (bool) {
+                    setState(() {
+                      API.prefs.setBool('upload_notification', bool);
                     });
                   },
                 ),

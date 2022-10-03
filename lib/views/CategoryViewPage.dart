@@ -318,13 +318,15 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
       child: Scaffold(
         resizeToAvoidBottomInset: true,
         extendBody: true,
-        body: RefreshIndicator(
-          onRefresh: _onRefresh,
-          child: CustomScrollView(
-            slivers: [
-              _createAppBar,
-              SliverToBoxAdapter(child: _createFutureBuilders,),
-            ],
+        body: SafeArea(
+          child: RefreshIndicator(
+            onRefresh: _onRefresh,
+            child: CustomScrollView(
+              slivers: [
+                _createAppBar,
+                SliverToBoxAdapter(child: _createFutureBuilders,),
+              ],
+            ),
           ),
         ),
         floatingActionButton: _isEditMode

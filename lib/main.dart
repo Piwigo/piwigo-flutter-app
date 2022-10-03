@@ -55,34 +55,22 @@ void initLocalNotifications() {
 }
 
 Future<void> onSelectNotification(String payload) async {
-  print("Payload: $payload");
-  if(payload.contains('\\')) {
-    launchUrl(Uri());
-  }
+  if(payload == null) return;
   OpenResult result = await OpenFile.open(payload);
-  print(result.message);
+  debugPrint(result.message);
 }
 
 
 class MyApp extends StatelessWidget {
+  static final GlobalKey appKey = GlobalKey();
 
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeNotifier>(context);
     final localeProvider = Provider.of<LocaleNotifier>(context);
     return MaterialApp(
+      key: appKey,
       title: "Piwigo NG",
-      // localeListResolutionCallback: (locales, supportedLocales) {
-      //   debugPrint('device locales=$locales supported locales=$supportedLocales');
-      //
-      //   for (Locale locale in locales) {
-      //     if (supportedLocales.contains(locale)) {
-      //       return locale;
-      //     }
-      //   }
-      //
-      //   return Locale('en', 'US');
-      // },
       localizationsDelegates: [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,

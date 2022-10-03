@@ -19,6 +19,7 @@ import 'ImageViewPage.dart';
 
 class RootCategoryViewPage extends StatefulWidget {
   final bool isAdmin;
+  static final GlobalKey rootKey = GlobalKey();
 
   const RootCategoryViewPage({Key key, this.isAdmin = false}) : super(key: key);
   @override
@@ -77,67 +78,105 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
   Widget build(BuildContext context) {
     ThemeData _theme = Theme.of(context);
     return Scaffold(
-      body: GestureDetector(
-        onTap: () {
-          _focus.unfocus();
-        },
-        child: RefreshIndicator(
-          onRefresh: () {
-            setState(() {
-              _getData();
-            });
-            return Future.delayed(Duration(milliseconds: 1000));
+      key: RootCategoryViewPage.rootKey,
+      body: SafeArea(
+        child: GestureDetector(
+          onTap: () {
+            _focus.unfocus();
           },
-          child: CustomScrollView(
-            slivers: [
-              SliverAppBar(
-                pinned: true,
-                backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
-                leading: IconButton(
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(builder: (context) => SettingsPage()),
-                    );
+          child: RefreshIndicator(
+            onRefresh: () {
+              setState(() {
+                _getData();
+              });
+              return Future.delayed(Duration(milliseconds: 1000));
+            },
+            child: CustomScrollView(
+              slivers: [
+                SliverAppBar(
+                  pinned: true,
+                  backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
+                  leading: IconButton(
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(builder: (context) => SettingsPage()),
+                      );
+                    },
+                    icon: Icon(Icons.settings, color: _theme.iconTheme.color),
+                  ),
+                  title: Text(appStrings(context).tabBar_albums,
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+                  ),
+                ),
+                AppBarSearch(
+                  textController: _searchController,
+                  onTap: () {},
+                  focusNode: _focus,
+                  onSubmit: (string) {
+                    setState(() {
+                      _isSearching = _searchController.text.length > 0;
+                      _getData();
+                    });
                   },
-                  icon: Icon(Icons.settings, color: _theme.iconTheme.color),
                 ),
-                title: Text(appStrings(context).tabBar_albums,
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
-                ),
-              ),
-              AppBarSearch(
-                textController: _searchController,
-                onTap: () {},
-                focusNode: _focus,
-                onSubmit: (string) {
-                  setState(() {
-                    _isSearching = _searchController.text.length > 0;
-                    _getData();
-                  });
-                },
-              ),
-              SliverToBoxAdapter(
-                child: Builder(builder: (context) {
-                  if(_isSearching) {
-                    return FutureBuilder<Map<String,dynamic>>(
-                      key: UniqueKey(),
-                      future: _imagesFuture,
-                      builder: (BuildContext context, AsyncSnapshot imagesSnapshot) {
-                        if(imagesSnapshot.hasData){
-                          if(imagesSnapshot.data['stat'] == 'fail') {
+                SliverToBoxAdapter(
+                  child: Builder(builder: (context) {
+                    if(_isSearching) {
+                      return FutureBuilder<Map<String,dynamic>>(
+                        key: UniqueKey(),
+                        future: _imagesFuture,
+                        builder: (BuildContext context, AsyncSnapshot imagesSnapshot) {
+                          if(imagesSnapshot.hasData){
+                            if(imagesSnapshot.data['stat'] == 'fail') {
+                              return Center(
+                                child: Text(appStrings(context).categoryImageList_noDataError),
+                              );
+                            }
+                            var images = imagesSnapshot.data['result']['images'];
+                            var nbImages = images.length;
+                            return Column(
+                              children: [
+                                _imageGrid(images),
+                                Center(
+                                  child: Container(
+                                    padding: EdgeInsets.all(10),
+                                    child: Text(appStrings(context).imageCount(nbImages), style: TextStyle(fontSize: 20, color: _theme.textTheme.bodyText2.color, fontWeight: FontWeight.w300,),),
+                                  ),
+                                ),
+                              ],
+                            );
+                          } else {
                             return Center(
-                              child: Text(appStrings(context).categoryImageList_noDataError),
+                              child: CircularProgressIndicator(),
                             );
                           }
-                          var images = imagesSnapshot.data['result']['images'];
-                          var nbImages = images.length;
+                        },
+                      );
+                    }
+                    return FutureBuilder<Map<String,dynamic>>(
+                      key: UniqueKey(),
+                      future: _albumsFuture, // Albums of the list
+                      builder: (BuildContext context, AsyncSnapshot albumSnapshot) {
+                        if(albumSnapshot.hasData){
+                          if(albumSnapshot.data['stat'] == 'fail') {
+                            return Container(
+                              padding: EdgeInsets.all(10),
+                              child: Text(albumSnapshot.data['result']),
+                            ); //appStrings(context).categoryMainEmpty
+                          }
+                          var albums = albumSnapshot.data['result']['categories'];
+                          int nbPhotos = 0;
+                          albums.forEach((cat) => nbPhotos+=cat["total_nb_images"]);
+                          albums.removeWhere((category) => (
+                              category["id"].toString() == _rootCategory
+                          ));
                           return Column(
                             children: [
-                              _imageGrid(images),
+                              _albumGrid(albums),
                               Center(
                                 child: Container(
                                   padding: EdgeInsets.all(10),
-                                  child: Text(appStrings(context).imageCount(nbImages), style: TextStyle(fontSize: 20, color: _theme.textTheme.bodyText2.color, fontWeight: FontWeight.w300,),),
+                                  child: Text(appStrings(context).imageCount(nbPhotos), style: TextStyle(fontSize: 20, color: _theme.textTheme.bodyText2.color, fontWeight: FontWeight.w300,),),
                                 ),
                               ),
                             ],
@@ -149,45 +188,10 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
                         }
                       },
                     );
-                  }
-                  return FutureBuilder<Map<String,dynamic>>(
-                    key: UniqueKey(),
-                    future: _albumsFuture, // Albums of the list
-                    builder: (BuildContext context, AsyncSnapshot albumSnapshot) {
-                      if(albumSnapshot.hasData){
-                        if(albumSnapshot.data['stat'] == 'fail') {
-                          return Container(
-                            padding: EdgeInsets.all(10),
-                            child: Text(albumSnapshot.data['result']),
-                          ); //appStrings(context).categoryMainEmpty
-                        }
-                        var albums = albumSnapshot.data['result']['categories'];
-                        int nbPhotos = 0;
-                        albums.forEach((cat) => nbPhotos+=cat["total_nb_images"]);
-                        albums.removeWhere((category) => (
-                            category["id"].toString() == _rootCategory
-                        ));
-                        return Column(
-                          children: [
-                            _albumGrid(albums),
-                            Center(
-                              child: Container(
-                                padding: EdgeInsets.all(10),
-                                child: Text(appStrings(context).imageCount(nbPhotos), style: TextStyle(fontSize: 20, color: _theme.textTheme.bodyText2.color, fontWeight: FontWeight.w300,),),
-                              ),
-                            ),
-                          ],
-                        );
-                      } else {
-                        return Center(
-                          child: CircularProgressIndicator(),
-                        );
-                      }
-                    },
-                  );
-                }),
-              ),
-            ],
+                  }),
+                ),
+              ],
+            ),
           ),
         ),
       ),
