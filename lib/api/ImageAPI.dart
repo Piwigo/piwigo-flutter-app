@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
@@ -82,10 +83,11 @@ Future<bool> _requestPermissions() async {
 
   return permission == PermissionStatus.granted;
 }
-Future<String> _pickDirectoryPath() async {
+Future<String> pickDirectoryPath() async {
   return await FilePicker.platform.getDirectoryPath();
 }
 Future<void> _showNotification({bool success = true, String payload}) async {
+  if(!(API.prefs.getBool('download_notification') ?? true)) return;
   final android = AndroidNotificationDetails(
     'id',
     'Piwigo NG Download',
@@ -120,9 +122,14 @@ Future<List<String>> downloadImages(List<dynamic> images, {bool showNotification
   final isPermissionStatusGranted = await _requestPermissions();
   if (!isPermissionStatusGranted) return null;
 
-  final dirPath = cached
-      ? (await getTemporaryDirectory()).path
-      : await _pickDirectoryPath();
+  String dirPath = (await getTemporaryDirectory()).path;
+  if(!cached) {
+    if(API.prefs.getString('download_destination') != null) {
+      dirPath = API.prefs.getString('download_destination');
+    } else {
+      dirPath = await pickDirectoryPath();
+    }
+  }
   if(dirPath == null) return null;
 
   final List<String> filesPath = [];
@@ -151,8 +158,7 @@ Future<List<String>> downloadImages(List<dynamic> images, {bool showNotification
   return filesPath;
 }
 Future<String> downloadImage(String dirPath, String url, String file) async {
-
-  var localPath = path.join(dirPath, file);
+  String localPath = path.join(dirPath, file);
   try {
     Response response = await API().dio.download(
       url,
@@ -160,7 +166,7 @@ Future<String> downloadImage(String dirPath, String url, String file) async {
     );
     return localPath;
   } catch (e) {
-    print(e);
+    print("Download error: $e");
     return null;
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:piwigo_ng/api/ImageAPI.dart';
 import 'package:piwigo_ng/constants/SettingsConstants.dart';
 import 'package:piwigo_ng/views/LoginViewPage.dart';
 import 'package:piwigo_ng/api/API.dart';
@@ -30,6 +31,10 @@ class _SettingsPageState extends State<SettingsPage> {
     super.initState();
     _currentSliderValue = API.prefs.getInt("recent_albums").toDouble();
     _thumbnailDerivative = API.prefs.getString('thumbnail_size');
+  }
+
+  String _parseFilePath(String path) {
+    return path.replaceFirst(RegExp(r'/storage/emulated/0'), '');
   }
 
   @override
@@ -195,32 +200,74 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
               ),
               SectionItem(
-                Text(appStrings(context).defaultImageSize320px, style: TextStyle(color: Colors.black, fontSize: 16)),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    DropdownButton<String>(
-                      value: _fsDerivative == null ? API.prefs.getString('full_screen_image_size') : _fsDerivative,
-                      style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
-                      underline: Container(),
-                      icon: Icon(Icons.chevron_right, color: Colors.grey.shade600, size: 20),
-                      onChanged: (String newValue) {
-                        setState(() {
-                          _fsDerivative = newValue;
-                          API.prefs.setString('full_screen_image_size', _fsDerivative);
-                        });
-                      },
-                      items: API.prefs.getStringList('available_sizes').map<DropdownMenuItem<String>>((
-                          String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(photoSize(context, value)),
-                        );
-                      }).toList(),
-                    ),
-                  ],
+                Expanded(
+                  child: Text(appStrings(context).defaultImageSize320px,
+                    style: TextStyle(color: Colors.black, fontSize: 16),
+                  ),
                 ),
-                isEnd: true,
+                DropdownButton<String>(
+                  value: _fsDerivative == null ? API.prefs.getString('full_screen_image_size') : _fsDerivative,
+                  style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
+                  underline: const SizedBox(),
+                  icon: Icon(Icons.chevron_right, color: Colors.grey.shade600, size: 20),
+                  onChanged: (String newValue) {
+                    setState(() {
+                      _fsDerivative = newValue;
+                      API.prefs.setString('full_screen_image_size', _fsDerivative);
+                    });
+                  },
+                  items: API.prefs.getStringList('available_sizes').map<DropdownMenuItem<String>>((
+                      String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      alignment: AlignmentDirectional.centerStart,
+                      child: Text(photoSize(context, value)),
+                    );
+                  }).toList(),
+                ),
+              ),
+              SectionItem(
+                Text(appStrings(context).settings_downloadDestination, style: TextStyle(color: Colors.black, fontSize: 16)),
+                Expanded(
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () async {
+                      String path = await pickDirectoryPath();
+                      if(path != null) {
+                        setState(() {
+                          API.prefs.setString('download_destination', path);
+                        });
+                      }
+                    },
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            _parseFilePath(API.prefs.getString('download_destination') ?? appStrings(context).none),
+                            textAlign: TextAlign.end,
+                            style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 8),
+                          child: Icon(Icons.chevron_right, color: Colors.grey.shade600, size: 20),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              SectionItem(
+                Text(appStrings(context).settings_downloadNotification, style: TextStyle(color: Colors.black, fontSize: 16)),
+                Switch(
+                  value: API.prefs.getBool('download_notification') ?? true,
+                  activeColor: Theme.of(context).colorScheme.primary,
+                  onChanged: (bool) {
+                    setState(() {
+                      API.prefs.setBool('download_notification', bool);
+                    });
+                  },
+                ),
               ),
             ],
           ),
@@ -259,7 +306,7 @@ class _SettingsPageState extends State<SettingsPage> {
               SectionItem(
                 Text(appStrings(context).settings_uploadNotification, style: TextStyle(color: Colors.black, fontSize: 16)),
                 Switch(
-                  value: API.prefs.getBool('upload_notification') ?? false,
+                  value: API.prefs.getBool('upload_notification') ?? true,
                   activeColor: Theme.of(context).colorScheme.primary,
                   onChanged: (bool) {
                     setState(() {

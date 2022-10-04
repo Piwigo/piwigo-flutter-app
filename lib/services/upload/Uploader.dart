@@ -25,7 +25,7 @@ class Uploader {
   Uploader(this.mainContext);
 
   Future<void> _showUploadNotification({bool success = true}) async {
-    if(!(API.prefs.getBool('upload_notification') ?? false)) return;
+    if(!(API.prefs.getBool('upload_notification') ?? true)) return;
     final android = AndroidNotificationDetails(
         'piwigo-ng-upload',
         'Piwigo NG Upload',

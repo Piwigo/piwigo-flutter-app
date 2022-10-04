@@ -841,6 +841,8 @@
     "settings_wifiOnly": "Wi-Fi Only",
     "settings_deleteImage": "Delete After Upload",
     "settings_uploadNotification": "Upload Notification",
+    "settings_downloadNotification": "Download Notification",
+    "settings_downloadDestination": "Download Folder",
 
 
     "settings_autoUpload": "Auto Upload",
