@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 
 import 'API.dart';
 
@@ -27,9 +28,7 @@ Future<String> loginUser(String url, String username, String password) async {
     if(response.statusCode == 200) {
       if(json.decode(response.data)['stat'] == 'ok') {
         var status = await sessionStatus();
-        print(status);
         if(status["stat"] == "ok") {
-          print("$url, $username");
           savePreferences(status["result"], url: url, username: username, password: password, isLogged: true, isGuest: false);
           return null;
         }
@@ -38,22 +37,25 @@ Future<String> loginUser(String url, String username, String password) async {
       return 'Invalid username / password';
     }
 
-  } catch(e) {
-    return 'Dio: Invalid url';
+  } on DioError catch(e) {
+    return e.message;
   }
   return 'Something happened';
 }
 Future<String> loginGuest(String url) async {
-
   API().dio.options.baseUrl = url;
 
-  var status = await sessionStatus();
+  try {
+    var status = await sessionStatus();
 
-  if(status["stat"] == "ok") {
-    savePreferences(status["result"], url: url, username: "", password: "", isLogged: true, isGuest: true);
-    return null;
+    if(status["stat"] == "ok") {
+      savePreferences(status["result"], url: url, username: "", password: "", isLogged: true, isGuest: true);
+      return null;
+    }
+    return status["message"];
+  } on DioError catch(e) {
+    return e.message;
   }
-  return 'Invalid url';
 }
 
 Future<Map<String, dynamic>> sessionStatus() async {
@@ -65,14 +67,32 @@ Future<Map<String, dynamic>> sessionStatus() async {
   try {
     Response response = await API().dio.get('ws.php', queryParameters: queries);
     return json.decode(response.data);
-  } catch (e) {
-    print('Dio error $e');
-    return {"stat": "KO"};
+  } on DioError catch (e) {
+    debugPrint('Dio error $e');
+    return {"stat": "KO",
+      "message": e.message,
+    };
+  }
+}
+
+Future<Map<String, dynamic>> communityStatus() async {
+  Map<String, String> queries = {
+    'format': 'json',
+    'method': 'community.session.getStatus'
+  };
+
+  try {
+    Response response = await API().dio.get('ws.php', queryParameters: queries);
+    return json.decode(response.data);
+  } on DioError catch (e) {
+    debugPrint('Dio error $e');
+    return {"stat": "KO",
+      "message": e.message,
+    };
   }
 }
 
 void saveStatus(Map<String, dynamic> status) async {
-  print(status);
   API.prefs.setString("account_username", status["username"]);
   API.prefs.setString('pwg_token', status['pwg_token']);
   API.prefs.setString("status", status["status"]);
@@ -94,12 +114,23 @@ void savePreferences(Map<String, dynamic> status, {
   bool isLogged,
   bool isGuest
 }) async {
-  API.prefs.setString('username', url);
-  API.prefs.setString('username', username);
-  API.prefs.setString('password', password);
+  API.storage.write(key: 'username', value: username);
+  API.storage.write(key: 'password', value: password);
   API.prefs.setBool("is_logged", isLogged);
   API.prefs.setBool("is_guest", isGuest);
-  API.prefs.setString("user_status", status["status"]);
+  if (await methodExist('community.session.getStatus')) {
+    var community = await communityStatus();
+    if(community['stat'] == 'ok') {
+      API.prefs.setString("user_status", community['result']["real_user_status"]);
+      API.prefs.setBool("community", true);
+    } else {
+      API.prefs.setString("user_status", status["status"]);
+      API.prefs.setBool("community", false);
+    }
+  } else {
+    API.prefs.setString("user_status", status["status"]);
+    API.prefs.setBool("community", false);
+  }
   API.prefs.setString("base_url", url);
 
   API.prefs.setString("default_album", "Root Album");
@@ -109,6 +140,7 @@ void savePreferences(Map<String, dynamic> status, {
   if(API.prefs.getDouble("portrait_image_count") == null) API.prefs.setDouble("portrait_image_count", 4);
   if(API.prefs.getDouble("landscape_image_count") == null) API.prefs.setDouble("landscape_image_count", 6);
   if(API.prefs.getBool("show_thumbnail_title") == null) API.prefs.setBool("show_thumbnail_title", false);
+  if(API.prefs.getBool("remove_metadata") == null) API.prefs.setBool("remove_metadata", false);
   saveStatus(status);
 }
 
@@ -122,7 +154,7 @@ Future<Map<String, dynamic>> getMethods() async {
     Response response = await API().dio.get('ws.php', queryParameters: queries);
     return json.decode(response.data);
   } catch (e) {
-    print('Dio error $e');
+    debugPrint('Dio error $e');
     return {"stat": "KO"};
   }
 }

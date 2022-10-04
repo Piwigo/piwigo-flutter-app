@@ -28,7 +28,6 @@ ThemeData light = ThemeData(
   colorScheme: ColorScheme.light(
     primary: Color(0xffff7700)
   ),
-
   iconTheme: IconThemeData(
     color: Color(0xffff7700),
   ),
@@ -76,20 +75,29 @@ ThemeData dark = ThemeData(
   dialogBackgroundColor: Color(0xff2D2D2D),
   bottomAppBarColor: Color(0xff232323),
   focusColor: Color(0xffff7700),
-  // accentColor: Color(0xffff7700),
   backgroundColor: Color(0xff2D2D2D),
-  // buttonColor: Color(0x30ff7700),
   scaffoldBackgroundColor: Color(0xff232323),
-  cardColor: Color(0xffffffff),
+  bottomSheetTheme: BottomSheetThemeData(
+      backgroundColor: Colors.black.withOpacity(0)),
+  cardColor: Color(0xff2D2D2D),
   errorColor: Color(0xffff0e00),
   primaryColorLight: Color(0xffffffff),
   primaryColorDark: Color(0xff000000),
-
+  appBarTheme: AppBarTheme(
+    backgroundColor: Color(0xff232323),
+    iconTheme: IconThemeData(
+      color: Color(0xffff7700),
+    ),
+    titleTextStyle: TextStyle(fontSize: 20.0, color: Color(0xffffffff)),
+  ),
+  colorScheme: ColorScheme.dark(
+    primary: Color(0xffff7700),
+  ),
   iconTheme: IconThemeData(
     color: Color(0xffff7700),
   ),
   floatingActionButtonTheme: FloatingActionButtonThemeData(
-    backgroundColor: Color(0x30ff7700),
+    backgroundColor: Color(0x60ff7700),
     foregroundColor: Color(0xffffffff),
   ),
   buttonTheme: ButtonThemeData(
@@ -97,7 +105,7 @@ ThemeData dark = ThemeData(
   ),
   inputDecorationTheme: InputDecorationTheme(
     prefixStyle: TextStyle(color: Color(0xffff7700)),
-    fillColor: Color(0xffefefef),
+    fillColor: Color(0xff2D2D2D),
     hintStyle: TextStyle(fontSize: 14,
         fontStyle: FontStyle.italic,
         color: Color(0xff6f6f6f)

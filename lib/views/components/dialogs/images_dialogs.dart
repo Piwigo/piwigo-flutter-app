@@ -23,8 +23,8 @@ class EditImagesPage extends StatefulWidget {
 }
 class _EditImagesPageState extends State<EditImagesPage> {
   final _formKey = GlobalKey<FormState>();
-  TextEditingController _nameController = TextEditingController();
-  TextEditingController _descController = TextEditingController();
+  TextEditingController _nameController;
+  TextEditingController _descController;
 
   List<DropdownMenuItem<int>> _levelItems = [];
   List<TagModel> _tags = [];
@@ -37,6 +37,16 @@ class _EditImagesPageState extends State<EditImagesPage> {
   @override
   void initState() {
     super.initState();
+    
+    String initialName = "";
+    String initialDesc = "";
+    if (widget.images.length == 1) {
+      initialName = widget.images[_page]['name'] ?? "";
+      initialDesc = widget.images[_page]['comment'] ?? "";
+    }
+    _nameController = TextEditingController(text: initialName);
+    _descController = TextEditingController(text: initialDesc);
+
     _pageController = PageController(viewportFraction: 7/8);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       privacyLevels(context).forEach((key, value) {

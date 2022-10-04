@@ -2,14 +2,14 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
-import 'package:ext_storage/ext_storage.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:path/path.dart' as path;
 import 'package:piwigo_ng/views/components/snackbars.dart';
+import 'package:share_plus/share_plus.dart';
 
 import 'API.dart';
 
@@ -76,7 +76,6 @@ Future<dynamic> getImageInfo(int imageId) async {
 
 Future<bool> _requestPermissions() async {
   var permission = await Permission.storage.status;
-  print(permission.isGranted);
   if (permission != PermissionStatus.granted) {
     await Permission.storage.request();
     permission = await Permission.storage.status;
@@ -84,90 +83,91 @@ Future<bool> _requestPermissions() async {
 
   return permission == PermissionStatus.granted;
 }
-Future<String> _getDownloadPath() async {
-  if (Platform.isAndroid) {
-    return ExtStorage.getExternalStoragePublicDirectory(ExtStorage.DIRECTORY_PICTURES);
-  }
-  return (await getApplicationDocumentsDirectory()).path;
+Future<String> pickDirectoryPath() async {
+  return await FilePicker.platform.getDirectoryPath();
 }
-Future<void> _showNotification(Map<String, dynamic> downloadStatus) async {
+Future<void> _showNotification({bool success = true, String payload}) async {
+  if(!(API.prefs.getBool('download_notification') ?? true)) return;
   final android = AndroidNotificationDetails(
-      'channel id',
-      'channel name',
-      channelDescription: 'channel description',
-      priority: Priority.high,
-      importance: Importance.max
+    'id',
+    'Piwigo NG Download',
+    channelDescription: 'piwigo_ng',
+    priority: Priority.defaultPriority,
+    importance: Importance.defaultImportance,
   );
   final platform = NotificationDetails(android: android);
-  final isSuccess = downloadStatus['isSuccess'];
 
   await API.localNotification.show(
     0,
-    isSuccess ? 'Success' : 'Failure',
-    isSuccess ? 'All files has been downloaded successfully!' : 'There was an error while downloading the file.',
+    success ? 'Success' : 'Failure',
+    success ? 'All files has been downloaded successfully!' : 'There was an error while downloading the file.',
     platform,
+    payload: payload,
   );
 }
 
-Future<void> downloadSingleImage(dynamic image) async {
+Future<void> share(List<dynamic> images) async {
+  List<String> filesPath = await downloadImages(images,
+    showNotification: false,
+    cached: true,
+  );
+  print(filesPath);
+  if(filesPath == null) return;
+  if(filesPath.isNotEmpty) {
+    Share.shareFiles(filesPath);
+  }
+}
+
+Future<List<String>> downloadImages(List<dynamic> images, {bool showNotification = true, bool cached = false}) async {
   final isPermissionStatusGranted = await _requestPermissions();
-  final dirPath = await _getDownloadPath();
+  if (!isPermissionStatusGranted) return null;
 
-  Map<String, dynamic> result = {
-    'isSuccess': true,
-    'filePath': null,
-    'error': null,
-  };
+  String dirPath = (await getTemporaryDirectory()).path;
+  if(!cached) {
+    if(API.prefs.getString('download_destination') != null) {
+      dirPath = API.prefs.getString('download_destination');
+    } else {
+      dirPath = await pickDirectoryPath();
+    }
+  }
+  if(dirPath == null) return null;
 
-  if (isPermissionStatusGranted) {
-    await downloadImage(
+  final List<String> filesPath = [];
+
+  await Future.forEach(images, (image) async {
+    String filePath = await downloadImage(
       dirPath,
       image['element_url'],
       image['file'],
     );
-    await _showNotification(result);
-  } else {
-    print('No storage Permission');
-  }
-}
-Future<void> downloadImages(List<dynamic> images) async {
-  final isPermissionStatusGranted = await _requestPermissions();
-  final dirPath = await _getDownloadPath();
+    if(filePath != null) {
+      filesPath.add(filePath);
+    }
+  });
 
-  Map<String, dynamic> result = {
-    'isSuccess': true,
-    'filePath': null,
-    'error': null,
-  };
-
-  if (isPermissionStatusGranted) {
-    await Future.forEach(images, (image) async {
-      await downloadImage(
-        dirPath,
-        image['element_url'],
-        image['file'],
+  if(showNotification) {
+    if(filesPath.isNotEmpty) {
+      await _showNotification(
+        success: true,
+        payload: filesPath.length == 1 ? filesPath.first : '$dirPath\\',
       );
-    });
-    await _showNotification(result);
-  } else {
-    print('No storage Permission');
+    } else {
+      await _showNotification(success: false);
+    }
   }
+  return filesPath;
 }
-Future<dynamic> downloadImage(String dirPath, String url, String file) async {
-
-  var localPath = path.join(dirPath, file);
+Future<String> downloadImage(String dirPath, String url, String file) async {
+  String localPath = path.join(dirPath, file);
   try {
     Response response = await API().dio.download(
       url,
       localPath,
     );
-    // result['isSuccess'] = response.statusCode == 200;
-    // result['filePath'] = localPath;
+    return localPath;
   } catch (e) {
-    print(e);
-    // result['error'] = e.toString();
-  } finally {
-
+    print("Download error: $e");
+    return null;
   }
 }
 
@@ -176,7 +176,6 @@ Future<int> deleteImages(BuildContext context, List<int> imageIdList) async {
   for(int id in imageIdList) {
     var response = await deleteImage(id);
     if(response['stat'] == 'fail') {
-      print(response);
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
       ScaffoldMessenger.of(context).showSnackBar(
         errorSnackBar(context, '${response['result']}'),
@@ -225,7 +224,6 @@ Future<int> removeImages(BuildContext context, List<int> imageIdList, String cat
   for(int id in imageIdList) {
     var response = await removeImage(id, catId);
     if(response['stat'] == 'fail') {
-      print(response);
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
       ScaffoldMessenger.of(context).showSnackBar(
         errorSnackBar(context, '${response['result']}'),
@@ -265,8 +263,6 @@ Future<dynamic> removeImage(int imageId, String catId) async {
         data: formData,
         queryParameters: queries
     );
-
-    print(response.data);
 
     if (response.statusCode == 200) {
       return json.decode(response.data);
@@ -497,7 +493,6 @@ Future<dynamic> uploadCompleted(List<int> imageId, int categoryId) async {
         queryParameters: queries
     );
     if (response.statusCode == 200) {
-      print(response.data);
       return json.decode(response.data);
     } else {
       return {
@@ -529,7 +524,6 @@ Future<dynamic> communityUploadCompleted(List<int> imageId, int categoryId) asyn
         queryParameters: queries
     );
     if (response.statusCode == 200) {
-      print(response.data);
       return json.decode(response.data);
     } else {
       return {

@@ -1,5 +1,6 @@
 import 'package:better_player/better_player.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class VideoPlayerViewPage extends StatefulWidget {
   const VideoPlayerViewPage(this.url, {Key key, this.ratio = 1}) : super(key: key);
@@ -15,9 +16,7 @@ class _VideoPlayerViewPageState extends State<VideoPlayerViewPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      primary: true,
       backgroundColor: Colors.black,
-      resizeToAvoidBottomInset: true,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         leading: IconButton(
@@ -30,24 +29,25 @@ class _VideoPlayerViewPageState extends State<VideoPlayerViewPage> {
         foregroundColor: Colors.white,
         backgroundColor: Colors.transparent
       ),
-      body: Container(
-        child: Center(
-          child: BetterPlayer.network(
-            widget.url,
-            betterPlayerConfiguration: BetterPlayerConfiguration(
-              fit: BoxFit.contain,
-              aspectRatio: widget.ratio,
-              fullScreenAspectRatio: widget.ratio,
-              autoPlay: true,
-              autoDispose: true,
-              controlsConfiguration: BetterPlayerControlsConfiguration(
-                enableSkips: false,
-                enableFullscreen: false,
-                enableAudioTracks: false,
-                enableMute: false,
-                unMuteIcon: Icons.volume_off,
-              ),
-            ),
+      body: BetterPlayer.network(
+        widget.url,
+        betterPlayerConfiguration: BetterPlayerConfiguration(
+          fit: BoxFit.contain,
+          aspectRatio: widget.ratio,
+          fullScreenAspectRatio: widget.ratio,
+          autoPlay: true,
+          autoDispose: true,
+          fullScreenByDefault: false,
+          deviceOrientationsOnFullScreen: DeviceOrientation.values,
+          controlsConfiguration: BetterPlayerControlsConfiguration(
+            enableSkips: false,
+            enableFullscreen: false,
+            enableAudioTracks: false,
+            enableMute: true,
+            enableSubtitles: false,
+            enableQualities: false,
+            unMuteIcon: Icons.volume_off,
+            controlsHideTime: const Duration(milliseconds: 100),
           ),
         ),
       ),

@@ -20,10 +20,11 @@ String albumSubCount(dynamic album, context) {
 }
 
 class AlbumListItem extends StatefulWidget {
-  const AlbumListItem(this.album, {Key key, this.isAdmin = false, this.onClose, this.onOpen}) : super(key: key);
+  const AlbumListItem(this.album, {Key key, this.isAdmin = false, this.onClose, this.onOpen, this.canUpload = false}) : super(key: key);
 
   final dynamic album;
   final bool isAdmin;
+  final bool canUpload;
   final Function() onClose;
   final Function() onOpen;
 
@@ -33,22 +34,21 @@ class AlbumListItem extends StatefulWidget {
 class _AlbumListItemState extends State<AlbumListItem> {
 
   void _onEditAlbum() async {
-    showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return EditCategoryDialog(
-              catId: widget.album['id'],
-              catName: widget.album['name'],
-              catDesc: widget.album['comment'],
-              privacy: widget.album['status'] == 'private' ? true : false
-          );
-        }
-    ).whenComplete(() {
-      widget.onClose();
-    });
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return EditCategoryDialog(
+            catId: widget.album['id'],
+            catName: widget.album['name'],
+            catDesc: widget.album['comment'],
+            privacy: widget.album['status'] == 'private' ? true : false
+        );
+      },
+    );
+    widget.onClose();
   }
   void _onMoveAlbum() async {
-    showDialog(
+    await showDialog(
       context: context,
       builder: (BuildContext context) {
         return MoveOrCopyDialog(
@@ -76,9 +76,7 @@ class _AlbumListItemState extends State<AlbumListItem> {
           },
         );
       }
-    ).whenComplete(() {
-      widget.onClose();
-    });
+    );
     widget.onClose();
   }
   void _onDeleteAlbum() async {
@@ -141,37 +139,40 @@ class _AlbumListItemState extends State<AlbumListItem> {
         borderRadius: BorderRadius.circular(10),
         child: Slidable(
           enabled: widget.isAdmin,
-          child: AlbumListCard(widget.album, isAdmin: widget.isAdmin),
+          child: AlbumListCard(widget.album, isAdmin: widget.isAdmin, canUpload: widget.canUpload,),
           endActionPane: ActionPane(
             motion: DrawerMotion(),
             children: [
               CustomSlidableAction(
                 backgroundColor: Theme.of(context).colorScheme.primary,
-                onPressed: (_) {
-                  _onEditAlbum();
-                },
-                child: Center(
-                  child: Icon(Icons.edit, size: 38, color: Colors.white),
+                onPressed: (_) => _onEditAlbum(),
+                child: SizedBox.expand(
+                  child: FittedBox(
+                    fit: BoxFit.contain,
+                    child: Icon(Icons.edit, color: Colors.white),
+                  ),
                 ),
               ),
               CustomSlidableAction(
                 backgroundColor: Color(0xFF4B4B4B),
-                child: Center(
-                  child: Icon(Icons.reply, size: 38, color: Colors.white),
+                onPressed: (_) => _onMoveAlbum(),
+                child: SizedBox.expand(
+                  child: FittedBox(
+                    fit: BoxFit.contain,
+                    child: Icon(Icons.reply, color: Colors.white),
+                  ),
                 ),
-                onPressed: (_) {
-                  _onMoveAlbum();
-                },
               ),
               CustomSlidableAction(
                 backgroundColor: Colors.red,
-                child: Center(
-                  child: Icon(Icons.delete, size: 38, color: Colors.white),
-                ),
                 autoClose: true,
-                onPressed: (_) {
-                  _onDeleteAlbum();
-                },
+                onPressed: (_) => _onDeleteAlbum(),
+                child: SizedBox.expand(
+                  child: FittedBox(
+                    fit: BoxFit.contain,
+                    child: Icon(Icons.delete, color: Colors.white),
+                  ),
+                ),
               ),
             ],
           ),
@@ -182,10 +183,11 @@ class _AlbumListItemState extends State<AlbumListItem> {
 }
 
 class AlbumListCard extends StatelessWidget {
-  const AlbumListCard(this.album, {Key key, this.isAdmin = false}) : super(key: key);
+  const AlbumListCard(this.album, {Key key, this.isAdmin = false, this.canUpload = false,}) : super(key: key);
 
   final dynamic album;
   final bool isAdmin;
+  final bool canUpload;
 
   @override
   Widget build(BuildContext context) {
@@ -235,12 +237,23 @@ class AlbumListCard extends StatelessWidget {
         child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('${album["name"]}',
-                  style: Theme.of(context).textTheme.headline6,
-                  textAlign: TextAlign.center,
-                  overflow: TextOverflow.ellipsis,
-                  softWrap: false,
-                  maxLines: 1
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Flexible(
+                    child: Text('${album["name"]}',
+                      style: Theme.of(context).textTheme.headline6,
+                      textAlign: TextAlign.center,
+                      overflow: TextOverflow.ellipsis,
+                      softWrap: false,
+                      maxLines: 1,
+                    ),
+                  ),
+                  if(canUpload) Padding(
+                    padding: const EdgeInsets.only(left: 5),
+                    child: Icon(Icons.upload, size: 18,),
+                  ),
+                ],
               ),
               Column(
                 children: [

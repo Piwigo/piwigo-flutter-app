@@ -358,6 +358,7 @@
     "imageOptions_title": "Photo Options",
     "imageOptions_edit": "Edit",
     "imageOptions_download": "Download",
+    "imageOptions_share": "Share",
     "imageOptions_setAlbumImage": "Set Album Thumbnail",
 
 
@@ -839,6 +840,9 @@
     "settings_deleteImage375px": "Delete Photo After Upload",
     "settings_wifiOnly": "Wi-Fi Only",
     "settings_deleteImage": "Delete After Upload",
+    "settings_uploadNotification": "Upload Notification",
+    "settings_downloadNotification": "Download Notification",
+    "settings_downloadDestination": "Download Folder",
 
 
     "settings_autoUpload": "Auto Upload",
@@ -906,6 +910,7 @@
 
 
     "settings_appName": "Piwigo NG",
+    "settings_language": "Choose language",
     "settingsHeader_about": "Information",
     "settings_twitter": "@piwigo",
     "settings_twitterURL": "https://twitter.com/piwigo",

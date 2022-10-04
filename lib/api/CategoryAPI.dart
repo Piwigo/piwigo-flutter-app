@@ -1,15 +1,61 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'API.dart';
+import 'SessionAPI.dart';
 
 Future<Map<String,dynamic>> fetchAlbums(String albumID) async {
-
-  Map<String, String> queries = {
+  Map<String, dynamic> queries = {
     "format": "json",
     "method": "pwg.categories.getList",
     "cat_id": albumID,
     "thumbnail_size": API.prefs.getString('thumbnail_size'),
+  };
+  List<String> uploadCategoryIdList = [];
+  if (await methodExist('community.categories.getList')) {
+    queries['faked_by_community'] = false;
+    var communityResult = await fetchCommunityAlbums(albumID);
+    uploadCategoryIdList = communityResult['result']['categories'].map<String>(
+      (cat) => cat['id'].toString(),
+    ).toList();
+  }
+
+  try {
+    Response response = await API().dio.get('ws.php', queryParameters: queries);
+
+    if (response.statusCode == 200) {
+      Map<String, dynamic> result = json.decode(response.data);
+      if(result['stat'] == 'fail') return result;
+      var categoryList = result['result']['categories'];
+      for (var cat in categoryList) {
+        bool canUpload = false;
+        if (!['normal', 'guest'].contains(API.prefs.getString('user_status'))
+            || uploadCategoryIdList.contains(cat['id'].toString())) {
+          canUpload = true;
+        }
+        cat['can_upload'] = canUpload;
+      }
+      result['result']['categories'] = categoryList;
+      return result;
+    } else {
+      return {
+        'stat': 'fail',
+        'result': response.statusMessage
+      };
+    }
+  } on DioError {
+    return {
+      'stat': 'fail',
+      'result': 'error',
+    };
+  }
+}
+Future<Map<String,dynamic>> fetchCommunityAlbums(String albumID) async {
+  Map<String, dynamic> queries = {
+    "format": "json",
+    "method": "community.categories.getList",
+    "cat_id": albumID,
   };
 
   try {
@@ -24,10 +70,10 @@ Future<Map<String,dynamic>> fetchAlbums(String albumID) async {
       };
     }
   } catch(e) {
-    //var error = e as DioError;
+    var error = e as DioError;
     return {
       'stat': 'fail',
-      'result': e.toString(),
+      'result': error.message,
     };
   }
 }
@@ -76,8 +122,7 @@ Future<dynamic> addCategory(String catName, String catDesc, String parent) async
         'result': response.statusMessage
       };
     }
-  } catch(e) {
-    var error = e as DioError;
+  } on DioError catch(error) {
     return {
       'stat': 'fail',
       'result': error.message
@@ -170,7 +215,7 @@ Future<dynamic> editCategory(int catId, String catName, String catDesc) async {
       return json.decode(response.data);
     }
   } catch (e) {
-    print('Dio move category error $e');
+    debugPrint('Dio move category error $e');
     return e;
   }
 }

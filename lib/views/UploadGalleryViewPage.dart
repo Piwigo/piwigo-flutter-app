@@ -1,17 +1,20 @@
 import 'dart:io';
 
-import 'package:video_player/video_player.dart';
+import 'package:better_player/better_player.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:piwigo_ng/constants/SettingsConstants.dart';
 import 'package:piwigo_ng/services/OrientationService.dart';
 import 'package:piwigo_ng/api/API.dart';
+import 'package:mime_type/mime_type.dart';
 
 import 'package:flutter/material.dart';
 
 import 'package:piwigo_ng/views/components/buttons.dart';
 import 'package:piwigo_ng/views/components/textfields.dart';
 import 'package:piwigo_ng/views/components/dialogs/dialogs.dart';
+
+import '../model/TagModel.dart';
 
 class UploadGalleryViewPage extends StatefulWidget {
   final List<XFile> imageData;
@@ -29,7 +32,7 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
   TextEditingController _descController = TextEditingController();
 
   List<DropdownMenuItem<int>> _levelItems = [];
-  List<dynamic> _tags = [];
+  List<TagModel> _tags = [];
   int _page = 0;
   int _privacyLevel = -1;
   bool _isLoading = false;
@@ -67,7 +70,7 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
 
   Map<String, dynamic> getImagesInfo() {
     List<int> tagIds = _tags.map<int>((tag) {
-      return int.parse(tag['id']);
+      return tag.id;
     }).toList();
     return {
       'name': _nameController.text,
@@ -138,7 +141,7 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
     setState(() {
       _isLoading = true;
     });
-    await API.uploader.uploadPhotos(context, widget.imageData, widget.category, getImagesInfo());
+    await API.uploader.uploadPhotos(widget.imageData, widget.category, getImagesInfo());
 
     if(mounted) {
       setState(() {
@@ -436,7 +439,7 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
   }
 
   Widget _buildHorizontalListItem(XFile image) {
-    String expansion = image.path.split('.').last;
+    String mimeType = mime(image.path);
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 5),
       child: Stack(
@@ -456,7 +459,7 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
                   ),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(7),
-                    child: expansion == 'mp4'
+                    child: mimeType.startsWith('video')
                         ? VideoItem(path: image.path)
                         : Image.file(File(image.path),
                       fit: BoxFit.cover,
@@ -506,7 +509,7 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
   }
 
   Widget _buildGridItem(XFile image) {
-    String expansion = image.path.split('.').last;
+    String mimeType = mime(image.path);
     return Container(
       child: Stack(
         children: [
@@ -518,7 +521,7 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
               semanticContainer: true,
               child: GridTile(
                 child: Container(
-                  child: expansion == 'mp4'
+                  child: mimeType.startsWith('video')
                       ? VideoItem(path: image.path)
                       : Image.file(File(image.path),
                     fit: BoxFit.cover,
@@ -549,7 +552,7 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
     );
   }
 
-  Widget tagItem(dynamic tag, Animation<double> animation, {BorderRadius borderRadius, Border border}) {
+  Widget tagItem(TagModel tag, Animation<double> animation, {BorderRadius borderRadius, Border border}) {
     return SizeTransition(
       axis: Axis.vertical,
       sizeFactor: animation,
@@ -566,7 +569,7 @@ class _UploadGalleryViewPage extends State<UploadGalleryViewPage> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('${tag['name']}', style: Theme.of(context).textTheme.subtitle1),
+              Text('${tag.name}', style: Theme.of(context).textTheme.subtitle1),
               InkWell(
                 onTap: () async {
                   _listKey.currentState.removeItem(_tags.indexOf(tag), (context, animation) => tagItem(tag, animation));
@@ -593,15 +596,24 @@ class VideoItem extends StatefulWidget {
   _VideoItemState createState() => _VideoItemState();
 }
 class _VideoItemState extends State<VideoItem> {
-  VideoPlayerController _controller;
+  BetterPlayerController _controller;
 
   @override
   void initState() {
     super.initState();
-    _controller = VideoPlayerController.file(File(widget.path))
-      ..initialize().then((_) {
-        setState(() {});
-      });
+    BetterPlayerDataSource betterPlayerDataSource = BetterPlayerDataSource.file(widget.path);
+    _controller = BetterPlayerController(
+        BetterPlayerConfiguration(
+          aspectRatio: 1,
+          autoPlay: true,
+          looping: true,
+          fit: BoxFit.cover,
+          controlsConfiguration: BetterPlayerControlsConfiguration(
+            showControls: false
+          ),
+        ),
+        betterPlayerDataSource: betterPlayerDataSource);
+    setState(() {});
   }
 
   @override
@@ -612,25 +624,18 @@ class _VideoItemState extends State<VideoItem> {
 
   @override
   Widget build(BuildContext context) {
-    if(_controller.value.isInitialized) {
-      return FittedBox(
-        fit: BoxFit.cover,
-        child: GestureDetector(
-          onTap: () {
-            setState(() {
-              _controller.value.isPlaying
-                  ? _controller.pause()
-                  : _controller.play();
-            });
-          },
-          child: SizedBox(
-            width: _controller.value.size?.width ?? 0,
-            height: _controller.value.size?.height ?? 0,
-            child: VideoPlayer(_controller),
-          ),
-        ),
+      return GestureDetector(
+        onTap: () {
+          setState(() {
+            _controller.isPlaying()
+                ? _controller.pause()
+                : _controller.play();
+          });
+        },
+        child: AspectRatio(
+          aspectRatio: 1,
+          child: BetterPlayer(controller: _controller),
+        )
       );
-    }
-    return CircularProgressIndicator();
   }
 }
