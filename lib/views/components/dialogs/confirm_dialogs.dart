@@ -441,16 +441,24 @@ Future<int> confirmRemoveImagesFromAlbumDialog(BuildContext context, {content = 
   final int confirm = await showModalBottomSheet<int>(
     context: context,
     isScrollControlled: true,
-    builder: (_) => MultiConfirmBottomSheet(
-      content: content,
-      no: DialogButtonText(appStrings(context).alertCancelButton,
-          color: Theme.of(context).disabledColor),
-      actions: <Widget>[
-        DialogButtonText(appStrings(context).deleteCategoryConfirm_deleteButton, color: Colors.red),
-        DialogButtonText(appStrings(context).removeSingleImage_title,
-          color: Theme.of(context).colorScheme.primary),
-      ],
-    ),
+    builder: (_) =>
+        MultiConfirmBottomSheet(
+          content: content,
+          no: DialogButtonText(appStrings(context).alertCancelButton,
+              color: Theme
+                  .of(context)
+                  .disabledColor),
+          actions: <Widget>[
+            DialogButtonText(
+                appStrings(context).deleteCategoryConfirm_deleteButton,
+                color: Colors.red),
+            DialogButtonText(appStrings(context).removeSingleImage_title,
+                color: Theme
+                    .of(context)
+                    .colorScheme
+                    .primary),
+          ],
+        ),
   );
 
   return (confirm != null) ? confirm : -1;
