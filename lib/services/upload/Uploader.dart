@@ -14,6 +14,7 @@ import 'package:piwigo_ng/constants/SettingsConstants.dart';
 import 'package:piwigo_ng/views/components/snackbars.dart';
 import 'package:provider/provider.dart';
 
+import '../../api/SessionAPI.dart';
 import '../../views/RootCategoryViewPage.dart';
 import '../UploadStatusProvider.dart';
 import 'chunked_uploader.dart';
@@ -103,8 +104,9 @@ class Uploader {
 
     try {
       await uploadCompleted(uploadedImages, int.parse(category));
-      await communityUploadCompleted(uploadedImages, int.parse(category));
-
+      if(await methodExist('community.images.uploadCompleted')) {
+        await communityUploadCompleted(uploadedImages, int.parse(category));
+      }
       // cleanTempDirectory();
     } on DioError catch (e) {
       debugPrint(e.message);

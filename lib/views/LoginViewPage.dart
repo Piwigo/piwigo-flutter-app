@@ -90,7 +90,7 @@ class _LoginViewPageState extends State<LoginViewPage> {
       url = url.substring(0, url.lastIndexOf('/'));
       urlController.text = url;
       usernameController.text = await API.storage.read(key: "username") ?? '';
-      passwordController.text = '';
+      passwordController.text = await API.storage.read(key: "password") ?? '';
       if(mounted) setState(() {});
     }
   }

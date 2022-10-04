@@ -34,6 +34,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
   Future<Map<String,dynamic>> _albumsFuture;
   Future<Map<String,dynamic>> _imagesFuture;
 
+  bool _canUpload = false;
   bool _isEditMode;
   int _page;
   int _nbImages;
@@ -76,7 +77,6 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
       imageList.addAll(newListPage);
     }
     setState(() {
-      print('Fetch images of page $_page');
       _getData();
     });
   }
@@ -296,13 +296,15 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
 
   handleAlbumSnapshot(AsyncSnapshot albumSnapshot, int nbImages) {
     var albums = albumSnapshot.data['result']['categories'];
-    int nbImages = _nbImages;
-    if(albums.length > 0 && albums[0]["id"].toString() == widget.category) {
-      nbImages = albums[0]["total_nb_images"];
-      _nbImages = nbImages;
+    if(albums.length > 0 && albums.first["id"].toString() == widget.category) {
+      _nbImages = albums.first["total_nb_images"];
+      _canUpload = albums.first["can_upload"] ?? false;
+      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+        setState(() {});
+      });
     }
     albums.removeWhere((category) =>
-    (category["id"].toString() == widget.category)
+      (category["id"].toString() == widget.category)
     );
     return albums;
   }
@@ -439,81 +441,79 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
             });
           },
         ),
-        SpeedDialChild(
-          elevation: 5,
-          labelWidget: Text(appStrings(context).categoryUpload_images, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white)),
-          child: Icon(Icons.add_to_photos),
-          backgroundColor: _theme.floatingActionButtonTheme.backgroundColor,
-          foregroundColor: _theme.floatingActionButtonTheme.foregroundColor,
-          onTap: () async {
-            try {
-              ScaffoldMessenger.of(context).removeCurrentSnackBar();
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                content: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(appStrings(context).loadingHUD_label),
-                    CircularProgressIndicator(),
-                  ],
-                ),
-                duration: Duration(days: 365),
-              ));
-              final List<XFile> images = ((await FilePicker.platform.pickFiles(
-                type: FileType.media,
-                allowMultiple: true,
-              )) ?.files ?? []).map<XFile>((e) => XFile(e.path, name: e.name, bytes: e.bytes)).toList();
-              ScaffoldMessenger.of(context).removeCurrentSnackBar();
-              if(images.isNotEmpty) {
-                Navigator.push(context, MaterialPageRoute(
-                    builder: (context) => UploadGalleryViewPage(imageData: images, category: widget.category)
-                )).whenComplete(() {
-                  setState(() {
-                    print('After upload'); // refresh
-                  });
-                });
-              }
-            } catch (e) {
-              print('${e.toString()}');
-            }
-          }
-        ),
-        SpeedDialChild(
-            elevation: 5,
-            labelWidget: Text(appStrings(context).categoryUpload_take, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white)),
-            child: Icon(Icons.photo_camera_rounded),
-            backgroundColor: _theme.floatingActionButtonTheme.backgroundColor,
-            foregroundColor: _theme.floatingActionButtonTheme.foregroundColor,
-            onTap: () async {
-              try {
-                ScaffoldMessenger.of(context).removeCurrentSnackBar();
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                  content: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(appStrings(context).loadingHUD_label),
-                      CircularProgressIndicator(),
-                    ],
-                  ),
-                  duration: Duration(days: 365),
-                ));
-                final XFile image = await ImagePicker().pickImage(source: ImageSource.camera);
-                ScaffoldMessenger.of(context).removeCurrentSnackBar();
-                if(image != null) {
-                  Navigator.push(context, MaterialPageRoute(
-                      builder: (context) => UploadGalleryViewPage(imageData: [image], category: widget.category)
-                  )).whenComplete(() {
-                    setState(() {
-                      print('After upload'); // refresh
+        if(_canUpload) ... [
+          SpeedDialChild(
+              elevation: 5,
+              labelWidget: Text(appStrings(context).categoryUpload_images, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white)),
+              child: Icon(Icons.add_to_photos),
+              backgroundColor: _theme.floatingActionButtonTheme.backgroundColor,
+              foregroundColor: _theme.floatingActionButtonTheme.foregroundColor,
+              onTap: () async {
+                try {
+                  ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(appStrings(context).loadingHUD_label),
+                        CircularProgressIndicator(),
+                      ],
+                    ),
+                    duration: Duration(days: 365),
+                  ));
+                  final List<XFile> images = ((await FilePicker.platform.pickFiles(
+                    type: FileType.media,
+                    allowMultiple: true,
+                  )) ?.files ?? []).map<XFile>((e) => XFile(e.path, name: e.name, bytes: e.bytes)).toList();
+                  ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                  if(images.isNotEmpty) {
+                    Navigator.push(context, MaterialPageRoute(
+                        builder: (context) => UploadGalleryViewPage(imageData: images, category: widget.category)
+                    )).whenComplete(() {
+                      setState(() {});
                     });
-                  });
+                  }
+                } catch (e) {
+                  debugPrint('${e.toString()}');
                 }
-              } catch (e) {
-                print('Dio error ${e.toString()}');
               }
-            }
-        ),
+          ),
+          SpeedDialChild(
+              elevation: 5,
+              labelWidget: Text(appStrings(context).categoryUpload_take, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white)),
+              child: Icon(Icons.photo_camera_rounded),
+              backgroundColor: _theme.floatingActionButtonTheme.backgroundColor,
+              foregroundColor: _theme.floatingActionButtonTheme.foregroundColor,
+              onTap: () async {
+                try {
+                  ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(appStrings(context).loadingHUD_label),
+                        CircularProgressIndicator(),
+                      ],
+                    ),
+                    duration: Duration(days: 365),
+                  ));
+                  final XFile image = await ImagePicker().pickImage(source: ImageSource.camera);
+                  ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                  if(image != null) {
+                    Navigator.push(context, MaterialPageRoute(
+                        builder: (context) => UploadGalleryViewPage(imageData: [image], category: widget.category)
+                    )).whenComplete(() {
+                      setState(() {});
+                    });
+                  }
+                } catch (e) {
+                  debugPrint('Dio error ${e.toString()}');
+                }
+              }
+          ),
+        ],
       ],
     );
   }
@@ -541,7 +541,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
           itemBuilder: (BuildContext context, int index) {
             var album = albums[index];
             return AlbumListItem(album,
-              isAdmin: widget.isAdmin,
+              isAdmin: API.prefs.getString('user_status') != 'normal',
               onClose: () {
                 setState(() {
                   _getData();
@@ -694,14 +694,14 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
       padding: const EdgeInsets.all(8.0),
       child: Stack(
         children: <Widget>[
-          widget.isAdmin? Align(
+          widget.isAdmin || _canUpload ? Align(
             alignment: Alignment.bottomRight,
             child: _createUploadActionButton,
-          ) : Container(),
+          ) : const SizedBox(),
           Align(
             alignment: Alignment.bottomRight,
             child: Container(
-              margin: EdgeInsets.only(bottom: 0, right: widget.isAdmin? 70 : 0),
+              margin: EdgeInsets.only(bottom: 0, right: widget.isAdmin || _canUpload ? 70 : 0),
               child: FloatingActionButton(
                 backgroundColor: Color(0xff868686),
                 onPressed: () {

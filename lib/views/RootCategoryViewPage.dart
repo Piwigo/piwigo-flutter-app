@@ -186,7 +186,7 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
           ),
         ),
       ),
-      floatingActionButton: widget.isAdmin ? FloatingActionButton(
+      floatingActionButton: widget.isAdmin && ['webmaster', 'admin'].contains(API.prefs.getString('user_status')) ? FloatingActionButton(
         onPressed: _onAddAlbum,
         child: Icon(Icons.create_new_folder, color: _theme.primaryColorLight, size: 30),
       ) : null,
@@ -211,7 +211,7 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
       itemBuilder: (BuildContext context, int index) {
         var album = albums[index];
         return AlbumListItem(album,
-          isAdmin: widget.isAdmin,
+          isAdmin: API.prefs.getString('user_status') != 'normal',
           onClose: () {
             setState(() {
               _getData();

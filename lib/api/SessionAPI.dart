@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 
 import 'API.dart';
 
@@ -68,7 +69,24 @@ Future<Map<String, dynamic>> sessionStatus() async {
     Response response = await API().dio.get('ws.php', queryParameters: queries);
     return json.decode(response.data);
   } on DioError catch (e) {
-    print('Dio error $e');
+    debugPrint('Dio error $e');
+    return {"stat": "KO",
+      "message": e.message,
+    };
+  }
+}
+
+Future<Map<String, dynamic>> communityStatus() async {
+  Map<String, String> queries = {
+    'format': 'json',
+    'method': 'community.session.getStatus'
+  };
+
+  try {
+    Response response = await API().dio.get('ws.php', queryParameters: queries);
+    return json.decode(response.data);
+  } on DioError catch (e) {
+    debugPrint('Dio error $e');
     return {"stat": "KO",
       "message": e.message,
     };
@@ -101,7 +119,19 @@ void savePreferences(Map<String, dynamic> status, {
   API.storage.write(key: 'password', value: password);
   API.prefs.setBool("is_logged", isLogged);
   API.prefs.setBool("is_guest", isGuest);
-  API.prefs.setString("user_status", status["status"]);
+  if (await methodExist('community.session.getStatus')) {
+    var community = await communityStatus();
+    if(community['stat'] == 'ok') {
+      API.prefs.setString("user_status", community['result']["real_user_status"]);
+      API.prefs.setBool("community", true);
+    } else {
+      API.prefs.setString("user_status", status["status"]);
+      API.prefs.setBool("community", false);
+    }
+  } else {
+    API.prefs.setString("user_status", status["status"]);
+    API.prefs.setBool("community", false);
+  }
   API.prefs.setString("base_url", url);
 
   API.prefs.setString("default_album", "Root Album");
@@ -125,7 +155,7 @@ Future<Map<String, dynamic>> getMethods() async {
     Response response = await API().dio.get('ws.php', queryParameters: queries);
     return json.decode(response.data);
   } catch (e) {
-    print('Dio error $e');
+    debugPrint('Dio error $e');
     return {"stat": "KO"};
   }
 }

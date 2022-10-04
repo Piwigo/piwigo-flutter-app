@@ -232,12 +232,23 @@ class AlbumListCard extends StatelessWidget {
         child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('${album["name"]}',
-                  style: Theme.of(context).textTheme.headline6,
-                  textAlign: TextAlign.center,
-                  overflow: TextOverflow.ellipsis,
-                  softWrap: false,
-                  maxLines: 1
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Flexible(
+                    child: Text('${album["name"]}',
+                      style: Theme.of(context).textTheme.headline6,
+                      textAlign: TextAlign.center,
+                      overflow: TextOverflow.ellipsis,
+                      softWrap: false,
+                      maxLines: 1,
+                    ),
+                  ),
+                  if(album["can_upload"] ?? false) Padding(
+                    padding: const EdgeInsets.only(left: 5),
+                    child: Icon(Icons.upload, size: 18,),
+                  ),
+                ],
               ),
               Column(
                 children: [
