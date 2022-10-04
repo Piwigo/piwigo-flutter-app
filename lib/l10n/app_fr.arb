@@ -691,6 +691,8 @@
     "settings_wifiOnly": "Wi-Fi uniquement",
     "settings_deleteImage": "Effacer après Envoi",
     "settings_uploadNotification": "Notifications de transfert",
+    "settings_downloadNotification": "Notification de téléchargement",
+    "settings_downloadDestination": "Dossier de téléchargement",
     "settings_autoUpload": "Télécharger automatiquement",
     "settings_autoUpload414px": "Télécharger automatiquement des photos",
     "settings_autoUploadEnabled": "Activé",
