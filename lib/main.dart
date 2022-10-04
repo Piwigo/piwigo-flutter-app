@@ -81,6 +81,7 @@ class MyApp extends StatelessWidget {
         Locale('en'),
         Locale('de'),
         Locale('fr'),
+        Locale('zh'),
       ],
       locale: localeProvider.locale,
       theme: light,
