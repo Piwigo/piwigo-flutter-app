@@ -356,7 +356,7 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
       title: _isEditMode ?
       Text("${_selectedItems.length}", overflow: TextOverflow.fade, softWrap: true) :
       Text(widget.title),
-      actions: [
+      actions: widget.isAdmin ? [
         _isEditMode ? IconButton(
           onPressed: _onSelectAll,
           icon: _selectedItems.length == imageList.length ?
@@ -365,11 +365,11 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
         _isEditMode ? IconButton(
           onPressed: closeEditMode,
           icon: Icon(Icons.cancel),
-        ) : widget.isAdmin? IconButton(
+        ) : widget.isAdmin ? IconButton(
           onPressed: openEditMode,
           icon: Icon(Icons.touch_app_rounded),
         ) : SizedBox(),
-      ],
+      ] : [],
     );
   }
 
@@ -422,7 +422,8 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
       overlayOpacity: 0.5,
       shape: CircleBorder(),
       children: [
-        SpeedDialChild(
+        if(widget.isAdmin)
+          SpeedDialChild(
           elevation: 5,
           labelWidget: Text(appStrings(context).createNewAlbum_title, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white)),
           child: Icon(Icons.create_new_folder),
@@ -540,8 +541,10 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
           physics: NeverScrollableScrollPhysics(),
           itemBuilder: (BuildContext context, int index) {
             var album = albums[index];
+            print(widget.isAdmin);
             return AlbumListItem(album,
-              isAdmin: API.prefs.getString('user_status') != 'normal',
+              isAdmin: widget.isAdmin && API.prefs.getString('user_status') != 'normal',
+              canUpload: API.prefs.getString('user_status') == 'normal' && _canUpload,
               onClose: () {
                 setState(() {
                   _getData();

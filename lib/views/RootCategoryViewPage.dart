@@ -211,7 +211,8 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
       itemBuilder: (BuildContext context, int index) {
         var album = albums[index];
         return AlbumListItem(album,
-          isAdmin: API.prefs.getString('user_status') != 'normal',
+          isAdmin: widget.isAdmin && API.prefs.getString('user_status') != 'normal',
+          canUpload: API.prefs.getString('user_status') == 'normal' && album['can_upload'],
           onClose: () {
             setState(() {
               _getData();

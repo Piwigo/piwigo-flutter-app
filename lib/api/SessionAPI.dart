@@ -43,7 +43,6 @@ Future<String> loginUser(String url, String username, String password) async {
   return 'Something happened';
 }
 Future<String> loginGuest(String url) async {
-
   API().dio.options.baseUrl = url;
 
   try {

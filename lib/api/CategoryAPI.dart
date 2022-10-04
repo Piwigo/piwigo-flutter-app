@@ -30,7 +30,7 @@ Future<Map<String,dynamic>> fetchAlbums(String albumID) async {
       var categoryList = result['result']['categories'];
       for (var cat in categoryList) {
         bool canUpload = false;
-        if (API.prefs.getString('user_status') != 'normal'
+        if (!['normal', 'guest'].contains(API.prefs.getString('user_status'))
             || uploadCategoryIdList.contains(cat['id'].toString())) {
           canUpload = true;
         }
