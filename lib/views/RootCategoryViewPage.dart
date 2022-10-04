@@ -28,7 +28,6 @@ class RootCategoryViewPage extends StatefulWidget {
 class _RootCategoryViewPageState extends State<RootCategoryViewPage> with SingleTickerProviderStateMixin {
   String _rootCategory;
   TextEditingController _searchController = TextEditingController();
-  ScrollController _scrollController = ScrollController();
   bool _isSearching = false;
   final FocusNode _focus = FocusNode();
 
@@ -79,119 +78,111 @@ class _RootCategoryViewPageState extends State<RootCategoryViewPage> with Single
     ThemeData _theme = Theme.of(context);
     return Scaffold(
       key: RootCategoryViewPage.rootKey,
-      body: SafeArea(
-        child: GestureDetector(
-          onTap: () {
-            _focus.unfocus();
+      body: GestureDetector(
+        onTap: () {
+          _focus.unfocus();
+        },
+        child: RefreshIndicator(
+          onRefresh: () {
+            setState(() {
+              _getData();
+            });
+            return Future.delayed(Duration(milliseconds: 1000));
           },
-          child: RefreshIndicator(
-            onRefresh: () {
-              setState(() {
-                _getData();
-              });
-              return Future.delayed(Duration(milliseconds: 1000));
-            },
-            child: CustomScrollView(
-              slivers: [
-                SliverAppBar(
-                  pinned: true,
-                  backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
-                  leading: IconButton(
-                    onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(builder: (context) => SettingsPage()),
-                      );
-                    },
-                    icon: Icon(Icons.settings, color: _theme.iconTheme.color),
-                  ),
-                  title: Text(appStrings(context).tabBar_albums,
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
-                  ),
-                ),
-                AppBarSearch(
-                  textController: _searchController,
-                  onTap: () {},
-                  focusNode: _focus,
-                  onSubmit: (string) {
-                    setState(() {
-                      _isSearching = _searchController.text.length > 0;
-                      _getData();
-                    });
+          child: CustomScrollView(
+            slivers: [
+              SliverAppBar(
+                pinned: true,
+                backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
+                leading: IconButton(
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (context) => SettingsPage()),
+                    );
                   },
+                  icon: Icon(Icons.settings, color: _theme.iconTheme.color),
                 ),
-                SliverToBoxAdapter(
-                  child: Builder(builder: (context) {
-                    if(_isSearching) {
-                      return FutureBuilder<Map<String,dynamic>>(
-                        key: UniqueKey(),
-                        future: _imagesFuture,
-                        builder: (BuildContext context, AsyncSnapshot imagesSnapshot) {
-                          if(imagesSnapshot.hasData){
-                            if(imagesSnapshot.data['stat'] == 'fail') {
-                              return Center(
-                                child: Text(appStrings(context).categoryImageList_noDataError),
-                              );
-                            }
-                            var images = imagesSnapshot.data['result']['images'];
-                            var nbImages = images.length;
-                            return Column(
-                              children: [
-                                _imageGrid(images),
-                                Center(
-                                  child: Container(
-                                    padding: EdgeInsets.all(10),
-                                    child: Text(appStrings(context).imageCount(nbImages), style: TextStyle(fontSize: 20, color: _theme.textTheme.bodyText2.color, fontWeight: FontWeight.w300,),),
-                                  ),
-                                ),
-                              ],
-                            );
-                          } else {
-                            return Center(
-                              child: CircularProgressIndicator(),
-                            );
-                          }
-                        },
-                      );
-                    }
+                title: Text(appStrings(context).tabBar_albums,
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+                ),
+              ),
+              AppBarSearch(
+                textController: _searchController,
+                onTap: () {},
+                focusNode: _focus,
+                onSubmit: (string) {
+                  setState(() {
+                    _isSearching = _searchController.text.length > 0;
+                    _getData();
+                  });
+                },
+              ),
+              SliverToBoxAdapter(
+                child: Builder(builder: (context) {
+                  if(_isSearching) {
                     return FutureBuilder<Map<String,dynamic>>(
                       key: UniqueKey(),
-                      future: _albumsFuture, // Albums of the list
-                      builder: (BuildContext context, AsyncSnapshot albumSnapshot) {
-                        if(albumSnapshot.hasData){
-                          if(albumSnapshot.data['stat'] == 'fail') {
-                            return Container(
-                              padding: EdgeInsets.all(10),
-                              child: Text(albumSnapshot.data['result']),
-                            ); //appStrings(context).categoryMainEmpty
+                      future: _imagesFuture,
+                      builder: (BuildContext context, AsyncSnapshot imagesSnapshot) {
+                        if(imagesSnapshot.hasData){
+                          if(imagesSnapshot.data['stat'] == 'fail') {
+                            return Center(
+                              child: Text(appStrings(context).categoryImageList_noDataError),
+                            );
                           }
-                          var albums = albumSnapshot.data['result']['categories'];
-                          int nbPhotos = 0;
-                          albums.forEach((cat) => nbPhotos+=cat["total_nb_images"]);
-                          albums.removeWhere((category) => (
-                              category["id"].toString() == _rootCategory
-                          ));
+                          var images = imagesSnapshot.data['result']['images'];
+                          var nbImages = images.length;
                           return Column(
                             children: [
-                              _albumGrid(albums),
+                              _imageGrid(images),
                               Center(
                                 child: Container(
                                   padding: EdgeInsets.all(10),
-                                  child: Text(appStrings(context).imageCount(nbPhotos), style: TextStyle(fontSize: 20, color: _theme.textTheme.bodyText2.color, fontWeight: FontWeight.w300,),),
+                                  child: Text(appStrings(context).imageCount(nbImages), style: TextStyle(fontSize: 20, color: _theme.textTheme.bodyText2.color, fontWeight: FontWeight.w300,),),
                                 ),
                               ),
                             ],
                           );
-                        } else {
-                          return Center(
-                            child: CircularProgressIndicator(),
-                          );
                         }
+                        return Center(child: CircularProgressIndicator());
                       },
                     );
-                  }),
-                ),
-              ],
-            ),
+                  }
+                  return FutureBuilder<Map<String,dynamic>>(
+                    key: UniqueKey(),
+                    future: _albumsFuture, // Albums of the list
+                    builder: (BuildContext context, AsyncSnapshot albumSnapshot) {
+                      if(albumSnapshot.hasData){
+                        if(albumSnapshot.data['stat'] == 'fail') {
+                          return Container(
+                            padding: EdgeInsets.all(10),
+                            child: Text(albumSnapshot.data['result']),
+                          ); //appStrings(context).categoryMainEmpty
+                        }
+                        var albums = albumSnapshot.data['result']['categories'];
+                        int nbPhotos = 0;
+                        albums.forEach((cat) => nbPhotos+=cat["total_nb_images"]);
+                        albums.removeWhere((category) => (
+                            category["id"].toString() == _rootCategory
+                        ));
+                        return Column(
+                          children: [
+                            _albumGrid(albums),
+                            Center(
+                              child: Container(
+                                padding: EdgeInsets.all(10),
+                                child: Text(appStrings(context).imageCount(nbPhotos), style: TextStyle(fontSize: 20, color: _theme.textTheme.bodyText2.color, fontWeight: FontWeight.w300,),),
+                              ),
+                            ),
+                          ],
+                        );
+                      }
+                      return Center(child: CircularProgressIndicator());
+                    },
+                  );
+                }),
+              ),
+            ],
           ),
         ),
       ),

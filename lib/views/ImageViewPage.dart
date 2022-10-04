@@ -1,8 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:icon_shadow/icon_shadow.dart';
-import 'package:open_file/open_file.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:piwigo_ng/api/API.dart';
 import 'package:piwigo_ng/api/ImageAPI.dart';
@@ -31,6 +29,7 @@ class _ImageViewPageState extends State<ImageViewPage> with SingleTickerProvider
   AnimationController _animationController;
   Animation<Color> _backgroundAnimation;
   Animation<double> _heightAnimation;
+
   String _derivative;
   PageController _pageController;
   ScrollPhysics _pageViewPhysic = BouncingScrollPhysics();
@@ -231,7 +230,7 @@ class _ImageViewPageState extends State<ImageViewPage> with SingleTickerProvider
         appBar: PreferredSize(
           preferredSize: Size.fromHeight(kToolbarHeight * _heightAnimation.value),
           child: Transform.translate(
-            offset: Offset(0, -kToolbarHeight*(1-_heightAnimation.value)),
+            offset: Offset(0, -kToolbarHeight * (1-_heightAnimation.value)),
             child: AppBar(
               iconTheme: IconThemeData(
                 color: Theme.of(context).iconTheme.color, //change your color here
@@ -248,7 +247,6 @@ class _ImageViewPageState extends State<ImageViewPage> with SingleTickerProvider
                 },
                 icon: Icon(Icons.chevron_left),
               ),
-              toolbarHeight: kToolbarHeight*_heightAnimation.value,
               actions: MediaQuery.of(context).orientation == Orientation.landscape ? [
                 IconButton(
                   onPressed: _onEditImage,

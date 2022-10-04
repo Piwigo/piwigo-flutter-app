@@ -318,15 +318,13 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
       child: Scaffold(
         resizeToAvoidBottomInset: true,
         extendBody: true,
-        body: SafeArea(
-          child: RefreshIndicator(
-            onRefresh: _onRefresh,
-            child: CustomScrollView(
-              slivers: [
-                _createAppBar,
-                SliverToBoxAdapter(child: _createFutureBuilders,),
-              ],
-            ),
+        body: RefreshIndicator(
+          onRefresh: _onRefresh,
+          child: CustomScrollView(
+            slivers: [
+              _createAppBar,
+              SliverToBoxAdapter(child: _createFutureBuilders,),
+            ],
           ),
         ),
         floatingActionButton: _isEditMode
@@ -396,18 +394,12 @@ class _CategoryViewPageState extends State<CategoryViewPage> with SingleTickerPr
                     handleImagesSnapshot(imagesSnapshot);
                   }
                   return _createPageContent(albums, nbImages);
-                } else {
-                  return Center(
-                    child: CircularProgressIndicator(),
-                  );
                 }
+                return Center(child: CircularProgressIndicator());
               },
             );
-          } else {
-            return Center(
-              child: CircularProgressIndicator(),
-            );
           }
+          return Center(child: CircularProgressIndicator());
         }
     );
   }
