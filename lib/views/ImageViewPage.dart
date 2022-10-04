@@ -370,6 +370,11 @@ class _ImageViewPageState extends State<ImageViewPage> with SingleTickerProvider
   Widget _displayImage(dynamic image) {
     return PhotoView(
       imageProvider: NetworkImage(image["derivatives"][_derivative]["url"]),
+      loadFailedChild: Center(child: Icon(
+        Icons.insert_drive_file,
+        color: Theme.of(context).colorScheme.primary,
+        size: 64,
+      )),
       minScale: PhotoViewComputedScale.contained,
       backgroundDecoration: BoxDecoration(
         color: Colors.transparent,
