@@ -1,6 +1,5 @@
 {
     "tabBar_albums": "Alben",
-    "settings_language": "Wählen Sie die Sprache",
     "tabBar_upload": "Hochladen",
     "tabBar_preferences": "Einstellungen",
     "alertOkButton": "OK",
@@ -277,6 +276,7 @@
     "imageOptions_title": "Foto-Optionen",
     "imageOptions_edit": "Bearbeiten",
     "imageOptions_download": "Herunterladen",
+    "imageOptions_share": "Share",
     "imageOptions_setAlbumImage": "Album-Vorschaubild festlegen",
     "imageDetailsView_title": "Eigenschaften",
     "editImageDetails_title": "Titel",
@@ -690,6 +690,9 @@
     "settings_deleteImage375px": "Foto nach dem Hochladen löschen",
     "settings_wifiOnly": "Nur über WLAN",
     "settings_deleteImage": "Nach dem Hochladen löschen",
+    "settings_uploadNotification": "Upload Notification",
+    "settings_downloadNotification": "Download Notification",
+    "settings_downloadDestination": "Download Folder",
     "settings_autoUpload": "Automatisch hochladen",
     "settings_autoUpload414px": "Fotos automatisch hochladen",
     "settings_autoUploadEnabled": "Ein",
@@ -745,6 +748,7 @@
         }
     },
     "settings_appName": "Piwigo NG",
+    "settings_language": "Choose language",
     "settingsHeader_about": "Hinweis",
     "settings_twitter": "@piwigo",
     "settings_twitterURL": "https://twitter.com/piwigo",
