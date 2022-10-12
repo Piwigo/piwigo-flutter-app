@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:piwigo_ng/api/albums.dart';
 import 'package:piwigo_ng/api/api_error.dart';
@@ -52,6 +53,28 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
       "images": <XFile>[],
       "category": widget.album.id,
     });
+  }
+
+  Future<void> _onPickImages() async {
+    try {
+      // final List<XFile> images = ((await FilePicker.platform.pickFiles(
+      //   type: FileType.media,
+      //   allowMultiple: true,
+      // )) ?.files ?? [])
+      //     .map<XFile>((e) => XFile(e.path, name: e.name, bytes: e.bytes)).toList();
+      final ImagePicker picker = ImagePicker();
+      final List<XFile>? images = await picker.pickMultiImage();
+      if (images != null && images.isNotEmpty) {
+        Navigator.of(context).pushNamed(UploadViewPage.routeName, arguments: {
+          'images': images,
+          'category': widget.album.id,
+        }).whenComplete(() {
+          setState(() {});
+        });
+      }
+    } catch (e) {
+      debugPrint('${e.toString()}');
+    }
   }
 
   @override
@@ -172,12 +195,38 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
           ),
         ),
       ),
-      floatingActionButton: widget.isAdmin
-          ? FloatingActionButton(
-              onPressed: _onAddAlbum,
-              child: Icon(Icons.create_new_folder, color: Theme.of(context).primaryColorLight),
-            )
-          : null,
+      floatingActionButton: widget.isAdmin ? _adminActionsSpeedDial : null,
+    );
+  }
+
+  Widget get _adminActionsSpeedDial {
+    final Color childBackgroundColor = Theme.of(context).primaryColorLight;
+    final Color childIconColor = Theme.of(context).primaryColor;
+    return SpeedDial(
+      spacing: 5,
+      overlayOpacity: 0.3,
+      overlayColor: Colors.black,
+      animatedIcon: AnimatedIcons.menu_close,
+      activeBackgroundColor: Colors.red,
+      children: [
+        SpeedDialChild(
+          backgroundColor: childBackgroundColor,
+          foregroundColor: childIconColor,
+          onTap: _onAddAlbum,
+          child: Icon(Icons.create_new_folder),
+        ),
+        SpeedDialChild(
+          backgroundColor: childBackgroundColor,
+          foregroundColor: childIconColor,
+          onTap: _onPickImages,
+          child: Icon(Icons.add_photo_alternate),
+        ),
+        SpeedDialChild(
+          backgroundColor: childBackgroundColor,
+          foregroundColor: childIconColor,
+          child: Icon(Icons.add_a_photo),
+        ),
+      ],
     );
   }
 }

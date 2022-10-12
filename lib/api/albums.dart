@@ -3,17 +3,16 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:piwigo_ng/api/api_error.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:piwigo_ng/services/shared_preferences_service.dart';
 
 import 'api_client.dart';
 
 Future<ApiResult<List<AlbumModel>>> fetchAlbums(String albumID) async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
   Map<String, String> queries = {
     'format': 'json',
     'method': 'pwg.categories.getList',
     'cat_id': albumID,
-    'thumbnail_size': prefs.getString('thumbnail_size') ?? 'xxlarge',
+    'thumbnail_size': appPreferences.getString('thumbnail_size') ?? 'xxlarge',
   };
 
   try {
@@ -21,7 +20,6 @@ Future<ApiResult<List<AlbumModel>>> fetchAlbums(String albumID) async {
 
     if (response.statusCode == 200) {
       List<dynamic> jsonAlbums = json.decode(response.data)['result']['categories'];
-      print(jsonAlbums);
       List<AlbumModel> albums = List<AlbumModel>.from(jsonAlbums.map(
         (album) => AlbumModel.fromJson(album),
       ));
@@ -35,7 +33,7 @@ Future<ApiResult<List<AlbumModel>>> fetchAlbums(String albumID) async {
     debugPrint(e.message);
     return ApiResult(error: ApiErrors.fetchAlbumsError);
   } on Error catch (e) {
-    print(e.stackTrace);
+    debugPrint("${e.stackTrace}");
     return ApiResult(error: ApiErrors.fetchAlbumsError);
   }
 }

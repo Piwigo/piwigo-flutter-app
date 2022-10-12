@@ -1,90 +1,84 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:piwigo_ng/app.dart';
 
-AppLocalizations appStrings = AppLocalizations.of(App.appKey.currentContext!)!;
+AppLocalizations appStrings(BuildContext context) => AppLocalizations.of(context)!;
 
-Map<int, String> privacyLevels(context) => {
-      -1: appStrings.privacyLevel_unchanged,
-      0: appStrings.privacyLevel_everybody,
-      1: appStrings.privacyLevel_adminsFamilyFriendsContacts,
-      2: appStrings.privacyLevel_adminsFamilyFriends,
-      4: appStrings.privacyLevel_adminFamily,
-      8: appStrings.privacyLevel_admin,
+Map<int, String> privacyLevels(BuildContext context) => {
+      -1: appStrings(context).privacyLevel_unchanged,
+      0: appStrings(context).privacyLevel_everybody,
+      1: appStrings(context).privacyLevel_adminsFamilyFriendsContacts,
+      2: appStrings(context).privacyLevel_adminsFamilyFriends,
+      4: appStrings(context).privacyLevel_adminFamily,
+      8: appStrings(context).privacyLevel_admin,
     };
 
 String getLanguageFromCode(String code) {
   switch (code) {
     case 'de':
       return 'Deutsch';
-      break;
     case 'en':
       return 'English';
-      break;
     case 'es':
       return 'Español';
-      break;
     case 'fr':
       return 'Français';
-      break;
     case 'zh':
       return '中国人';
-      break;
     default:
       return code;
-      break;
   }
 }
 
-Map<int, String> albumSort(context) => {
-      0: appStrings.categorySort_nameAscending,
-      1: appStrings.categorySort_nameDescending,
-      2: appStrings.categorySort_fileNameAscending,
-      3: appStrings.categorySort_fileNameDescending,
-      4: appStrings.categorySort_dateCreatedDescending,
-      5: appStrings.categorySort_dateCreatedAscending,
-      6: appStrings.categorySort_datePostedDescending,
-      7: appStrings.categorySort_datePostedAscending,
-      8: appStrings.categorySort_ratingScoreDescending,
-      9: appStrings.categorySort_ratingScoreAscending,
-      10: appStrings.categorySort_visitsDescending,
-      11: appStrings.categorySort_visitsAscending,
-      12: appStrings.categorySort_manual,
-      13: appStrings.categorySort_random,
+Map<int, String> albumSort(BuildContext context) => {
+      0: appStrings(context).categorySort_nameAscending,
+      1: appStrings(context).categorySort_nameDescending,
+      2: appStrings(context).categorySort_fileNameAscending,
+      3: appStrings(context).categorySort_fileNameDescending,
+      4: appStrings(context).categorySort_dateCreatedDescending,
+      5: appStrings(context).categorySort_dateCreatedAscending,
+      6: appStrings(context).categorySort_datePostedDescending,
+      7: appStrings(context).categorySort_datePostedAscending,
+      8: appStrings(context).categorySort_ratingScoreDescending,
+      9: appStrings(context).categorySort_ratingScoreAscending,
+      10: appStrings(context).categorySort_visitsDescending,
+      11: appStrings(context).categorySort_visitsAscending,
+      12: appStrings(context).categorySort_manual,
+      13: appStrings(context).categorySort_random,
     };
 
-String thumbnailSize(context, String size) {
+String thumbnailSize(BuildContext context, String size) {
   String sizeName = "";
 
   switch (size) {
     case "square":
-      sizeName = appStrings.thumbnailSizeSquare;
+      sizeName = appStrings(context).thumbnailSizeSquare;
       break;
     case "thumb":
-      sizeName = appStrings.thumbnailSizeThumbnail;
+      sizeName = appStrings(context).thumbnailSizeThumbnail;
       break;
     case "2small":
-      sizeName = appStrings.thumbnailSizeXXSmall;
+      sizeName = appStrings(context).thumbnailSizeXXSmall;
       break;
     case "xsmall":
-      sizeName = appStrings.thumbnailSizeXSmall;
+      sizeName = appStrings(context).thumbnailSizeXSmall;
       break;
     case "small":
-      sizeName = appStrings.thumbnailSizeSmall;
+      sizeName = appStrings(context).thumbnailSizeSmall;
       break;
     case "medium":
-      sizeName = appStrings.thumbnailSizeMedium;
+      sizeName = appStrings(context).thumbnailSizeMedium;
       break;
     case "large":
-      sizeName = appStrings.thumbnailSizeLarge;
+      sizeName = appStrings(context).thumbnailSizeLarge;
       break;
     case "xlarge":
-      sizeName = appStrings.thumbnailSizeXLarge;
+      sizeName = appStrings(context).thumbnailSizeXLarge;
       break;
     case "xxlarge":
-      sizeName = appStrings.thumbnailSizeXXLarge;
+      sizeName = appStrings(context).thumbnailSizeXXLarge;
       break;
     case "full":
-      sizeName = appStrings.thumbnailSizexFullRes;
+      sizeName = appStrings(context).thumbnailSizexFullRes;
       break;
     default:
       sizeName = "null";
@@ -94,39 +88,39 @@ String thumbnailSize(context, String size) {
   return sizeName;
 }
 
-String photoSize(context, String size) {
+String photoSize(BuildContext context, String size) {
   String sizeName = "";
 
   switch (size) {
     case "square":
-      sizeName = appStrings.imageSizeSquare;
+      sizeName = appStrings(context).imageSizeSquare;
       break;
     case "thumb":
-      sizeName = appStrings.imageSizeThumbnail;
+      sizeName = appStrings(context).imageSizeThumbnail;
       break;
     case "2small":
-      sizeName = appStrings.imageSizeXXSmall;
+      sizeName = appStrings(context).imageSizeXXSmall;
       break;
     case "xsmall":
-      sizeName = appStrings.imageSizeXSmall;
+      sizeName = appStrings(context).imageSizeXSmall;
       break;
     case "small":
-      sizeName = appStrings.imageSizeSmall;
+      sizeName = appStrings(context).imageSizeSmall;
       break;
     case "medium":
-      sizeName = appStrings.imageSizeMedium;
+      sizeName = appStrings(context).imageSizeMedium;
       break;
     case "large":
-      sizeName = appStrings.imageSizeLarge;
+      sizeName = appStrings(context).imageSizeLarge;
       break;
     case "xlarge":
-      sizeName = appStrings.imageSizeXLarge;
+      sizeName = appStrings(context).imageSizeXLarge;
       break;
     case "xxlarge":
-      sizeName = appStrings.imageSizeXXLarge;
+      sizeName = appStrings(context).imageSizeXXLarge;
       break;
     case "full":
-      sizeName = appStrings.imageSizexFullRes;
+      sizeName = appStrings(context).imageSizexFullRes;
       break;
     default:
       sizeName = "null";

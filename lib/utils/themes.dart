@@ -109,6 +109,11 @@ ThemeData lightTheme = ThemeData.light().copyWith(
       color: const Color(0xFF000000),
       fontWeight: FontWeight.w500,
     ),
+    titleSmall: GoogleFonts.roboto(
+      fontSize: 16,
+      color: const Color(0xFF000000),
+      fontWeight: FontWeight.normal,
+    ),
     titleMedium: GoogleFonts.roboto(
       fontSize: 16,
       color: const Color(0xFF000000),
@@ -123,6 +128,11 @@ ThemeData lightTheme = ThemeData.light().copyWith(
       fontSize: 16,
       color: const Color(0xffffffff),
       fontWeight: FontWeight.w500,
+    ),
+    displayMedium: GoogleFonts.roboto(
+      fontSize: 20,
+      color: const Color(0xFF000000),
+      fontWeight: FontWeight.normal,
     ),
   ),
 );

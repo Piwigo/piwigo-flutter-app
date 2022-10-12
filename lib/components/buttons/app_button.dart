@@ -6,23 +6,23 @@ class AppButton extends StatelessWidget {
     this.margin,
     this.padding,
     this.color,
-    this.child,
     this.onPressed,
     this.disabled = false,
+    this.loading = false,
+    this.text = '',
   }) : super(key: key);
 
   final EdgeInsets? margin;
   final EdgeInsets? padding;
   final Color? color;
-  final Widget? child;
   final Function()? onPressed;
   final bool disabled;
+  final bool loading;
+  final String text;
 
   @override
   Widget build(BuildContext context) {
-    final Color backgroundColor = disabled
-        ? Theme.of(context).disabledColor
-        : color ?? Theme.of(context).colorScheme.primary;
+    final Color backgroundColor = disabled ? Theme.of(context).disabledColor : color ?? Theme.of(context).colorScheme.primary;
     return GestureDetector(
       onTap: disabled ? null : onPressed,
       child: AnimatedContainer(
@@ -37,7 +37,16 @@ class AppButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(10),
           color: backgroundColor,
         ),
-        child: child,
+        alignment: Alignment.center,
+        child: Builder(builder: (context) {
+          if (loading) {
+            return CircularProgressIndicator();
+          }
+          return Text(
+            text,
+            style: Theme.of(context).textTheme.titleSmall,
+          );
+        }),
       ),
     );
   }

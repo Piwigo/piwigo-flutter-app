@@ -4,7 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:piwigo_ng/api/api_error.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:piwigo_ng/services/shared_preferences_service.dart';
 
 import 'api_client.dart';
 
@@ -13,6 +13,12 @@ Future<ApiResult<bool>> loginUser(
   String username,
   String password,
 ) async {
+  if (url.isEmpty) {
+    return ApiResult<bool>(
+      data: false,
+      error: ApiErrors.wrongServerUrl,
+    );
+  }
   FlutterSecureStorage secureStorage = const FlutterSecureStorage();
   await secureStorage.write(key: 'SERVER_URL', value: url);
 
@@ -105,43 +111,41 @@ void savePreferences(
 }
 
 Future<void> saveSettings() async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  if (prefs.getInt("SORT") == null) {
-    prefs.setInt("SORT", 0);
+  if (appPreferences.getInt("SORT") == null) {
+    appPreferences.setInt("SORT", 0);
   }
-  if (prefs.getDouble("PORTRAIT_IMAGE_COUNT") == null) {
-    prefs.setDouble("PORTRAIT_IMAGE_COUNT", 4);
+  if (appPreferences.getDouble("PORTRAIT_IMAGE_COUNT") == null) {
+    appPreferences.setDouble("PORTRAIT_IMAGE_COUNT", 4);
   }
-  if (prefs.getBool("SHOW_THUMBNAIL_TITLE") == null) {
-    prefs.setBool("SHOW_THUMBNAIL_TITLE", false);
+  if (appPreferences.getBool("SHOW_THUMBNAIL_TITLE") == null) {
+    appPreferences.setBool("SHOW_THUMBNAIL_TITLE", false);
   }
-  if (prefs.getBool("REMOVE_METADATA") == null) {
-    prefs.setBool("REMOVE_METADATA", false);
+  if (appPreferences.getBool("REMOVE_METADATA") == null) {
+    appPreferences.setBool("REMOVE_METADATA", false);
   }
-  if (prefs.getString('THUMBNAIL_SIZE') == null) {
-    prefs.setString('THUMBNAIL_SIZE', 'medium');
+  if (appPreferences.getString('THUMBNAIL_SIZE') == null) {
+    appPreferences.setString('THUMBNAIL_SIZE', 'medium');
   }
-  if (prefs.getString('FULL_SCREEN_IMAGE_SIZE') == null) {
-    prefs.setString('FULL_SCREEN_IMAGE_SIZE', 'medium');
+  if (appPreferences.getString('FULL_SCREEN_IMAGE_SIZE') == null) {
+    appPreferences.setString('FULL_SCREEN_IMAGE_SIZE', 'medium');
   }
-  if (prefs.getString('ALBUM_THUMBNAIL_SIZE') == null) {
-    prefs.setString('ALBUM_THUMBNAIL_SIZE', 'medium');
+  if (appPreferences.getString('ALBUM_THUMBNAIL_SIZE') == null) {
+    appPreferences.setString('ALBUM_THUMBNAIL_SIZE', 'medium');
   }
 }
 
 void saveStatus(StatusModel status) async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  prefs.setString('ACCOUNT_USERNAME', status.username);
-  prefs.setString('USER_STATUS', status.status);
-  prefs.setString('PWG_TOKEN', status.pwgToken);
-  prefs.setString('VERSION', status.version);
-  prefs.setStringList("AVAILABLE_SIZES", status.availableSizes);
+  appPreferences.setString('ACCOUNT_USERNAME', status.username);
+  appPreferences.setString('USER_STATUS', status.status);
+  appPreferences.setString('PWG_TOKEN', status.pwgToken);
+  appPreferences.setString('VERSION', status.version);
+  appPreferences.setStringList("AVAILABLE_SIZES", status.availableSizes);
   if (["admin", "webmaster"].contains(status.status)) {
-    prefs.setBool("IS_USER_ADMIN", true);
-    prefs.setInt('UPLOAD_FORM_CHUNK_SIZE', status.uploadFormChunkSize ?? 0);
-    prefs.setString("FILE_TYPES", status.uploadFileTypes ?? '');
+    appPreferences.setBool("IS_USER_ADMIN", true);
+    appPreferences.setInt('UPLOAD_FORM_CHUNK_SIZE', status.uploadFormChunkSize ?? 0);
+    appPreferences.setString("FILE_TYPES", status.uploadFileTypes ?? '');
   } else {
-    prefs.setBool("IS_USER_ADMIN", false);
+    appPreferences.setBool("IS_USER_ADMIN", false);
   }
 }
 

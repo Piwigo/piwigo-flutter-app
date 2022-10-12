@@ -24,8 +24,7 @@ class _LoginViewPageState extends State<LoginViewPage> {
       resizeToAvoidBottomInset: true,
       body: SafeArea(
         child: Center(
-          child: LayoutBuilder(
-              builder: (BuildContext context, BoxConstraints constraints) {
+          child: LayoutBuilder(builder: (BuildContext context, BoxConstraints constraints) {
             return SingleChildScrollView(
               child: Container(
                 padding: const EdgeInsets.symmetric(vertical: 8.0),

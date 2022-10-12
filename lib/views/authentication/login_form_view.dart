@@ -5,6 +5,7 @@ import 'package:piwigo_ng/api/authentication.dart';
 import 'package:piwigo_ng/app.dart';
 import 'package:piwigo_ng/components/buttons/animated_app_button.dart';
 import 'package:piwigo_ng/components/snackbars.dart';
+import 'package:piwigo_ng/utils/localizations.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -50,7 +51,14 @@ class _LoginFormViewState extends State<LoginFormView> {
     _usernameController.text = await storage.read(key: 'SERVER_USERNAME') ?? '';
     _passwordController.text = await storage.read(key: 'SERVER_PASSWORD') ?? '';
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      if (mounted) setState(() {});
+      if (mounted) {
+        bool isError = !_urlValidator(url);
+        if (_urlError != isError) {
+          setState(() {
+            _urlError = isError;
+          });
+        }
+      }
       if (widget.autoLogin) _onLogin();
     });
   }
@@ -99,7 +107,7 @@ class _LoginFormViewState extends State<LoginFormView> {
         _usernameController.text,
         _passwordController.text,
       );
-      if (result.error != null) {
+      if (result.data == false || result.error != null) {
         _onLoginError(result);
       } else {
         await _onLoginSuccess(result);
@@ -193,7 +201,7 @@ class _LoginFormViewState extends State<LoginFormView> {
               color: Theme.of(context).primaryColor,
               onPressed: _onLogin,
               child: Text(
-                "Login", // Todo: Use translations
+                appStrings(context).login,
                 style: Theme.of(context).textTheme.displaySmall,
               ),
             ),

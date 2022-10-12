@@ -58,48 +58,56 @@ class AlbumCard extends StatelessWidget {
               ),
             ],
           ),
-          child: Stack(
-            children: [
-              Positioned(
-                right: 0,
-                top: 1,
-                bottom: 1,
-                child: Container(
-                  width: kAlbumAnchorRadius * 2,
-                  color: Theme.of(context).primaryColor,
-                ),
-              ),
-              ClipShadowPath(
-                clipper: const AlbumCardClipper(
-                  anchorRadius: kAlbumAnchorRadius,
-                  outerRadius: kAlbumOuterRadius,
-                ),
-                shadow: Shadow(
-                  color: Colors.black.withOpacity(0.3),
-                  blurRadius: 3.0,
-                  offset: const Offset(1.0, 0.0),
-                ),
-                child: Container(
-                  padding: const EdgeInsets.only(
-                    top: 8.0,
-                    left: 8.0,
-                    bottom: 8.0,
-                    right: 0.0,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).cardColor,
-                    border: Border.all(
-                      color: Theme.of(context).cardColor,
-                      width: 1,
+          child: Builder(builder: (context) {
+            return GestureDetector(
+              onLongPress: () => Slidable.of(context)?.openEndActionPane(),
+              child: Stack(
+                children: [
+                  Positioned(
+                    right: 0,
+                    top: 1,
+                    bottom: 1,
+                    child: Container(
+                      width: kAlbumAnchorRadius * 2,
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).primaryColor,
+                        border: Border.all(color: Theme.of(context).primaryColor, width: 1),
+                      ),
                     ),
                   ),
-                  child: AlbumCardContent(
-                    album: album,
+                  ClipShadowPath(
+                    clipper: const AlbumCardClipper(
+                      anchorRadius: kAlbumAnchorRadius,
+                      outerRadius: kAlbumOuterRadius,
+                    ),
+                    shadow: Shadow(
+                      color: Colors.black.withOpacity(0.3),
+                      blurRadius: 3.0,
+                      offset: const Offset(1.0, 0.0),
+                    ),
+                    child: Container(
+                      padding: const EdgeInsets.only(
+                        top: 8.0,
+                        left: 8.0,
+                        bottom: 8.0,
+                        right: 0.0,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).cardColor,
+                        border: Border.all(
+                          color: Theme.of(context).cardColor,
+                          width: 1,
+                        ),
+                      ),
+                      child: AlbumCardContent(
+                        album: album,
+                      ),
+                    ),
                   ),
-                ),
+                ],
               ),
-            ],
-          ),
+            );
+          }),
         ),
       ),
     );

@@ -31,9 +31,7 @@ class _SettingsViewPageState extends State<SettingsViewPage> {
   int _recent = 5;
   int _recentPeriod = 7;
   int _numberOfImagesPerRow = 4;
-  int _cacheDisk = 1;
   int _availableCacheDisk = 256;
-  int _cacheMemory = 1;
   int _availableCacheMemory = 32;
   bool _thumbnailTitle = false;
   bool _stripMetadata = false;
@@ -55,9 +53,7 @@ class _SettingsViewPageState extends State<SettingsViewPage> {
     final cacheDir = await getTemporaryDirectory();
     try {
       if (cacheDir.existsSync()) {
-        cacheDir
-            .listSync(recursive: true, followLinks: false)
-            .forEach((FileSystemEntity entity) {
+        cacheDir.listSync(recursive: true, followLinks: false).forEach((FileSystemEntity entity) {
           if (entity is File) {
             totalSize = totalSize! + entity.lengthSync();
           }
@@ -117,8 +113,7 @@ class _SettingsViewPageState extends State<SettingsViewPage> {
                       SettingsSectionButton(
                         color: Theme.of(context).primaryColor,
                         onPressed: () {
-                          App.navigatorKey.currentState
-                              ?.pushNamedAndRemoveUntil(
+                          App.navigatorKey.currentState?.pushNamedAndRemoveUntil(
                             LoginViewPage.routeName,
                             (route) => false,
                           );
@@ -353,8 +348,7 @@ class _SettingsViewPageState extends State<SettingsViewPage> {
                         builder: (context, snapshot) {
                           String cacheSize = 'N/A';
                           if (snapshot.hasData && snapshot.data != null) {
-                            cacheSize =
-                                '${snapshot.data!.toStringAsFixed(1)} MB';
+                            cacheSize = '${snapshot.data!.toStringAsFixed(1)} MB';
                           }
                           return SettingsSectionItemInfo(
                             title: 'Cache size',
@@ -372,10 +366,7 @@ class _SettingsViewPageState extends State<SettingsViewPage> {
                           child: Text(
                             "Clear Cache",
                             textAlign: TextAlign.center,
-                            style: Theme.of(context)
-                                .textTheme
-                                .displaySmall
-                                ?.copyWith(
+                            style: Theme.of(context).textTheme.displaySmall?.copyWith(
                                   color: Theme.of(context).primaryColor,
                                 ),
                           ),
@@ -413,8 +404,7 @@ class _SettingsViewPageState extends State<SettingsViewPage> {
                         title: "Rate on Play Store",
                         icon: const Icon(Icons.star_rate),
                         onPressed: () async {
-                          PackageInfo package =
-                              await PackageInfo.fromPlatform();
+                          PackageInfo package = await PackageInfo.fromPlatform();
                           await launchUrl(
                             Uri.parse(
                               "market://details?id=${package.packageName}",
@@ -426,8 +416,7 @@ class _SettingsViewPageState extends State<SettingsViewPage> {
                         title: "Translate Piwigo NG",
                         icon: const Icon(Icons.translate),
                         onPressed: () async {
-                          PackageInfo package =
-                              await PackageInfo.fromPlatform();
+                          PackageInfo package = await PackageInfo.fromPlatform();
                           await launchUrl(
                             Uri.parse(
                               "https://crowdin.com/project/piwigo-ng",
