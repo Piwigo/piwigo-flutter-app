@@ -177,40 +177,40 @@
     "renameCategoryError_message": "Nepavyko pervardyti albumo",
     "refreshCategoryHUD_label": "Atnaujinamas atvaizdavimas…",
     "refreshCategoryError_title": "Atnaujinti nepavyko",
-    "refreshCategoryError_message": "Failed to refresh your album representative",
-    "deleteCategory_title": "DELETE ALBUM",
-    "deleteCategory_message": "{count, plural, =0{ARE YOU SURE YOU WANT TO DELETE THE ALBUM {album}} =1{ARE YOU SURE YOU WANT TO DELETE THE ALBUM {album} AND ITS PHOTO} other{ARE YOU SURE YOU WANT TO DELETE THE ALBUM {album} AND ALL {count} PHOTOS ?}",
+    "refreshCategoryError_message": "Nepavyko atnaujinti albumo atvaizdavimo",
+    "deleteCategory_title": "IŠTRINTI ALBUMĄ",
+    "deleteCategory_message": "{count, plural, =0{AR TIKRAI NORITE IŠTRINTI ALBUMĄ {album}} =1{AR TIKRAI NORITE IŠTRINTI ALBUMĄ {album} IR JO NUOTRAUKĄ} one{AR TIKRAI NORITE IŠTRINTI ALBUMĄ {album} IR VISAS {count} NUOTRAUKĄ ?} few{AR TIKRAI NORITE IŠTRINTI ALBUMĄ {album} IR VISAS {count} NUOTRAUKAS ?} other{AR TIKRAI NORITE IŠTRINTI ALBUMĄ {album} IR VISAS {count} NUOTRAUKŲ ?}",
     "@deleteCategory_message": {
         "placeholders": {
             "count": {},
             "album": {}
         }
     },
-    "deleteCategory_empty": "Delete Empty Album",
-    "deleteCategory_noImages": "Keep Photos",
-    "deleteCategory_orphanedImages": "Delete Orphans",
+    "deleteCategory_empty": "Ištrinti tuščią albumą",
+    "deleteCategory_noImages": "Palikti nuotraukas",
+    "deleteCategory_orphanedImages": "Ištrinti našlaičius",
     "deleteCategory_allImages": "{count, plural, =0{Delete Photos} =1{Delete Photo} other{Delete {count} Photos}}",
     "@deleteCategory_allImages": {
         "placeholders": {
             "count": {}
         }
     },
-    "deleteCategoryConfirm_title": "Are you sure?",
-    "deleteCategoryConfirm_message": "Please enter the number of photos in order to delete this album. Number of photos: {count}",
+    "deleteCategoryConfirm_title": "Ar tikrai?",
+    "deleteCategoryConfirm_message": "Įveskite nuotraukų skaičių, kad ištrintumėte šį albumą. Nuotraukų skaičius: {count}",
     "@deleteCategoryConfirm_message": {
         "placeholders": {
             "count": {}
         }
     },
-    "deleteCategoryConfirm_deleteButton": "DELETE",
-    "deleteCategoryHUD_label": "Deleting Album…",
-    "deleteCategoryHUD_deleted": "Album Deleted",
-    "deleteCategoryMatchError_title": "Number Doesn't Match",
-    "deleteCategoryMatchError_message": "The number of photos you entered doesn't match the number of photos in the category. Please try again if you desire to delete this album",
-    "deleteCategoryError_title": "Delete Fail",
-    "deleteCategoryError_message": "Failed to delete your album",
-    "moveCategory": "Move Album",
-    "moveCategory_select": "Please select an album or sub-album to move album {album} into.",
+    "deleteCategoryConfirm_deleteButton": "IŠTRINTI",
+    "deleteCategoryHUD_label": "Ištrinamas albumas…",
+    "deleteCategoryHUD_deleted": "Albumas ištrintas",
+    "deleteCategoryMatchError_title": "Skaičius nesutampa",
+    "deleteCategoryMatchError_message": "Įvestas nuotraukų skaičius nesutampa su nuotraukų skaičiumi kategorijoje. Bandykite dar kartą, jei norite ištrinti šį albumą",
+    "deleteCategoryError_title": "Nepavyko ištrinti",
+    "deleteCategoryError_message": "Nepavyko ištrinti albumo",
+    "moveCategory": "Perkelti albumą",
+    "moveCategory_select": "Pasirinkite albumą arba poalbumį, į kurį norite perkelti albumą {album}.",
     "@moveCategory_select": {
         "placeholders": {
             "album": {}
