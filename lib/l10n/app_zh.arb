@@ -422,21 +422,21 @@
             "count": {}
         }
     },
-    "downloadImageFail_title": "Download Fail",
-    "downloadImageFail_message": "Failed to download photo!",
-    "downloadVideoFail_message": "Failed to download video!",
+    "downloadImageFail_title": "下载失败",
+    "downloadImageFail_message": "无法下载照片！",
+    "downloadVideoFail_message": "无法下载视频！",
     "downloadVideoFail_Photos": "Video format not accepted by Photos!",
-    "imageSaveError_title": "Fail Saving Photo",
-    "imageSaveError_message": "Failed to save photo",
-    "videoSaveError_title": "Fail Saving Video",
-    "videoSaveError_message": "Failed to save video",
-    "moveOrCopyImage_title": "{count, plural, =1{Do you want to move or copy this image ?} other{Do you want to move or copy {count} images ?}}",
+    "imageSaveError_title": "保存照片失败",
+    "imageSaveError_message": "照片保存失败",
+    "videoSaveError_title": "视频保存失败",
+    "videoSaveError_message": "视频保存失败",
+    "moveOrCopyImage_title": "{count, plural, =1{您想移动或复制这张照片吗？} other{您想移动或复制 {count} 张照片吗？}}",
     "@moveOrCopyImage_title": {
         "placeholders": {
             "count": {}
         }
     },
-    "moveImage_title": "Move to Album",
+    "moveImage_title": "移动到相册",
     "moveImage_selectAlbum": "{count, plural, =1{Please, select the album in which you wish to move the photo {photo}.} other{Please, select the album in which you wish to move the photos.}}",
     "@moveImage_selectAlbum": {
         "placeholders": {
@@ -464,14 +464,14 @@
             "count": {}
         }
     },
-    "moveImageError_title": "Move Fail",
+    "moveImageError_title": "移动失败",
     "moveImageError_message": "{count, plural, =1{Failed to move your photo} other{Failed to move some photos}}",
     "@moveImageError_message": {
         "placeholders": {
             "count": {}
         }
     },
-    "copyImage_title": "Copy to Album",
+    "copyImage_title": "复制到相册",
     "copyImage_selectAlbum": "{count, plural, =1{Please, select the album in which you wish to copy the photo {photo}.} other{Please, select the album in which you wish to copy the photos.}}",
     "@copyImage_selectAlbum": {
         "placeholders": {
@@ -499,27 +499,27 @@
             "count": {}
         }
     },
-    "copyImageError_title": "Copy Fail",
+    "copyImageError_title": "复制失败",
     "copyImageError_message": "{count, plural, =1{Failed to copy your photo} other{Failed to copy some photos}}",
     "@copyImageError_message": {
         "placeholders": {
             "count": {}
         }
     },
-    "imageUploadHeader": "Please select the album or sub-album from which photos and videos of your device will be uploaded.",
-    "imageUploadHeaderTitle_images": "Photos Parameters",
-    "imageUploadHeaderText_images": "Please set the parameters to apply to the selection of photos/videos",
-    "imageUploadHeaderTitle_upload": "Upload Settings",
-    "imageUploadHeaderText_upload": "Please set the upload parameters to apply to the selection of photos/videos",
-    "imageUploadDetails_title": "Title:",
-    "imageUploadDetails_author": "Author:",
-    "imageUploadDetails_privacy": "Privacy:",
-    "imageUploadDetails_tags": "Tags:",
-    "imageUploadDetails_description": "Description:",
-    "imageUploadDetailsView_title": "Photos",
-    "imageUploadDetailsButton_title": "Upload",
-    "imageUploadDetailsEdit_title": "Edit Photos to Upload",
-    "imageUploadDetailsUploading_title": "Photos that are Being Uploaded",
+    "imageUploadHeader": "请指定需要上传的照片和视频的相册或子相册",
+    "imageUploadHeaderTitle_images": "图片参数",
+    "imageUploadHeaderText_images": "请配置所选择照片或视频的参数",
+    "imageUploadHeaderTitle_upload": "上传设置",
+    "imageUploadHeaderText_upload": "请配置所选择照片或视频的上传参数",
+    "imageUploadDetails_title": "标题:",
+    "imageUploadDetails_author": "作者:",
+    "imageUploadDetails_privacy": "隐私:",
+    "imageUploadDetails_tags": "标签:",
+    "imageUploadDetails_description": "描述:",
+    "imageUploadDetailsView_title": "照片",
+    "imageUploadDetailsButton_title": "上传",
+    "imageUploadDetailsEdit_title": "编辑要上传的照片",
+    "imageUploadDetailsUploading_title": "正在上传的照片",
     "imageUploadDetailsCell_uploadComplete": "Completed! Finishing up...",
     "imageUploadRemove": "Removing uploaded photos",
     "imageUploadTableCell_waiting": "Waiting...",
@@ -554,11 +554,11 @@
             "max": {}
         }
     },
-    "imageUploadProgressBar_completed": "Completed",
-    "imageUploadCompleted_title": "Upload Completed",
-    "imageUploadCompleted_message": "photo uploaded to your Piwigo server.",
-    "imageUploadCompleted_message1": "photos uploaded to your Piwigo server.",
-    "uploadError_title": "Upload Error",
+    "imageUploadProgressBar_completed": "已完成",
+    "imageUploadCompleted_title": "上传完毕",
+    "imageUploadCompleted_message": "照片成功上传到你的 Piwigo 服务器",
+    "imageUploadCompleted_message1": "照片成功上传到你的Piwigo服务器",
+    "uploadError_title": "上传出错",
     "uploadError_message": "Could not upload your photo.",
     "uploadCancelled_title": "Upload Cancelled",
     "uploadNoInternetNetwork": "No Internet Connection",
@@ -567,30 +567,30 @@
     "uploadSection_impossible": "Impossible Uploads",
     "uploadSection_resumable": "Resumable Uploads",
     "uploadSection_queue": "Uploads Queue",
-    "imageUploadError_title": "Photo Upload Error",
-    "imageUploadError_format": "File format not accepted by Piwigo server.",
-    "imageUploadError_source": "cannot create photo source",
-    "imageUploadError_destination": "cannot create photo destination",
-    "imageUploadError_iCloud": "Could not retrieve photo.",
-    "audioUploadError_title": "Audio Upload Error",
-    "audioUploadError_format": "Sorry, audio files are not supported by Piwigo NG yet.",
-    "videoUploadError_title": "Video Upload Error",
-    "videoUploadError_format": "Sorry, video files with extension .{extension} are not accepted by the Piwigo server.",
+    "imageUploadError_title": "照片上传出错",
+    "imageUploadError_format": "Piwigo服务器不支持该文件格式",
+    "imageUploadError_source": "无法创建照片源",
+    "imageUploadError_destination": "无法创建照片目标",
+    "imageUploadError_iCloud": "无法获取照片",
+    "audioUploadError_title": "音频上传出错",
+    "audioUploadError_format": "抱歉，Piwigo NG 尚不支持音频文件",
+    "videoUploadError_title": "视频上传出错",
+    "videoUploadError_format": "抱歉，Piwigo服务器不支持 .{extension} 后缀名的视频文件",
     "@videoUploadError_format": {
         "placeholders": {
             "extension": {}
         }
     },
-    "videoUploadError_export": "Sorry, the video could not be retrieved for the upload.",
-    "videoUploadError_unknown": "Sorry, the upload of the video has failed for an unknown error during the MP4 conversion.",
-    "videoUploadCancelled_message": "The upload of the video has been cancelled.",
-    "localAlbums": "Photo Library",
-    "localAlbums_accessible": "Accessible Photos",
-    "localAlbums_photosNotAuthorized_title": "No Access",
-    "localAlbums_photosNiltitle": "Problem Reading Photos",
-    "localAlbums_photosNnil_msg": "There is a problem reading your local photo library.",
-    "localAlbums_photosNotAuthorized_msg": "Cannot open local photo library. Please go into the Settings app and enable access for Piwigo.",
-    "localImages_deleteTitle": "Remove from Camera Roll",
+    "videoUploadError_export": "抱歉，无法获取视频进行上传。",
+    "videoUploadError_unknown": "抱歉，视频上传失败，在MP4转换过程中发生未知错误。",
+    "videoUploadCancelled_message": "视频上传已被取消",
+    "localAlbums": "照片库",
+    "localAlbums_accessible": "可访问的照片",
+    "localAlbums_photosNotAuthorized_title": "无访问权限",
+    "localAlbums_photosNiltitle": "读取照片出错",
+    "localAlbums_photosNnil_msg": "读取本地照片库时出现问题",
+    "localAlbums_photosNotAuthorized_msg": "无法读取本地照片库，请在设备设置中为 Piwigo 授予相应权限",
+    "localImages_deleteTitle": "从相机相册中移除",
     "localImages_deleteMessage": "Do you wish to delete the uploaded photos or videos from the camera roll? The deleted photos or videos will still be available in the iOS Photos Trash for 30 days.",
     "settingsHeader_server": "Piwigo Server {version}",
     "@settingsHeader_server": {
