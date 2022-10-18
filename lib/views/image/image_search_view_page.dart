@@ -107,7 +107,7 @@ class _ImageSearchViewPageState extends State<ImageSearchViewPage> {
               return Center(
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: Text(appStrings(context).categoryImageList_noDataError),
+                  child: Text(appStrings.categoryImageList_noDataError),
                 ),
               );
             }
@@ -116,7 +116,7 @@ class _ImageSearchViewPageState extends State<ImageSearchViewPage> {
               return Center(
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: Text(appStrings(context).noImages),
+                  child: Text(appStrings.noImages),
                 ),
               );
             }

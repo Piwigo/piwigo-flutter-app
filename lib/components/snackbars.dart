@@ -1,40 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:piwigo_ng/app.dart';
+import 'package:piwigo_ng/services/shared_preferences_service.dart';
+import 'package:piwigo_ng/utils/resources.dart';
+import 'package:piwigo_ng/utils/themes.dart';
 
 Future<void> showAppSnackBar({
   String message = '',
-  Color color = Colors.white,
+  Color? color,
   SnackBarAction? action,
   Widget? icon,
 }) async {
   App.scaffoldMessengerKey.currentState?.showSnackBar(
     SnackBar(
-      backgroundColor: color,
+      backgroundColor: color ?? (appPreferences.getBool('THEME') == true ? darkTheme.cardColor : lightTheme.cardColor),
       action: action,
-      margin: const EdgeInsets.all(8),
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
-      behavior: SnackBarBehavior.floating,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(10.0))),
       content: Row(
         children: [
           if (icon != null)
             Padding(
               padding: const EdgeInsets.only(right: 8.0),
-              child: PhysicalModel(
-                shape: BoxShape.circle,
-                color: Colors.white,
-                elevation: 5,
-                child: Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: icon,
-                ),
-              ),
+              child: icon,
             ),
-          Text(
-            message,
-            style: const TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.w500,
+          Expanded(
+            child: Text(
+              message,
+              softWrap: true,
+              maxLines: 2,
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ),
         ],
@@ -43,7 +40,7 @@ Future<void> showAppSnackBar({
   );
 }
 
-Future<void> showErrorSnackBar({String message = ''}) async {
+Future<void> showErrorSnackBar({String message = '', IconData? icon}) async {
   showAppSnackBar(
     color: Colors.red,
     action: SnackBarAction(
@@ -51,10 +48,11 @@ Future<void> showErrorSnackBar({String message = ''}) async {
       onPressed: () {},
       label: 'OK',
     ),
-    icon: const Icon(
-      Icons.remove_circle_outline,
-      color: Colors.red,
-      size: 24,
+    icon: Icon(
+      icon ?? Icons.error,
+      color: Colors.white,
+      shadows: AppShadows.icon,
+      size: 32,
     ),
     message: message,
   );

@@ -74,13 +74,25 @@ class _LoginFormViewState extends State<LoginFormView> {
   }
 
   void _onLoginError(ApiResult result) {
-    showErrorSnackBar(message: result.error.toString());
     _btnController.error();
     setState(() {
-      if (result.error == ApiErrors.wrongLoginId) {
-        _idError = true;
-      } else if (result.error == ApiErrors.wrongServerUrl) {
-        _urlError = true;
+      switch (result.error) {
+        case ApiErrors.wrongLoginId:
+          showErrorSnackBar(
+            message: appStrings.loginError_message,
+            icon: Icons.text_fields,
+          );
+          _idError = true;
+          break;
+        case ApiErrors.wrongServerUrl:
+          showErrorSnackBar(
+            message: appStrings.serverURLerror_title,
+            icon: Icons.public_off,
+          );
+          _urlError = true;
+          break;
+        default:
+          showErrorSnackBar(message: appStrings.serverUnknownError_message);
       }
     });
   }
@@ -115,7 +127,7 @@ class _LoginFormViewState extends State<LoginFormView> {
     } on Error catch (e) {
       debugPrint(e.toString());
       _btnController.error();
-      showErrorSnackBar(message: "An error occurred");
+      showErrorSnackBar(message: appStrings.serverUnknownError_message);
     }
     await Future.delayed(const Duration(seconds: 1));
     _btnController.reset();
@@ -201,7 +213,7 @@ class _LoginFormViewState extends State<LoginFormView> {
               color: Theme.of(context).primaryColor,
               onPressed: _onLogin,
               child: Text(
-                appStrings(context).login,
+                appStrings.login,
                 style: Theme.of(context).textTheme.displaySmall,
               ),
             ),

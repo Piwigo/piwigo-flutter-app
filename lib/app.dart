@@ -42,7 +42,9 @@ class App extends StatelessWidget {
             Locale('de'),
             Locale('fr'),
           ],
-          theme: themeNotifier.isDark ? darkTheme : lightTheme,
+          themeMode: themeNotifier.isDark ? ThemeMode.dark : ThemeMode.light,
+          darkTheme: darkTheme,
+          theme: lightTheme,
           builder: (context, child) {
             return ScrollConfiguration(
               behavior: OverscrollBehavior(),

@@ -11,12 +11,11 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:piwigo_ng/api/api_client.dart';
 import 'package:piwigo_ng/api/authentication.dart';
-import 'package:piwigo_ng/app.dart';
 import 'package:piwigo_ng/services/shared_preferences_service.dart';
 import 'package:piwigo_ng/utils/localizations.dart';
 
-import 'chunked_uploader.dart';
-import 'notification_service.dart';
+import '../services/chunked_uploader.dart';
+import '../services/notification_service.dart';
 
 Future<void> _showUploadNotification({bool success = true}) async {
   if (!(appPreferences.getBool('upload_notification') ?? true)) return;
@@ -31,9 +30,7 @@ Future<void> _showUploadNotification({bool success = true}) async {
   await localNotification.show(
     1,
     success ? 'Success' : 'Failure',
-    success
-        ? appStrings(App.appKey.currentContext!).imageUploadCompleted_message
-        : appStrings(App.appKey.currentContext!).uploadError_message,
+    success ? appStrings.imageUploadCompleted_message : appStrings.uploadError_message,
     platform,
   );
 }
@@ -154,7 +151,7 @@ Future<Map<String, dynamic>> uploadCompleted(List<int> imageId, int categoryId) 
   };
   FormData formData = FormData.fromMap({
     "image_id": imageId,
-    "pwg_token": appPreferences.getString("pwg_token"),
+    "pwg_token": appPreferences.getString("PWG_TOKEN"),
     "category_id": categoryId,
   });
   try {
@@ -177,7 +174,7 @@ Future<Map<String, dynamic>> communityUploadCompleted(List<int> imageId, int cat
   };
   FormData formData = FormData.fromMap({
     "image_id": imageId,
-    "pwg_token": appPreferences.getString("pwg_token"),
+    "pwg_token": appPreferences.getString("PWG_TOKEN"),
     "category_id": categoryId,
   });
   try {

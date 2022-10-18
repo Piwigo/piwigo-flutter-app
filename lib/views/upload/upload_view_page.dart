@@ -7,8 +7,8 @@ import 'package:piwigo_ng/components/fields/app_field.dart';
 import 'package:piwigo_ng/components/sections/form_section.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 
+import '../../api/upload.dart';
 import '../../models/tag_model.dart';
-import '../../services/uploader.dart';
 import '../../utils/localizations.dart';
 
 class UploadViewPage extends StatefulWidget {
@@ -38,7 +38,7 @@ class _UploadGalleryViewPage extends State<UploadViewPage> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      privacyLevels(context).forEach((key, value) {
+      privacyLevels.forEach((key, value) {
         _levelItems.add(DropdownMenuItem<int>(
           value: key,
           child: Tooltip(
@@ -103,7 +103,6 @@ class _UploadGalleryViewPage extends State<UploadViewPage> {
   Future<void> _onUpload() async {
     _btnController.start();
     var result = await uploadPhotos(widget.imageData, widget.category, info: _imagesInfo);
-    print(result);
     if (!mounted) return;
     if (result.isEmpty) {
       _btnController.error();
@@ -130,7 +129,7 @@ class _UploadGalleryViewPage extends State<UploadViewPage> {
               SliverAppBar(
                 pinned: true,
                 centerTitle: true,
-                title: Text(appStrings(context).categoryUpload_images),
+                title: Text(appStrings.categoryUpload_images),
                 actions: [
                   IconButton(
                     onPressed: _onUpload,
@@ -147,7 +146,7 @@ class _UploadGalleryViewPage extends State<UploadViewPage> {
                     onTapTitle: () => setState(() {
                       _showFiles = !_showFiles;
                     }),
-                    title: appStrings(context).imageCount(widget.imageData.length),
+                    title: appStrings.imageCount(widget.imageData.length),
                     actions: [
                       GestureDetector(
                         behavior: HitTestBehavior.opaque,
@@ -216,30 +215,30 @@ class _UploadGalleryViewPage extends State<UploadViewPage> {
                     }),
                   ),
                   FormSection(
-                    title: appStrings(context).editImageDetails_title,
+                    title: appStrings.editImageDetails_title,
                     child: AppField(
                       controller: _nameController,
                       margin: const EdgeInsets.symmetric(vertical: 0.0),
                       padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-                      hint: appStrings(context).editImageDetails_titlePlaceholder,
+                      hint: appStrings.editImageDetails_titlePlaceholder,
                     ),
                   ),
                   FormSection(
-                    title: appStrings(context).editImageDetails_description,
+                    title: appStrings.editImageDetails_description,
                     child: AppDescriptionField(
                       controller: _descController,
                       margin: const EdgeInsets.symmetric(vertical: 0.0),
                       padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-                      hint: appStrings(context).editImageDetails_descriptionPlaceholder,
+                      hint: appStrings.editImageDetails_descriptionPlaceholder,
                       minLines: 5,
                       maxLines: 10,
                     ),
                   ), // Description
                   FormSection(
-                    title: appStrings(context).tagsAdd_title,
+                    title: appStrings.tagsAdd_title,
                     actions: [
                       IconButton(
-                        tooltip: appStrings(context).tagsTitle_selectOne,
+                        tooltip: appStrings.tagsTitle_selectOne,
                         onPressed: () {
                           // Todo: tags
                         },
@@ -271,7 +270,7 @@ class _UploadGalleryViewPage extends State<UploadViewPage> {
                     ),
                   ),
                   FormSection(
-                    title: appStrings(context).editImageDetails_privacyLevel,
+                    title: appStrings.editImageDetails_privacyLevel,
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10),
                       decoration: BoxDecoration(
@@ -307,9 +306,7 @@ class _UploadGalleryViewPage extends State<UploadViewPage> {
                       disabled: widget.imageData.isEmpty,
                       onPressed: _onUpload,
                       child: Text(
-                        widget.imageData.isEmpty
-                            ? appStrings(context).noImages
-                            : appStrings(context).imageUploadDetailsButton_title,
+                        widget.imageData.isEmpty ? appStrings.noImages : appStrings.imageUploadDetailsButton_title,
                         style: Theme.of(context).textTheme.displaySmall,
                       ),
                     ),

@@ -111,13 +111,13 @@ class _RootAlbumViewPageState extends State<RootAlbumViewPage> {
                       ApiResult<List<AlbumModel>> result = snapshot.data!;
                       if (result.hasError) {
                         return Center(
-                          child: Text(appStrings(context).categoryImageList_noDataError),
+                          child: Text(appStrings.categoryImageList_noDataError),
                         );
                       }
                       _albumList = result.data!;
                       if (_albumList.isEmpty)
                         return Center(
-                          child: Text(appStrings(context).categoryMainEmpty),
+                          child: Text(appStrings.categoryMainEmpty),
                         );
                       return AnimatedSlide(
                         duration: const Duration(milliseconds: 500),

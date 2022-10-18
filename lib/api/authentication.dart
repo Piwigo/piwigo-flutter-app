@@ -154,7 +154,8 @@ Future<ApiResult<List<String>>> getMethods() async {
 
   try {
     Response response = await ApiClient.get(queryParameters: queries);
-    final List<String> methods = json.decode(response.data)['result']['methods'];
+    Map<String, dynamic> data = json.decode(response.data);
+    final List<String> methods = data['result']['methods'].map<String>((e) => e.toString()).toList();
     return ApiResult<List<String>>(data: methods);
   } catch (e) {
     debugPrint('Dio error $e');

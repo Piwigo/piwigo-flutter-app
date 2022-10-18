@@ -1,9 +1,11 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:piwigo_ng/api/albums.dart';
 import 'package:piwigo_ng/api/api_error.dart';
 import 'package:piwigo_ng/components/cards/image_card.dart';
+import 'package:piwigo_ng/modals/choose_camera_picker_modal.dart';
 import 'package:piwigo_ng/utils/localizations.dart';
 import 'package:piwigo_ng/views/upload/upload_view_page.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
@@ -59,7 +61,9 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
     if (_nbImages <= _imageList.length) return;
     ApiResult<List<ImageModel>> result = await fetchImages(widget.album.id, _page + 1);
     if (result.hasError || !result.hasData) {
-      return _refreshController.loadFailed();
+      _refreshController.loadFailed();
+      await Future.delayed(const Duration(milliseconds: 500));
+      return _refreshController.loadComplete();
     }
     setState(() {
       _imageList.addAll(result.data!);
@@ -72,7 +76,9 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
     final ApiResult<List<AlbumModel>> albumsResult = result.first as ApiResult<List<AlbumModel>>;
     final ApiResult<List<ImageModel>> imagesResult = result.last as ApiResult<List<ImageModel>>;
     if (!albumsResult.hasData || !imagesResult.hasData) {
-      return _refreshController.refreshFailed();
+      _refreshController.refreshFailed();
+      await Future.delayed(const Duration(milliseconds: 500));
+      return _refreshController.refreshCompleted();
     }
     setState(() {
       _albumList = _parseAlbums(albumsResult.data!);
@@ -90,16 +96,42 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
 
   Future<void> _onPickImages() async {
     try {
-      // final List<XFile> images = ((await FilePicker.platform.pickFiles(
-      //   type: FileType.media,
-      //   allowMultiple: true,
-      // )) ?.files ?? [])
-      //     .map<XFile>((e) => XFile(e.path, name: e.name, bytes: e.bytes)).toList();
       final ImagePicker picker = ImagePicker();
       final List<XFile>? images = await picker.pickMultiImage();
       if (images != null && images.isNotEmpty) {
         Navigator.of(context).pushNamed(UploadViewPage.routeName, arguments: {
           'images': images,
+          'category': widget.album.id,
+        }).whenComplete(() {
+          setState(() {});
+        });
+      }
+    } catch (e) {
+      debugPrint('${e.toString()}');
+    }
+  }
+
+  Future<void> _onTakePhoto() async {
+    final int? choice = await showModalBottomSheet<int>(
+      context: context,
+      builder: (context) => ChooseCameraPickerModal(),
+    );
+    if (choice == null) return;
+    try {
+      final ImagePicker picker = ImagePicker();
+      XFile? image;
+      switch (choice) {
+        case 0:
+          image = await picker.pickImage(source: ImageSource.camera);
+          break;
+        case 1:
+          image = await picker.pickVideo(source: ImageSource.camera);
+          break;
+      }
+
+      if (image != null) {
+        Navigator.of(context).pushNamed(UploadViewPage.routeName, arguments: {
+          'images': [image],
           'category': widget.album.id,
         }).whenComplete(() {
           setState(() {});
@@ -121,7 +153,7 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
           onLoading: _loadMoreImages,
           onRefresh: _onRefresh,
           header: MaterialClassicHeader(
-            backgroundColor: Theme.of(context).inputDecorationTheme.fillColor,
+            backgroundColor: Theme.of(context).cardColor,
             color: Theme.of(context).colorScheme.primary,
           ),
           child: CustomScrollView(
@@ -150,7 +182,7 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
                             child: Padding(
                               padding: const EdgeInsets.all(8),
                               child: Text(
-                                appStrings(context).imageCount(widget.album.nbImages),
+                                appStrings.imageCount(widget.album.nbImages),
                                 style: Theme.of(context).textTheme.titleSmall,
                               ),
                             ),
@@ -200,6 +232,7 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
         SpeedDialChild(
           backgroundColor: childBackgroundColor,
           foregroundColor: childIconColor,
+          onTap: _onTakePhoto,
           child: Icon(Icons.add_a_photo),
         ),
       ],
@@ -243,7 +276,7 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
       final ApiResult<List<ImageModel>> result = snapshot.data!.last as ApiResult<List<ImageModel>>;
       if (result.hasError || !result.hasData) {
         return Center(
-          child: Text(appStrings(context).noImages),
+          child: Text(appStrings.noImages),
         );
       }
       _imageList = result.data!;
@@ -251,7 +284,7 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
     }
     if (_imageList.isEmpty) {
       return Center(
-        child: Text(appStrings(context).noImages),
+        child: Text(appStrings.noImages),
       );
     }
     return GridView.builder(

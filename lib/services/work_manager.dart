@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:image_picker/image_picker.dart';
-import 'package:piwigo_ng/services/uploader.dart';
+import 'package:piwigo_ng/api/upload.dart';
 import 'package:workmanager/workmanager.dart';
 
 void callbackDispatcher() {
