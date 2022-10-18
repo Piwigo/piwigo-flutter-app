@@ -276,7 +276,7 @@
     "imageOptions_title": "照片选项",
     "imageOptions_edit": "编辑",
     "imageOptions_download": "下载",
-    "imageOptions_share": "Share",
+    "imageOptions_share": "分享",
     "imageOptions_setAlbumImage": "设为相册缩略图",
     "imageDetailsView_title": "属性",
     "editImageDetails_title": "标题",
@@ -599,9 +599,9 @@
         }
     },
     "settingsHeader_notSecure": "Website Not Secure!",
-    "settings_server": "Address",
-    "settings_username": "Username",
-    "settings_notLoggedIn": " - Not Logged In - ",
+    "settings_server": "地址",
+    "settings_username": "用户名",
+    "settings_notLoggedIn": " - 未登录 - ",
     "settings_logout": "Logout",
     "settingsFooter_formats": "The server accepts the following file types: {types}.",
     "@settingsFooter_formats": {
@@ -610,8 +610,8 @@
         }
     },
     "settingsHeader_general": "General Settings",
-    "settingsHeader_thumbnails": "Thumbnails",
-    "defaultImageSort": "Sort",
+    "settingsHeader_thumbnails": "缩略图",
+    "defaultImageSort": "分类",
     "defaultImageSort320px": "Default Sort",
     "defaultImageSort414px": "Default Sort of Photos",
     "defaultAlbumThumbnailFile414px": "Albums Thumbnail File",
