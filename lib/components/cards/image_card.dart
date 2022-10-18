@@ -23,6 +23,18 @@ class ImageCard extends StatelessWidget {
           Image.network(
             image.derivatives['medium']['url'],
             fit: BoxFit.cover,
+            errorBuilder: (context, o, s) => Center(child: Icon(Icons.image_not_supported)),
+            loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
+              if (loadingProgress == null) return child;
+
+              return Center(
+                child: CircularProgressIndicator(
+                  value: loadingProgress.expectedTotalBytes != null
+                      ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                      : null,
+                ),
+              );
+            },
           ),
           AnimatedOpacity(
             duration: const Duration(milliseconds: 100),

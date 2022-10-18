@@ -103,7 +103,7 @@
         }
     },
     "showPhotos": "Fotos anzeigen",
-    "categoryMainEmtpy": "Bislang keine Alben in Piwigo vorhanden.\nZur Aktualisierung nach unten wischen oder erneut anmelden.",
+    "categoryMainEmpty": "Bislang keine Alben in Piwigo vorhanden.\nZur Aktualisierung nach unten wischen oder erneut anmelden.",
     "categoryImageList_selectButton": "Auswählen",
     "categoryImageList_deselectButton": "Auswahl aufheben",
     "categoryImageList_noDataError": "Fehler: Keine Daten",

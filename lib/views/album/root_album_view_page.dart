@@ -3,6 +3,7 @@ import 'package:piwigo_ng/api/albums.dart';
 import 'package:piwigo_ng/api/api_error.dart';
 import 'package:piwigo_ng/components/buttons/animated_app_button.dart';
 import 'package:piwigo_ng/components/fields/app_field.dart';
+import 'package:piwigo_ng/utils/localizations.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 
 import '../../components/appbars/root_search_app_bar.dart';
@@ -29,6 +30,15 @@ class _RootAlbumViewPageState extends State<RootAlbumViewPage> {
   final ScrollController _scrollController = ScrollController();
   bool _isStarting = false;
 
+  late final Future<ApiResult<List<AlbumModel>>> _albumsFuture;
+  List<AlbumModel> _albumList = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _albumsFuture = fetchAlbums(widget.albumId);
+  }
+
   @override
   dispose() {
     _scrollController.dispose();
@@ -36,8 +46,13 @@ class _RootAlbumViewPageState extends State<RootAlbumViewPage> {
   }
 
   Future<void> _onRefresh() async {
-    await Future.delayed(const Duration(milliseconds: 300));
-    setState(() {});
+    final ApiResult<List<AlbumModel>> result = await fetchAlbums(widget.albumId);
+    if (!result.hasData) {
+      return;
+    }
+    setState(() {
+      _albumList = result.data!;
+    });
   }
 
   Future<void> _onAddAlbum() async {
@@ -90,16 +105,20 @@ class _RootAlbumViewPageState extends State<RootAlbumViewPage> {
               ),
               SliverToBoxAdapter(
                 child: FutureBuilder<ApiResult<List<AlbumModel>>>(
-                  future: fetchAlbums(widget.albumId),
+                  future: _albumsFuture,
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
                       ApiResult<List<AlbumModel>> result = snapshot.data!;
                       if (result.hasError) {
-                        return const Center(
-                          child: Text("error"),
+                        return Center(
+                          child: Text(appStrings(context).categoryImageList_noDataError),
                         );
                       }
-                      List<AlbumModel> albums = result.data!;
+                      _albumList = result.data!;
+                      if (_albumList.isEmpty)
+                        return Center(
+                          child: Text(appStrings(context).categoryMainEmpty),
+                        );
                       return AnimatedSlide(
                         duration: const Duration(milliseconds: 500),
                         curve: Curves.easeOut,
@@ -108,7 +127,7 @@ class _RootAlbumViewPageState extends State<RootAlbumViewPage> {
                           padding: const EdgeInsets.symmetric(
                             horizontal: 8.0,
                             vertical: 8.0,
-                          ).copyWith(bottom: widget.isAdmin ? kToolbarHeight : 8.0),
+                          ).copyWith(bottom: widget.isAdmin ? 80 : 8),
                           gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
                             maxCrossAxisExtent: 400.0,
                             mainAxisSpacing: 8.0,
@@ -117,9 +136,9 @@ class _RootAlbumViewPageState extends State<RootAlbumViewPage> {
                           ),
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
-                          itemCount: albums.length,
+                          itemCount: _albumList.length,
                           itemBuilder: (context, index) {
-                            AlbumModel album = albums[index];
+                            AlbumModel album = _albumList[index];
                             return AlbumCard(
                               album: album,
                               onTap: () {

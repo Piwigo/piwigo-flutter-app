@@ -25,6 +25,10 @@ ThemeData lightTheme = ThemeData.light().copyWith(
     iconTheme: IconThemeData(
       color: Color(0xffff7700),
     ),
+    actionsIconTheme: IconThemeData(
+      color: Color(0xffff7700),
+    ),
+    foregroundColor: Color(0xffff7700),
     titleTextStyle: TextStyle(fontSize: 20.0, color: Color(0xff000000)),
   ),
   iconTheme: const IconThemeData(

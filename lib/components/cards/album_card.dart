@@ -19,7 +19,7 @@ class AlbumCard extends StatelessWidget {
 
   static const double kAlbumAnchorRadius = 8.0;
   static const double kAlbumOuterRadius = 16.0;
-  static const double kAlbumRatio = 2.5;
+  static const double kAlbumRatio = 3;
 
   Future<void> _onEdit() async {}
 
@@ -67,11 +67,16 @@ class AlbumCard extends StatelessWidget {
                     right: 0,
                     top: 1,
                     bottom: 1,
-                    child: Container(
-                      width: kAlbumAnchorRadius * 2,
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).primaryColor,
-                        border: Border.all(color: Theme.of(context).primaryColor, width: 1),
+                    width: kAlbumAnchorRadius * 2,
+                    child: OverflowBox(
+                      alignment: Alignment.centerLeft,
+                      maxWidth: kAlbumAnchorRadius * 2 + 1,
+                      child: Container(
+                        width: kAlbumAnchorRadius * 2 + 1,
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).primaryColor,
+                          border: Border.all(color: Theme.of(context).primaryColor, width: 1),
+                        ),
                       ),
                     ),
                   ),
@@ -127,8 +132,8 @@ class AlbumCardContent extends StatelessWidget {
     return LayoutBuilder(builder: (context, constraints) {
       return Row(
         children: [
-          SizedBox.square(
-            dimension: constraints.maxHeight,
+          AspectRatio(
+            aspectRatio: 1,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(10.0),
               child: Builder(builder: (context) {
@@ -171,22 +176,33 @@ class AlbumCardContent extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Expanded(
-                    child: Text(
-                      album.name,
-                      style: Theme.of(context).textTheme.titleLarge,
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 4.0),
-                    child: Text(
-                      album.comment ?? '',
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
-                  ),
                   Text(
-                    "${album.nbTotalImages} photos", // Todo: use variable
-                    style: Theme.of(context).textTheme.labelSmall,
+                    album.name,
+                    softWrap: true,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 4.0),
+                      child: Align(
+                        alignment: Alignment.bottomCenter,
+                        child: Text(
+                          album.comment ?? '',
+                          softWrap: true,
+                          overflow: TextOverflow.ellipsis,
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
+                      ),
+                    ),
+                  ),
+                  FittedBox(
+                    fit: BoxFit.fitWidth,
+                    child: Text(
+                      "${album.nbTotalImages} photos", // Todo: use variable
+                      style: Theme.of(context).textTheme.labelSmall,
+                    ),
                   ),
                 ],
               ),

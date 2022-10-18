@@ -103,7 +103,7 @@
         }
     },
     "showPhotos": "Afficher les Photos",
-    "categoryMainEmtpy": "Pas encore d'albums dans votre Piwigo.\nVous pouvez tirer vers le bas pour actualiser ou vous reconnecter.",
+    "categoryMainEmpty": "Pas encore d'albums dans votre Piwigo.\nVous pouvez tirer vers le bas pour actualiser ou vous reconnecter.",
     "categoryImageList_selectButton": "Sélectionner",
     "categoryImageList_deselectButton": "Désélectionner",
     "categoryImageList_noDataError": "Erreur Aucune Donnée",

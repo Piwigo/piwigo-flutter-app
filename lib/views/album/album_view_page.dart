@@ -3,11 +3,13 @@ import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:piwigo_ng/api/albums.dart';
 import 'package:piwigo_ng/api/api_error.dart';
+import 'package:piwigo_ng/components/cards/image_card.dart';
+import 'package:piwigo_ng/utils/localizations.dart';
 import 'package:piwigo_ng/views/upload/upload_view_page.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import '../../api/images.dart';
 import '../../components/cards/album_card.dart';
-import '../../services/shared_preferences_service.dart';
 
 class AlbumViewPage extends StatefulWidget {
   const AlbumViewPage({
@@ -25,27 +27,58 @@ class AlbumViewPage extends StatefulWidget {
 }
 
 class _AlbumViewPageState extends State<AlbumViewPage> {
+  final RefreshController _refreshController = RefreshController(initialRefresh: false);
+  final ScrollController _scrollController = ScrollController();
+
+  late final Future<List<ApiResult>> _data;
+  List<ImageModel> _imageList = [];
+  List<AlbumModel> _albumList = [];
+
   int _nbImages = 0;
   int _page = 0;
-
-  final List<ImageModel> _imageList = [];
 
   @override
   initState() {
     _nbImages = widget.album.nbImages;
     super.initState();
+    _getData();
+  }
+
+  void _getData() {
+    setState(() {
+      _data = Future.wait([fetchAlbums(widget.album.id), fetchImages(widget.album.id, 0)]);
+    });
+  }
+
+  List<AlbumModel> _parseAlbums(List<AlbumModel> albums) {
+    albums.removeWhere((album) => album.id == widget.album.id);
+    return albums;
   }
 
   Future<void> _loadMoreImages() async {
     if (_nbImages <= _imageList.length) return;
     ApiResult<List<ImageModel>> result = await fetchImages(widget.album.id, _page + 1);
-    if (result.hasError || !result.hasData) return;
-    _imageList.addAll(result.data!);
+    if (result.hasError || !result.hasData) {
+      return _refreshController.loadFailed();
+    }
+    setState(() {
+      _imageList.addAll(result.data!);
+    });
+    _refreshController.loadComplete();
   }
 
   Future<void> _onRefresh() async {
-    await Future.delayed(const Duration(milliseconds: 300));
-    setState(() {});
+    final result = await Future.wait([fetchAlbums(widget.album.id), fetchImages(widget.album.id, 0)]);
+    final ApiResult<List<AlbumModel>> albumsResult = result.first as ApiResult<List<AlbumModel>>;
+    final ApiResult<List<ImageModel>> imagesResult = result.last as ApiResult<List<ImageModel>>;
+    if (!albumsResult.hasData || !imagesResult.hasData) {
+      return _refreshController.refreshFailed();
+    }
+    setState(() {
+      _albumList = _parseAlbums(albumsResult.data!);
+      _imageList = imagesResult.data!;
+    });
+    _refreshController.refreshCompleted();
   }
 
   Future<void> _onAddAlbum() async {
@@ -80,12 +113,19 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: RefreshIndicator(
-        onRefresh: _onRefresh,
-        backgroundColor: Theme.of(context).cardColor,
-        color: Theme.of(context).primaryColor,
-        child: SafeArea(
+      body: SafeArea(
+        child: SmartRefresher(
+          controller: _refreshController,
+          scrollController: _scrollController,
+          enablePullUp: _imageList.isNotEmpty && widget.album.nbImages > _imageList.length,
+          onLoading: _loadMoreImages,
+          onRefresh: _onRefresh,
+          header: MaterialClassicHeader(
+            backgroundColor: Theme.of(context).inputDecorationTheme.fillColor,
+            color: Theme.of(context).colorScheme.primary,
+          ),
           child: CustomScrollView(
+            controller: _scrollController,
             slivers: [
               SliverAppBar(
                 titleSpacing: 0,
@@ -96,99 +136,35 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
                 pinned: true,
               ),
               SliverToBoxAdapter(
-                child: Column(
-                  children: [
-                    FutureBuilder<ApiResult<List<AlbumModel>>>(
-                      future: fetchAlbums(widget.album.id),
-                      builder: (context, snapshot) {
-                        if (snapshot.hasData) {
-                          ApiResult<List<AlbumModel>> result = snapshot.data!;
-                          if (result.hasError || !result.hasData) {
-                            return const Center(
-                              child: Text("error"),
-                            );
-                          }
-                          List<AlbumModel> albums = result.data!;
-                          albums.removeWhere((album) => album.id == widget.album.id);
-                          if (albums.isEmpty) return const SizedBox();
-                          return GridView.builder(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8.0,
+                child: FutureBuilder<List<ApiResult>>(
+                  future: _data,
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          _albumGrid(snapshot),
+                          _imageGrid(snapshot),
+                          SizedBox(
+                            height: 72,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8),
+                              child: Text(
+                                appStrings(context).imageCount(widget.album.nbImages),
+                                style: Theme.of(context).textTheme.titleSmall,
+                              ),
                             ),
-                            gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                              maxCrossAxisExtent: 400.0,
-                              mainAxisSpacing: 8.0,
-                              crossAxisSpacing: 8.0,
-                              childAspectRatio: AlbumCard.kAlbumRatio,
-                            ),
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            itemCount: albums.length,
-                            itemBuilder: (context, index) {
-                              AlbumModel album = albums[index];
-                              return AlbumCard(
-                                album: album,
-                                onTap: () {
-                                  Navigator.of(context).pushNamed(AlbumViewPage.routeName, arguments: {
-                                    'isAdmin': widget.isAdmin,
-                                    'album': album,
-                                  });
-                                },
-                              );
-                            },
-                          );
-                        }
-                        return const Center(
-                          child: Padding(
-                            padding: EdgeInsets.all(8.0),
-                            child: CircularProgressIndicator(),
                           ),
-                        );
-                      },
-                    ),
-                    const SizedBox(height: 8.0),
-                    FutureBuilder<ApiResult<List<ImageModel>>>(
-                      future: fetchImages(widget.album.id, _page),
-                      builder: (context, snapshot) {
-                        if (snapshot.hasData) {
-                          ApiResult<List<ImageModel>> result = snapshot.data!;
-                          if (result.hasError || !result.hasData) {
-                            return const Center(
-                              child: Text("error"),
-                            );
-                          }
-                          List<ImageModel> images = result.data!;
-                          if (images.isEmpty) return const SizedBox();
-                          return GridView.builder(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8.0,
-                            ),
-                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 4,
-                              mainAxisSpacing: 4.0,
-                              crossAxisSpacing: 4.0,
-                            ),
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            itemCount: images.length,
-                            itemBuilder: (context, index) {
-                              var image = images[index];
-                              return Image.network(
-                                image.derivatives[appPreferences.getString('THUMBNAIL_SIZE')]['url'] ?? '',
-                                fit: BoxFit.cover,
-                              );
-                            },
-                          );
-                        }
-                        return const Center(
-                          child: Padding(
-                            padding: EdgeInsets.all(8.0),
-                            child: CircularProgressIndicator(),
-                          ),
-                        );
-                      },
-                    ),
-                  ],
+                        ],
+                      );
+                    }
+                    return const Center(
+                      child: Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: CircularProgressIndicator(),
+                      ),
+                    );
+                  },
                 ),
               ),
             ],
@@ -227,6 +203,73 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
           child: Icon(Icons.add_a_photo),
         ),
       ],
+    );
+  }
+
+  Widget _albumGrid(AsyncSnapshot snapshot) {
+    if (_albumList.isEmpty) {
+      final ApiResult<List<AlbumModel>> result = snapshot.data!.first as ApiResult<List<AlbumModel>>;
+      _albumList = _parseAlbums(result.data!);
+    }
+    if (_albumList.isEmpty) return const SizedBox();
+    return GridView.builder(
+      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
+      gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+        maxCrossAxisExtent: 400.0,
+        mainAxisSpacing: 8.0,
+        crossAxisSpacing: 8.0,
+        childAspectRatio: AlbumCard.kAlbumRatio,
+      ),
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: _albumList.length,
+      itemBuilder: (context, index) {
+        AlbumModel album = _albumList[index];
+        return AlbumCard(
+          album: album,
+          onTap: () {
+            Navigator.of(context).pushNamed(AlbumViewPage.routeName, arguments: {
+              'isAdmin': widget.isAdmin,
+              'album': album,
+            });
+          },
+        );
+      },
+    );
+  }
+
+  Widget _imageGrid(AsyncSnapshot snapshot) {
+    if (_imageList.isEmpty && _page == 0) {
+      final ApiResult<List<ImageModel>> result = snapshot.data!.last as ApiResult<List<ImageModel>>;
+      if (result.hasError || !result.hasData) {
+        return Center(
+          child: Text(appStrings(context).noImages),
+        );
+      }
+      _imageList = result.data!;
+      WidgetsBinding.instance.addPostFrameCallback((timeStamp) => setState(() {}));
+    }
+    if (_imageList.isEmpty) {
+      return Center(
+        child: Text(appStrings(context).noImages),
+      );
+    }
+    return GridView.builder(
+      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 4,
+        mainAxisSpacing: 4.0,
+        crossAxisSpacing: 4.0,
+      ),
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: _imageList.length,
+      itemBuilder: (context, index) {
+        var image = _imageList[index];
+        return ImageCard(
+          image: image,
+        );
+      },
     );
   }
 }

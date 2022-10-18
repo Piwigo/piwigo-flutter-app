@@ -32,9 +32,7 @@ class _RootSearchAppBarState extends State<RootSearchAppBar> {
       if (widget.scrollController.offset > _expandedHeight * _opacityScale) {
         return 0.0;
       }
-      return (_expandedHeight * _opacityScale -
-              widget.scrollController.offset) /
-          (_expandedHeight * _opacityScale);
+      return (_expandedHeight * _opacityScale - widget.scrollController.offset) / (_expandedHeight * _opacityScale);
     }
     return 1.0;
   }
@@ -50,8 +48,7 @@ class _RootSearchAppBarState extends State<RootSearchAppBar> {
       }
 
       // In case 0%-100% of the expanded height is viewed
-      double scrollDelta =
-          (_expandedHeight - widget.scrollController.offset) / _expandedHeight;
+      double scrollDelta = (_expandedHeight - widget.scrollController.offset) / _expandedHeight;
       double scrollPercent = (scrollDelta * 2 - 1);
       return (1 - scrollPercent) * delta * basePadding + basePadding;
     }
@@ -63,8 +60,7 @@ class _RootSearchAppBarState extends State<RootSearchAppBar> {
   Widget build(BuildContext context) {
     return SliverAppBar(
       leading: IconButton(
-        onPressed: () =>
-            Navigator.of(context).pushNamed(SettingsViewPage.routeName),
+        onPressed: () => Navigator.of(context).pushNamed(SettingsViewPage.routeName),
         icon: const Icon(Icons.settings),
       ),
       pinned: true,
