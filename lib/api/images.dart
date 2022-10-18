@@ -21,21 +21,52 @@ Future<ApiResult<List<ImageModel>>> fetchImages(String albumID, int page) async 
     if (response.statusCode == 200) {
       var jsonImages = json.decode(response.data)["result"]["images"];
 
-      List<ImageModel> images = List<ImageModel>.from(jsonImages.map(
-        (image) => ImageModel.fromJson(image),
-      ));
-
-      return ApiResult<List<ImageModel>>(
-        data: images,
+      List<ImageModel> images = List<ImageModel>.from(
+        jsonImages.map((image) => ImageModel.fromJson(image)),
       );
+
+      return ApiResult<List<ImageModel>>(data: images);
     }
     return ApiResult(error: ApiErrors.fetchImagesError);
   } on DioError catch (e) {
     debugPrint(e.message);
     return ApiResult(error: ApiErrors.fetchImagesError);
   } on Error catch (e) {
-    debugPrint('${e}');
+    debugPrint('$e');
     return ApiResult(error: ApiErrors.fetchImagesError);
+  }
+}
+
+Future<ApiResult<List<ImageModel>>> searchImages(String searchQuery) async {
+  Map<String, String> query = {
+    "format": "json",
+    "method": "pwg.images.search",
+    "query": searchQuery,
+  };
+
+  try {
+    Response response = await ApiClient.get(queryParameters: query);
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> result = json.decode(response.data);
+      if (result['err'] == 1002) {
+        return ApiResult<List<ImageModel>>(data: []);
+      }
+      print(result["result"]["images"]);
+      final jsonImages = result["result"]["images"];
+      List<ImageModel> images = List<ImageModel>.from(
+        jsonImages.map((image) => ImageModel.fromJson(image)),
+      );
+      return ApiResult<List<ImageModel>>(data: images);
+    } else {
+      return ApiResult(
+        error: ApiErrors.searchImagesError,
+      );
+    }
+  } on DioError {
+    return ApiResult(
+      error: ApiErrors.searchImagesError,
+    );
   }
 }
 

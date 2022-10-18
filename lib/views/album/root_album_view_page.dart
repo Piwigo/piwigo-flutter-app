@@ -108,7 +108,7 @@ class _RootAlbumViewPageState extends State<RootAlbumViewPage> {
                           padding: const EdgeInsets.symmetric(
                             horizontal: 8.0,
                             vertical: 8.0,
-                          ).copyWith(bottom: kToolbarHeight),
+                          ).copyWith(bottom: widget.isAdmin ? kToolbarHeight : 8.0),
                           gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
                             maxCrossAxisExtent: 400.0,
                             mainAxisSpacing: 8.0,
@@ -172,14 +172,6 @@ class AppDialog extends StatelessWidget {
   final double? height;
   final Widget? action;
   static final RoundedLoadingButtonController _controller = RoundedLoadingButtonController();
-
-  double _getWidth(context) {
-    var screen = MediaQuery.of(context);
-    if (screen.orientation == Orientation.portrait) {
-      return screen.size.width * 0.8;
-    }
-    return screen.size.height * 0.8;
-  }
 
   @override
   Widget build(BuildContext context) {

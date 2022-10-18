@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:piwigo_ng/api/images.dart';
 
 class ImageCard extends StatelessWidget {
   const ImageCard({
     Key? key,
     this.onPressed,
     this.selected = false,
+    required this.image,
   }) : super(key: key);
 
   final Function()? onPressed;
   final bool selected;
+  final ImageModel image;
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +21,7 @@ class ImageCard extends StatelessWidget {
         fit: StackFit.expand,
         children: [
           Image.network(
-            "https://png.pngtree.com/background/20210711/original/pngtree-round-gold-frame-picture-image_1155839.jpg",
+            image.derivatives['medium']['url'],
             fit: BoxFit.cover,
           ),
           AnimatedOpacity(

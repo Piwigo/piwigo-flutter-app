@@ -149,6 +149,27 @@ void saveStatus(StatusModel status) async {
   }
 }
 
+Future<ApiResult<List<String>>> getMethods() async {
+  Map<String, String> queries = {'format': 'json', 'method': 'reflection.getMethodList'};
+
+  try {
+    Response response = await ApiClient.get(queryParameters: queries);
+    final List<String> methods = json.decode(response.data)['result']['methods'];
+    return ApiResult<List<String>>(data: methods);
+  } catch (e) {
+    debugPrint('Dio error $e');
+    return ApiResult<List<String>>(error: ApiErrors.getMethodsError);
+  }
+}
+
+Future<bool> methodExist(String method) async {
+  var result = await getMethods();
+  if (result.hasData) {
+    return result.data!.contains(method);
+  }
+  return false;
+}
+
 class StatusModel {
   String username;
   String status;

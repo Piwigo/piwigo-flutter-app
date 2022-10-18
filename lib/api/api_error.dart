@@ -4,7 +4,9 @@ enum ApiErrors {
   fetchAlbumsError,
   fetchAlbumListError,
   fetchImagesError,
+  searchImagesError,
   getStatusError,
+  getMethodsError,
 }
 
 class ApiResult<T> {
