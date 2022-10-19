@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:piwigo_ng/api/images.dart';
+import 'package:piwigo_ng/models/image_model.dart';
 
 class ImageCard extends StatelessWidget {
   const ImageCard({
@@ -21,7 +21,7 @@ class ImageCard extends StatelessWidget {
         fit: StackFit.expand,
         children: [
           Image.network(
-            image.derivatives['medium']['url'],
+            image.derivatives.medium!.url,
             fit: BoxFit.cover,
             errorBuilder: (context, o, s) => Center(child: Icon(Icons.image_not_supported)),
             loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {

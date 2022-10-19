@@ -1,13 +1,14 @@
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:piwigo_ng/api/albums.dart';
 import 'package:piwigo_ng/api/api_error.dart';
 import 'package:piwigo_ng/components/cards/image_card.dart';
-import 'package:piwigo_ng/modals/choose_camera_picker_modal.dart';
+import 'package:piwigo_ng/components/modals/choose_camera_picker_modal.dart';
+import 'package:piwigo_ng/models/image_model.dart';
 import 'package:piwigo_ng/utils/localizations.dart';
+import 'package:piwigo_ng/views/image/image_view_page.dart';
 import 'package:piwigo_ng/views/upload/upload_view_page.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
@@ -33,6 +34,8 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
   final RefreshController _refreshController = RefreshController(initialRefresh: false);
   final ScrollController _scrollController = ScrollController();
 
+  late AlbumModel _currentAlbum;
+
   late final Future<List<ApiResult>> _data;
   List<ImageModel> _imageList = [];
   List<AlbumModel> _albumList = [];
@@ -42,13 +45,20 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
 
   @override
   initState() {
+    _currentAlbum = widget.album;
     _nbImages = widget.album.nbImages;
     _data = Future.wait([fetchAlbums(widget.album.id), fetchImages(widget.album.id, 0)]);
     super.initState();
   }
 
   List<AlbumModel> _parseAlbums(List<AlbumModel> albums) {
-    albums.removeWhere((album) => album.id == widget.album.id);
+    albums.removeWhere((album) {
+      if (album.id == widget.album.id) {
+        _currentAlbum = album;
+        return true;
+      }
+      return false;
+    });
     return albums;
   }
 
@@ -298,6 +308,16 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
         var image = _imageList[index];
         return ImageCard(
           image: image,
+          onPressed: () {
+            Navigator.of(context).pushNamed(
+              ImageViewPage.routeName,
+              arguments: {
+                'images': _imageList,
+                'album': _currentAlbum,
+                'startId': image.id,
+              },
+            ).then((value) => _onRefresh());
+          },
         );
       },
     );

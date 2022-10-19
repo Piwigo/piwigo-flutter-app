@@ -540,6 +540,7 @@
 
     "videoSaveError_title": "Fail Saving Video",
     "videoSaveError_message": "Failed to save video",
+    "videoLoadError_message": "Failed to load video",
 
     "moveOrCopyImage_title": "{count, plural, =1{Do you want to move or copy this image ?} other{Do you want to move or copy {count} images ?}}",
     "@moveOrCopyImage_title": {

@@ -10,6 +10,7 @@ import 'package:piwigo_ng/views/album/album_view_page.dart';
 import 'package:piwigo_ng/views/album/root_album_view_page.dart';
 import 'package:piwigo_ng/views/authentication/login_view_page.dart';
 import 'package:piwigo_ng/views/image/image_search_view_page.dart';
+import 'package:piwigo_ng/views/image/image_view_page.dart';
 import 'package:piwigo_ng/views/settings/privacy_policy_view_page.dart';
 import 'package:piwigo_ng/views/settings/settings_view_page.dart';
 import 'package:piwigo_ng/views/unknown_route_page.dart';
@@ -113,6 +114,15 @@ Route<dynamic> generateRoute(RouteSettings settings) {
         builder: (_) => UploadViewPage(
           imageData: arguments["images"] ?? <XFile>[],
           category: arguments["category"],
+        ),
+        settings: settings,
+      );
+    case ImageViewPage.routeName:
+      return MaterialPageRoute(
+        builder: (_) => ImageViewPage(
+          imageList: arguments['images'] ?? [],
+          startId: arguments['startId'],
+          album: arguments['album'],
         ),
         settings: settings,
       );

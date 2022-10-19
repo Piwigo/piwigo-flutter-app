@@ -223,7 +223,7 @@ class _UploadGalleryViewPage extends State<UploadViewPage> {
                                         );
                                       }
                                       if (mimeType?.first == 'video') {
-                                        return VideoItem(
+                                        return VideoUploadItem(
                                           path: file.path,
                                         );
                                       }
@@ -394,16 +394,16 @@ class _UploadGalleryViewPage extends State<UploadViewPage> {
   }
 }
 
-class VideoItem extends StatefulWidget {
-  const VideoItem({Key? key, required this.path}) : super(key: key);
+class VideoUploadItem extends StatefulWidget {
+  const VideoUploadItem({Key? key, required this.path}) : super(key: key);
 
   final String path;
 
   @override
-  State<VideoItem> createState() => _VideoItemState();
+  State<VideoUploadItem> createState() => _VideoUploadItemState();
 }
 
-class _VideoItemState extends State<VideoItem> {
+class _VideoUploadItemState extends State<VideoUploadItem> {
   late VideoPlayerController _controller;
 
   @override
@@ -413,6 +413,12 @@ class _VideoItemState extends State<VideoItem> {
       File(widget.path),
       videoPlayerOptions: VideoPlayerOptions(),
     )..initialize().then((_) => setState(() {}));
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   String get _duration {

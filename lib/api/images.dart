@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:piwigo_ng/api/api_error.dart';
+import 'package:piwigo_ng/models/image_model.dart';
 
 import 'api_client.dart';
 
@@ -19,23 +20,21 @@ Future<ApiResult<List<ImageModel>>> fetchImages(String albumID, int page) async 
     Response response = await ApiClient.get(queryParameters: queries);
 
     if (response.statusCode == 200) {
-      print(response.data);
       var jsonImages = json.decode(response.data)["result"]["images"];
-
       List<ImageModel> images = List<ImageModel>.from(
         jsonImages.map((image) => ImageModel.fromJson(image)),
       );
 
       return ApiResult<List<ImageModel>>(data: images);
     }
-    return ApiResult(error: ApiErrors.fetchImagesError);
   } on DioError catch (e) {
-    debugPrint(e.message);
-    return ApiResult(error: ApiErrors.fetchImagesError);
+    debugPrint('fetch images: ${e.message}');
+  } on Error catch (e) {
+    debugPrint('fetch images: ${e.stackTrace}');
   } catch (e) {
-    debugPrint('$e');
-    return ApiResult(error: ApiErrors.fetchImagesError);
+    debugPrint('fetch images: $e');
   }
+  return ApiResult(error: ApiErrors.fetchImagesError);
 }
 
 Future<ApiResult<List<ImageModel>>> searchImages(String searchQuery) async {
@@ -59,45 +58,13 @@ Future<ApiResult<List<ImageModel>>> searchImages(String searchQuery) async {
         jsonImages.map((image) => ImageModel.fromJson(image)),
       );
       return ApiResult<List<ImageModel>>(data: images);
-    } else {
-      return ApiResult(
-        error: ApiErrors.searchImagesError,
-      );
     }
-  } on DioError {
-    return ApiResult(
-      error: ApiErrors.searchImagesError,
-    );
+  } on DioError catch (e) {
+    debugPrint('search images: ${e.message}');
+  } on Error catch (e) {
+    debugPrint('search images: ${e.stackTrace}');
+  } catch (e) {
+    debugPrint('search images: $e');
   }
-}
-
-class ImageModel {
-  String id;
-  int width;
-  int height;
-  int hit;
-  String file;
-  String name;
-  String? comment;
-  String? dateCreation;
-  String? dateAvailable;
-  String? pageUrl;
-  String? elementUrl;
-  Map<String, dynamic> derivatives;
-  List<dynamic> categories;
-
-  ImageModel.fromJson(Map<String, dynamic> json)
-      : id = json['id'].toString(),
-        width = json['width'] ?? 0,
-        height = json['height'] ?? 0,
-        hit = json['hit'] ?? 0,
-        file = json['file'] ?? '',
-        name = json['name'] ?? '',
-        comment = json['comment'],
-        dateCreation = json['date_creation'],
-        dateAvailable = json['date_available'],
-        pageUrl = json['page_url'],
-        elementUrl = json['element_url'],
-        derivatives = json['derivatives'] ?? {},
-        categories = json['categories'] ?? [];
+  return ApiResult(error: ApiErrors.searchImagesError);
 }
