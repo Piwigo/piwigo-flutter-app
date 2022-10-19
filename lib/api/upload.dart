@@ -49,29 +49,32 @@ Future<List<Map<String, dynamic>>> uploadPhotos(
   String? password = await storage.read(key: 'SERVER_PASSWORD');
   try {
     for (var photo in photos) {
-      var compressedFile = await compressFile(photo);
-      if (compressedFile != null) {
-        Response? response = await uploadChunk(
-          photo: compressedFile,
-          category: category,
-          url: url,
-          username: username,
-          password: password,
-          info: info,
-          onProgress: (progress) {
-            debugPrint("$progress");
-          },
-        );
-        if (response != null) {
-          var data = json.decode(response.data);
-          if (data["stat"] != "fail") {
-            result.add({
-              "name": photo.name,
-              "filename": photo.path.split("/").last,
-              "url": data["result"]["element_url"],
-            });
-            uploadCompletedList.add(data["result"]["id"]);
-          }
+      File? compressedFile = await compressFile(photo);
+      if (compressedFile == null) {
+        compressedFile = File(photo.path);
+      }
+      // todo: upload video without chunk
+      Response? response = await uploadChunk(
+        photo: compressedFile,
+        category: category,
+        url: url,
+        username: username,
+        password: password,
+        info: info,
+        onProgress: (progress) {
+          debugPrint("$progress");
+        },
+      );
+      print(response);
+      if (response != null) {
+        var data = json.decode(response.data);
+        if (data["stat"] != "fail") {
+          result.add({
+            "name": photo.name,
+            "filename": photo.path.split("/").last,
+            "url": data["result"]["element_url"],
+          });
+          uploadCompletedList.add(data["result"]["id"]);
         }
       }
     }
@@ -79,7 +82,10 @@ Future<List<Map<String, dynamic>>> uploadPhotos(
   } on DioError catch (e) {
     _showUploadNotification(success: false);
     debugPrint(e.message);
+  } on Error catch (e) {
+    debugPrint(e.toString());
   }
+  if (uploadCompletedList.isEmpty) return [];
 
   try {
     await uploadCompleted(uploadCompletedList, int.parse(category));
@@ -131,17 +137,22 @@ Future<Response?> uploadChunk({
 }
 
 Future<File?> compressFile(XFile file) async {
-  final filePath = file.path;
-  var dir = await getTemporaryDirectory();
-  String filename = filePath.split('/').last;
-  final outPath = "${dir.path}/compressed_$filename";
+  try {
+    final filePath = file.path;
+    var dir = await getTemporaryDirectory();
+    String filename = filePath.split('/').last;
+    final outPath = "${dir.path}/compressed_$filename";
 
-  var result = await FlutterImageCompress.compressAndGetFile(
-    filePath,
-    outPath,
-    quality: 10,
-  );
-  return result;
+    var result = await FlutterImageCompress.compressAndGetFile(
+      filePath,
+      outPath,
+      quality: 10,
+    );
+    return result;
+  } catch (e) {
+    debugPrint(e.toString());
+  }
+  return null;
 }
 
 Future<Map<String, dynamic>> uploadCompleted(List<int> imageId, int categoryId) async {

@@ -1,3 +1,4 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
@@ -42,14 +43,8 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
   @override
   initState() {
     _nbImages = widget.album.nbImages;
+    _data = Future.wait([fetchAlbums(widget.album.id), fetchImages(widget.album.id, 0)]);
     super.initState();
-    _getData();
-  }
-
-  void _getData() {
-    setState(() {
-      _data = Future.wait([fetchAlbums(widget.album.id), fetchImages(widget.album.id, 0)]);
-    });
   }
 
   List<AlbumModel> _parseAlbums(List<AlbumModel> albums) {
@@ -96,15 +91,19 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
 
   Future<void> _onPickImages() async {
     try {
-      final ImagePicker picker = ImagePicker();
-      final List<XFile>? images = await picker.pickMultiImage();
-      if (images != null && images.isNotEmpty) {
+      final FilePickerResult? result = await FilePicker.platform.pickFiles(
+        allowMultiple: true,
+        type: FileType.media,
+      );
+      if (result == null) return;
+      final List<XFile> images = result.files.map<XFile>((e) {
+        return XFile(e.path!, name: e.name, bytes: e.bytes);
+      }).toList();
+      if (images.isNotEmpty) {
         Navigator.of(context).pushNamed(UploadViewPage.routeName, arguments: {
           'images': images,
           'category': widget.album.id,
-        }).whenComplete(() {
-          setState(() {});
-        });
+        }).then((value) => _refreshController.requestRefresh());
       }
     } catch (e) {
       debugPrint('${e.toString()}');
@@ -133,9 +132,7 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
         Navigator.of(context).pushNamed(UploadViewPage.routeName, arguments: {
           'images': [image],
           'category': widget.album.id,
-        }).whenComplete(() {
-          setState(() {});
-        });
+        }).then((value) => _refreshController.requestRefresh());
       }
     } catch (e) {
       debugPrint('${e.toString()}');

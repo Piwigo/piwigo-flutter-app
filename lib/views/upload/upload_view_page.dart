@@ -1,11 +1,15 @@
 import 'dart:io';
 
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:mime_type/mime_type.dart';
 import 'package:piwigo_ng/components/buttons/animated_app_button.dart';
 import 'package:piwigo_ng/components/fields/app_field.dart';
 import 'package:piwigo_ng/components/sections/form_section.dart';
+import 'package:piwigo_ng/utils/resources.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
+import 'package:video_player/video_player.dart';
 
 import '../../api/upload.dart';
 import '../../models/tag_model.dart';
@@ -23,7 +27,7 @@ class UploadViewPage extends StatefulWidget {
 }
 
 class _UploadGalleryViewPage extends State<UploadViewPage> {
-  final _listKey = GlobalKey<AnimatedListState>();
+  final _tagListKey = GlobalKey<AnimatedListState>();
   final ImagePicker _picker = ImagePicker();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _descController = TextEditingController();
@@ -56,24 +60,19 @@ class _UploadGalleryViewPage extends State<UploadViewPage> {
     super.dispose();
   }
 
-  Map<String, dynamic> get _imagesInfo {
-    List<int> tagIds = _tags.map<int>((tag) {
-      return tag.id;
-    }).toList();
-    return {
-      'name': _nameController.text,
-      'comment': _descController.text,
-      'tag_ids': tagIds,
-      'level': _privacyLevel,
-    };
-  }
-
   Future<void> _addFiles() async {
     try {
-      final List<XFile>? pickerResult = await _picker.pickMultiImage();
-      if (pickerResult != null && pickerResult.isNotEmpty) {
+      final FilePickerResult? result = await FilePicker.platform.pickFiles(
+        allowMultiple: true,
+        type: FileType.media,
+      );
+      if (result == null) return;
+      final List<XFile> images = result.files.map<XFile>((e) {
+        return XFile(e.path!, name: e.name, bytes: e.bytes);
+      }).toList();
+      if (images.isNotEmpty) {
         setState(() {
-          widget.imageData.addAll(pickerResult);
+          widget.imageData.addAll(images);
         });
       }
     } catch (e) {
@@ -94,6 +93,19 @@ class _UploadGalleryViewPage extends State<UploadViewPage> {
     }
   }
 
+  Future<void> _takeVideo() async {
+    try {
+      final XFile? image = await _picker.pickVideo(source: ImageSource.camera);
+      if (image != null) {
+        setState(() {
+          widget.imageData.add(image);
+        });
+      }
+    } catch (e) {
+      debugPrint('Pick image error ${e.toString()}');
+    }
+  }
+
   Future<void> _onRemoveFile(int index) async {
     setState(() {
       widget.imageData.removeAt(index);
@@ -102,7 +114,13 @@ class _UploadGalleryViewPage extends State<UploadViewPage> {
 
   Future<void> _onUpload() async {
     _btnController.start();
-    var result = await uploadPhotos(widget.imageData, widget.category, info: _imagesInfo);
+    List<int> tagIds = _tags.map<int>((tag) => tag.id).toList();
+    var result = await uploadPhotos(widget.imageData, widget.category, info: {
+      'name': _nameController.text,
+      'comment': _descController.text,
+      'tag_ids': tagIds,
+      'level': _privacyLevel,
+    });
     if (!mounted) return;
     if (result.isEmpty) {
       _btnController.error();
@@ -153,7 +171,7 @@ class _UploadGalleryViewPage extends State<UploadViewPage> {
                         onTap: _addFiles,
                         child: Padding(
                           padding: const EdgeInsets.all(8),
-                          child: Icon(Icons.add_to_photos, color: Theme.of(context).iconTheme.color),
+                          child: Icon(Icons.add_photo_alternate),
                         ),
                       ),
                       GestureDetector(
@@ -161,7 +179,15 @@ class _UploadGalleryViewPage extends State<UploadViewPage> {
                         onTap: _takePhoto,
                         child: Padding(
                           padding: const EdgeInsets.all(8),
-                          child: Icon(Icons.photo_camera_rounded, color: Theme.of(context).iconTheme.color),
+                          child: Icon(Icons.photo_camera_rounded),
+                        ),
+                      ),
+                      GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: _takeVideo,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8),
+                          child: Icon(Icons.video_camera_back),
                         ),
                       ),
                     ],
@@ -178,19 +204,33 @@ class _UploadGalleryViewPage extends State<UploadViewPage> {
                           itemBuilder: (context, index) {
                             final File file = File(widget.imageData[index].path);
                             return Stack(
-                              fit: StackFit.expand,
                               children: [
-                                Padding(
-                                  padding: const EdgeInsets.all(4.0),
-                                  child: Image.file(
-                                    file,
-                                    fit: BoxFit.cover,
-                                    scale: 0.7,
-                                    cacheHeight: 128,
-                                    cacheWidth: 128,
-                                    errorBuilder: (context, object, stacktrace) => Center(
-                                      child: Icon(Icons.image_not_supported),
-                                    ),
+                                Positioned.fill(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(4.0),
+                                    child: Builder(builder: (context) {
+                                      List<String>? mimeType = mime(file.path.split('/').last)?.split('/');
+                                      if (mimeType?.first == 'image') {
+                                        return Image.file(
+                                          file,
+                                          fit: BoxFit.cover,
+                                          scale: 0.7,
+                                          cacheHeight: 128,
+                                          cacheWidth: 128,
+                                          errorBuilder: (context, object, stacktrace) => Center(
+                                            child: Icon(Icons.image_not_supported),
+                                          ),
+                                        );
+                                      }
+                                      if (mimeType?.first == 'video') {
+                                        return VideoItem(
+                                          path: file.path,
+                                        );
+                                      }
+                                      return const Center(
+                                        child: Icon(Icons.image_not_supported),
+                                      );
+                                    }),
                                   ),
                                 ),
                                 Positioned(
@@ -250,7 +290,7 @@ class _UploadGalleryViewPage extends State<UploadViewPage> {
                       child: AnimatedList(
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
-                        key: _listKey,
+                        key: _tagListKey,
                         initialItemCount: _tags.length,
                         itemBuilder: (BuildContext context, int index, Animation<double> animation) {
                           if (_tags.isEmpty) return const SizedBox();
@@ -339,7 +379,7 @@ class _UploadGalleryViewPage extends State<UploadViewPage> {
               Text(tag.name, style: Theme.of(context).textTheme.subtitle1),
               InkWell(
                 onTap: () async {
-                  _listKey.currentState?.removeItem(_tags.indexOf(tag), (context, animation) => tagItem(tag, animation));
+                  _tagListKey.currentState?.removeItem(_tags.indexOf(tag), (context, animation) => tagItem(tag, animation));
                   setState(() {
                     _tags.remove(tag);
                   });
@@ -351,5 +391,82 @@ class _UploadGalleryViewPage extends State<UploadViewPage> {
         ),
       ),
     );
+  }
+}
+
+class VideoItem extends StatefulWidget {
+  const VideoItem({Key? key, required this.path}) : super(key: key);
+
+  final String path;
+
+  @override
+  State<VideoItem> createState() => _VideoItemState();
+}
+
+class _VideoItemState extends State<VideoItem> {
+  late VideoPlayerController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = VideoPlayerController.file(
+      File(widget.path),
+      videoPlayerOptions: VideoPlayerOptions(),
+    )..initialize().then((_) => setState(() {}));
+  }
+
+  String get _duration {
+    final Duration duration = _controller.value.duration;
+    int hours = duration.inHours;
+    int minutes = (duration - Duration(hours: hours)).inMinutes;
+    int seconds = (duration - Duration(hours: hours) - Duration(minutes: minutes)).inSeconds;
+    return '${hours > 0 ? '$hours:' : ''}${minutes < 10 ? '0$minutes' : '$minutes'}:${seconds < 10 ? '0$seconds' : '$seconds'}';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_controller.value.hasError) {
+      return Center(
+        child: Icon(Icons.image_not_supported),
+      );
+    }
+    if (!_controller.value.isInitialized) {
+      return Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+    return LayoutBuilder(builder: (context, constraints) {
+      return Stack(
+        alignment: Alignment.center,
+        fit: StackFit.expand,
+        children: [
+          ClipRect(
+            child: FittedBox(
+              fit: BoxFit.cover,
+              child: SizedBox(
+                width: _controller.value.size.width,
+                height: _controller.value.size.height,
+                child: AspectRatio(
+                  aspectRatio: _controller.value.aspectRatio,
+                  child: VideoPlayer(_controller),
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: 2,
+            left: 2,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+              decoration: BoxDecoration(borderRadius: BorderRadius.circular(5), color: AppColors.black.withOpacity(0.7)),
+              child: Text(
+                _duration,
+                style: TextStyle(color: AppColors.white, fontSize: 10, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ),
+        ],
+      );
+    });
   }
 }

@@ -19,6 +19,7 @@ Future<ApiResult<List<ImageModel>>> fetchImages(String albumID, int page) async 
     Response response = await ApiClient.get(queryParameters: queries);
 
     if (response.statusCode == 200) {
+      print(response.data);
       var jsonImages = json.decode(response.data)["result"]["images"];
 
       List<ImageModel> images = List<ImageModel>.from(
@@ -31,7 +32,7 @@ Future<ApiResult<List<ImageModel>>> fetchImages(String albumID, int page) async 
   } on DioError catch (e) {
     debugPrint(e.message);
     return ApiResult(error: ApiErrors.fetchImagesError);
-  } on Error catch (e) {
+  } catch (e) {
     debugPrint('$e');
     return ApiResult(error: ApiErrors.fetchImagesError);
   }
