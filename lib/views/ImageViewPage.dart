@@ -292,7 +292,7 @@ class _ImageViewPageState extends State<ImageViewPage> with SingleTickerProvider
             itemBuilder: (context, index) {
               var image = _images[index];
               String mimeType = mime(image['element_url']);
-              if(mimeType.startsWith('video')) {
+              if(mimeType != null && mimeType.startsWith('video')) {
                 return _displayVideo(image);
               }
               return _displayImage(image);

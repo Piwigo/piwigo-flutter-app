@@ -3,7 +3,7 @@ description: A Piwigo Android application
 
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
-version: 1.2.0+120
+version: 1.2.1+121
 
 environment:
   sdk: ">=2.7.0 <3.0.0"
@@ -34,7 +34,7 @@ dependencies:
   flutter_local_notifications: ^9.1.2
   flutter_image_compress: ^1.1.0
   share_plus: ^4.4.0
-  open_file: ^3.2.1
+  # open_file: ^3.2.1
 
   # File pickers :
   image_picker: ^0.8.4+4

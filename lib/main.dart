@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:open_file/open_file.dart';
 import 'package:piwigo_ng/services/LocaleProvider.dart';
 import 'package:piwigo_ng/services/ThemeProvider.dart';
 import 'package:piwigo_ng/services/UploadStatusProvider.dart';
@@ -12,7 +11,6 @@ import 'package:provider/provider.dart';
 import 'package:piwigo_ng/views/LoginViewPage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 
 void main() async {
@@ -56,8 +54,8 @@ void initLocalNotifications() {
 
 Future<void> onSelectNotification(String payload) async {
   if(payload == null) return;
-  OpenResult result = await OpenFile.open(payload);
-  debugPrint(result.message);
+  // OpenResult result = await OpenFile.open(payload);
+  // debugPrint(result.message);
 }
 
 
