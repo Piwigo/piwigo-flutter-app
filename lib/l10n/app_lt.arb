@@ -216,18 +216,18 @@
             "album": {}
         }
     },
-    "moveCategory_message": "Are you sure you want to move {album} into the album {parent} ?",
+    "moveCategory_message": "Ar tikrai norite perkelti {album} į albumą {parent}?",
     "@moveCategory_message": {
         "placeholders": {
             "album": {},
             "parent": {}
         }
     },
-    "moveCategoryHUD_moving": "Moving Album…",
-    "moveCategoryHUD_moved": "Album Moved",
-    "moveCategoryError_title": "Move Fail",
-    "moveCategoryError_message": "Failed to move your album",
-    "categorySelection_setThumbnail": "Please select the album which will use the photo {photo} as a thumbnail.",
+    "moveCategoryHUD_moving": "Perkeliamas albumas…",
+    "moveCategoryHUD_moved": "Albumas perkeltas",
+    "moveCategoryError_title": "Perkelti nepavyko",
+    "moveCategoryError_message": "Nepavyko perkelti albumo",
+    "categorySelection_setThumbnail": "Pasirinkite albumą, kuriame nuotrauka {photo} bus naudojama kaip miniatiūra.",
     "@categorySelection_setThumbnail": {
         "placeholders": {
             "photo": {}
