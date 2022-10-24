@@ -4,6 +4,13 @@ class AppShadows {
   static final List<Shadow> icon = [
     Shadow(color: Colors.black26, blurRadius: 7, offset: Offset(1, 1)),
   ];
+  static final List<BoxShadow> dragStack = [
+    BoxShadow(
+      color: Colors.black26,
+      blurRadius: 8,
+      offset: const Offset(-1, -1),
+    ),
+  ];
 }
 
 class AppColors {

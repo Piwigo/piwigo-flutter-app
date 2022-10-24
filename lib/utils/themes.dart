@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:piwigo_ng/utils/resources.dart';
 
 final ThemeData lightTheme = ThemeData.light().copyWith(
@@ -46,7 +45,7 @@ final ThemeData lightTheme = ThemeData.light().copyWith(
     buttonColor: AppColors.accent,
   ),
   inputDecorationTheme: InputDecorationTheme(
-    prefixStyle: GoogleFonts.roboto(
+    prefixStyle: TextStyle(
       fontSize: 14,
       fontWeight: FontWeight.normal,
       color: AppColors.fieldDark,
@@ -54,13 +53,13 @@ final ThemeData lightTheme = ThemeData.light().copyWith(
     prefixIconColor: AppColors.prefix,
     fillColor: AppColors.fieldLight,
     focusColor: AppColors.accent,
-    hintStyle: GoogleFonts.roboto(
+    hintStyle: TextStyle(
       fontSize: 14,
       fontStyle: FontStyle.italic,
       fontWeight: FontWeight.normal,
       color: AppColors.disabled,
     ),
-    labelStyle: GoogleFonts.roboto(
+    labelStyle: TextStyle(
       fontSize: 14,
       fontWeight: FontWeight.normal,
       color: AppColors.textGrey,
@@ -95,46 +94,46 @@ final ThemeData lightTheme = ThemeData.light().copyWith(
   ),
   splashFactory: NoSplash.splashFactory,
   textTheme: TextTheme(
-    labelSmall: GoogleFonts.roboto(
+    labelSmall: TextStyle(
       fontSize: 11,
       color: AppColors.black,
       letterSpacing: 0,
     ),
-    bodySmall: GoogleFonts.roboto(
+    bodySmall: TextStyle(
       fontSize: 14,
       color: const Color(0x80000000),
     ),
-    bodyMedium: GoogleFonts.roboto(
+    bodyMedium: TextStyle(
       fontSize: 14,
       color: AppColors.black,
       fontWeight: FontWeight.normal,
     ),
-    bodyLarge: GoogleFonts.roboto(
+    bodyLarge: TextStyle(
       fontSize: 14,
       color: AppColors.black,
       fontWeight: FontWeight.w500,
     ),
-    titleSmall: GoogleFonts.roboto(
+    titleSmall: TextStyle(
       fontSize: 16,
       color: AppColors.black,
       fontWeight: FontWeight.normal,
     ),
-    titleMedium: GoogleFonts.roboto(
+    titleMedium: TextStyle(
       fontSize: 16,
       color: AppColors.black,
       fontWeight: FontWeight.w500,
     ),
-    titleLarge: GoogleFonts.roboto(
+    titleLarge: TextStyle(
       fontSize: 18,
       color: AppColors.accent,
       fontWeight: FontWeight.w500,
     ),
-    displaySmall: GoogleFonts.roboto(
+    displaySmall: TextStyle(
       fontSize: 16,
       color: AppColors.white,
-      fontWeight: FontWeight.w500,
+      fontWeight: FontWeight.bold,
     ),
-    displayMedium: GoogleFonts.roboto(
+    displayMedium: TextStyle(
       fontSize: 20,
       color: AppColors.black,
       fontWeight: FontWeight.normal,
@@ -181,7 +180,7 @@ final ThemeData darkTheme = ThemeData.dark().copyWith(
     buttonColor: AppColors.accent,
   ),
   inputDecorationTheme: InputDecorationTheme(
-    prefixStyle: GoogleFonts.roboto(
+    prefixStyle: TextStyle(
       fontSize: 14,
       fontWeight: FontWeight.normal,
       color: AppColors.white,
@@ -189,13 +188,13 @@ final ThemeData darkTheme = ThemeData.dark().copyWith(
     prefixIconColor: AppColors.white,
     fillColor: AppColors.fieldDark,
     focusColor: AppColors.accent,
-    hintStyle: GoogleFonts.roboto(
+    hintStyle: TextStyle(
       fontSize: 14,
       fontStyle: FontStyle.italic,
       fontWeight: FontWeight.normal,
       color: AppColors.disabled,
     ),
-    labelStyle: GoogleFonts.roboto(
+    labelStyle: TextStyle(
       fontSize: 14,
       fontWeight: FontWeight.normal,
       color: AppColors.white,
@@ -230,39 +229,39 @@ final ThemeData darkTheme = ThemeData.dark().copyWith(
   ),
   splashFactory: NoSplash.splashFactory,
   textTheme: TextTheme(
-    labelSmall: GoogleFonts.roboto(
+    labelSmall: TextStyle(
       fontSize: 11,
       color: AppColors.white,
       letterSpacing: 0,
     ),
-    bodySmall: GoogleFonts.roboto(
+    bodySmall: TextStyle(
       fontSize: 14,
       color: const Color(0x80FFFFFF),
     ),
-    bodyMedium: GoogleFonts.roboto(
+    bodyMedium: TextStyle(
       fontSize: 14,
       color: AppColors.white,
       fontWeight: FontWeight.normal,
     ),
-    bodyLarge: GoogleFonts.roboto(
+    bodyLarge: TextStyle(
       fontSize: 14,
       color: AppColors.white,
       fontWeight: FontWeight.w500,
     ),
-    titleMedium: GoogleFonts.roboto(
+    titleMedium: TextStyle(
       fontSize: 16,
       color: AppColors.white,
       fontWeight: FontWeight.w500,
     ),
-    titleLarge: GoogleFonts.roboto(
+    titleLarge: TextStyle(
       fontSize: 18,
       color: AppColors.accent,
       fontWeight: FontWeight.w500,
     ),
-    displaySmall: GoogleFonts.roboto(
+    displaySmall: TextStyle(
       fontSize: 16,
       color: AppColors.white,
-      fontWeight: FontWeight.w500,
+      fontWeight: FontWeight.bold,
     ),
   ),
 );

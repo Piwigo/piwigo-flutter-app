@@ -27,6 +27,12 @@ class ImageModel {
         elementUrl = json['element_url'],
         derivatives = Derivatives.fromJson(json['derivatives']),
         categories = json['categories'] ?? [];
+
+  @override
+  operator ==(other) => other is ImageModel && id == other.id;
+
+  @override
+  int get hashCode => Object.hash(id, name);
 }
 
 class Derivatives {

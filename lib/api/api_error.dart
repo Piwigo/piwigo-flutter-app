@@ -6,6 +6,7 @@ enum ApiErrors {
   fetchImagesError,
   searchImagesError,
   getStatusError,
+  getInfoError,
   getMethodsError,
 }
 

@@ -68,6 +68,7 @@ class SettingsSectionItem extends StatelessWidget {
     this.color,
     this.disabled = false,
     this.expandedChild = false,
+    this.padding,
   }) : super(key: key);
 
   final Widget child;
@@ -75,11 +76,12 @@ class SettingsSectionItem extends StatelessWidget {
   final Color? color;
   final bool disabled;
   final bool expandedChild;
+  final EdgeInsetsGeometry? padding;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8),
+      padding: padding ?? const EdgeInsets.symmetric(horizontal: 8),
       decoration: BoxDecoration(
         color: color,
       ),
@@ -122,10 +124,12 @@ class SettingsSectionItemInfo extends StatelessWidget {
     Key? key,
     this.text,
     this.title,
+    this.child,
   }) : super(key: key);
 
   final String? title;
   final String? text;
+  final Widget? child;
 
   @override
   Widget build(BuildContext context) {
@@ -133,11 +137,16 @@ class SettingsSectionItemInfo extends StatelessWidget {
       title: title,
       child: Padding(
         padding: const EdgeInsets.only(right: 8.0),
-        child: Text(
-          text ?? "",
-          textAlign: TextAlign.end,
-          style: Theme.of(context).textTheme.bodySmall,
-        ),
+        child: Builder(builder: (context) {
+          if (child != null) {
+            return child!;
+          }
+          return Text(
+            text ?? "",
+            textAlign: TextAlign.end,
+            style: Theme.of(context).textTheme.bodySmall,
+          );
+        }),
       ),
     );
   }
@@ -222,8 +231,7 @@ class SettingsSectionItemSlider extends StatefulWidget {
   final Function(double) onChanged;
 
   @override
-  State<SettingsSectionItemSlider> createState() =>
-      _SettingsSectionItemSliderState();
+  State<SettingsSectionItemSlider> createState() => _SettingsSectionItemSliderState();
 }
 
 class _SettingsSectionItemSliderState extends State<SettingsSectionItemSlider> {
@@ -306,8 +314,7 @@ class _SettingsSectionItemSliderState extends State<SettingsSectionItemSlider> {
                 max: widget.max,
                 value: widget.value,
                 onChanged: widget.onChanged,
-                divisions:
-                    widget.divisions ?? (widget.max - widget.min).round(),
+                divisions: widget.divisions ?? (widget.max - widget.min).round(),
               ),
             ),
             if (widget.text != null)
@@ -316,8 +323,7 @@ class _SettingsSectionItemSliderState extends State<SettingsSectionItemSlider> {
                 child: Padding(
                   padding: const EdgeInsets.only(right: 8.0),
                   child: SizedBox(
-                    width: widget.textWidth ??
-                        widget.max.toString().length * 2 * 6,
+                    width: widget.textWidth ?? widget.max.toString().length * 2 * 6,
                     child: Text(
                       widget.text!,
                       textAlign: TextAlign.end,
@@ -386,8 +392,7 @@ class SettingsSectionItemField extends StatefulWidget {
   final Function(String) onChanged;
 
   @override
-  State<SettingsSectionItemField> createState() =>
-      _SettingsSectionItemFieldState();
+  State<SettingsSectionItemField> createState() => _SettingsSectionItemFieldState();
 }
 
 class _SettingsSectionItemFieldState extends State<SettingsSectionItemField> {
@@ -419,8 +424,10 @@ class SettingsSectionButton extends StatelessWidget {
     this.onPressed,
     this.child,
     this.color,
+    this.padding,
   }) : super(key: key);
 
+  final EdgeInsetsGeometry? padding;
   final Function()? onPressed;
   final Widget? child;
   final Color? color;
@@ -430,6 +437,7 @@ class SettingsSectionButton extends StatelessWidget {
     return GestureDetector(
       onTap: onPressed,
       child: SettingsSectionItem(
+        padding: padding,
         color: color,
         child: child ?? const SizedBox(),
       ),

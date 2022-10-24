@@ -44,7 +44,7 @@ class _LoginFormViewState extends State<LoginFormView> {
   Future<void> _initFields() async {
     FlutterSecureStorage storage = const FlutterSecureStorage();
     String? url = await storage.read(key: 'SERVER_URL');
-    if (url == null) return;
+    if (url == null || url.isEmpty) return;
     url = url.split('//').last;
     url = url.substring(0, url.lastIndexOf('/'));
     _urlController.text = url;

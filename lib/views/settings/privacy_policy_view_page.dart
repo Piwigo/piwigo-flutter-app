@@ -4,7 +4,7 @@ import 'package:webview_flutter/webview_flutter.dart';
 class PrivacyPolicyViewPage extends StatefulWidget {
   const PrivacyPolicyViewPage({Key? key}) : super(key: key);
 
-  static const String routeName = '/privacy';
+  static const String routeName = '/settings/privacy';
 
   @override
   State<PrivacyPolicyViewPage> createState() => _PrivacyPolicyViewPageState();

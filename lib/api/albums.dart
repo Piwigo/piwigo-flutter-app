@@ -3,12 +3,13 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:piwigo_ng/api/api_error.dart';
+import 'package:piwigo_ng/models/album_model.dart';
 import 'package:piwigo_ng/services/shared_preferences_service.dart';
 
 import 'api_client.dart';
 
-Future<ApiResult<List<AlbumModel>>> fetchAlbums(String albumID) async {
-  Map<String, String> queries = {
+Future<ApiResult<List<AlbumModel>>> fetchAlbums(int albumID) async {
+  Map<String, dynamic> queries = {
     'format': 'json',
     'method': 'pwg.categories.getList',
     'cat_id': albumID,
@@ -32,8 +33,8 @@ Future<ApiResult<List<AlbumModel>>> fetchAlbums(String albumID) async {
   } on DioError catch (e) {
     debugPrint(e.message);
     return ApiResult(error: ApiErrors.fetchAlbumsError);
-  } on Error catch (e) {
-    debugPrint("${e.stackTrace}");
+  } catch (e) {
+    debugPrint("$e");
     return ApiResult(error: ApiErrors.fetchAlbumsError);
   }
 }
@@ -55,42 +56,8 @@ Future<ApiResult<Map<String, dynamic>>> getAlbumList() async {
   } on DioError catch (e) {
     debugPrint(e.message);
     return ApiResult(error: ApiErrors.fetchAlbumListError);
+  } catch (e) {
+    debugPrint("$e");
+    return ApiResult(error: ApiErrors.fetchAlbumListError);
   }
-}
-
-class AlbumModel {
-  String id;
-  String name;
-  String? comment;
-  String url;
-  String? urlRepresentative;
-  String? permalink;
-  String? status;
-  String upperCategories;
-  String? idUpperCategory;
-  String globalRank;
-  int nbImages;
-  int nbTotalImages;
-  int nbCategories;
-  String? idRepresentative;
-  String? dateLast;
-  String? dateLastMax;
-
-  AlbumModel.fromJson(Map<String, dynamic> json)
-      : id = json['id'].toString(),
-        name = json['name'] ?? '',
-        comment = json['comment'],
-        url = json['url'],
-        urlRepresentative = json['tn_url'],
-        permalink = json['permalink'],
-        status = json['status'],
-        upperCategories = json['uppercats'],
-        idUpperCategory = json['id_uppercat'],
-        globalRank = json['global_rank'],
-        nbImages = json['nb_images'] ?? 0,
-        nbTotalImages = json['total_nb_images'] ?? 0,
-        nbCategories = json['nb_categories'] ?? 0,
-        idRepresentative = json['representative_picture_id'],
-        dateLast = json['date_last'],
-        dateLastMax = json['max_date_last'];
 }

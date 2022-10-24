@@ -11,8 +11,7 @@ import 'package:piwigo_ng/views/album/root_album_view_page.dart';
 import 'package:piwigo_ng/views/authentication/login_view_page.dart';
 import 'package:piwigo_ng/views/image/image_search_view_page.dart';
 import 'package:piwigo_ng/views/image/image_view_page.dart';
-import 'package:piwigo_ng/views/settings/privacy_policy_view_page.dart';
-import 'package:piwigo_ng/views/settings/settings_view_page.dart';
+import 'package:piwigo_ng/views/settings/settings_pages.dart';
 import 'package:piwigo_ng/views/unknown_route_page.dart';
 import 'package:piwigo_ng/views/upload/upload_view_page.dart';
 
@@ -72,7 +71,17 @@ Route<dynamic> generateRoute(RouteSettings settings) {
   if (settings.arguments != null) {
     arguments = settings.arguments as Map<String, dynamic>;
   }
-  switch (settings.name) {
+
+  if (settings.name == null) {
+    debugPrint("no route name");
+    return MaterialPageRoute(
+      builder: (_) => UnknownRoutePage(route: settings),
+      settings: settings,
+    );
+  }
+  Iterable<String> routePath = settings.name!.split('/').where((path) => path != '');
+
+  switch ('/${routePath.isEmpty ? '' : routePath.first}') {
     case LoginViewPage.routeName:
       return MaterialPageRoute(
         builder: (_) => const LoginViewPage(),
@@ -81,7 +90,7 @@ Route<dynamic> generateRoute(RouteSettings settings) {
     case RootAlbumViewPage.routeName:
       return MaterialPageRoute(
         builder: (_) => RootAlbumViewPage(
-          albumId: arguments['albumId'] ?? "0",
+          albumId: arguments['albumId'] ?? 0,
           isAdmin: arguments['isAdmin'] ?? false,
         ),
         settings: settings,
@@ -97,16 +106,6 @@ Route<dynamic> generateRoute(RouteSettings settings) {
     case ImageSearchViewPage.routeName:
       return SlideUpPageRoute(
         page: const ImageSearchViewPage(),
-        settings: settings,
-      );
-    case SettingsViewPage.routeName:
-      return MaterialPageRoute(
-        builder: (_) => const SettingsViewPage(),
-        settings: settings,
-      );
-    case PrivacyPolicyViewPage.routeName:
-      return MaterialPageRoute(
-        builder: (_) => const PrivacyPolicyViewPage(),
         settings: settings,
       );
     case UploadViewPage.routeName:
@@ -126,6 +125,8 @@ Route<dynamic> generateRoute(RouteSettings settings) {
         ),
         settings: settings,
       );
+    case '/settings':
+      return generateSettingsRoutes(settings);
     default:
       return MaterialPageRoute(
         builder: (_) => UnknownRoutePage(route: settings),

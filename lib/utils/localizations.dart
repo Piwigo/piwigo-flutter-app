@@ -48,54 +48,54 @@ Map<int, String> get albumSort => {
 
 String thumbnailSize(String size) {
   switch (size) {
-    case "square":
+    case 'square':
       return appStrings.thumbnailSizeSquare;
-    case "thumb":
+    case 'thumb':
       return appStrings.thumbnailSizeThumbnail;
-    case "2small":
+    case '2small':
       return appStrings.thumbnailSizeXXSmall;
-    case "xsmall":
+    case 'xsmall':
       return appStrings.thumbnailSizeXSmall;
-    case "small":
+    case 'small':
       return appStrings.thumbnailSizeSmall;
-    case "medium":
+    case 'medium':
       return appStrings.thumbnailSizeMedium;
-    case "large":
+    case 'large':
       return appStrings.thumbnailSizeLarge;
-    case "xlarge":
+    case 'xlarge':
       return appStrings.thumbnailSizeXLarge;
-    case "xxlarge":
+    case 'xxlarge':
       return appStrings.thumbnailSizeXXLarge;
-    case "full":
+    case 'full':
       return appStrings.thumbnailSizexFullRes;
     default:
-      return "null";
+      return 'null';
   }
 }
 
 String photoSize(String size) {
   switch (size) {
-    case "square":
+    case 'square':
       return appStrings.imageSizeSquare;
-    case "thumb":
+    case 'thumb':
       return appStrings.imageSizeThumbnail;
-    case "2small":
+    case '2small':
       return appStrings.imageSizeXXSmall;
-    case "xsmall":
+    case 'xsmall':
       return appStrings.imageSizeXSmall;
-    case "small":
+    case 'small':
       return appStrings.imageSizeSmall;
-    case "medium":
+    case 'medium':
       return appStrings.imageSizeMedium;
-    case "large":
+    case 'large':
       return appStrings.imageSizeLarge;
-    case "xlarge":
+    case 'xlarge':
       return appStrings.imageSizeXLarge;
-    case "xxlarge":
+    case 'xxlarge':
       return appStrings.imageSizeXXLarge;
-    case "full":
+    case 'full':
       return appStrings.imageSizexFullRes;
     default:
-      return "null";
+      return 'null';
   }
 }

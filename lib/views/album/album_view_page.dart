@@ -4,8 +4,11 @@ import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:piwigo_ng/api/albums.dart';
 import 'package:piwigo_ng/api/api_error.dart';
-import 'package:piwigo_ng/components/cards/image_card.dart';
 import 'package:piwigo_ng/components/modals/choose_camera_picker_modal.dart';
+import 'package:piwigo_ng/components/popup_list_item.dart';
+import 'package:piwigo_ng/components/scroll_widgets/album_grid_view.dart';
+import 'package:piwigo_ng/components/scroll_widgets/image_grid_view.dart';
+import 'package:piwigo_ng/models/album_model.dart';
 import 'package:piwigo_ng/models/image_model.dart';
 import 'package:piwigo_ng/utils/localizations.dart';
 import 'package:piwigo_ng/views/image/image_view_page.dart';
@@ -13,7 +16,6 @@ import 'package:piwigo_ng/views/upload/upload_view_page.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import '../../api/images.dart';
-import '../../components/cards/album_card.dart';
 
 class AlbumViewPage extends StatefulWidget {
   const AlbumViewPage({
@@ -39,14 +41,13 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
   late final Future<List<ApiResult>> _data;
   List<ImageModel> _imageList = [];
   List<AlbumModel> _albumList = [];
+  List<ImageModel> _selectedList = [];
 
-  int _nbImages = 0;
   int _page = 0;
 
   @override
   initState() {
     _currentAlbum = widget.album;
-    _nbImages = widget.album.nbImages;
     _data = Future.wait([fetchAlbums(widget.album.id), fetchImages(widget.album.id, 0)]);
     super.initState();
   }
@@ -63,7 +64,7 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
   }
 
   Future<void> _loadMoreImages() async {
-    if (_nbImages <= _imageList.length) return;
+    if (_currentAlbum.nbImages <= _imageList.length) return;
     ApiResult<List<ImageModel>> result = await fetchImages(widget.album.id, _page + 1);
     if (result.hasError || !result.hasData) {
       _refreshController.loadFailed();
@@ -86,11 +87,16 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
       return _refreshController.refreshCompleted();
     }
     setState(() {
+      _page = 0;
       _albumList = _parseAlbums(albumsResult.data!);
       _imageList = imagesResult.data!;
     });
     _refreshController.refreshCompleted();
   }
+
+  void _onEdit() {}
+  void _onMove() {}
+  void _onDelete() {}
 
   Future<void> _onAddAlbum() async {
     Navigator.of(context).pushNamed(UploadViewPage.routeName, arguments: {
@@ -156,7 +162,7 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
         child: SmartRefresher(
           controller: _refreshController,
           scrollController: _scrollController,
-          enablePullUp: _imageList.isNotEmpty && widget.album.nbImages > _imageList.length,
+          enablePullUp: _imageList.isNotEmpty && _currentAlbum.nbImages > _imageList.length,
           onLoading: _loadMoreImages,
           onRefresh: _onRefresh,
           header: MaterialClassicHeader(
@@ -166,14 +172,7 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
           child: CustomScrollView(
             controller: _scrollController,
             slivers: [
-              SliverAppBar(
-                titleSpacing: 0,
-                title: Text(
-                  widget.album.name,
-                  style: Theme.of(context).appBarTheme.titleTextStyle,
-                ),
-                pinned: true,
-              ),
+              _appBar,
               SliverToBoxAdapter(
                 child: FutureBuilder<List<ApiResult>>(
                   future: _data,
@@ -210,11 +209,73 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
           ),
         ),
       ),
-      floatingActionButton: widget.isAdmin ? _adminActionsSpeedDial : null,
+      bottomNavigationBar: AnimatedSlide(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+        offset: _selectedList.isEmpty ? Offset(0, 1) : Offset.zero,
+        child: _bottomBar,
+      ),
+      floatingActionButton: _adminActionsSpeedDial,
     );
   }
 
-  Widget get _adminActionsSpeedDial {
+  Widget get _appBar {
+    return SliverAppBar(
+      pinned: true,
+      titleSpacing: 0,
+      title: Text(
+        widget.album.name,
+        style: Theme.of(context).appBarTheme.titleTextStyle,
+      ),
+      actions: [
+        PopupMenuButton(
+          position: PopupMenuPosition.under,
+          itemBuilder: (context) => [
+            if (_selectedList.isNotEmpty)
+              PopupMenuItem(
+                onTap: () => setState(() {
+                  _selectedList.clear();
+                }),
+                child: PopupListItem(
+                  icon: Icons.cancel,
+                  text: appStrings.categoryImageList_deselectButton,
+                ),
+              ),
+            if (_selectedList.isNotEmpty)
+              PopupMenuItem(
+                child: PopupListItem(
+                  icon: Icons.share,
+                  text: appStrings.imageOptions_share,
+                ),
+              ),
+            if (_selectedList.isNotEmpty)
+              PopupMenuItem(
+                child: PopupListItem(
+                  icon: Icons.download,
+                  text: appStrings.downloadImage_title(_selectedList.length),
+                ),
+              ),
+            PopupMenuItem(
+              child: PopupListItem(
+                icon: Icons.drive_file_rename_outline_sharp,
+                text: appStrings.renameCategory_title,
+              ),
+            ),
+            PopupMenuItem(
+              child: PopupListItem(
+                color: Theme.of(context).errorColor,
+                icon: Icons.delete,
+                text: appStrings.deleteCategory_title,
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget? get _adminActionsSpeedDial {
+    if (!widget.isAdmin) return null;
     final Color childBackgroundColor = Theme.of(context).primaryColorLight;
     final Color childIconColor = Theme.of(context).primaryColor;
     return SpeedDial(
@@ -252,28 +313,13 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
       _albumList = _parseAlbums(result.data!);
     }
     if (_albumList.isEmpty) return const SizedBox();
-    return GridView.builder(
-      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
-      gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-        maxCrossAxisExtent: 400.0,
-        mainAxisSpacing: 8.0,
-        crossAxisSpacing: 8.0,
-        childAspectRatio: AlbumCard.kAlbumRatio,
-      ),
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: _albumList.length,
-      itemBuilder: (context, index) {
-        AlbumModel album = _albumList[index];
-        return AlbumCard(
-          album: album,
-          onTap: () {
-            Navigator.of(context).pushNamed(AlbumViewPage.routeName, arguments: {
-              'isAdmin': widget.isAdmin,
-              'album': album,
-            });
-          },
-        );
+    return AlbumGridView(
+      albumList: _albumList,
+      onTap: (album) {
+        Navigator.of(context).pushNamed(AlbumViewPage.routeName, arguments: {
+          'isAdmin': true, // todo: use preferences
+          'album': album,
+        });
       },
     );
   }
@@ -294,32 +340,55 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
         child: Text(appStrings.noImages),
       );
     }
-    return GridView.builder(
-      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 4,
-        mainAxisSpacing: 4.0,
-        crossAxisSpacing: 4.0,
+    return ImageGridView(
+      imageList: _imageList,
+      selectedList: _selectedList,
+      onTapImage: (image) => Navigator.of(context).pushNamed(
+        ImageViewPage.routeName,
+        arguments: {
+          'images': _imageList,
+          'startId': image.id,
+          'album': _currentAlbum,
+        },
       ),
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: _imageList.length,
-      itemBuilder: (context, index) {
-        var image = _imageList[index];
-        return ImageCard(
-          image: image,
-          onPressed: () {
-            Navigator.of(context).pushNamed(
-              ImageViewPage.routeName,
-              arguments: {
-                'images': _imageList,
-                'album': _currentAlbum,
-                'startId': image.id,
-              },
-            ).then((value) => _onRefresh());
-          },
-        );
-      },
+      onSelectImage: (image) => setState(() {
+        _selectedList.add(image);
+      }),
+      onDeselectImage: (image) => setState(() {
+        _selectedList.remove(image);
+      }),
+    );
+  }
+
+  Widget get _bottomBar {
+    return BottomAppBar(
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+        height: _selectedList.isEmpty ? 0 : 56.0,
+        child: Row(
+          children: [
+            Expanded(
+              child: IconButton(
+                onPressed: _onEdit,
+                icon: Icon(Icons.edit),
+              ),
+            ),
+            Expanded(
+              child: IconButton(
+                onPressed: _onMove,
+                icon: Icon(Icons.drive_file_move),
+              ),
+            ),
+            Expanded(
+              child: IconButton(
+                onPressed: _onDelete,
+                icon: Icon(Icons.delete),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

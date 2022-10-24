@@ -7,8 +7,8 @@ import 'package:piwigo_ng/models/image_model.dart';
 
 import 'api_client.dart';
 
-Future<ApiResult<List<ImageModel>>> fetchImages(String albumID, int page) async {
-  Map<String, String> queries = {
+Future<ApiResult<List<ImageModel>>> fetchImages(int albumID, int page) async {
+  Map<String, dynamic> queries = {
     "format": "json",
     "method": "pwg.categories.getImages",
     "cat_id": albumID,
@@ -37,11 +37,12 @@ Future<ApiResult<List<ImageModel>>> fetchImages(String albumID, int page) async 
   return ApiResult(error: ApiErrors.fetchImagesError);
 }
 
-Future<ApiResult<List<ImageModel>>> searchImages(String searchQuery) async {
-  Map<String, String> query = {
+Future<ApiResult<Map>> searchImages(String searchQuery, [int page = 0]) async {
+  Map<String, dynamic> query = {
     "format": "json",
     "method": "pwg.images.search",
     "query": searchQuery,
+    "page": page,
   };
 
   try {
@@ -50,14 +51,19 @@ Future<ApiResult<List<ImageModel>>> searchImages(String searchQuery) async {
     if (response.statusCode == 200) {
       final Map<String, dynamic> result = json.decode(response.data);
       if (result['err'] == 1002) {
-        return ApiResult<List<ImageModel>>(data: []);
+        return ApiResult<Map>(data: {
+          "total_count": 0,
+          "images": [],
+        });
       }
-      print(result["result"]["images"]);
       final jsonImages = result["result"]["images"];
       List<ImageModel> images = List<ImageModel>.from(
         jsonImages.map((image) => ImageModel.fromJson(image)),
       );
-      return ApiResult<List<ImageModel>>(data: images);
+      return ApiResult<Map>(data: {
+        "total_count": result["result"]["paging"]["total_count"],
+        "images": images,
+      });
     }
   } on DioError catch (e) {
     debugPrint('search images: ${e.message}');

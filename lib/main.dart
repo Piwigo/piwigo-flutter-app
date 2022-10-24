@@ -9,7 +9,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   initializeWorkManager();
-  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+  // SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+    systemNavigationBarColor: Colors.black.withOpacity(0.1),
+    statusBarColor: Colors.black.withOpacity(0.1),
+  ));
   runApp(const App());
   _clearUnusedStorage();
   appPreferences = await SharedPreferences.getInstance();

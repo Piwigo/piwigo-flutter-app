@@ -3,10 +3,13 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mime_type/mime_type.dart';
-import 'package:piwigo_ng/api/albums.dart';
+import 'package:photo_view/photo_view.dart';
+import 'package:photo_view/photo_view_gallery.dart';
+import 'package:piwigo_ng/models/album_model.dart';
 import 'package:piwigo_ng/models/image_model.dart';
 import 'package:piwigo_ng/utils/localizations.dart';
 import 'package:piwigo_ng/utils/resources.dart';
+import 'package:piwigo_ng/utils/themes.dart';
 import 'package:video_player/video_player.dart';
 
 class ImageViewPage extends StatefulWidget {
@@ -46,104 +49,199 @@ class _ImageViewPageState extends State<ImageViewPage> {
 
   @override
   void dispose() {
-    SystemChrome.restoreSystemUIOverlays();
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     super.dispose();
   }
 
-  void _onToggleOverlay() {
-    if (_showOverlay) {
-      SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky, overlays: [SystemUiOverlay.top]);
-    } else {
-      SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge, overlays: [SystemUiOverlay.top]);
+  Future<bool> _onWillPop() async {
+    if (!_showOverlay) {
+      setState(() {
+        _showOverlay = true;
+      });
+      return false;
     }
+    return true;
+  }
+
+  void _onToggleOverlay(Orientation orientation) {
+    // if (_showOverlay) {
+    //   SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+    // } else {
+    //   SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge, overlays: [
+    //     if (orientation == Orientation.portrait) SystemUiOverlay.top,
+    //   ]);
+    // }
     setState(() {
       _showOverlay = !_showOverlay;
     });
   }
 
+  void _onEdit() {}
+  void _onMove() {}
+  void _onDelete() {}
+
   @override
   Widget build(BuildContext context) {
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.light,
-      child: Scaffold(
-        backgroundColor: Colors.black,
-        resizeToAvoidBottomInset: true,
-        extendBodyBehindAppBar: true,
-        extendBody: true,
-        primary: false,
-        body: Container(
-          color: Colors.green,
-          child: Stack(
-            children: [
-              Positioned.fill(
-                child: PageView.builder(
-                  controller: _pageController,
-                  onPageChanged: (page) => setState(() {
-                    _page = page;
-                  }),
-                  itemCount: widget.imageList.length,
-                  itemBuilder: (context, index) {
-                    final ImageModel image = widget.imageList[index];
-                    String? mimeType = mime(image.file);
-                    if (mimeType != null && mimeType.startsWith('video')) {
-                      return VideoView(
-                        videoUrl: image.elementUrl ?? '',
-                        thumbnailUrl: image.derivatives.medium.url,
-                        showOverlay: _showOverlay,
-                        onToggleOverlay: _onToggleOverlay,
-                      );
-                    }
-                    return GestureDetector(
-                      behavior: HitTestBehavior.opaque,
-                      onTap: _onToggleOverlay,
-                      child: Image.network(
-                        image.derivatives.medium.url,
-                        fit: BoxFit.scaleDown,
-                      ),
-                    );
-                  },
+    return WillPopScope(
+      onWillPop: _onWillPop,
+      child: AnnotatedRegion<SystemUiOverlayStyle>(
+        value: SystemUiOverlayStyle.light.copyWith(
+          systemNavigationBarColor: Colors.black.withOpacity(0.1),
+          statusBarColor: Colors.black.withOpacity(0.1),
+        ),
+        child: Scaffold(
+          backgroundColor: Colors.black,
+          resizeToAvoidBottomInset: true,
+          extendBodyBehindAppBar: true,
+          extendBody: true,
+          primary: false,
+          body: SafeArea(
+            child: OrientationBuilder(builder: (context, orientation) {
+              return Stack(
+                children: [
+                  _content,
+                  _top,
+                  if (orientation == Orientation.portrait) _bottom,
+                ],
+              );
+            }),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget get _top {
+    return Positioned(
+      top: 0,
+      right: 0,
+      left: 0,
+      child: AnimatedSlide(
+        duration: _overlayAnimationDuration,
+        curve: _overlayAnimationCurve,
+        offset: _showOverlay ? Offset.zero : Offset(0, -1),
+        child: AnimatedOpacity(
+          duration: _overlayAnimationDuration,
+          curve: _overlayAnimationCurve,
+          opacity: _showOverlay ? 1 : 0,
+          child: Container(
+            height: 56.0,
+            decoration: BoxDecoration(color: Colors.black.withOpacity(0.5)),
+            child: Row(
+              children: [
+                IconButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  icon: Icon(Icons.arrow_back),
                 ),
-              ),
-              Positioned(
-                top: 0,
-                right: 0,
-                left: 0,
-                child: AnimatedSlide(
-                  duration: _overlayAnimationDuration,
-                  curve: _overlayAnimationCurve,
-                  offset: _showOverlay ? Offset.zero : Offset(0, -1),
-                  child: Container(
-                    padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
-                    decoration: BoxDecoration(color: Colors.black.withOpacity(0.5)),
-                    child: SizedBox(
-                      height: 56,
-                      child: Row(
-                        children: [
-                          IconButton(
-                            onPressed: () => Navigator.of(context).pop(),
-                            icon: Icon(Icons.arrow_back),
-                          ),
-                          Expanded(
-                            child: Text(
-                              '${widget.imageList[_page].name}',
-                              softWrap: true,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(fontSize: 16, color: Colors.white),
-                            ),
-                          ),
-                          IconButton(
-                            onPressed: () {},
-                            icon: Icon(Icons.more_vert),
-                          ),
-                        ],
-                      ),
-                    ),
+                Expanded(
+                  child: Text(
+                    '${widget.imageList[_page].name}',
+                    softWrap: true,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(fontSize: 16, color: Colors.white),
                   ),
                 ),
-              ),
-            ],
+                if (MediaQuery.of(context).orientation == Orientation.landscape) ...[
+                  IconButton(
+                    onPressed: _onEdit,
+                    icon: Icon(Icons.edit),
+                  ),
+                  IconButton(
+                    onPressed: _onMove,
+                    icon: Icon(Icons.drive_file_move),
+                  ),
+                  IconButton(
+                    onPressed: _onDelete,
+                    icon: Icon(Icons.delete, color: Theme.of(context).errorColor),
+                  ),
+                ],
+                IconButton(
+                  onPressed: () {},
+                  icon: Icon(Icons.more_vert),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget get _content {
+    return Positioned.fill(
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () => _onToggleOverlay(MediaQuery.of(context).orientation),
+        child: PhotoViewGallery.builder(
+          pageController: _pageController,
+          onPageChanged: (page) => setState(() {
+            _page = page;
+          }),
+          itemCount: widget.imageList.length,
+          builder: (context, index) {
+            final ImageModel image = widget.imageList[index];
+            String? mimeType = mime(image.file);
+            if (mimeType != null && mimeType.startsWith('video')) {
+              return PhotoViewGalleryPageOptions.customChild(
+                disableGestures: true,
+                child: VideoView(
+                  videoUrl: image.elementUrl ?? '',
+                  thumbnailUrl: image.derivatives.medium.url,
+                  showOverlay: _showOverlay,
+                  screenPadding: const EdgeInsets.only(bottom: 56.0),
+                  onToggleOverlay: () => _onToggleOverlay(MediaQuery.of(context).orientation),
+                ),
+              );
+            }
+            return PhotoViewGalleryPageOptions(
+              imageProvider: NetworkImage(image.derivatives.medium.url),
+              maxScale: 2.0,
+              minScale: PhotoViewComputedScale.contained,
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget get _bottom {
+    return Positioned(
+      bottom: 0,
+      right: 0,
+      left: 0,
+      child: AnimatedSlide(
+        duration: _overlayAnimationDuration,
+        curve: _overlayAnimationCurve,
+        offset: _showOverlay ? Offset.zero : Offset(0, 1),
+        child: AnimatedOpacity(
+          duration: _overlayAnimationDuration,
+          curve: _overlayAnimationCurve,
+          opacity: _showOverlay ? 1 : 0,
+          child: Container(
+            height: 56.0,
+            decoration: BoxDecoration(color: Colors.black.withOpacity(0.5)),
+            child: Row(
+              children: [
+                Expanded(
+                  child: IconButton(
+                    onPressed: _onEdit,
+                    icon: Icon(Icons.edit),
+                  ),
+                ),
+                Expanded(
+                  child: IconButton(
+                    onPressed: _onMove,
+                    icon: Icon(Icons.drive_file_move),
+                  ),
+                ),
+                Expanded(
+                  child: IconButton(
+                    onPressed: _onDelete,
+                    icon: Icon(Icons.delete, color: Theme.of(context).errorColor),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -158,12 +256,14 @@ class VideoView extends StatefulWidget {
     this.thumbnailUrl,
     this.onToggleOverlay,
     this.showOverlay = false,
+    this.screenPadding = EdgeInsets.zero,
   }) : super(key: key);
 
   final String videoUrl;
   final String? thumbnailUrl;
   final Function()? onToggleOverlay;
   final bool showOverlay;
+  final EdgeInsets screenPadding;
 
   @override
   State<VideoView> createState() => _VideoViewState();
@@ -176,6 +276,7 @@ class _VideoViewState extends State<VideoView> {
   double _progress = 0;
   double _updateProgressInterval = 0.0;
   bool _mute = false;
+  bool _isEnd = false;
 
   @override
   void initState() {
@@ -186,6 +287,7 @@ class _VideoViewState extends State<VideoView> {
     )..initialize().then((_) {
         debugPrint("---- controller initialized");
         _controller.addListener(_onControllerUpdated);
+        _controller.addListener(_checkControllerEnd);
         setState(() {});
       });
   }
@@ -201,9 +303,7 @@ class _VideoViewState extends State<VideoView> {
     // blocking too many updates
     // important !!
     final int now = DateTime.now().millisecondsSinceEpoch;
-    if (_updateProgressInterval > now) {
-      return;
-    }
+    if (_updateProgressInterval > now) return;
     _updateProgressInterval = now + 300.0;
 
     final VideoPlayerController controller = _controller;
@@ -218,24 +318,33 @@ class _VideoViewState extends State<VideoView> {
         _progress = position.inMilliseconds.ceilToDouble() / controller.value.duration.inMilliseconds.ceilToDouble();
       });
     }
-
-    // handle clip end
-    if (_isEnd) {
-      if (!mounted) return;
-      setState(() {
-        _progress = 1;
-      });
-    }
   }
 
-  bool get _isEnd {
-    return _controller.value.position.inMilliseconds > 0 &&
-        _controller.value.position.inSeconds + 1 >= _controller.value.duration.inSeconds;
+  void _checkControllerEnd() async {
+    if (!mounted) return;
+    if (_controller.value.position.inMilliseconds > 0 &&
+        _controller.value.position.inSeconds >= _controller.value.duration.inSeconds) {
+      setState(() {
+        _isEnd = true;
+        if (!widget.showOverlay && widget.onToggleOverlay != null) {
+          widget.onToggleOverlay!();
+        }
+        setState(() {
+          _progress = 1;
+        });
+      });
+    } else {
+      if (_isEnd) {
+        setState(() {
+          _isEnd = false;
+        });
+      }
+    }
   }
 
   String get _durationText {
     late final Duration duration;
-    if (!_controller.value.isPlaying && !_isEnd) {
+    if (_controller.value.isPlaying) {
       duration = _controller.value.duration;
     } else {
       duration = _controller.value.duration - _controller.value.position;
@@ -252,27 +361,23 @@ class _VideoViewState extends State<VideoView> {
       return _thumbnail;
     }
     return LayoutBuilder(builder: (context, constraints) {
-      return GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: widget.onToggleOverlay,
-        child: Stack(
-          alignment: Alignment.center,
-          fit: StackFit.expand,
-          children: [
-            FittedBox(
-              fit: BoxFit.contain,
-              child: SizedBox(
-                width: _controller.value.size.width,
-                height: _controller.value.size.height,
-                child: AspectRatio(
-                  aspectRatio: _controller.value.aspectRatio,
-                  child: VideoPlayer(_controller),
-                ),
+      return Stack(
+        alignment: Alignment.center,
+        fit: StackFit.expand,
+        children: [
+          FittedBox(
+            fit: BoxFit.contain,
+            child: SizedBox(
+              width: _controller.value.size.width,
+              height: _controller.value.size.height,
+              child: AspectRatio(
+                aspectRatio: _controller.value.aspectRatio,
+                child: VideoPlayer(_controller),
               ),
             ),
-            _overlay,
-          ],
-        ),
+          ),
+          _overlay,
+        ],
       );
     });
   }
@@ -402,7 +507,7 @@ class _VideoViewState extends State<VideoView> {
 
   Widget get _overlayBottom {
     return Positioned(
-      bottom: 0,
+      bottom: widget.screenPadding.bottom,
       right: 0,
       left: 0,
       child: AnimatedSlide(
@@ -421,24 +526,27 @@ class _VideoViewState extends State<VideoView> {
                 ),
               ),
               Expanded(
-                child: Slider(
-                  value: _isEnd ? 100 : max(0, min(_progress * 100, 100)),
-                  min: 0,
-                  max: 100,
-                  onChanged: (value) {
-                    setState(() {
-                      _progress = value * 0.01;
-                    });
-                  },
-                  onChangeStart: (value) {
-                    _controller.pause();
-                  },
-                  onChangeEnd: (value) {
-                    final double newValue = max(0, min(value, 99)) * 0.01;
-                    final int millis = (_controller.value.duration.inMilliseconds * newValue).toInt();
-                    _controller.seekTo(Duration(milliseconds: millis));
-                    _controller.play();
-                  },
+                child: Theme(
+                  data: lightTheme,
+                  child: Slider(
+                    value: _isEnd ? 100 : max(0, min(_progress * 100, 100)),
+                    min: 0,
+                    max: 100,
+                    onChanged: (value) {
+                      setState(() {
+                        _progress = value * 0.01;
+                      });
+                    },
+                    onChangeStart: (value) {
+                      _controller.pause();
+                    },
+                    onChangeEnd: (value) {
+                      final double newValue = max(0, min(value, 99)) * 0.01;
+                      final int millis = (_controller.value.duration.inMilliseconds * newValue).toInt();
+                      _controller.seekTo(Duration(milliseconds: millis));
+                      _controller.play();
+                    },
+                  ),
                 ),
               ),
               GestureDetector(
