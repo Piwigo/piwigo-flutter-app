@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:piwigo_ng/components/scroll_widgets/album_grid_view.dart';
 import 'package:piwigo_ng/components/sections/settings_section.dart';
 import 'package:piwigo_ng/models/album_model.dart';
-import 'package:piwigo_ng/services/shared_preferences_service.dart';
+import 'package:piwigo_ng/services/preferences_service.dart';
 import 'package:piwigo_ng/utils/localizations.dart';
 import 'package:piwigo_ng/utils/settings.dart';
 
@@ -72,7 +72,6 @@ class _SettingsAlbumThumbnailPageState extends State<SettingsAlbumThumbnailPage>
                     ],
                   ),
                   AlbumGridView(
-                    example: true,
                     albumList: [
                       AlbumModel(
                         id: 0,
