@@ -1,5 +1,5 @@
 class ImageModel {
-  String id;
+  int id;
   int width;
   int height;
   int hit;
@@ -13,8 +13,24 @@ class ImageModel {
   Derivatives derivatives;
   List<dynamic> categories;
 
+  ImageModel({
+    required this.id,
+    this.width = 1,
+    this.height = 1,
+    this.hit = 0,
+    this.file = '',
+    required this.name,
+    this.comment,
+    this.dateCreation,
+    this.dateAvailable,
+    this.pageUrl,
+    this.elementUrl,
+    required this.derivatives,
+    this.categories = const [],
+  });
+
   ImageModel.fromJson(Map<String, dynamic> json)
-      : id = json['id'].toString(),
+      : id = json['id'],
         width = int.tryParse(json['width'].toString()) ?? 0,
         height = int.tryParse(json['height'].toString()) ?? 0,
         hit = int.tryParse(json['hit'].toString()) ?? 0,
@@ -27,6 +43,33 @@ class ImageModel {
         elementUrl = json['element_url'],
         derivatives = Derivatives.fromJson(json['derivatives']),
         categories = json['categories'] ?? [];
+
+  Derivative? getDerivativeFromString(String derivative) {
+    switch (derivative) {
+      case 'square':
+        return derivatives.square;
+      case 'thumb':
+        return derivatives.thumbnail;
+      case '2small':
+        return derivatives.xxsmall;
+      case 'xsmall':
+        return derivatives.xsmall;
+      case 'small':
+        return derivatives.small;
+      case 'medium':
+        return derivatives.medium;
+      case 'large':
+        return derivatives.large;
+      case 'xlarge':
+        return derivatives.xlarge;
+      case 'xxlarge':
+        return derivatives.xxlarge;
+      case 'full':
+        return derivatives.full;
+      default:
+        return null;
+    }
+  }
 
   @override
   operator ==(other) => other is ImageModel && id == other.id;
@@ -50,6 +93,7 @@ class Derivatives {
   Derivatives({
     required this.square,
     required this.thumbnail,
+    this.xxsmall,
     this.xsmall,
     this.small,
     required this.medium,

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:piwigo_ng/app.dart';
-import 'package:piwigo_ng/services/shared_preferences_service.dart';
+import 'package:piwigo_ng/services/preferences_service.dart';
 import 'package:piwigo_ng/utils/resources.dart';
 import 'package:piwigo_ng/utils/themes.dart';
 

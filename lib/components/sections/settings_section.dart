@@ -285,56 +285,62 @@ class _SettingsSectionItemSliderState extends State<SettingsSectionItemSlider> {
     return SettingsSectionItem(
       title: widget.title,
       expandedChild: true,
-      child: Builder(builder: (context) {
-        if (_isEditing) {
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          minWidth: MediaQuery.of(context).size.width / 2,
+          maxWidth: MediaQuery.of(context).size.width * 2 / 3,
+        ),
+        child: Builder(builder: (context) {
+          if (_isEditing) {
+            return Row(
+              children: [
+                Expanded(
+                  child: SettingsField(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    controller: _controller,
+                    focusNode: _focusNode,
+                    hint: widget.hint,
+                    keyboardType: TextInputType.number,
+                    onFieldSubmitted: _onEditValue,
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () => _onEditValue(_controller.text),
+                  child: const Icon(Icons.check),
+                ),
+              ],
+            );
+          }
           return Row(
             children: [
               Expanded(
-                child: SettingsField(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                  controller: _controller,
-                  focusNode: _focusNode,
-                  hint: widget.hint,
-                  keyboardType: TextInputType.number,
-                  onFieldSubmitted: _onEditValue,
+                child: Slider(
+                  min: widget.min,
+                  max: widget.max,
+                  value: widget.value,
+                  onChanged: widget.onChanged,
+                  divisions: widget.divisions ?? (widget.max - widget.min).round(),
                 ),
               ),
-              GestureDetector(
-                onTap: () => _onEditValue(_controller.text),
-                child: const Icon(Icons.check),
-              ),
-            ],
-          );
-        }
-        return Row(
-          children: [
-            Expanded(
-              child: Slider(
-                min: widget.min,
-                max: widget.max,
-                value: widget.value,
-                onChanged: widget.onChanged,
-                divisions: widget.divisions ?? (widget.max - widget.min).round(),
-              ),
-            ),
-            if (widget.text != null)
-              GestureDetector(
-                onTap: _onOpenEditField,
-                child: Padding(
-                  padding: const EdgeInsets.only(right: 8.0),
-                  child: SizedBox(
-                    width: widget.textWidth ?? widget.max.toString().length * 2 * 6,
-                    child: Text(
-                      widget.text!,
-                      textAlign: TextAlign.end,
-                      style: Theme.of(context).textTheme.bodySmall,
+              if (widget.text != null)
+                GestureDetector(
+                  onTap: _onOpenEditField,
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: SizedBox(
+                      width: widget.textWidth ?? widget.max.toString().length * 2 * 6,
+                      child: Text(
+                        widget.text!,
+                        textAlign: TextAlign.end,
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
                     ),
                   ),
                 ),
-              ),
-          ],
-        );
-      }),
+            ],
+          );
+        }),
+      ),
     );
   }
 }
@@ -440,6 +446,54 @@ class SettingsSectionButton extends StatelessWidget {
         padding: padding,
         color: color,
         child: child ?? const SizedBox(),
+      ),
+    );
+  }
+}
+
+class SettingsSectionDropdown<T> extends StatelessWidget {
+  const SettingsSectionDropdown({
+    Key? key,
+    this.color,
+    this.padding,
+    required this.items,
+    required this.value,
+    required this.onChanged,
+    this.hint,
+    this.title,
+    this.selectedItemBuilder,
+  }) : super(key: key);
+
+  final EdgeInsetsGeometry? padding;
+  final Color? color;
+  final List<DropdownMenuItem<T>> items;
+  final List<Widget> Function(BuildContext)? selectedItemBuilder;
+  final T value;
+  final Function(T?) onChanged;
+  final String? hint;
+  final String? title;
+
+  @override
+  Widget build(BuildContext context) {
+    return SettingsSectionItem(
+      padding: padding,
+      color: color,
+      title: title,
+      child: DropdownButton<T>(
+        value: value,
+        hint: hint != null
+            ? Text(
+                "$hint",
+                style: Theme.of(context).textTheme.bodySmall,
+              )
+            : null,
+        iconEnabledColor: Theme.of(context).textTheme.bodySmall?.color,
+        underline: const SizedBox(),
+        alignment: Alignment.centerRight,
+        style: Theme.of(context).textTheme.bodySmall,
+        onChanged: onChanged,
+        selectedItemBuilder: selectedItemBuilder,
+        items: items,
       ),
     );
   }

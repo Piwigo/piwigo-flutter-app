@@ -1,29 +1,24 @@
+import 'dart:io';
+
 import 'package:cookie_jar/cookie_jar.dart';
+import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 
 import 'api_interceptor.dart';
 
 class ApiClient {
-  // static final ApiClient _singleton = ApiClient._internal();
+  static HttpClientAdapter _httpClientAdapter = DefaultHttpClientAdapter()
+    ..onHttpClientCreate = (HttpClient client) {
+      client.badCertificateCallback = (X509Certificate cert, String host, int port) => true;
+      return client;
+    };
 
-  // static PersistCookieJar cookieJar = PersistCookieJar();
   static CookieJar cookieJar = CookieJar();
   static Dio dio = Dio(BaseOptions())
     ..interceptors.add(ApiInterceptor())
-    ..interceptors.add(CookieManager(cookieJar));
-
-  // factory ApiClient() {
-  //   return _singleton;
-  // }
-
-  void createDio() {
-    dio = Dio(BaseOptions())
-      ..interceptors.add(CookieManager(cookieJar))
-      ..interceptors.add(ApiInterceptor());
-  }
-
-  // ApiClient._internal();
+    ..interceptors.add(CookieManager(cookieJar))
+    ..httpClientAdapter = _httpClientAdapter;
 
   static Future<Response> get({
     String path = 'ws.php',

@@ -4,16 +4,17 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:piwigo_ng/api/api_error.dart';
 import 'package:piwigo_ng/models/album_model.dart';
-import 'package:piwigo_ng/services/shared_preferences_service.dart';
+import 'package:piwigo_ng/services/preferences_service.dart';
 
 import 'api_client.dart';
 
 Future<ApiResult<List<AlbumModel>>> fetchAlbums(int albumID) async {
+  print(Preferences.getAlbumThumbnailSize);
   Map<String, dynamic> queries = {
     'format': 'json',
     'method': 'pwg.categories.getList',
     'cat_id': albumID,
-    'thumbnail_size': appPreferences.getString('thumbnail_size') ?? 'xxlarge',
+    'thumbnail_size': Preferences.getAlbumThumbnailSize,
   };
 
   try {

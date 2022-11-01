@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:piwigo_ng/app.dart';
-import 'package:piwigo_ng/services/shared_preferences_service.dart';
+import 'package:piwigo_ng/services/preferences_service.dart';
 import 'package:piwigo_ng/services/work_manager.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

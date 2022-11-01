@@ -10,13 +10,15 @@ import 'package:piwigo_ng/api/api_error.dart';
 import 'package:piwigo_ng/api/authentication.dart';
 import 'package:piwigo_ng/app.dart';
 import 'package:piwigo_ng/components/appbars/settings_app_bar.dart';
+import 'package:piwigo_ng/components/scroll_widgets/album_grid_view.dart';
+import 'package:piwigo_ng/components/scroll_widgets/image_grid_view.dart';
 import 'package:piwigo_ng/components/sections/settings_section.dart';
 import 'package:piwigo_ng/models/info_model.dart';
-import 'package:piwigo_ng/services/shared_preferences_service.dart';
+import 'package:piwigo_ng/services/preferences_service.dart';
 import 'package:piwigo_ng/utils/localizations.dart';
+import 'package:piwigo_ng/utils/settings.dart';
 import 'package:piwigo_ng/views/authentication/login_view_page.dart';
 import 'package:piwigo_ng/views/settings/privacy_policy_view_page.dart';
-import 'package:piwigo_ng/views/settings/settings_album_thumbnail_page.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -33,20 +35,38 @@ class SettingsViewPage extends StatefulWidget {
 
 class _SettingsViewPageState extends State<SettingsViewPage> {
   final ScrollController _scrollController = ScrollController();
+  late final Future<ApiResult<InfoModel>> _infoFuture;
 
-  int _recent = 5;
-  int _recentPeriod = 7;
-  int _numberOfImagesPerRow = 4;
-  int _availableCacheDisk = 256;
-  int _availableCacheMemory = 32;
-  bool _thumbnailTitle = false;
-  bool _stripMetadata = false;
-  bool _downsizeBeforeUpload = false;
-  bool _compressBeforeUpload = false;
-  bool _prefixPhotoFilename = false;
-  bool _wifiOnly = false;
-  bool _deleteAfterUpload = false;
-  String _author = "";
+  late final List<String> _availableSizes;
+  late int _imageRowNumber;
+  late bool _thumbnailTitle;
+  late String _imageThumbnailSize;
+  late String _albumThumbnailSize;
+  late String _imageFullScreenSize;
+  late bool _stripMetadata;
+  late String _author;
+  late bool _compressBeforeUpload;
+  late bool _wifiOnly;
+  late bool _deleteAfterUpload;
+  late double _quality;
+
+  @override
+  void initState() {
+    _imageRowNumber = Preferences.getImageRowCount;
+    _thumbnailTitle = Preferences.getShowThumbnailTitle;
+    _imageThumbnailSize = Preferences.getImageThumbnailSize;
+    _imageFullScreenSize = Preferences.getImageFullScreenSize;
+    _albumThumbnailSize = Preferences.getAlbumThumbnailSize;
+    _availableSizes = Preferences.getAvailableSizes;
+    _author = Preferences.getUploadAuthor ?? '';
+    _stripMetadata = Preferences.getRemoveMetadata;
+    _compressBeforeUpload = Preferences.getCompressUpload;
+    _deleteAfterUpload = Preferences.getDeleteAfterUpload;
+    _wifiOnly = Preferences.getWifiUpload;
+    _quality = Preferences.getUploadQuality;
+    super.initState();
+    _infoFuture = getInfo();
+  }
 
   @override
   void dispose() {
@@ -116,7 +136,7 @@ class _SettingsViewPageState extends State<SettingsViewPage> {
                   _albumsSection,
                   _photosSection,
                   _uploadSection,
-                  _privacySection,
+                  // _privacySection,
                   _appearanceSection,
                   _cacheSection,
                   _infoSection,
@@ -190,161 +210,237 @@ class _SettingsViewPageState extends State<SettingsViewPage> {
     );
   }
 
-  Widget get _albumsSection => SettingsSection(
-        title: appStrings.tabBar_albums,
+  Widget get _albumsSection => Column(
         children: [
-          // SettingsSectionItemButton(
-          //   title: appStrings.setDefaultCategory_title,
-          //   text: "Root",
-          // ),
-          SettingsSectionItemButton(
-            onPressed: () => Navigator.of(context).pushNamed(
-              SettingsAlbumThumbnailPage.routeName,
-            ),
-            title: "File Size",
-            text: "Medium",
+          SettingsSection(
+            title: appStrings.tabBar_albums,
+            children: [
+              SettingsSectionDropdown<String>(
+                title: appStrings.defaultThumbnailFile320px,
+                value: _albumThumbnailSize,
+                onChanged: (size) {
+                  if (size != null) {
+                    setState(() {
+                      _albumThumbnailSize = size;
+                      appPreferences.setString(Preferences.albumThumbnailSizeKey, _albumThumbnailSize);
+                    });
+                  }
+                },
+                selectedItemBuilder: (context) {
+                  return List.generate(_availableSizes.length, (index) {
+                    String size = _availableSizes[index];
+                    return Center(child: Text("${thumbnailSize(size)}"));
+                  });
+                },
+                items: List.generate(_availableSizes.length, (index) {
+                  String size = _availableSizes[index];
+                  return DropdownMenuItem<String>(
+                    value: size,
+                    child: Text(
+                      "${thumbnailSize(size)} ${Settings.getDerivativeRatio(size)}",
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                  );
+                }),
+              ),
+            ],
           ),
-          SettingsSectionItemSlider(
-            title: "Recent",
-            text: '$_recent/10',
-            textWidth: 40,
-            hint: "value",
-            min: 3,
-            max: 10,
-            value: _recent.toDouble(),
-            onChanged: (value) => setState(() {
-              _recent = value.round();
-            }),
-          ),
-          SettingsSectionItemSlider(
-            title: "Recent Period",
-            text: '$_recentPeriod days',
-            textWidth: 49.0,
-            hint: "value",
-            min: 1,
-            max: 99,
-            value: _recentPeriod.toDouble(),
-            onChanged: (value) => setState(() {
-              _recentPeriod = value.round();
-            }),
+          ExampleAlbumGridView(
+            albumThumbnailSize: _albumThumbnailSize,
           ),
         ],
       );
-  Widget get _photosSection => SettingsSection(
-        title: "Photos",
+  Widget get _photosSection => Column(
         children: [
-          const SettingsSectionItemButton(
-            title: "Sort",
-            text: "Date Created, old → new",
+          SettingsSection(
+            title: appStrings.settingsHeader_images,
+            children: [
+              SettingsSectionDropdown<String>(
+                title: appStrings.defaultThumbnailFile320px,
+                value: _imageThumbnailSize,
+                onChanged: (size) {
+                  if (size != null) {
+                    setState(() {
+                      _imageThumbnailSize = size;
+                      appPreferences.setString(Preferences.imageThumbnailSizeKey, _imageThumbnailSize);
+                    });
+                  }
+                },
+                selectedItemBuilder: (context) {
+                  return List.generate(_availableSizes.length, (index) {
+                    String size = _availableSizes[index];
+                    return Center(child: Text("${thumbnailSize(size)}"));
+                  });
+                },
+                items: List.generate(_availableSizes.length, (index) {
+                  String size = _availableSizes[index];
+                  return DropdownMenuItem<String>(
+                    value: size,
+                    child: Text(
+                      "${thumbnailSize(size)} ${Settings.getDerivativeRatio(size)}",
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                  );
+                }),
+              ),
+              SettingsSectionDropdown<String>(
+                title: appStrings.defaultPreviewFile320px,
+                value: _imageFullScreenSize,
+                onChanged: (size) {
+                  if (size != null) {
+                    setState(() {
+                      _imageFullScreenSize = size;
+                      appPreferences.setString(
+                        Preferences.imageFullScreenSizeKey,
+                        _imageFullScreenSize,
+                      );
+                    });
+                  }
+                },
+                selectedItemBuilder: (context) {
+                  return List.generate(_availableSizes.length, (index) {
+                    String size = _availableSizes[index];
+                    return Center(child: Text("${thumbnailSize(size)}"));
+                  });
+                },
+                items: List.generate(_availableSizes.length, (index) {
+                  String size = _availableSizes[index];
+                  return DropdownMenuItem<String>(
+                    value: size,
+                    child: Text(
+                      "${photoSize(size)} ${Settings.getDerivativeRatio(size)}",
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                  );
+                }),
+              ),
+              Builder(builder: (context) {
+                final orientation = MediaQuery.of(context).orientation;
+                final int nbImages = Settings.getImageCrossAxisCount(context, _imageRowNumber);
+                final int maxNbImages = Settings.getImageCrossAxisCount(context, 6);
+                return SettingsSectionItemSlider(
+                  enableField: false,
+                  title: appStrings.defaultNberOfThumbnailsShort,
+                  text: '$nbImages/$maxNbImages',
+                  textWidth: orientation == Orientation.portrait ? 24.0 : 40.0,
+                  min: Settings.minImageRowCount.toDouble(),
+                  max: Settings.maxImageRowCount.toDouble(),
+                  divisions: Settings.maxImageRowCount - Settings.minImageRowCount,
+                  value: _imageRowNumber.toDouble(),
+                  onChanged: (value) => setState(() {
+                    _imageRowNumber = value.round();
+                    appPreferences.setInt(Preferences.imageRowCountKey, _imageRowNumber);
+                  }),
+                );
+              }),
+              SettingsSectionItemSwitch(
+                title: appStrings.settings_displayTitles,
+                value: _thumbnailTitle,
+                onChanged: (value) => setState(() {
+                  _thumbnailTitle = value;
+                  appPreferences.setBool(Preferences.showThumbnailTitleKey, _thumbnailTitle);
+                }),
+              ),
+            ],
           ),
-          const SettingsSectionItemButton(
-            title: "File Size",
-            text: "Large",
-          ),
-          SettingsSectionItemSlider(
-            title: "Number",
-            text: '$_numberOfImagesPerRow/6',
-            textWidth: 24,
-            hint: "value",
-            min: 3,
-            max: 6,
-            value: _numberOfImagesPerRow.toDouble(),
-            onChanged: (value) => setState(() {
-              _numberOfImagesPerRow = value.round();
-            }),
-          ),
-          SettingsSectionItemSwitch(
-            title: "Titles on thumbnails",
-            value: _thumbnailTitle,
-            onChanged: (value) => setState(() {
-              _thumbnailTitle = value;
-            }),
-          ),
-          const SettingsSectionItemButton(
-            title: "Preview",
-            text: "Large",
-          ),
-          const SettingsSectionItemButton(
-            title: "Share Private Metadata",
+          ExampleImageGridView(
+            nbImageRow: _imageRowNumber,
+            imageThumbnailSize: _imageThumbnailSize,
           ),
         ],
       );
   Widget get _uploadSection => SettingsSection(
-        title: "Default Upload Settings",
+        title: appStrings.settingsHeader_upload,
         children: [
           SettingsSectionItemField(
-            title: "Author",
-            hint: "Author Name",
+            title: appStrings.settings_defaultAuthor320px,
+            hint: appStrings.settings_defaultAuthorPlaceholder,
             value: _author,
             onChanged: (value) => setState(() {
               _author = value;
+              appPreferences.setString(
+                Preferences.uploadAuthorKey,
+                _author,
+              );
             }),
           ),
-          const SettingsSectionItemButton(
-            title: "Privacy",
-            text: "Everybody",
+          SettingsSectionItemSlider(
+            enableField: true,
+            title: appStrings.settings_photoQuality,
+            text: '${(_quality * 100).toStringAsFixed(0)}%',
+            textWidth: 40.0,
+            min: 50,
+            max: 100,
+            divisions: 50,
+            value: (_quality * 100).roundToDouble(),
+            onChanged: (value) => setState(() {
+              _quality = value / 100;
+              appPreferences.setDouble(Preferences.uploadQualityKey, _quality);
+            }),
           ),
+          // const SettingsSectionItemButton(
+          //   title: "Privacy",
+          //   text: "Everybody",
+          // ),
           SettingsSectionItemSwitch(
-            title: "Strip Private Metadata",
+            title: appStrings.settings_stripGPSdata,
             value: _stripMetadata,
             onChanged: (value) => setState(() {
               _stripMetadata = value;
+              appPreferences.setBool(
+                Preferences.removeMetadataKey,
+                _stripMetadata,
+              );
             }),
           ),
           SettingsSectionItemSwitch(
-            title: "Downsize Before Upload",
-            value: _downsizeBeforeUpload,
-            onChanged: (value) => setState(() {
-              _downsizeBeforeUpload = value;
-            }),
-          ),
-          SettingsSectionItemSwitch(
-            title: "Compress Before Upload",
+            title: appStrings.settings_photoCompress,
             value: _compressBeforeUpload,
             onChanged: (value) => setState(() {
               _compressBeforeUpload = value;
+              appPreferences.setBool(
+                Preferences.compressUploadKey,
+                _compressBeforeUpload,
+              );
             }),
           ),
           SettingsSectionItemSwitch(
-            title: "Prefix Photo Filename",
-            value: _prefixPhotoFilename,
-            onChanged: (value) => setState(() {
-              _prefixPhotoFilename = value;
-            }),
-          ),
-          SettingsSectionItemSwitch(
-            title: "Wi-Fi Only",
+            title: appStrings.settings_wifiOnly,
             value: _wifiOnly,
             onChanged: (value) => setState(() {
               _wifiOnly = value;
+              appPreferences.setBool(
+                Preferences.wifiUploadKey,
+                _wifiOnly,
+              );
             }),
           ),
-          const SettingsSectionItemButton(
-            title: "Auto Upload",
-            text: "Off",
-          ),
+          // const SettingsSectionItemButton(
+          //   title: "Auto Upload",
+          //   text: "Off",
+          // ),
           SettingsSectionItemSwitch(
-            title: "Delete After Upload",
+            title: appStrings.settings_deleteImage,
             value: _deleteAfterUpload,
             onChanged: (value) => setState(() {
               _deleteAfterUpload = value;
+              appPreferences.setBool(
+                Preferences.deleteAfterUploadKey,
+                _deleteAfterUpload,
+              );
             }),
           ),
         ],
       );
-  Widget get _privacySection => const SettingsSection(
-        title: "Privacy",
+  Widget get _privacySection => SettingsSection(
+        title: appStrings.settings_defaultPrivacy,
         children: [
           SettingsSectionItemButton(
             title: "App Lock",
             text: "Off",
           ),
-          SettingsSectionItemButton(
-            title: "Clear Clipboard",
-            text: "Never",
-          ),
         ],
-      );
+      ); // todo: use biometry unlock
   Widget get _appearanceSection => SettingsSection(
         title: "Appearance",
         children: [
@@ -360,41 +456,17 @@ class _SettingsViewPageState extends State<SettingsViewPage> {
         ],
       );
   Widget get _cacheSection => SettingsSection(
-        title: "Cache Settings (Used/Total)",
+        title: appStrings.settingsHeader_cache,
         children: [
-          SettingsSectionItemSlider(
-            title: "Disk",
-            text: '1/$_availableCacheDisk',
-            textWidth: 49,
-            min: 128,
-            max: 2048,
-            divisions: 30,
-            value: _availableCacheDisk.toDouble(),
-            onChanged: (value) => setState(() {
-              _availableCacheDisk = value.round();
-            }),
-          ),
-          SettingsSectionItemSlider(
-            title: "Memory",
-            text: '1/$_availableCacheMemory',
-            textWidth: 40,
-            min: 0,
-            max: 256,
-            divisions: 32,
-            value: _availableCacheMemory.toDouble(),
-            onChanged: (value) => setState(() {
-              _availableCacheMemory = value.round();
-            }),
-          ),
           FutureBuilder<double?>(
             future: _getCacheSize(),
             builder: (context, snapshot) {
-              String cacheSize = 'N/A';
+              String cacheSize = appStrings.none;
               if (snapshot.hasData && snapshot.data != null) {
-                cacheSize = '${snapshot.data!.toStringAsFixed(1)} MB';
+                cacheSize = '${snapshot.data!.toStringAsFixed(1)} ${appStrings.settings_cacheMegabytes}';
               }
               return SettingsSectionItemInfo(
-                title: 'Cache size',
+                title: appStrings.settings_cacheSize,
                 text: cacheSize,
               );
             },
@@ -403,11 +475,11 @@ class _SettingsViewPageState extends State<SettingsViewPage> {
             onPressed: _clearCache,
             child: Padding(
               padding: const EdgeInsets.symmetric(
-                horizontal: 8,
-                vertical: 14,
+                horizontal: 8.0,
+                vertical: 14.0,
               ),
               child: Text(
-                "Clear Cache",
+                appStrings.settings_cacheClear,
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.displaySmall?.copyWith(
                       color: Theme.of(context).primaryColor,
@@ -418,23 +490,19 @@ class _SettingsViewPageState extends State<SettingsViewPage> {
         ],
       );
   Widget get _infoSection => SettingsSection(
-        title: "Information",
+        title: appStrings.settingsHeader_about,
         children: [
           SettingsSectionItemButton(
-            title: "@piwigo",
+            title: appStrings.settings_twitter,
             icon: const FaIcon(FontAwesomeIcons.twitter),
             onPressed: () async {
               await launchUrl(
-                Uri.parse("https://twitter.com/piwigo"),
+                Uri.parse('https://twitter.com/piwigo'),
               );
             },
           ),
-          const SettingsSectionItemButton(
-            title: "Contact us",
-            disabled: true,
-          ),
           SettingsSectionItemButton(
-            title: "Support Forum",
+            title: appStrings.settings_supportForum,
             icon: const Icon(Icons.message),
             onPressed: () async {
               await launchUrl(
@@ -443,7 +511,7 @@ class _SettingsViewPageState extends State<SettingsViewPage> {
             },
           ),
           SettingsSectionItemButton(
-            title: "Rate on Play Store",
+            title: appStrings.settings_rateInAppStore,
             icon: const Icon(Icons.star_rate),
             onPressed: () async {
               PackageInfo package = await PackageInfo.fromPlatform();
@@ -455,10 +523,9 @@ class _SettingsViewPageState extends State<SettingsViewPage> {
             },
           ),
           SettingsSectionItemButton(
-            title: "Translate Piwigo NG",
+            title: appStrings.settings_translateWithCrowdin,
             icon: const Icon(Icons.translate),
             onPressed: () async {
-              PackageInfo package = await PackageInfo.fromPlatform();
               await launchUrl(
                 Uri.parse(
                   "https://crowdin.com/project/piwigo-ng",
@@ -466,14 +533,8 @@ class _SettingsViewPageState extends State<SettingsViewPage> {
               );
             },
           ),
-          // const SettingsSectionItemButton(
-          //   title: "Release Notes",
-          // ),
-          // const SettingsSectionItemButton(
-          //   title: "Acknowledgements",
-          // ),
           SettingsSectionItemButton(
-            title: "Privacy Policy",
+            title: appStrings.settings_privacy,
             icon: const Icon(Icons.privacy_tip),
             onPressed: () {
               Navigator.of(context).pushNamed(
@@ -501,7 +562,7 @@ class _SettingsViewPageState extends State<SettingsViewPage> {
         children: [
           SettingsSectionItem(
             child: FutureBuilder<ApiResult<InfoModel>>(
-              future: getInfo(),
+              future: _infoFuture,
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   if (!snapshot.data!.hasData) {

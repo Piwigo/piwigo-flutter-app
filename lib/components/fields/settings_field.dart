@@ -23,7 +23,7 @@ class SettingsField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: padding ?? const EdgeInsets.all(0),
+      padding: padding ?? const EdgeInsets.symmetric(horizontal: 8.0),
       child: TextFormField(
         controller: controller,
         focusNode: focusNode,

@@ -47,8 +47,10 @@ class _RootAlbumViewPageState extends State<RootAlbumViewPage> {
     if (!result.hasData) {
       return;
     }
+
     setState(() {
       _albumList = result.data!;
+      print(_albumList.first.urlRepresentative);
     });
   }
 
@@ -88,23 +90,26 @@ class _RootAlbumViewPageState extends State<RootAlbumViewPage> {
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           ApiResult<List<AlbumModel>> result = snapshot.data!;
-          if (result.hasError) {
+          if (!result.hasData) {
             return Center(
               child: Text(appStrings.categoryImageList_noDataError),
             );
           }
-          _albumList = result.data!;
-          if (_albumList.isEmpty)
-            return Center(
-              child: Text(appStrings.categoryMainEmpty),
-            );
+          if (_albumList.isEmpty) {
+            if (result.data!.isEmpty) {
+              return Center(
+                child: Text(appStrings.categoryMainEmpty),
+              );
+            }
+            _albumList = result.data!;
+          }
           return AlbumGridView(
             albumList: _albumList,
             onTap: (album) {
               Navigator.of(context).pushNamed(AlbumViewPage.routeName, arguments: {
                 'isAdmin': widget.isAdmin, // todo: use preferences
                 'album': album,
-              });
+              }).then((value) => _onRefresh());
             },
           );
         }

@@ -6,7 +6,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:piwigo_ng/api/api_error.dart';
 import 'package:piwigo_ng/models/info_model.dart';
 import 'package:piwigo_ng/models/status_model.dart';
-import 'package:piwigo_ng/services/shared_preferences_service.dart';
+import 'package:piwigo_ng/services/preferences_service.dart';
 
 import 'api_client.dart';
 
@@ -23,7 +23,7 @@ Future<ApiResult<bool>> loginUser(String url, String username, String password) 
   if (username.isEmpty && password.isEmpty) {
     ApiResult<StatusModel> status = await sessionStatus();
     if (status.hasData) {
-      savePreferences(status.data!, username: username, password: password);
+      Preferences.saveId(status.data!, username: username, password: password);
     }
     return ApiResult<bool>(
       data: true,
@@ -50,7 +50,7 @@ Future<ApiResult<bool>> loginUser(String url, String username, String password) 
       }
       ApiResult<StatusModel> status = await sessionStatus();
       if (status.hasData) {
-        savePreferences(status.data!, username: username, password: password);
+        Preferences.saveId(status.data!, username: username, password: password);
       }
       return ApiResult<bool>(
         data: true,
