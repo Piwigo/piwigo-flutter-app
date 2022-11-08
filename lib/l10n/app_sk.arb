@@ -195,14 +195,14 @@
             "count": {}
         }
     },
-    "deleteCategoryConfirm_title": "Are you sure?",
+    "deleteCategoryConfirm_title": "Ste si istý?",
     "deleteCategoryConfirm_message": "Please enter the number of photos in order to delete this album. Number of photos: {count}",
     "@deleteCategoryConfirm_message": {
         "placeholders": {
             "count": {}
         }
     },
-    "deleteCategoryConfirm_deleteButton": "DELETE",
+    "deleteCategoryConfirm_deleteButton": "ODSTRÁNIŤ",
     "deleteCategoryHUD_label": "Deleting Album…",
     "deleteCategoryHUD_deleted": "Album Deleted",
     "deleteCategoryMatchError_title": "Number Doesn't Match",
@@ -236,7 +236,7 @@
     "categorySelection_current": "Select the current album for this photo",
     "categorySelection_one": "Select one of the albums containing this photo",
     "categorySelection_other": "Or select another album for this photo",
-    "categoryImageSet_title": "Album Thumbnail",
+    "categoryImageSet_title": "Náhľad albumu",
     "categoryImageSet_message": "Are you sure you want to apply this photo to the album {album} ?",
     "@categoryImageSet_message": {
         "placeholders": {
