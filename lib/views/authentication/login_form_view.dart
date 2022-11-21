@@ -3,7 +3,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:piwigo_ng/api/api_error.dart';
 import 'package:piwigo_ng/api/authentication.dart';
 import 'package:piwigo_ng/app.dart';
-import 'package:piwigo_ng/components/buttons/animated_app_button.dart';
+import 'package:piwigo_ng/components/buttons/animated_piwigo_button.dart';
 import 'package:piwigo_ng/components/snackbars.dart';
 import 'package:piwigo_ng/utils/localizations.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
@@ -28,7 +28,14 @@ class _LoginFormViewState extends State<LoginFormView> {
   final TextEditingController _urlController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final FocusNode _urlFocusNode = FocusNode();
+  final FocusNode _usernameFocusNode = FocusNode();
+  final FocusNode _passwordFocusNode = FocusNode();
   final RoundedLoadingButtonController _btnController = RoundedLoadingButtonController();
+
+  String _url = '';
+  String _username = '';
+  String _password = '';
 
   bool _isSecured = true;
   bool _showPassword = false;
@@ -45,11 +52,14 @@ class _LoginFormViewState extends State<LoginFormView> {
     FlutterSecureStorage storage = const FlutterSecureStorage();
     String? url = await storage.read(key: 'SERVER_URL');
     if (url == null || url.isEmpty) return;
-    url = url.split('//').last;
-    url = url.substring(0, url.lastIndexOf('/'));
-    _urlController.text = url;
-    _usernameController.text = await storage.read(key: 'SERVER_USERNAME') ?? '';
-    _passwordController.text = await storage.read(key: 'SERVER_PASSWORD') ?? '';
+    List<String> urlFields = url.split('://');
+    _isSecured = urlFields.first == 'https';
+    _url = urlFields.last.substring(0, urlFields.last.lastIndexOf('/'));
+    _username = await storage.read(key: 'SERVER_USERNAME') ?? '';
+    _password = await storage.read(key: 'SERVER_PASSWORD') ?? '';
+    _urlController.text = _url;
+    _usernameController.text = _username;
+    _passwordController.text = _password;
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       if (mounted) {
         bool isError = !_urlValidator(url);
@@ -78,21 +88,29 @@ class _LoginFormViewState extends State<LoginFormView> {
     setState(() {
       switch (result.error) {
         case ApiErrors.wrongLoginId:
-          showErrorSnackBar(
-            message: appStrings.loginError_message,
-            icon: Icons.text_fields,
+          ScaffoldMessenger.of(context).showSnackBar(
+            errorSnackBar(
+              message: appStrings.loginError_message,
+              icon: Icons.text_fields,
+            ),
           );
           _idError = true;
           break;
         case ApiErrors.wrongServerUrl:
-          showErrorSnackBar(
-            message: appStrings.serverURLerror_title,
-            icon: Icons.public_off,
+          ScaffoldMessenger.of(context).showSnackBar(
+            errorSnackBar(
+              message: appStrings.serverURLerror_title,
+              icon: Icons.public_off,
+            ),
           );
           _urlError = true;
           break;
         default:
-          showErrorSnackBar(message: appStrings.serverUnknownError_message);
+          ScaffoldMessenger.of(context).showSnackBar(
+            errorSnackBar(
+              message: appStrings.serverUnknownError_message,
+            ),
+          );
       }
     });
   }
@@ -115,9 +133,9 @@ class _LoginFormViewState extends State<LoginFormView> {
     _btnController.start();
     try {
       var result = await loginUser(
-        '${_isSecured ? 'https' : 'http'}://${_urlController.text}/',
-        _usernameController.text,
-        _passwordController.text,
+        '${_isSecured ? 'https' : 'http'}://$_url/',
+        username: _username,
+        password: _password,
       );
       if (result.data == false || result.error != null) {
         _onLoginError(result);
@@ -127,7 +145,11 @@ class _LoginFormViewState extends State<LoginFormView> {
     } on Error catch (e) {
       debugPrint(e.toString());
       _btnController.error();
-      showErrorSnackBar(message: appStrings.serverUnknownError_message);
+      ScaffoldMessenger.of(context).showSnackBar(
+        errorSnackBar(
+          message: appStrings.serverUnknownError_message,
+        ),
+      );
     }
     await Future.delayed(const Duration(seconds: 1));
     _btnController.reset();
@@ -141,8 +163,9 @@ class _LoginFormViewState extends State<LoginFormView> {
         children: [
           AppField(
             margin: const EdgeInsets.symmetric(vertical: 4.0),
-            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            padding: const EdgeInsets.symmetric(vertical: 16.0),
             controller: _urlController,
+            focusNode: _urlFocusNode,
             onChanged: (value) {
               bool isError = !_urlValidator(value);
               if (_urlError != isError) {
@@ -150,27 +173,30 @@ class _LoginFormViewState extends State<LoginFormView> {
                   _urlError = isError;
                 });
               }
+              setState(() {
+                _url = value;
+              });
             },
             textInputAction: TextInputAction.next,
             icon: const Icon(Icons.public),
             hint: 'example.piwigo.com',
             error: _urlError,
-            prefix: _securedPrefix(),
-            suffix: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: Text('/', style: Theme.of(context).textTheme.bodyMedium),
-            ),
+            prefix: _securedPrefix,
           ),
           AppField(
             margin: const EdgeInsets.symmetric(vertical: 4.0),
-            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            padding: const EdgeInsets.symmetric(vertical: 16.0),
             controller: _usernameController,
+            focusNode: _usernameFocusNode,
             onChanged: (value) {
               if (_idError) {
                 setState(() {
                   _idError = false;
                 });
               }
+              setState(() {
+                _username = value;
+              });
             },
             textInputAction: TextInputAction.next,
             hint: "username",
@@ -180,8 +206,9 @@ class _LoginFormViewState extends State<LoginFormView> {
           ),
           AppField(
             margin: const EdgeInsets.symmetric(vertical: 4.0),
-            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            padding: const EdgeInsets.symmetric(vertical: 16.0),
             controller: _passwordController,
+            focusNode: _passwordFocusNode,
             onFieldSubmitted: (String value) {
               FocusScope.of(context).unfocus();
               _onLogin();
@@ -192,6 +219,9 @@ class _LoginFormViewState extends State<LoginFormView> {
                   _idError = false;
                 });
               }
+              setState(() {
+                _password = value;
+              });
             },
             textInputAction: TextInputAction.done,
             obscureText: !_showPassword,
@@ -207,7 +237,7 @@ class _LoginFormViewState extends State<LoginFormView> {
           ),
           Padding(
             padding: const EdgeInsets.only(top: 12),
-            child: AnimatedAppButton(
+            child: AnimatedPiwigoButton(
               controller: _btnController,
               disabled: _urlError,
               color: Theme.of(context).primaryColor,
@@ -223,7 +253,7 @@ class _LoginFormViewState extends State<LoginFormView> {
     );
   }
 
-  Widget _securedPrefix() {
+  Widget get _securedPrefix {
     return GestureDetector(
       onTap: () => setState(() {
         _isSecured = !_isSecured;

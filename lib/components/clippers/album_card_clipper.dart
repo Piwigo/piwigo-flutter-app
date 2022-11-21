@@ -5,8 +5,13 @@ import 'package:flutter/material.dart';
 class AlbumCardClipper extends CustomClipper<Path> {
   final double anchorRadius;
   final double outerRadius;
+  final bool isAdmin;
 
-  const AlbumCardClipper({this.anchorRadius = 8, this.outerRadius = 16});
+  const AlbumCardClipper({
+    this.anchorRadius = 8,
+    this.outerRadius = 16,
+    this.isAdmin = false,
+  });
 
   @override
   Path getClip(Size size) {
@@ -25,37 +30,24 @@ class AlbumCardClipper extends CustomClipper<Path> {
       clockwise: false,
     );
 
-    // Right side
-    // path.lineTo(width - outerRadius, 0);
-    // path.arcToPoint(
-    //   Offset(width, outerRadius),
-    //   radius: Radius.circular(outerRadius),
-    // );
-    // path.lineTo(width, height / 2 - rightAnchorHeight / 2);
     path.lineTo(width, 0);
     path.lineTo(width, height / 2 - rightAnchorHeight / 2);
 
     // Right anchor
-    path.arcToPoint(
-      Offset(width - anchorRadius,
-          height / 2 - rightAnchorHeight / 2 + anchorRadius),
-      radius: Radius.circular(anchorRadius),
-      clockwise: false,
-    );
-    path.lineTo(width - anchorRadius,
-        height / 2 + rightAnchorHeight / 2 - anchorRadius);
-    path.arcToPoint(
-      Offset(width, height / 2 + rightAnchorHeight / 2),
-      radius: Radius.circular(anchorRadius),
-      clockwise: false,
-    );
+    if (isAdmin) {
+      path.arcToPoint(
+        Offset(width - anchorRadius, height / 2 - rightAnchorHeight / 2 + anchorRadius),
+        radius: Radius.circular(anchorRadius),
+        clockwise: false,
+      );
+      path.lineTo(width - anchorRadius, height / 2 + rightAnchorHeight / 2 - anchorRadius);
+      path.arcToPoint(
+        Offset(width, height / 2 + rightAnchorHeight / 2),
+        radius: Radius.circular(anchorRadius),
+        clockwise: false,
+      );
+    }
 
-    // path.lineTo(width, height - outerRadius);
-    // path.arcToPoint(
-    //   Offset(width - outerRadius, height),
-    //   radius: Radius.circular(outerRadius),
-    // );
-    // path.lineTo(height + anchorRadius * 2, height);
     path.lineTo(width, height);
     path.lineTo(height + anchorRadius * 2, height);
 

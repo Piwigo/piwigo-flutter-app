@@ -12,10 +12,16 @@ class AlbumGridView extends StatelessWidget {
     this.albumList = const [],
     this.onTap,
     this.padding,
+    this.onDelete,
+    this.onEdit,
+    this.onMove,
   }) : super(key: key);
 
   final List<AlbumModel> albumList;
   final Function(AlbumModel)? onTap;
+  final Function(AlbumModel)? onDelete;
+  final Function(AlbumModel)? onEdit;
+  final Function(AlbumModel)? onMove;
   final EdgeInsetsGeometry? padding;
 
   @override
@@ -38,6 +44,9 @@ class AlbumGridView extends StatelessWidget {
           onTap: () {
             if (onTap != null) onTap!(album);
           },
+          onDelete: () => onDelete?.call(album),
+          onEdit: () => onEdit?.call(album),
+          onMove: () => onMove?.call(album),
         );
       },
     );

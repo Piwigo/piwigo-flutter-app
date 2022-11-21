@@ -242,7 +242,7 @@
 
 
     "deleteCategory_title": "DELETE ALBUM",
-    "deleteCategory_message": "{count, plural, =0{ARE YOU SURE YOU WANT TO DELETE THE ALBUM {album}} =1{ARE YOU SURE YOU WANT TO DELETE THE ALBUM {album} AND ITS PHOTO} other{ARE YOU SURE YOU WANT TO DELETE THE ALBUM {album} AND ALL {count} PHOTOS ?}",
+    "deleteCategory_message": "{count, plural, =0{ARE YOU SURE YOU WANT TO DELETE THE ALBUM {album} ?} =1{ARE YOU SURE YOU WANT TO DELETE THE ALBUM {album} AND ITS PHOTO ?} other{ARE YOU SURE YOU WANT TO DELETE THE ALBUM {album} AND ALL {count} PHOTOS ?}",
     "@deleteCategory_message" : {
         "placeholders": {
             "count": {},
@@ -251,13 +251,16 @@
     },
     "deleteCategory_empty": "Delete Empty Album",
     "deleteCategory_noImages": "Keep Photos",
+    "deleteCategory_noImages_subtitle": "may create orphan photos",
     "deleteCategory_orphanedImages": "Delete Orphans",
+    "deleteCategory_orphanedImages_subtitle": "Default mode, only deletes photos linked to no other album",
     "deleteCategory_allImages": "{count, plural, =0{Delete Photos} =1{Delete Photo} other{Delete {count} Photos}}",
     "@deleteCategory_allImages" : {
         "placeholders": {
             "count": {}
         }
     },
+    "deleteCategory_allImages_subtitle": "Delete all photos, even those linked to other albums",
     "deleteCategoryConfirm_title": "Are you sure?",
     "deleteCategoryConfirm_message": "Please enter the number of photos in order to delete this album. Number of photos: {count}",
     "@deleteCategoryConfirm_message" : {

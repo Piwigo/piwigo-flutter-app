@@ -4,7 +4,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mime_type/mime_type.dart';
-import 'package:piwigo_ng/components/buttons/animated_app_button.dart';
+import 'package:piwigo_ng/components/buttons/animated_piwigo_button.dart';
 import 'package:piwigo_ng/components/fields/app_field.dart';
 import 'package:piwigo_ng/components/sections/form_section.dart';
 import 'package:piwigo_ng/utils/resources.dart';
@@ -16,11 +16,11 @@ import '../../models/tag_model.dart';
 import '../../utils/localizations.dart';
 
 class UploadViewPage extends StatefulWidget {
-  const UploadViewPage({Key? key, required this.imageData, required this.category}) : super(key: key);
+  const UploadViewPage({Key? key, required this.imageList, required this.albumId}) : super(key: key);
 
   static const String routeName = '/upload';
-  final List<XFile> imageData;
-  final String category;
+  final List<XFile> imageList;
+  final int albumId;
 
   @override
   State<UploadViewPage> createState() => _UploadGalleryViewPage();
@@ -72,7 +72,7 @@ class _UploadGalleryViewPage extends State<UploadViewPage> {
       }).toList();
       if (images.isNotEmpty) {
         setState(() {
-          widget.imageData.addAll(images);
+          widget.imageList.addAll(images);
         });
       }
     } catch (e) {
@@ -85,7 +85,7 @@ class _UploadGalleryViewPage extends State<UploadViewPage> {
       final XFile? image = await _picker.pickImage(source: ImageSource.camera);
       if (image != null) {
         setState(() {
-          widget.imageData.add(image);
+          widget.imageList.add(image);
         });
       }
     } catch (e) {
@@ -98,7 +98,7 @@ class _UploadGalleryViewPage extends State<UploadViewPage> {
       final XFile? image = await _picker.pickVideo(source: ImageSource.camera);
       if (image != null) {
         setState(() {
-          widget.imageData.add(image);
+          widget.imageList.add(image);
         });
       }
     } catch (e) {
@@ -108,14 +108,14 @@ class _UploadGalleryViewPage extends State<UploadViewPage> {
 
   Future<void> _onRemoveFile(int index) async {
     setState(() {
-      widget.imageData.removeAt(index);
+      widget.imageList.removeAt(index);
     });
   }
 
   Future<void> _onUpload() async {
     _btnController.start();
     List<int> tagIds = _tags.map<int>((tag) => tag.id).toList();
-    var result = await uploadPhotos(widget.imageData, widget.category, info: {
+    var result = await uploadPhotos(widget.imageList, widget.albumId, info: {
       'name': _nameController.text,
       'comment': _descController.text,
       'tag_ids': tagIds,
@@ -164,7 +164,7 @@ class _UploadGalleryViewPage extends State<UploadViewPage> {
                     onTapTitle: () => setState(() {
                       _showFiles = !_showFiles;
                     }),
-                    title: appStrings.imageCount(widget.imageData.length),
+                    title: appStrings.imageCount(widget.imageList.length),
                     actions: [
                       GestureDetector(
                         behavior: HitTestBehavior.opaque,
@@ -200,9 +200,9 @@ class _UploadGalleryViewPage extends State<UploadViewPage> {
                           padding: const EdgeInsets.all(0),
                           physics: const NeverScrollableScrollPhysics(),
                           shrinkWrap: true,
-                          itemCount: widget.imageData.length,
+                          itemCount: widget.imageList.length,
                           itemBuilder: (context, index) {
-                            final File file = File(widget.imageData[index].path);
+                            final File file = File(widget.imageList[index].path);
                             return Stack(
                               children: [
                                 Positioned.fill(
@@ -340,13 +340,13 @@ class _UploadGalleryViewPage extends State<UploadViewPage> {
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 16),
-                    child: AnimatedAppButton(
+                    child: AnimatedPiwigoButton(
                       controller: _btnController,
                       color: Theme.of(context).primaryColor,
-                      disabled: widget.imageData.isEmpty,
+                      disabled: widget.imageList.isEmpty,
                       onPressed: _onUpload,
                       child: Text(
-                        widget.imageData.isEmpty ? appStrings.noImages : appStrings.imageUploadDetailsButton_title,
+                        widget.imageList.isEmpty ? appStrings.noImages : appStrings.imageUploadDetailsButton_title,
                         style: Theme.of(context).textTheme.displaySmall,
                       ),
                     ),

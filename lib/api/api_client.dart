@@ -8,17 +8,22 @@ import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'api_interceptor.dart';
 
 class ApiClient {
-  static HttpClientAdapter _httpClientAdapter = DefaultHttpClientAdapter()
-    ..onHttpClientCreate = (HttpClient client) {
-      client.badCertificateCallback = (X509Certificate cert, String host, int port) => true;
-      return client;
-    };
-
   static CookieJar cookieJar = CookieJar();
   static Dio dio = Dio(BaseOptions())
     ..interceptors.add(ApiInterceptor())
     ..interceptors.add(CookieManager(cookieJar))
-    ..httpClientAdapter = _httpClientAdapter;
+    ..httpClientAdapter = sslHttpClientAdapter;
+
+  static HttpClientAdapter get sslHttpClientAdapter {
+    return DefaultHttpClientAdapter()
+      ..onHttpClientCreate = (HttpClient client) {
+        client.badCertificateCallback = (X509Certificate cert, String host, int port) {
+          // todo: accept certs
+          return true;
+        };
+        return client;
+      };
+  }
 
   static Future<Response> get({
     String path = 'ws.php',

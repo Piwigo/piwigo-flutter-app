@@ -10,7 +10,7 @@ void callbackDispatcher() {
     print(appDocDir.listSync());
     final List<File> files = appDocDir.listSync().whereType<File>().toList();
     List<XFile> uploadFiles = files.map<XFile>((file) => XFile(file.path)).toList();
-    final result = await uploadPhotos(uploadFiles, "92");
+    final result = await uploadPhotos(uploadFiles, 92);
     print(result);
     return Future.value(true);
   });

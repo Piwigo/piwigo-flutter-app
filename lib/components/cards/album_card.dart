@@ -15,29 +15,32 @@ class AlbumCard extends StatelessWidget {
     this.onTap,
     this.showActions = true,
     this.example = false,
+    this.onDelete,
+    this.onEdit,
+    this.onMove,
   }) : super(key: key);
 
   final bool example;
   final AlbumModel album;
   final Function()? onTap;
+  final Function()? onDelete;
+  final Function()? onEdit;
+  final Function()? onMove;
   final bool showActions;
 
   static const double kAlbumAnchorRadius = 8.0;
   static const double kAlbumOuterRadius = 16.0;
   static const double kAlbumRatio = 3;
 
-  Future<void> _onEdit() async {}
-
-  Future<void> _onMove() async {}
-
-  Future<void> _onDelete() async {}
-
   void _onPressedAlbum(context) {
     if (example) return;
     if (onTap == null) {
-      Navigator.of(context).pushNamed(AlbumViewPage.routeName, arguments: {
-        'album': album,
-      });
+      Navigator.of(context).pushNamed(
+        AlbumViewPage.routeName,
+        arguments: {
+          'album': album,
+        },
+      );
     } else {
       onTap!();
     }
@@ -51,7 +54,7 @@ class AlbumCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(kAlbumOuterRadius),
         child: Slidable(
           enabled: showActions,
-          endActionPane: _actionPane,
+          endActionPane: _actionPane(context),
           child: Builder(builder: (context) {
             return GestureDetector(
               onLongPress: () => Slidable.of(context)?.openEndActionPane(),
@@ -68,31 +71,31 @@ class AlbumCard extends StatelessWidget {
     );
   }
 
-  ActionPane? get _actionPane {
+  ActionPane? _actionPane(BuildContext context) {
     return ActionPane(
       motion: const DrawerMotion(),
       children: [
-        Builder(builder: (context) {
-          return AlbumCardAction(
-            backgroundColor: Theme.of(context).primaryColor,
-            foregroundColor: Colors.white, // Todo: Theme icon light color
-            onPressed: _onEdit,
-            icon: Icons.edit,
-          );
-        }),
+        AlbumCardAction(
+          backgroundColor: Theme.of(context).primaryColor,
+          foregroundColor: Colors.white,
+          autoClose: true,
+          onPressed: onEdit,
+          icon: Icons.edit,
+        ),
         AlbumCardAction(
           backgroundColor: const Color(0xFF4B4B4B), // Todo: Theme grey action color
-          onPressed: _onMove,
+          foregroundColor: Colors.white,
+          autoClose: true,
+          onPressed: onMove,
           icon: Icons.drive_file_move,
         ),
-        Builder(builder: (context) {
-          return AlbumCardAction(
-            backgroundColor: Theme.of(context).errorColor,
-            autoClose: true,
-            onPressed: _onDelete,
-            icon: Icons.delete,
-          );
-        }),
+        AlbumCardAction(
+          backgroundColor: Theme.of(context).errorColor,
+          foregroundColor: Colors.white,
+          autoClose: true,
+          onPressed: onDelete,
+          icon: Icons.delete,
+        ),
       ],
     );
   }
@@ -122,6 +125,7 @@ class AlbumCard extends StatelessWidget {
             clipper: const AlbumCardClipper(
               anchorRadius: kAlbumAnchorRadius,
               outerRadius: kAlbumOuterRadius,
+              isAdmin: true,
             ),
             shadow: Shadow(
               color: Colors.black.withOpacity(0.3),
@@ -147,8 +151,12 @@ class AlbumCard extends StatelessWidget {
 
   Widget get _userContent {
     return Builder(builder: (context) {
-      return ClipRRect(
-        borderRadius: BorderRadius.circular(kAlbumOuterRadius),
+      return ClipPath(
+        clipper: const AlbumCardClipper(
+          anchorRadius: kAlbumAnchorRadius,
+          outerRadius: kAlbumOuterRadius,
+          isAdmin: false,
+        ),
         child: Container(
           padding: const EdgeInsets.all(8.0),
           decoration: BoxDecoration(
@@ -212,7 +220,7 @@ class AlbumCardContent extends StatelessWidget {
                 album.urlRepresentative!,
                 fit: BoxFit.cover,
                 errorBuilder: (context, o, s) {
-                  print(o);
+                  debugPrint("$o");
                   return Center(child: Icon(Icons.image_not_supported));
                 },
               );

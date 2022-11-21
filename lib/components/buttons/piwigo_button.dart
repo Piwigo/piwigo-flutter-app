@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class AppButton extends StatelessWidget {
-  const AppButton({
+class PiwigoButton extends StatelessWidget {
+  const PiwigoButton({
     Key? key,
     this.margin,
     this.padding,
@@ -10,11 +10,13 @@ class AppButton extends StatelessWidget {
     this.disabled = false,
     this.loading = false,
     this.text = '',
+    this.style,
   }) : super(key: key);
 
   final EdgeInsets? margin;
   final EdgeInsets? padding;
   final Color? color;
+  final TextStyle? style;
   final Function()? onPressed;
   final bool disabled;
   final bool loading;
@@ -24,17 +26,18 @@ class AppButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final Color backgroundColor = disabled ? Theme.of(context).disabledColor : color ?? Theme.of(context).colorScheme.primary;
     return GestureDetector(
+      behavior: HitTestBehavior.opaque,
       onTap: disabled ? null : onPressed,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 300),
         margin: margin,
         padding: padding,
-        height: 50,
+        height: 56.0,
         constraints: const BoxConstraints(
-          minWidth: 50,
+          minWidth: 56.0,
         ),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(10.0),
           color: backgroundColor,
         ),
         alignment: Alignment.center,
@@ -44,7 +47,7 @@ class AppButton extends StatelessWidget {
           }
           return Text(
             text,
-            style: Theme.of(context).textTheme.titleSmall,
+            style: style ?? Theme.of(context).textTheme.displaySmall,
           );
         }),
       ),

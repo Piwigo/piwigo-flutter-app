@@ -18,7 +18,9 @@ Future<ApiResult<List<AlbumModel>>> fetchAlbums(int albumID) async {
   };
 
   try {
-    Response response = await ApiClient.get(queryParameters: queries);
+    Response response = await ApiClient.get(
+      queryParameters: queries,
+    );
 
     if (response.statusCode == 200) {
       List<dynamic> jsonAlbums = json.decode(response.data)['result']['categories'];
@@ -30,35 +32,179 @@ Future<ApiResult<List<AlbumModel>>> fetchAlbums(int albumID) async {
         data: albums,
       );
     }
-    return ApiResult(error: ApiErrors.fetchAlbumsError);
   } on DioError catch (e) {
     debugPrint(e.message);
-    return ApiResult(error: ApiErrors.fetchAlbumsError);
   } catch (e) {
     debugPrint("$e");
-    return ApiResult(error: ApiErrors.fetchAlbumsError);
   }
+  return ApiResult(error: ApiErrors.fetchAlbumsError);
 }
 
 Future<ApiResult<Map<String, dynamic>>> getAlbumList() async {
   Map<String, String> queries = {
-    "format": "json",
-    "method": "pwg.categories.getAdminList",
+    'format': 'json',
+    'method': 'pwg.categories.getAdminList',
   };
 
   try {
-    Response response = await ApiClient.get(queryParameters: queries);
+    Response response = await ApiClient.get(
+      queryParameters: queries,
+    );
 
     if (response.statusCode == 200) {
-      return json.decode(response.data);
-    } else {
-      return ApiResult(error: ApiErrors.fetchAlbumListError);
+      return ApiResult(data: json.decode(response.data));
     }
   } on DioError catch (e) {
     debugPrint(e.message);
-    return ApiResult(error: ApiErrors.fetchAlbumListError);
   } catch (e) {
     debugPrint("$e");
-    return ApiResult(error: ApiErrors.fetchAlbumListError);
+  }
+  return ApiResult(error: ApiErrors.fetchAlbumListError);
+}
+
+Future<ApiResult> addAlbum({required String name, required int parentId, String description = ''}) async {
+  Map<String, dynamic> queries = {
+    'format': 'json',
+    'method': 'pwg.categories.add',
+    'name': name,
+    'comment': description,
+    'parent': parentId,
+  };
+  try {
+    Response response = await ApiClient.post(
+      queryParameters: queries,
+    );
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = json.decode(response.data);
+      if (data['stat'] == 'fail') {
+        debugPrint("$data");
+        return ApiResult(error: ApiErrors.createAlbumError);
+      }
+      return ApiResult(data: data);
+    }
+  } on DioError catch (e) {
+    debugPrint(e.message);
+  } catch (e) {
+    debugPrint("$e");
+  }
+  return ApiResult(error: ApiErrors.createAlbumError);
+}
+
+Future<dynamic> deleteAlbum(
+  int catId, {
+  DeleteAlbumModes deletionMode = DeleteAlbumModes.deleteOrphans,
+}) async {
+  Map<String, String> queries = {
+    'format': 'json',
+    'method': 'pwg.categories.delete',
+  };
+  FormData formData = FormData.fromMap({
+    'category_id': catId,
+    'pwg_token': appPreferences.getString('PWG_TOKEN'),
+    'photo_deletion_mode': deletionMode.value,
+  });
+  try {
+    Response response = await ApiClient.post(
+      data: formData,
+      queryParameters: queries,
+    );
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = json.decode(response.data);
+      if (data['stat'] == 'fail') {
+        debugPrint("$data");
+        return ApiResult(error: ApiErrors.deleteAlbumError);
+      }
+      return ApiResult(data: data);
+    }
+  } on DioError catch (e) {
+    debugPrint("${e.message}");
+  } catch (e) {
+    debugPrint("$e");
+  }
+  return ApiResult(error: ApiErrors.deleteAlbumError);
+}
+
+Future<dynamic> moveAlbum(int catId, String parentCatId) async {
+  Map<String, String> queries = {
+    'format': 'json',
+    'method': 'pwg.categories.move',
+  };
+  FormData formData = FormData.fromMap({
+    'category_id': catId,
+    'parent': parentCatId,
+    'pwg_token': appPreferences.getString('PWG_TOKEN'),
+  });
+
+  try {
+    Response response = await ApiClient.post(
+      data: formData,
+      queryParameters: queries,
+    );
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = json.decode(response.data);
+      if (data['stat'] == 'fail') {
+        debugPrint("$data");
+        return ApiResult(error: ApiErrors.moveAlbumError);
+      }
+      return ApiResult(data: data);
+    }
+  } on DioError catch (e) {
+    debugPrint("${e.message}");
+  } catch (e) {
+    debugPrint("$e");
+  }
+  return ApiResult(error: ApiErrors.moveAlbumError);
+}
+
+Future<dynamic> editAlbum({required String name, required int albumId, String description = ''}) async {
+  Map<String, String> queries = {
+    'format': 'json',
+    'method': 'pwg.categories.setInfo',
+  };
+  FormData formData = FormData.fromMap({
+    'category_id': albumId,
+    'name': name,
+    'comment': description,
+  });
+  try {
+    Response response = await ApiClient.post(
+      data: formData,
+      queryParameters: queries,
+    );
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = json.decode(response.data);
+      if (data['stat'] == 'fail') {
+        debugPrint("$data");
+        return ApiResult(error: ApiErrors.editAlbumError);
+      }
+      return ApiResult(data: data);
+    }
+  } on DioError catch (e) {
+    debugPrint("${e.message}");
+  } catch (e) {
+    debugPrint("$e");
+  }
+  return ApiResult(error: ApiErrors.editAlbumError);
+}
+
+enum DeleteAlbumModes {
+  noDelete,
+  deleteOrphans,
+  forceDelete,
+}
+
+extension DeleteAlbumModesExtention on DeleteAlbumModes {
+  String get value {
+    switch (this) {
+      case DeleteAlbumModes.noDelete:
+        return 'no_delete';
+      case DeleteAlbumModes.deleteOrphans:
+        return 'delete_orphans';
+      case DeleteAlbumModes.forceDelete:
+        return 'force_delete';
+    }
   }
 }

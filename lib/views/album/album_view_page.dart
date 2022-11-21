@@ -5,9 +5,13 @@ import 'package:image_picker/image_picker.dart';
 import 'package:piwigo_ng/api/albums.dart';
 import 'package:piwigo_ng/api/api_error.dart';
 import 'package:piwigo_ng/components/modals/choose_camera_picker_modal.dart';
+import 'package:piwigo_ng/components/modals/create_album_modal.dart';
+import 'package:piwigo_ng/components/modals/delete_album_mode_modal.dart';
+import 'package:piwigo_ng/components/modals/edit_album_modal.dart';
 import 'package:piwigo_ng/components/popup_list_item.dart';
 import 'package:piwigo_ng/components/scroll_widgets/album_grid_view.dart';
 import 'package:piwigo_ng/components/scroll_widgets/image_grid_view.dart';
+import 'package:piwigo_ng/components/snackbars.dart';
 import 'package:piwigo_ng/models/album_model.dart';
 import 'package:piwigo_ng/models/image_model.dart';
 import 'package:piwigo_ng/utils/localizations.dart';
@@ -94,16 +98,76 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
     _refreshController.refreshCompleted();
   }
 
-  void _onEdit() {}
-  void _onMove() {}
-  void _onDelete() {}
+  void _onTapAlbum(AlbumModel album) {
+    Navigator.of(context).pushNamed(AlbumViewPage.routeName, arguments: {
+      'isAdmin': widget.isAdmin, // todo: use preferences
+      'album': album,
+    }).then((value) => _onRefresh());
+  }
 
   Future<void> _onAddAlbum() async {
-    Navigator.of(context).pushNamed(UploadViewPage.routeName, arguments: {
-      "images": <XFile>[],
-      "category": widget.album.id,
-    });
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (_) => Padding(
+        padding: MediaQuery.of(context).padding,
+        child: CreateAlbumModal(albumId: widget.album.id),
+      ),
+    ).whenComplete(() => _onRefresh());
   }
+
+  Future<bool> _onDeleteAlbum(AlbumModel album) async {
+    DeleteAlbumModes mode = DeleteAlbumModes.deleteOrphans;
+    if (album.nbTotalImages != 0) {
+      final int? choice = await showModalBottomSheet<int>(
+        context: context,
+        isScrollControlled: true,
+        isDismissible: true,
+        builder: (context) => DeleteAlbumModeModal(
+          albumModel: album,
+        ),
+      );
+      if (choice == null) return false;
+      switch (choice) {
+        case 0:
+          mode = DeleteAlbumModes.noDelete;
+          break;
+        case 1:
+          mode = DeleteAlbumModes.deleteOrphans;
+          break;
+        case 2:
+          mode = DeleteAlbumModes.forceDelete;
+          break;
+      }
+    }
+    final ApiResult result = await deleteAlbum(
+      album.id,
+      deletionMode: mode,
+    );
+    if (result.hasError) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        errorSnackBar(message: appStrings.deleteCategoryError_title),
+      );
+      return false;
+    }
+    _onRefresh();
+    return true;
+  }
+
+  Future<void> _onEditAlbum(AlbumModel album) async {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (_) => Padding(
+        padding: MediaQuery.of(context).padding,
+        child: EditAlbumModal(album: album),
+      ),
+    ).whenComplete(() => _onRefresh());
+  }
+
+  Future<void> _onEditPhotos() async {}
+  Future<void> _onMovePhotos() async {}
+  Future<void> _onDeletePhotos() async {}
 
   Future<void> _onPickImages() async {
     try {
@@ -256,12 +320,18 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
                 ),
               ),
             PopupMenuItem(
+              onTap: () => _onEditAlbum(widget.album),
               child: PopupListItem(
                 icon: Icons.drive_file_rename_outline_sharp,
                 text: appStrings.renameCategory_title,
               ),
             ),
             PopupMenuItem(
+              onTap: () async {
+                if (await _onDeleteAlbum(widget.album)) {
+                  Navigator.of(context).pop();
+                }
+              },
               child: PopupListItem(
                 color: Theme.of(context).errorColor,
                 icon: Icons.delete,
@@ -315,12 +385,9 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
     if (_albumList.isEmpty) return const SizedBox();
     return AlbumGridView(
       albumList: _albumList,
-      onTap: (album) {
-        Navigator.of(context).pushNamed(AlbumViewPage.routeName, arguments: {
-          'isAdmin': true, // todo: use preferences
-          'album': album,
-        });
-      },
+      onTap: _onTapAlbum,
+      onEdit: _onEditAlbum,
+      onDelete: _onDeleteAlbum,
     );
   }
 
@@ -370,19 +437,19 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
           children: [
             Expanded(
               child: IconButton(
-                onPressed: _onEdit,
+                onPressed: _onEditPhotos,
                 icon: Icon(Icons.edit),
               ),
             ),
             Expanded(
               child: IconButton(
-                onPressed: _onMove,
+                onPressed: _onMovePhotos,
                 icon: Icon(Icons.drive_file_move),
               ),
             ),
             Expanded(
               child: IconButton(
-                onPressed: _onDelete,
+                onPressed: _onDeletePhotos,
                 icon: Icon(Icons.delete),
               ),
             ),

@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:piwigo_ng/api/albums.dart';
 import 'package:piwigo_ng/api/api_error.dart';
+import 'package:piwigo_ng/components/modals/create_album_modal.dart';
+import 'package:piwigo_ng/components/modals/delete_album_mode_modal.dart';
+import 'package:piwigo_ng/components/modals/edit_album_modal.dart';
 import 'package:piwigo_ng/components/scroll_widgets/album_grid_view.dart';
+import 'package:piwigo_ng/components/snackbars.dart';
 import 'package:piwigo_ng/models/album_model.dart';
 import 'package:piwigo_ng/utils/localizations.dart';
 
@@ -50,11 +54,74 @@ class _RootAlbumViewPageState extends State<RootAlbumViewPage> {
 
     setState(() {
       _albumList = result.data!;
-      print(_albumList.first.urlRepresentative);
     });
   }
 
-  Future<void> _onAddAlbum() async {}
+  Future<void> _onAddAlbum() async {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (_) => Padding(
+        padding: MediaQuery.of(context).padding,
+        child: CreateAlbumModal(albumId: widget.albumId),
+      ),
+    ).whenComplete(() => _onRefresh());
+  }
+
+  void _onTapAlbum(AlbumModel album) {
+    Navigator.of(context).pushNamed(AlbumViewPage.routeName, arguments: {
+      'isAdmin': widget.isAdmin, // todo: use preferences
+      'album': album,
+    }).then((value) => _onRefresh());
+  }
+
+  Future<void> _onDeleteAlbum(AlbumModel album) async {
+    DeleteAlbumModes mode = DeleteAlbumModes.deleteOrphans;
+    if (album.nbTotalImages != 0) {
+      final int? choice = await showModalBottomSheet<int>(
+        context: context,
+        isScrollControlled: true,
+        isDismissible: true,
+        builder: (context) => DeleteAlbumModeModal(
+          albumModel: album,
+        ),
+      );
+      if (choice == null) return;
+      switch (choice) {
+        case 0:
+          mode = DeleteAlbumModes.noDelete;
+          break;
+        case 1:
+          mode = DeleteAlbumModes.deleteOrphans;
+          break;
+        case 2:
+          mode = DeleteAlbumModes.forceDelete;
+          break;
+      }
+    }
+    final ApiResult result = await deleteAlbum(
+      album.id,
+      deletionMode: mode,
+    );
+    if (result.hasError) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        errorSnackBar(message: appStrings.deleteCategoryError_title),
+      );
+      return;
+    }
+    _onRefresh();
+  }
+
+  Future<void> _onEditAlbum(AlbumModel album) async {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (_) => Padding(
+        padding: MediaQuery.of(context).padding,
+        child: EditAlbumModal(album: album),
+      ),
+    ).whenComplete(() => _onRefresh());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -105,12 +172,9 @@ class _RootAlbumViewPageState extends State<RootAlbumViewPage> {
           }
           return AlbumGridView(
             albumList: _albumList,
-            onTap: (album) {
-              Navigator.of(context).pushNamed(AlbumViewPage.routeName, arguments: {
-                'isAdmin': widget.isAdmin, // todo: use preferences
-                'album': album,
-              }).then((value) => _onRefresh());
-            },
+            onTap: _onTapAlbum,
+            onDelete: _onDeleteAlbum,
+            onEdit: _onEditAlbum,
           );
         }
         return const Center(

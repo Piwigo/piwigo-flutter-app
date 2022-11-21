@@ -80,10 +80,8 @@ class _AppFieldState extends State<AppField> {
     if (widget.controller != null) {
       _value = widget.controller!.text;
     }
-    EdgeInsets errorPadding = (widget.error ? const EdgeInsets.all(0) : const EdgeInsets.all(1));
     return Container(
       margin: widget.margin,
-      padding: (widget.padding ?? const EdgeInsets.all(0)) + errorPadding,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10.0),
         color: widget.color ?? Theme.of(context).inputDecorationTheme.fillColor,
@@ -105,6 +103,7 @@ class _AppFieldState extends State<AppField> {
               obscureText: widget.obscureText,
               style: Theme.of(context).textTheme.bodyMedium,
               decoration: InputDecoration(
+                contentPadding: widget.padding ?? const EdgeInsets.all(16.0),
                 border: InputBorder.none,
                 hintText: widget.hint,
                 isDense: true,

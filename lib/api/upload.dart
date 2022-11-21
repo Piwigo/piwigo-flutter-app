@@ -37,7 +37,7 @@ Future<void> _showUploadNotification({bool success = true}) async {
 
 Future<List<Map<String, dynamic>>> uploadPhotos(
   List<XFile> photos,
-  String category, {
+  int albumId, {
   Map<String, dynamic>? info,
 }) async {
   List<Map<String, dynamic>> result = [];
@@ -56,7 +56,7 @@ Future<List<Map<String, dynamic>>> uploadPhotos(
       // todo: upload video without chunk
       Response? response = await uploadChunk(
         photo: compressedFile,
-        category: category,
+        category: albumId,
         url: url,
         username: username,
         password: password,
@@ -88,9 +88,9 @@ Future<List<Map<String, dynamic>>> uploadPhotos(
   if (uploadCompletedList.isEmpty) return [];
 
   try {
-    await uploadCompleted(uploadCompletedList, int.parse(category));
+    await uploadCompleted(uploadCompletedList, albumId);
     if (await methodExist('community.images.uploadCompleted')) {
-      await communityUploadCompleted(uploadCompletedList, int.parse(category));
+      await communityUploadCompleted(uploadCompletedList, albumId);
     }
   } on DioError catch (e) {
     debugPrint(e.message);
@@ -101,7 +101,7 @@ Future<List<Map<String, dynamic>>> uploadPhotos(
 
 Future<Response?> uploadChunk({
   required File photo,
-  required String category,
+  required int category,
   required String url,
   Map<String, dynamic>? info,
   Function(double)? onProgress,

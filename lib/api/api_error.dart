@@ -8,6 +8,10 @@ enum ApiErrors {
   getStatusError,
   getInfoError,
   getMethodsError,
+  createAlbumError,
+  deleteAlbumError,
+  editAlbumError,
+  moveAlbumError,
 }
 
 class ApiResult<T> {

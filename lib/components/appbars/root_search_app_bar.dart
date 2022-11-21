@@ -76,6 +76,7 @@ class _RootSearchAppBarState extends State<RootSearchAppBar> {
               color: Colors.transparent,
               child: IgnorePointer(
                 child: AppField(
+                  padding: const EdgeInsets.symmetric(vertical: 8.0),
                   icon: Icon(Icons.search),
                   hint: "Search...",
                 ),

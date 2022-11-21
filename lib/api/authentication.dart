@@ -10,23 +10,27 @@ import 'package:piwigo_ng/services/preferences_service.dart';
 
 import 'api_client.dart';
 
-Future<ApiResult<bool>> loginUser(String url, String username, String password) async {
-  if (url.isEmpty) {
-    return ApiResult<bool>(
-      data: false,
-      error: ApiErrors.wrongServerUrl,
-    );
-  }
+Future<ApiResult<bool>> loginUser(
+  String url, {
+  String username = '',
+  String password = '',
+}) async {
+  if (url.isEmpty) {}
   FlutterSecureStorage secureStorage = const FlutterSecureStorage();
   await secureStorage.write(key: 'SERVER_URL', value: url);
+  print(url);
 
   if (username.isEmpty && password.isEmpty) {
     ApiResult<StatusModel> status = await sessionStatus();
-    if (status.hasData) {
+    if (!status.hasError && status.hasData) {
       Preferences.saveId(status.data!, username: username, password: password);
+      return ApiResult<bool>(
+        data: true,
+      );
     }
     return ApiResult<bool>(
-      data: true,
+      data: false,
+      error: ApiErrors.wrongServerUrl,
     );
   }
 

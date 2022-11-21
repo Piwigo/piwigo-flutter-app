@@ -165,6 +165,7 @@ class _ImageSearchViewPageState extends State<ImageSearchViewPage> {
         child: Material(
           color: Colors.transparent,
           child: AppField(
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
             controller: _searchController,
             focusNode: _focusNode,
             icon: const Icon(Icons.search),
