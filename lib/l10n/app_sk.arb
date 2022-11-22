@@ -67,11 +67,11 @@
     "loginError_title": "Prihásenie neúspešné",
     "loginError_message": "Používateľ a heslo nezodpovedá poskytnutej web adrese",
     "loginEmptyServer_title": "Zadajte webovú adresu",
-    "loginEmptyServer_message": "Please select a protocol and enter a Piwigo web address in order to proceed.",
+    "loginEmptyServer_message": "Vyber prosím protokol a napíš Piwigo web adresu, aby bolo možné pokračovať.",
     "serverConnectionError_title": "Nepodarilo sa pripojiť",
-    "serverConnectionError_message": "A secured HTTPS connection could not be established. Please check the address or try in unencrypted HTTP mode?",
+    "serverConnectionError_message": "Bezpečné HTTPS spojenie nebolo možné vytvoriť. Skontroluj adresu alebo mám vyskúšať nešifrované HTTP spojenie?",
     "serverVersionNotCompatible_title": "Nekompatibilný server",
-    "serverVersionNotCompatible_message": "Your Piwigo server version is {version}. Piwigo NG only supports a version of at least 2.8. Please update your server to use Piwigo NG. Do you still want to continue?",
+    "serverVersionNotCompatible_message": "Verzia Tvojho Piwigo servera je {version}. Piwigo NG podporuje minimálne verziu 2.8. Prosím aktualizuj Tvoj server, ak chceš používať Piwigo NG. Napriek tomu chceš pokračovať?",
     "@serverVersionNotCompatible_message": {
         "placeholders": {
             "version": {}
@@ -186,7 +186,7 @@
             "album": {}
         }
     },
-    "deleteCategory_empty": "Delete Empty Album",
+    "deleteCategory_empty": "Odstrániť prázdny album",
     "deleteCategory_noImages": "Ponechať fotografie",
     "deleteCategory_orphanedImages": "Odstrániť nezaradené",
     "deleteCategory_allImages": "{count, plural, =0{Delete Photos} =1{Delete Photo} other{Delete {count} Photos}}",
@@ -207,9 +207,9 @@
     "deleteCategoryHUD_deleted": "Album odstránený",
     "deleteCategoryMatchError_title": "Number Doesn't Match",
     "deleteCategoryMatchError_message": "The number of photos you entered doesn't match the number of photos in the category. Please try again if you desire to delete this album",
-    "deleteCategoryError_title": "Delete Fail",
-    "deleteCategoryError_message": "Failed to delete your album",
-    "moveCategory": "Move Album",
+    "deleteCategoryError_title": "Odstránenie zlyhalo",
+    "deleteCategoryError_message": "Nepodarilo sa odstrániť Tvoj album",
+    "moveCategory": "Presunúť album",
     "moveCategory_select": "Please select an album or sub-album to move album {album} into.",
     "@moveCategory_select": {
         "placeholders": {
@@ -223,9 +223,9 @@
             "parent": {}
         }
     },
-    "moveCategoryHUD_moving": "Moving Album…",
-    "moveCategoryHUD_moved": "Album Moved",
-    "moveCategoryError_title": "Move Fail",
+    "moveCategoryHUD_moving": "Presúvam album…",
+    "moveCategoryHUD_moved": "Album presunutý",
+    "moveCategoryError_title": "Presunutie zlyhalo",
     "moveCategoryError_message": "Failed to move your album",
     "categorySelection_setThumbnail": "Please select the album which will use the photo {photo} as a thumbnail.",
     "@categorySelection_setThumbnail": {
