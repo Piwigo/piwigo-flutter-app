@@ -136,3 +136,10 @@ class SSLHttpOverrides extends HttpOverrides {
     return super.createHttpClient(context)..badCertificateCallback = ApiClient.piwigoSSLBypass;
   }
 }
+
+class SSLHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context)..badCertificateCallback = ApiClient.piwigoSSLBypass;
+  }
+}
