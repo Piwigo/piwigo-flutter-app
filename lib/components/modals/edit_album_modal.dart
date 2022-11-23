@@ -52,6 +52,12 @@ class _EditAlbumModalState extends State<EditAlbumModal> {
         ),
       );
     } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        successSnackBar(
+          message: appStrings.renameCategoryHUD_renamed,
+          icon: Icons.build_circle,
+        ),
+      );
       _btnController.success();
       Navigator.of(context).pop();
     }

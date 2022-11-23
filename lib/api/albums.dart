@@ -73,7 +73,7 @@ Future<ApiResult<List<AlbumModel>>> getAlbumTree([int? startId]) async {
   return ApiResult(error: ApiErrors.fetchAlbumListError);
 }
 
-Future<ApiResult> addAlbum({
+Future<ApiResult<bool>> addAlbum({
   required String name,
   required int parentId,
   String description = '',
@@ -97,7 +97,7 @@ Future<ApiResult> addAlbum({
         debugPrint("$data");
         return ApiResult(error: ApiErrors.createAlbumError);
       }
-      return ApiResult(data: data);
+      return ApiResult(data: true);
     }
   } on DioError catch (e) {
     debugPrint(e.message);
@@ -105,43 +105,6 @@ Future<ApiResult> addAlbum({
     debugPrint("$e");
   }
   return ApiResult(error: ApiErrors.createAlbumError);
-}
-
-Future<dynamic> deleteAlbum(
-  int catId, {
-  DeleteAlbumModes deletionMode = DeleteAlbumModes.deleteOrphans,
-}) async {
-  final Map<String, String> queries = {
-    'format': 'json',
-    'method': 'pwg.categories.delete',
-  };
-
-  final FormData formData = FormData.fromMap({
-    'category_id': catId,
-    'pwg_token': appPreferences.getString('PWG_TOKEN'),
-    'photo_deletion_mode': deletionMode.value,
-  });
-
-  try {
-    Response response = await ApiClient.post(
-      data: formData,
-      queryParameters: queries,
-    );
-
-    if (response.statusCode == 200) {
-      final Map<String, dynamic> data = json.decode(response.data);
-      if (data['stat'] == 'fail') {
-        debugPrint("$data");
-        return ApiResult(error: ApiErrors.deleteAlbumError);
-      }
-      return ApiResult(data: data);
-    }
-  } on DioError catch (e) {
-    debugPrint("${e.message}");
-  } catch (e) {
-    debugPrint("$e");
-  }
-  return ApiResult(error: ApiErrors.deleteAlbumError);
 }
 
 Future<ApiResult<bool>> moveAlbum(int catId, int parentCatId) async {
@@ -177,7 +140,7 @@ Future<ApiResult<bool>> moveAlbum(int catId, int parentCatId) async {
   return ApiResult(error: ApiErrors.moveAlbumError);
 }
 
-Future<dynamic> editAlbum({required String name, required int albumId, String description = ''}) async {
+Future<ApiResult<bool>> editAlbum({required String name, required int albumId, String description = ''}) async {
   Map<String, String> queries = {
     'format': 'json',
     'method': 'pwg.categories.setInfo',
@@ -199,7 +162,7 @@ Future<dynamic> editAlbum({required String name, required int albumId, String de
         debugPrint("$data");
         return ApiResult(error: ApiErrors.editAlbumError);
       }
-      return ApiResult(data: data);
+      return ApiResult(data: true);
     }
   } on DioError catch (e) {
     debugPrint("${e.message}");
@@ -207,6 +170,43 @@ Future<dynamic> editAlbum({required String name, required int albumId, String de
     debugPrint("$e");
   }
   return ApiResult(error: ApiErrors.editAlbumError);
+}
+
+Future<ApiResult<bool>> deleteAlbum(
+  int catId, {
+  DeleteAlbumModes deletionMode = DeleteAlbumModes.deleteOrphans,
+}) async {
+  final Map<String, String> queries = {
+    'format': 'json',
+    'method': 'pwg.categories.delete',
+  };
+
+  final FormData formData = FormData.fromMap({
+    'category_id': catId,
+    'pwg_token': appPreferences.getString('PWG_TOKEN'),
+    'photo_deletion_mode': deletionMode.value,
+  });
+
+  try {
+    Response response = await ApiClient.post(
+      data: formData,
+      queryParameters: queries,
+    );
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = json.decode(response.data);
+      if (data['stat'] == 'fail') {
+        debugPrint("$data");
+        return ApiResult(error: ApiErrors.deleteAlbumError);
+      }
+      return ApiResult(data: true);
+    }
+  } on DioError catch (e) {
+    debugPrint("${e.message}");
+  } catch (e) {
+    debugPrint("$e");
+  }
+  return ApiResult(error: ApiErrors.deleteAlbumError);
 }
 
 enum DeleteAlbumModes {

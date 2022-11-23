@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:piwigo_ng/services/preferences_service.dart';
+import 'package:piwigo_ng/utils/localizations.dart';
 import 'package:piwigo_ng/utils/resources.dart';
 import 'package:piwigo_ng/utils/themes.dart';
 
-SnackBar appSnackBar({
+SnackBar piwigoSnackBar({
   String message = '',
   Color? color,
   SnackBarAction? action,
@@ -38,15 +39,51 @@ SnackBar appSnackBar({
 }
 
 SnackBar errorSnackBar({String message = '', IconData? icon}) {
-  return appSnackBar(
+  return piwigoSnackBar(
     color: Colors.red,
     action: SnackBarAction(
       textColor: Colors.white,
       onPressed: () {},
-      label: 'OK',
+      label: appStrings.alertOkButton,
     ),
     icon: Icon(
       icon ?? Icons.error,
+      color: Colors.white,
+      shadows: AppShadows.icon,
+      size: 32,
+    ),
+    message: message,
+  );
+}
+
+SnackBar successSnackBar({String message = '', IconData? icon}) {
+  return piwigoSnackBar(
+    color: Colors.green,
+    action: SnackBarAction(
+      textColor: Colors.white,
+      onPressed: () {},
+      label: appStrings.alertOkButton,
+    ),
+    icon: Icon(
+      icon ?? Icons.check_circle,
+      color: Colors.white,
+      shadows: AppShadows.icon,
+      size: 32,
+    ),
+    message: message,
+  );
+}
+
+SnackBar warningSnackBar({String message = '', IconData? icon}) {
+  return piwigoSnackBar(
+    color: Colors.orange,
+    action: SnackBarAction(
+      textColor: Colors.white,
+      onPressed: () {},
+      label: appStrings.alertOkButton,
+    ),
+    icon: Icon(
+      icon ?? Icons.warning,
       color: Colors.white,
       shadows: AppShadows.icon,
       size: 32,

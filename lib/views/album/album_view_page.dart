@@ -4,6 +4,7 @@ import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:piwigo_ng/api/albums.dart';
 import 'package:piwigo_ng/api/api_error.dart';
+import 'package:piwigo_ng/components/dialogs/confirm_dialog.dart';
 import 'package:piwigo_ng/components/modals/choose_camera_picker_modal.dart';
 import 'package:piwigo_ng/components/modals/create_album_modal.dart';
 import 'package:piwigo_ng/components/modals/delete_album_mode_modal.dart';
@@ -146,18 +147,27 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
           break;
       }
     }
+    if (!await showConfirmDialog(
+      context,
+      message: appStrings.deleteCategoryConfirm_title,
+    )) {
+      return false;
+    }
     final ApiResult result = await deleteAlbum(
       album.id,
       deletionMode: mode,
     );
-    if (result.hasError) {
+    if (result.hasData && result.data == true) {
+      _onRefresh();
       ScaffoldMessenger.of(context).showSnackBar(
-        errorSnackBar(message: appStrings.deleteCategoryError_title),
+        successSnackBar(message: appStrings.deleteCategoryHUD_deleted),
       );
-      return false;
+      return true;
     }
-    _onRefresh();
-    return true;
+    ScaffoldMessenger.of(context).showSnackBar(
+      errorSnackBar(message: appStrings.deleteCategoryError_title),
+    );
+    return false;
   }
 
   Future<void> _onEditAlbum(AlbumModel album) async {

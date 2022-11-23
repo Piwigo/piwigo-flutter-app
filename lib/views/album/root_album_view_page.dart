@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:piwigo_ng/api/albums.dart';
 import 'package:piwigo_ng/api/api_error.dart';
+import 'package:piwigo_ng/components/dialogs/confirm_dialog.dart';
 import 'package:piwigo_ng/components/modals/create_album_modal.dart';
 import 'package:piwigo_ng/components/modals/delete_album_mode_modal.dart';
 import 'package:piwigo_ng/components/modals/edit_album_modal.dart';
@@ -102,6 +103,7 @@ class _RootAlbumViewPageState extends State<RootAlbumViewPage> {
           break;
       }
     }
+    if (!await showConfirmDialog(context, message: appStrings.deleteCategoryConfirm_title)) return;
     final ApiResult result = await deleteAlbum(
       album.id,
       deletionMode: mode,

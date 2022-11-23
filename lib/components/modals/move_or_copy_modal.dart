@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:piwigo_ng/api/albums.dart';
 import 'package:piwigo_ng/api/api_error.dart';
-import 'package:piwigo_ng/components/buttons/piwigo_button.dart';
 import 'package:piwigo_ng/components/dialogs/confirm_dialog.dart';
-import 'package:piwigo_ng/components/modals/piwigo_modal.dart';
 import 'package:piwigo_ng/models/album_model.dart';
 import 'package:piwigo_ng/utils/localizations.dart';
 
@@ -28,6 +26,7 @@ class MoveOrCopyModal extends StatefulWidget {
 }
 
 class _MoveOrCopyModalState extends State<MoveOrCopyModal> {
+  final ScrollController _scrollController = ScrollController();
   late final Future<ApiResult<List<AlbumModel>>> _albumFuture;
   late final List<int> _disabledAlbums;
 
@@ -68,55 +67,77 @@ class _MoveOrCopyModalState extends State<MoveOrCopyModal> {
 
   @override
   Widget build(BuildContext context) {
-    return PiwigoModal(
-      title: widget.title,
-      subtitle: widget.subtitle,
-      fullscreen: true,
-      content: Column(
-        children: [
-          _albumTreeList,
-          PiwigoButton(
-            color: Colors.transparent,
-            style: Theme.of(context).textTheme.titleSmall,
-            onPressed: () => Navigator.of(context).pop(null),
-            text: appStrings.alertCancelButton,
-          ),
-        ],
+    return BottomSheet(
+      backgroundColor: Theme.of(context).backgroundColor,
+      enableDrag: false,
+      onClosing: () {},
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(15.0),
+        ),
       ),
-    );
-  }
-
-  Widget get _albumTreeList => Expanded(
-        child: Theme(
-          data: Theme.of(context).copyWith(
-            scrollbarTheme: ScrollbarThemeData(
-              crossAxisMargin: 8.0,
-              mainAxisMargin: 8.0,
-              radius: Radius.circular(10.0),
-              thumbColor: MaterialStateColor.resolveWith(
-                (states) => Theme.of(context).disabledColor,
+      builder: (context) => Padding(
+        padding: MediaQuery.of(context).viewInsets,
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          appBar: widget.title != null
+              ? ScrollElevationAppBar(
+                  controller: _scrollController,
+                  title: widget.title!,
+                )
+              : null,
+          body: Theme(
+            data: Theme.of(context).copyWith(
+              scrollbarTheme: ScrollbarThemeData(
+                crossAxisMargin: 8.0,
+                mainAxisMargin: 8.0,
+                radius: Radius.circular(10.0),
+                thumbColor: MaterialStateColor.resolveWith(
+                  (states) => Theme.of(context).disabledColor,
+                ),
               ),
             ),
-          ),
-          child: Scrollbar(
-            thumbVisibility: true,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(15.0),
-                child: SingleChildScrollView(
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).inputDecorationTheme.fillColor,
-                      borderRadius: BorderRadius.circular(15.0),
-                    ),
-                    child: _rootAlbum,
-                  ),
+            child: Scrollbar(
+              controller: _scrollController,
+              thumbVisibility: true,
+              child: ListView(
+                controller: _scrollController,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16.0,
                 ),
+                children: [
+                  if (widget.subtitle != null)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 8.0,
+                      ),
+                      child: Text(
+                        widget.subtitle!,
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                    ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 8.0,
+                    ),
+                    child: _albumTreeList,
+                  ),
+                ],
               ),
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget get _albumTreeList => DecoratedBox(
+        decoration: BoxDecoration(
+          color: Theme.of(context).inputDecorationTheme.fillColor,
+          borderRadius: BorderRadius.circular(15.0),
+        ),
+        child: _rootAlbum,
       );
 
   Widget get _rootAlbum => FutureBuilder<ApiResult<List<AlbumModel>>>(
@@ -153,6 +174,39 @@ class _MoveOrCopyModalState extends State<MoveOrCopyModal> {
           }
         },
       );
+}
+
+class ScrollElevationAppBar extends AnimatedWidget implements PreferredSizeWidget {
+  const ScrollElevationAppBar({
+    Key? key,
+    required this.controller,
+    this.title = '',
+  }) : super(key: key, listenable: controller);
+
+  final ScrollController controller;
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
+    return AppBar(
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(15.0),
+        ),
+      ),
+      elevation: 0.0,
+      scrolledUnderElevation: 5.0,
+      centerTitle: true,
+      title: Text(
+        title,
+        textAlign: TextAlign.center,
+        style: Theme.of(context).textTheme.titleLarge,
+      ),
+    );
+  }
+
+  @override
+  Size get preferredSize => Size.fromHeight(kToolbarHeight);
 }
 
 class ExpansionAlbumTile extends StatefulWidget {

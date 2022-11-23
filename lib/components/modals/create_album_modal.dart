@@ -41,6 +41,12 @@ class _CreateAlbumModalState extends State<CreateAlbumModal> {
       );
     } else {
       _btnController.success();
+      ScaffoldMessenger.of(context).showSnackBar(
+        successSnackBar(
+          message: appStrings.createNewAlbumHUD_created,
+          icon: Icons.add_circle_outlined,
+        ),
+      );
       Navigator.of(context).pop();
     }
     await Future.delayed(const Duration(seconds: 1));
