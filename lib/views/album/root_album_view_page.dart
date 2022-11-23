@@ -4,6 +4,7 @@ import 'package:piwigo_ng/api/api_error.dart';
 import 'package:piwigo_ng/components/modals/create_album_modal.dart';
 import 'package:piwigo_ng/components/modals/delete_album_mode_modal.dart';
 import 'package:piwigo_ng/components/modals/edit_album_modal.dart';
+import 'package:piwigo_ng/components/modals/move_or_copy_modal.dart';
 import 'package:piwigo_ng/components/scroll_widgets/album_grid_view.dart';
 import 'package:piwigo_ng/components/snackbars.dart';
 import 'package:piwigo_ng/models/album_model.dart';
@@ -69,10 +70,12 @@ class _RootAlbumViewPageState extends State<RootAlbumViewPage> {
   }
 
   void _onTapAlbum(AlbumModel album) {
-    Navigator.of(context).pushNamed(AlbumViewPage.routeName, arguments: {
-      'isAdmin': widget.isAdmin, // todo: use preferences
-      'album': album,
-    }).then((value) => _onRefresh());
+    Navigator.of(context).pushNamed(
+      AlbumViewPage.routeName,
+      arguments: {
+        'album': album,
+      },
+    ).then((value) => _onRefresh());
   }
 
   Future<void> _onDeleteAlbum(AlbumModel album) async {
@@ -119,6 +122,21 @@ class _RootAlbumViewPageState extends State<RootAlbumViewPage> {
       builder: (_) => Padding(
         padding: MediaQuery.of(context).padding,
         child: EditAlbumModal(album: album),
+      ),
+    ).whenComplete(() => _onRefresh());
+  }
+
+  Future<void> _onMoveAlbum(AlbumModel album) async {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (_) => Padding(
+        padding: MediaQuery.of(context).padding,
+        child: MoveOrCopyModal(
+          title: appStrings.moveCategory,
+          subtitle: appStrings.moveCategory_select(album.name),
+          album: album,
+        ),
       ),
     ).whenComplete(() => _onRefresh());
   }
@@ -175,6 +193,7 @@ class _RootAlbumViewPageState extends State<RootAlbumViewPage> {
             onTap: _onTapAlbum,
             onDelete: _onDeleteAlbum,
             onEdit: _onEditAlbum,
+            onMove: _onMoveAlbum,
           );
         }
         return const Center(

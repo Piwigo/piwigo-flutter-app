@@ -168,7 +168,7 @@ class _ImageSearchViewPageState extends State<ImageSearchViewPage> {
             padding: const EdgeInsets.symmetric(vertical: 8.0),
             controller: _searchController,
             focusNode: _focusNode,
-            icon: const Icon(Icons.search),
+            prefix: const Icon(Icons.search),
             hint: "Search...",
             onChanged: (value) => setState(() {
               _searchText = value;

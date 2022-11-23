@@ -9,8 +9,7 @@ import 'package:piwigo_ng/services/preferences_service.dart';
 import 'api_client.dart';
 
 Future<ApiResult<List<AlbumModel>>> fetchAlbums(int albumID) async {
-  print(Preferences.getAlbumThumbnailSize);
-  Map<String, dynamic> queries = {
+  final Map<String, dynamic> queries = {
     'format': 'json',
     'method': 'pwg.categories.getList',
     'cat_id': albumID,
@@ -40,10 +39,14 @@ Future<ApiResult<List<AlbumModel>>> fetchAlbums(int albumID) async {
   return ApiResult(error: ApiErrors.fetchAlbumsError);
 }
 
-Future<ApiResult<Map<String, dynamic>>> getAlbumList() async {
-  Map<String, String> queries = {
+Future<ApiResult<List<AlbumModel>>> getAlbumTree([int? startId]) async {
+  final Map<String, dynamic> queries = {
     'format': 'json',
-    'method': 'pwg.categories.getAdminList',
+    'method': 'pwg.categories.getList',
+    'cat_id': startId ?? 0,
+    'recursive': true,
+    'tree_output': true,
+    'thumbnail_size': Preferences.getAlbumThumbnailSize,
   };
 
   try {
@@ -52,28 +55,42 @@ Future<ApiResult<Map<String, dynamic>>> getAlbumList() async {
     );
 
     if (response.statusCode == 200) {
-      return ApiResult(data: json.decode(response.data));
+      List<dynamic> jsonAlbums = json.decode(response.data)['result'];
+      List<AlbumModel> albums = List<AlbumModel>.from(jsonAlbums.map(
+        (album) => AlbumModel.fromJson(album),
+      ));
+
+      return ApiResult<List<AlbumModel>>(
+        data: albums,
+      );
     }
   } on DioError catch (e) {
     debugPrint(e.message);
   } catch (e) {
     debugPrint("$e");
+    debugPrint("${(e as Error).stackTrace}");
   }
   return ApiResult(error: ApiErrors.fetchAlbumListError);
 }
 
-Future<ApiResult> addAlbum({required String name, required int parentId, String description = ''}) async {
-  Map<String, dynamic> queries = {
+Future<ApiResult> addAlbum({
+  required String name,
+  required int parentId,
+  String description = '',
+}) async {
+  final Map<String, dynamic> queries = {
     'format': 'json',
     'method': 'pwg.categories.add',
     'name': name,
     'comment': description,
     'parent': parentId,
   };
+
   try {
     Response response = await ApiClient.post(
       queryParameters: queries,
     );
+
     if (response.statusCode == 200) {
       final Map<String, dynamic> data = json.decode(response.data);
       if (data['stat'] == 'fail') {
@@ -94,15 +111,17 @@ Future<dynamic> deleteAlbum(
   int catId, {
   DeleteAlbumModes deletionMode = DeleteAlbumModes.deleteOrphans,
 }) async {
-  Map<String, String> queries = {
+  final Map<String, String> queries = {
     'format': 'json',
     'method': 'pwg.categories.delete',
   };
-  FormData formData = FormData.fromMap({
+
+  final FormData formData = FormData.fromMap({
     'category_id': catId,
     'pwg_token': appPreferences.getString('PWG_TOKEN'),
     'photo_deletion_mode': deletionMode.value,
   });
+
   try {
     Response response = await ApiClient.post(
       data: formData,
@@ -125,12 +144,13 @@ Future<dynamic> deleteAlbum(
   return ApiResult(error: ApiErrors.deleteAlbumError);
 }
 
-Future<dynamic> moveAlbum(int catId, String parentCatId) async {
-  Map<String, String> queries = {
+Future<ApiResult<bool>> moveAlbum(int catId, int parentCatId) async {
+  final Map<String, String> queries = {
     'format': 'json',
     'method': 'pwg.categories.move',
   };
-  FormData formData = FormData.fromMap({
+
+  final FormData formData = FormData.fromMap({
     'category_id': catId,
     'parent': parentCatId,
     'pwg_token': appPreferences.getString('PWG_TOKEN'),
@@ -145,10 +165,9 @@ Future<dynamic> moveAlbum(int catId, String parentCatId) async {
     if (response.statusCode == 200) {
       final Map<String, dynamic> data = json.decode(response.data);
       if (data['stat'] == 'fail') {
-        debugPrint("$data");
         return ApiResult(error: ApiErrors.moveAlbumError);
       }
-      return ApiResult(data: data);
+      return ApiResult(data: true);
     }
   } on DioError catch (e) {
     debugPrint("${e.message}");

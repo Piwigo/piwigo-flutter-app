@@ -77,7 +77,7 @@ class _RootSearchAppBarState extends State<RootSearchAppBar> {
               child: IgnorePointer(
                 child: AppField(
                   padding: const EdgeInsets.symmetric(vertical: 8.0),
-                  icon: Icon(Icons.search),
+                  prefix: Icon(Icons.search),
                   hint: "Search...",
                 ),
               ),

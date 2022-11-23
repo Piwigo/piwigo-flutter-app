@@ -17,12 +17,14 @@ class ApiClient {
   static HttpClientAdapter get sslHttpClientAdapter {
     return DefaultHttpClientAdapter()
       ..onHttpClientCreate = (HttpClient client) {
-        client.badCertificateCallback = (X509Certificate cert, String host, int port) {
-          // todo: accept certs
-          return true;
-        };
+        client.badCertificateCallback = piwigoSSLBypass;
         return client;
       };
+  }
+
+  static bool piwigoSSLBypass(X509Certificate cert, String host, int port) {
+    // todo: accept certs
+    return true;
   }
 
   static Future<Response> get({
@@ -101,5 +103,12 @@ class ApiClient {
       cancelToken: cancelToken,
     );
     return response;
+  }
+}
+
+class SSLHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context)..badCertificateCallback = ApiClient.piwigoSSLBypass;
   }
 }

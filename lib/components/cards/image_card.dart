@@ -39,7 +39,7 @@ class ImageCard extends StatelessWidget {
                 imageUrl ?? '',
                 fit: BoxFit.cover,
                 errorBuilder: (context, o, s) {
-                  debugPrint("$o");
+                  debugPrint("$o\n$s");
                   return Center(child: Icon(Icons.image_not_supported));
                 },
               );
@@ -47,7 +47,10 @@ class ImageCard extends StatelessWidget {
             return Image.network(
               imageUrl ?? '',
               fit: BoxFit.cover,
-              errorBuilder: (context, o, s) => Center(child: Icon(Icons.image_not_supported)),
+              errorBuilder: (context, o, s) {
+                debugPrint("$o\n$s");
+                return Center(child: Icon(Icons.image_not_supported));
+                },
               loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
                 if (loadingProgress == null) return child;
                 return Center(

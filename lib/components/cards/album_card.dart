@@ -4,7 +4,6 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:piwigo_ng/components/clippers/album_card_clipper.dart';
 import 'package:piwigo_ng/components/clippers/clip_shadow_path.dart';
 import 'package:piwigo_ng/models/album_model.dart';
-import 'package:piwigo_ng/views/album/album_view_page.dart';
 
 import 'album_card_action.dart';
 
@@ -32,24 +31,10 @@ class AlbumCard extends StatelessWidget {
   static const double kAlbumOuterRadius = 16.0;
   static const double kAlbumRatio = 3;
 
-  void _onPressedAlbum(context) {
-    if (example) return;
-    if (onTap == null) {
-      Navigator.of(context).pushNamed(
-        AlbumViewPage.routeName,
-        arguments: {
-          'album': album,
-        },
-      );
-    } else {
-      onTap!();
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => _onPressedAlbum(context),
+      onTap: onTap,
       child: ClipRRect(
         borderRadius: BorderRadius.circular(kAlbumOuterRadius),
         child: Slidable(
@@ -233,16 +218,19 @@ class AlbumCardContent extends StatelessWidget {
                   value: download.progress,
                 ),
               ),
-              errorWidget: (context, url, error) => FittedBox(
-                fit: BoxFit.cover,
-                child: Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).scaffoldBackgroundColor,
+              errorWidget: (context, url, error) {
+                debugPrint("[$url] $error");
+                return FittedBox(
+                  fit: BoxFit.cover,
+                  child: Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).scaffoldBackgroundColor,
+                    ),
+                    child: const Icon(Icons.broken_image_outlined),
                   ),
-                  child: const Icon(Icons.broken_image_outlined),
-                ),
-              ),
+                );
+              },
             );
           }),
         ),

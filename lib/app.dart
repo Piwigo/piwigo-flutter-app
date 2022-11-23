@@ -3,6 +3,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:piwigo_ng/services/app_providers.dart';
+import 'package:piwigo_ng/services/preferences_service.dart';
 import 'package:piwigo_ng/utils/overscroll_behavior.dart';
 import 'package:piwigo_ng/utils/page_routes.dart';
 import 'package:piwigo_ng/utils/themes.dart';
@@ -73,6 +74,8 @@ Route<dynamic> generateRoute(RouteSettings settings) {
     arguments = settings.arguments as Map<String, dynamic>;
   }
 
+  bool isAdmin = appPreferences.getBool('IS_USER_ADMIN') ?? false;
+
   if (settings.name == null) {
     debugPrint("no route name");
     return MaterialPageRoute(
@@ -92,7 +95,7 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       return MaterialPageRoute(
         builder: (_) => RootAlbumViewPage(
           albumId: arguments['albumId'] ?? 0,
-          isAdmin: arguments['isAdmin'] ?? false,
+          isAdmin: arguments['isAdmin'] ?? isAdmin,
         ),
         settings: settings,
       );
@@ -100,7 +103,7 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       return MaterialPageRoute(
         builder: (_) => AlbumViewPage(
           album: arguments['album'],
-          isAdmin: arguments['isAdmin'] ?? false,
+          isAdmin: arguments['isAdmin'] ?? isAdmin,
         ),
         settings: settings,
       );

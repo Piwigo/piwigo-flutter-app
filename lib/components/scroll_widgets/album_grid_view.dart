@@ -41,9 +41,7 @@ class AlbumGridView extends StatelessWidget {
         AlbumModel album = albumList[index];
         return AlbumCard(
           album: album,
-          onTap: () {
-            if (onTap != null) onTap!(album);
-          },
+          onTap: () => onTap?.call(album),
           onDelete: () => onDelete?.call(album),
           onEdit: () => onEdit?.call(album),
           onMove: () => onMove?.call(album),

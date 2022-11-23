@@ -9,12 +9,14 @@ class PiwigoModal extends StatelessWidget {
     this.subtitle,
     this.content,
     this.canCancel = false,
+    this.fullscreen = false,
   }) : super(key: key);
 
   final String? title;
   final String? subtitle;
   final Widget? content;
   final bool canCancel;
+  final bool fullscreen;
 
   @override
   Widget build(BuildContext context) {
@@ -27,30 +29,32 @@ class PiwigoModal extends StatelessWidget {
       ),
       builder: (context) => Padding(
         padding: MediaQuery.of(context).viewInsets,
-        child: ListView(
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          shrinkWrap: true,
-          children: [
-            if (title != null)
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                child: Text(
-                  title!,
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
+        child: Builder(builder: (context) {
+          Widget? titleWidget;
+          Widget? subtitleWidget;
+          List<Widget>? cancelWidget;
+          if (title != null) {
+            titleWidget = Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+              child: Text(
+                title!,
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.titleLarge,
               ),
-            if (subtitle != null)
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                child: Text(
-                  subtitle!,
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
+            );
+          }
+          if (subtitle != null) {
+            subtitleWidget = Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+              child: Text(
+                subtitle!,
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.bodyMedium,
               ),
-            if (content != null) content!,
-            if (canCancel) ...[
+            );
+          }
+          if (canCancel) {
+            cancelWidget = [
               Divider(
                 indent: 16.0,
                 endIndent: 16.0,
@@ -62,9 +66,37 @@ class PiwigoModal extends StatelessWidget {
                 onPressed: () => Navigator.of(context).pop(null),
                 text: appStrings.alertCancelButton,
               ),
-            ]
-          ],
-        ),
+            ];
+          }
+          if (fullscreen) {
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: Column(
+                mainAxisSize: MainAxisSize.max,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  if (titleWidget != null) titleWidget,
+                  if (subtitleWidget != null) subtitleWidget,
+                  if (content != null)
+                    Expanded(
+                      child: content!,
+                    ),
+                  if (cancelWidget != null) ...cancelWidget,
+                ],
+              ),
+            );
+          }
+          return ListView(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            shrinkWrap: true,
+            children: [
+              if (titleWidget != null) titleWidget,
+              if (subtitleWidget != null) subtitleWidget,
+              if (content != null) content!,
+              if (cancelWidget != null) ...cancelWidget,
+            ],
+          );
+        }),
       ),
     );
   }

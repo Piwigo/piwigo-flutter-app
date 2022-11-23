@@ -8,6 +8,7 @@ import 'package:piwigo_ng/components/modals/choose_camera_picker_modal.dart';
 import 'package:piwigo_ng/components/modals/create_album_modal.dart';
 import 'package:piwigo_ng/components/modals/delete_album_mode_modal.dart';
 import 'package:piwigo_ng/components/modals/edit_album_modal.dart';
+import 'package:piwigo_ng/components/modals/move_or_copy_modal.dart';
 import 'package:piwigo_ng/components/popup_list_item.dart';
 import 'package:piwigo_ng/components/scroll_widgets/album_grid_view.dart';
 import 'package:piwigo_ng/components/scroll_widgets/image_grid_view.dart';
@@ -52,7 +53,10 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
   @override
   initState() {
     _currentAlbum = widget.album;
-    _data = Future.wait([fetchAlbums(widget.album.id), fetchImages(widget.album.id, 0)]);
+    _data = Future.wait([
+      fetchAlbums(widget.album.id),
+      fetchImages(widget.album.id, 0),
+    ]);
     super.initState();
   }
 
@@ -99,10 +103,12 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
   }
 
   void _onTapAlbum(AlbumModel album) {
-    Navigator.of(context).pushNamed(AlbumViewPage.routeName, arguments: {
-      'isAdmin': widget.isAdmin, // todo: use preferences
-      'album': album,
-    }).then((value) => _onRefresh());
+    Navigator.of(context).pushNamed(
+      AlbumViewPage.routeName,
+      arguments: {
+        'album': album,
+      },
+    ).then((value) => _onRefresh());
   }
 
   Future<void> _onAddAlbum() async {
@@ -161,6 +167,21 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
       builder: (_) => Padding(
         padding: MediaQuery.of(context).padding,
         child: EditAlbumModal(album: album),
+      ),
+    ).whenComplete(() => _onRefresh());
+  }
+
+  Future<void> _onMoveAlbum(AlbumModel album) async {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (_) => Padding(
+        padding: MediaQuery.of(context).padding,
+        child: MoveOrCopyModal(
+          title: appStrings.moveCategory,
+          subtitle: appStrings.moveCategory_select(album.name),
+          album: album,
+        ),
       ),
     ).whenComplete(() => _onRefresh());
   }
@@ -388,6 +409,7 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
       onTap: _onTapAlbum,
       onEdit: _onEditAlbum,
       onDelete: _onDeleteAlbum,
+      onMove: _onMoveAlbum,
     );
   }
 

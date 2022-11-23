@@ -5,9 +5,9 @@ import 'package:piwigo_ng/api/authentication.dart';
 import 'package:piwigo_ng/app.dart';
 import 'package:piwigo_ng/components/buttons/animated_piwigo_button.dart';
 import 'package:piwigo_ng/components/snackbars.dart';
+import 'package:piwigo_ng/services/preferences_service.dart';
 import 'package:piwigo_ng/utils/localizations.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../components/fields/app_field.dart';
 import '../album/root_album_view_page.dart';
@@ -28,9 +28,7 @@ class _LoginFormViewState extends State<LoginFormView> {
   final TextEditingController _urlController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final FocusNode _urlFocusNode = FocusNode();
-  final FocusNode _usernameFocusNode = FocusNode();
-  final FocusNode _passwordFocusNode = FocusNode();
+  final GlobalKey _urlKey = GlobalKey();
   final RoundedLoadingButtonController _btnController = RoundedLoadingButtonController();
 
   String _url = '';
@@ -118,12 +116,11 @@ class _LoginFormViewState extends State<LoginFormView> {
   Future<void> _onLoginSuccess(ApiResult result) async {
     _btnController.success();
     await Future.delayed(const Duration(milliseconds: 300));
-    SharedPreferences prefs = await SharedPreferences.getInstance();
     if (!mounted) return;
-    debugPrint("is admin: ${prefs.getBool('IS_USER_ADMIN')}");
+    debugPrint("is admin: ${appPreferences.getBool('IS_USER_ADMIN')}");
     Navigator.of(context).pushReplacementNamed(
       RootAlbumViewPage.routeName,
-      arguments: {'isAdmin': prefs.getBool('IS_USER_ADMIN')},
+      arguments: {'isAdmin': appPreferences.getBool('IS_USER_ADMIN')},
     );
   }
 
@@ -159,40 +156,43 @@ class _LoginFormViewState extends State<LoginFormView> {
   Widget build(BuildContext context) {
     return Form(
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           AppField(
+            key: _urlKey,
             margin: const EdgeInsets.symmetric(vertical: 4.0),
-            padding: const EdgeInsets.symmetric(vertical: 16.0),
+            padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 8.0),
             controller: _urlController,
-            focusNode: _urlFocusNode,
             onChanged: (value) {
               bool isError = !_urlValidator(value);
               if (_urlError != isError) {
-                setState(() {
-                  _urlError = isError;
-                });
+                _urlError = isError;
               }
               setState(() {
                 _url = value;
               });
             },
             textInputAction: TextInputAction.next,
-            icon: const Icon(Icons.public),
+            prefix: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: const Icon(Icons.public),
+                ),
+                _securedPrefix,
+              ],
+            ),
             hint: 'example.piwigo.com',
             error: _urlError,
-            prefix: _securedPrefix,
           ),
           AppField(
             margin: const EdgeInsets.symmetric(vertical: 4.0),
-            padding: const EdgeInsets.symmetric(vertical: 16.0),
+            padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 8.0),
             controller: _usernameController,
-            focusNode: _usernameFocusNode,
             onChanged: (value) {
               if (_idError) {
-                setState(() {
-                  _idError = false;
-                });
+                _idError = false;
               }
               setState(() {
                 _username = value;
@@ -201,23 +201,32 @@ class _LoginFormViewState extends State<LoginFormView> {
             textInputAction: TextInputAction.next,
             hint: "username",
             error: _idError,
-            enableClearAction: true,
-            icon: const Icon(Icons.person),
+            prefix: const Icon(Icons.person),
+            suffix: _username.isNotEmpty
+                ? GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () => setState(() {
+                      _usernameController.clear();
+                      _username = '';
+                    }),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Icon(Icons.clear),
+                    ),
+                  )
+                : null,
           ),
           AppField(
             margin: const EdgeInsets.symmetric(vertical: 4.0),
-            padding: const EdgeInsets.symmetric(vertical: 16.0),
+            padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 8.0),
             controller: _passwordController,
-            focusNode: _passwordFocusNode,
             onFieldSubmitted: (String value) {
               FocusScope.of(context).unfocus();
               _onLogin();
             },
             onChanged: (value) {
               if (_idError) {
-                setState(() {
-                  _idError = false;
-                });
+                _idError = false;
               }
               setState(() {
                 _password = value;
@@ -227,13 +236,25 @@ class _LoginFormViewState extends State<LoginFormView> {
             obscureText: !_showPassword,
             hint: "password",
             error: _idError,
-            enableClearAction: true,
-            icon: GestureDetector(
+            prefix: GestureDetector(
               onTap: () => setState(() {
                 _showPassword = !_showPassword;
               }),
               child: Icon(_showPassword ? Icons.lock_open : Icons.lock),
             ),
+            suffix: _password.isNotEmpty
+                ? GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () => setState(() {
+                      _passwordController.clear();
+                      _password = '';
+                    }),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Icon(Icons.clear),
+                    ),
+                  )
+                : null,
           ),
           Padding(
             padding: const EdgeInsets.only(top: 12),
