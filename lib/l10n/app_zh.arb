@@ -315,7 +315,7 @@
     "none": "无",
     "tag": "标签",
     "tags": "标签",
-    "tagCount": "{count, plural, =0{0 tags} =1{1 tag} other{{count} tags}}",
+    "tagCount": "{count, plural, =0{0 个标签} =1{1 个标签} other{{count} 个标签}}",
     "@tagCount": {
         "placeholders": {
             "count": {}
@@ -333,7 +333,7 @@
     "tagsAddError_message": "无法创建新标签",
     "tagsAddError_title": "创建失败",
     "selectImages": "选择图片",
-    "selectImageSelectedCount": "{count, plural, =0{0 Photos Selected} =1{1 Photo Selected} other{{count} Photos Selected}}",
+    "selectImageSelectedCount": "{count, plural, =0{0 个图片已被选择} =1{1 个图片已被选择} other{{count} 个图片已被选择}}",
     "@selectImageSelectedCount": {
         "placeholders": {
             "count": {}
@@ -349,7 +349,7 @@
         }
     },
     "renameImageHUD_label": "重命名文件中...",
-    "renameImageHUD_renamed": "{count, plural, =0{0 Files Renamed} =1{File Renamed} other{{count} Files Renamed}}",
+    "renameImageHUD_renamed": "{count, plural, =0{没有文件已被重命名} =1{文件已被重命名} other{{count} 个文件已被重命名}}",
     "@renameImageHUD_renamed": {
         "placeholders": {
             "count": {}
@@ -363,20 +363,20 @@
             "count": {}
         }
     },
-    "deleteImageCount_title": "{count, plural, =0{Delete Photos} =1{Delete Photo} other{Delete {count} Photos}}",
+    "deleteImageCount_title": "{count, plural, =0{删除图片} =1{图片已删除} other{已删除 {count} 张图片}}",
     "@deleteImageCount_title": {
         "placeholders": {
             "count": {}
         }
     },
-    "deleteImageHUD_deleting": "{count, plural, =0{Deleting Photos…} =1{Deleting Photo…} other{Deleting Photos…}}",
+    "deleteImageHUD_deleting": "{count, plural, =0{正在删除图片…} =1{正在删除图片…} other{正在删除图片…}}",
     "@deleteImageHUD_deleting": {
         "placeholders": {
             "count": {}
         }
     },
     "removeSingleImage_title": "从相册中移除",
-    "removeImageHUD_removing": "{count, plural, =0{Removing Photos…} =1{Removing Photo…} other{Removing Photos…}}",
+    "removeImageHUD_removing": "{count, plural, =0{正在移除图片…} =1{正在移除图片…} other{正在移除图片…}}",
     "@removeImageHUD_removing": {
         "placeholders": {
             "count": {}
@@ -404,19 +404,19 @@
             "count": {}
         }
     },
-    "downloadImage_confirmation": "{count, plural, =1{Are you sure you want to download the selected photo?} other{Are you sure you want to download the selected {count} photos?}}",
+    "downloadImage_confirmation": "{count, plural, =1{您确定要下载选中的图片吗？} other{您确定要下载选中的 {count} 张图片吗？}}",
     "@downloadImage_confirmation": {
         "placeholders": {
             "count": {}
         }
     },
-    "downloadingImages": "{count, plural, =1{Downloading Photo} other{Downloading Photos}}",
+    "downloadingImages": "{count, plural, =1{正在下载图片} other{正在下载图片}}",
     "@downloadingImages": {
         "placeholders": {
             "count": {}
         }
     },
-    "downloadingVideos": "{count, plural, =1{Downloading Video} other{Downloading Videos}}",
+    "downloadingVideos": "{count, plural, =1{正在下载视频} other{正在下载视频}}",
     "@downloadingVideos": {
         "placeholders": {
             "count": {}
@@ -425,7 +425,7 @@
     "downloadImageFail_title": "下载失败",
     "downloadImageFail_message": "无法下载照片！",
     "downloadVideoFail_message": "无法下载视频！",
-    "downloadVideoFail_Photos": "Video format not accepted by Photos!",
+    "downloadVideoFail_Photos": "视频格式不被图片接受！",
     "imageSaveError_title": "保存照片失败",
     "imageSaveError_message": "照片保存失败",
     "videoSaveError_title": "视频保存失败",
@@ -437,14 +437,14 @@
         }
     },
     "moveImage_title": "移动到相册",
-    "moveImage_selectAlbum": "{count, plural, =1{Please, select the album in which you wish to move the photo {photo}.} other{Please, select the album in which you wish to move the photos.}}",
+    "moveImage_selectAlbum": "{count, plural, =1{请选择您想将图片 {photo} 移动到的的目标相册} other{请选择您想将图片移动到的目标相册。}}",
     "@moveImage_selectAlbum": {
         "placeholders": {
             "count": {},
             "photo": {}
         }
     },
-    "moveImage_message": "{count, plural, =1{Are you sure you want to move the photo {photo} to the album {album} ?} other{Are you sure you want to move the photos to the album {album} ?}}",
+    "moveImage_message": "{count, plural, =1{您确定将图片 {photo} 移动到相册 {album} 吗？} other{您确定要将这些图片移动到相册 {album} 吗？}}",
     "@moveImage_message": {
         "placeholders": {
             "count": {},
@@ -452,34 +452,34 @@
             "album": {}
         }
     },
-    "moveImageHUD_moving": "{count, plural, =1{Moving Photo…} other{Moving Photos…}}",
+    "moveImageHUD_moving": "{count, plural, =1{正在移动图片…} other{正在移动图片…}}",
     "@moveImageHUD_moving": {
         "placeholders": {
             "count": {}
         }
     },
-    "moveImageHUD_moved": "{count, plural, =1{Photo Moved} other{Photos Moved}}",
+    "moveImageHUD_moved": "{count, plural, =1{已移动图片} other{已移动图片}}",
     "@moveImageHUD_moved": {
         "placeholders": {
             "count": {}
         }
     },
     "moveImageError_title": "移动失败",
-    "moveImageError_message": "{count, plural, =1{Failed to move your photo} other{Failed to move some photos}}",
+    "moveImageError_message": "{count, plural, =1{移动图片失败} other{移动图片失败}}",
     "@moveImageError_message": {
         "placeholders": {
             "count": {}
         }
     },
     "copyImage_title": "复制到相册",
-    "copyImage_selectAlbum": "{count, plural, =1{Please, select the album in which you wish to copy the photo {photo}.} other{Please, select the album in which you wish to copy the photos.}}",
+    "copyImage_selectAlbum": "{count, plural, =1{请选择你想将图片 {photo} 复制到的目标相册} other{请选择你想将这些图片复制到的目标相册}}",
     "@copyImage_selectAlbum": {
         "placeholders": {
             "count": {},
             "photo": {}
         }
     },
-    "copyImage_message": "{count, plural, =1{Are you sure you want to copy the photo {photo} to the album {album} ?} other{Are you sure you want to copy the photos to the album {album} ?}}",
+    "copyImage_message": "{count, plural, =1{您确定将图片 {photo} 复制到相册 {album} 吗？} other{您确定将这些图片复制到相册 {album} 吗？}}",
     "@copyImage_message": {
         "placeholders": {
             "count": {},
@@ -487,20 +487,20 @@
             "album": {}
         }
     },
-    "copyImageHUD_copying": "{count, plural, =1{Copying Photo…} other{Copying Photos…}}",
+    "copyImageHUD_copying": "{count, plural, =1{正在复制图片…} other{正在复制图片…}}",
     "@copyImageHUD_copying": {
         "placeholders": {
             "count": {}
         }
     },
-    "copyImageHUD_copied": "{count, plural, =1{Photo Copied} other{Photos Copied}}",
+    "copyImageHUD_copied": "{count, plural, =1{照片已复制} other{照片已复制}}",
     "@copyImageHUD_copied": {
         "placeholders": {
             "count": {}
         }
     },
     "copyImageError_title": "复制失败",
-    "copyImageError_message": "{count, plural, =1{Failed to copy your photo} other{Failed to copy some photos}}",
+    "copyImageError_message": "{count, plural, =1{复制图片失败} other{复制一些图片失败}}",
     "@copyImageError_message": {
         "placeholders": {
             "count": {}
@@ -520,34 +520,34 @@
     "imageUploadDetailsButton_title": "上传",
     "imageUploadDetailsEdit_title": "编辑要上传的照片",
     "imageUploadDetailsUploading_title": "正在上传的照片",
-    "imageUploadDetailsCell_uploadComplete": "Completed! Finishing up...",
-    "imageUploadRemove": "Removing uploaded photos",
-    "imageUploadTableCell_waiting": "Waiting...",
-    "imageUploadTableCell_preparing": "Preparing...",
-    "imageUploadTableCell_prepared": "Ready for upload...",
-    "imageUploadTableCell_uploading": "Uploading...",
-    "imageUploadTableCell_uploaded": "Uploaded",
-    "imageUploadTableCell_finishing": "Finishing...",
-    "imageUploadClearFailed": "{count, plural, =1{Clear Failed Upload} other{Clear {count} Failed Uploads}}",
+    "imageUploadDetailsCell_uploadComplete": "即将完成...",
+    "imageUploadRemove": "正在移除已上传的照片",
+    "imageUploadTableCell_waiting": "等待中...",
+    "imageUploadTableCell_preparing": "准备中...",
+    "imageUploadTableCell_prepared": "已准备好上传...",
+    "imageUploadTableCell_uploading": "上传中…",
+    "imageUploadTableCell_uploaded": "上传成功",
+    "imageUploadTableCell_finishing": "正在完成...",
+    "imageUploadClearFailed": "{count, plural, =1{清除失败的上传} other{清除 {count} 个失败的上传}}",
     "@imageUploadClearFailed": {
         "placeholders": {
             "count": {}
         }
     },
-    "imageUploadClearCompleted": "{count, plural, =1{Clear Completed Upload} other{Clear {count} Completed Uploads}}",
+    "imageUploadClearCompleted": "{count, plural, =1{清除已完成的上传} other{清除 {count} 个已完成的上传}}",
     "@imageUploadClearCompleted": {
         "placeholders": {
             "count": {}
         }
     },
-    "imageUploadResume": "{count, plural, =1{Resume Upload} other{Resume {count} Uploads}}",
+    "imageUploadResume": "{count, plural, =1{继续上传} other{继续 {count} 个上传}}",
     "@imageUploadResume": {
         "placeholders": {
             "count": {}
         }
     },
-    "imageUploadProgressBar_zero": "Uploading 0/0",
-    "imageUploadProgressBar_nonZero": "Uploading {index}/{max}",
+    "imageUploadProgressBar_zero": "正在上传 0/0",
+    "imageUploadProgressBar_nonZero": "正在上传 {index}/{max}",
     "@imageUploadProgressBar_nonZero": {
         "placeholders": {
             "index": {},
@@ -559,14 +559,14 @@
     "imageUploadCompleted_message": "照片成功上传到你的 Piwigo 服务器",
     "imageUploadCompleted_message1": "照片成功上传到你的Piwigo服务器",
     "uploadError_title": "上传出错",
-    "uploadError_message": "Could not upload your photo.",
-    "uploadCancelled_title": "Upload Cancelled",
-    "uploadNoInternetNetwork": "No Internet Connection",
-    "uploadNoWiFiNetwork": "No Wi-Fi Connection",
-    "uploadLowPowerMode": "Low Power Mode enabled",
-    "uploadSection_impossible": "Impossible Uploads",
-    "uploadSection_resumable": "Resumable Uploads",
-    "uploadSection_queue": "Uploads Queue",
+    "uploadError_message": "无法上传你的照片",
+    "uploadCancelled_title": "上传已取消",
+    "uploadNoInternetNetwork": "没有网絡连接",
+    "uploadNoWiFiNetwork": "没有Wi-Fi连接",
+    "uploadLowPowerMode": "低电量模式已启用",
+    "uploadSection_impossible": "无法完成的上传任务",
+    "uploadSection_resumable": "可继续的上传任务",
+    "uploadSection_queue": "上传队列",
     "imageUploadError_title": "照片上传出错",
     "imageUploadError_format": "Piwigo服务器不支持该文件格式",
     "imageUploadError_source": "无法创建照片源",
@@ -591,19 +591,19 @@
     "localAlbums_photosNnil_msg": "读取本地照片库时出现问题",
     "localAlbums_photosNotAuthorized_msg": "无法读取本地照片库，请在设备设置中为 Piwigo 授予相应权限",
     "localImages_deleteTitle": "从相机相册中移除",
-    "localImages_deleteMessage": "Do you wish to delete the uploaded photos or videos from the camera roll? The deleted photos or videos will still be available in the iOS Photos Trash for 30 days.",
-    "settingsHeader_server": "Piwigo Server {version}",
+    "localImages_deleteMessage": "您想要从相机卷中删除上传的照片或视频吗？ 已删除的照片或视频在被彻底删除前会在 iOS 照片回收站中保留 30 天",
+    "settingsHeader_server": "Piwigo 服务器 {version}",
     "@settingsHeader_server": {
         "placeholders": {
             "version": {}
         }
     },
-    "settingsHeader_notSecure": "Website Not Secure!",
+    "settingsHeader_notSecure": "不安全的连接",
     "settings_server": "地址",
     "settings_username": "用户名",
     "settings_notLoggedIn": " - 未登录 - ",
     "settings_logout": "注销",
-    "settingsFooter_formats": "The server accepts the following file types: {types}.",
+    "settingsFooter_formats": "服务器接受以下文件类型: {types}",
     "@settingsFooter_formats": {
         "placeholders": {
             "types": {}
@@ -653,15 +653,15 @@
     "defaultImageSizeHeader": "请选择图片大小",
     "defaultImageSize_recommended": " (推荐)",
     "defaultSize_disabled": " （在服务器上禁用）",
-    "defaultSizeFooter": "Greyed sizes are not advised or not available on Piwigo server.",
+    "defaultSizeFooter": "灰色的尺寸不建议且不被Piwigo服务器支持",
     "settings_shareGPSdata": "分享私密元数据",
     "settings_shareGPSdata375px": "共享时包含私密元数据",
     "imageSizeSquare": "方形",
     "imageSizeThumbnail": "缩略图",
-    "imageSizeXXSmall": "Tiny",
-    "imageSizeXSmall": "Extra Small",
-    "imageSizeSmall": "Small",
-    "imageSizeMedium": "Medium",
+    "imageSizeXXSmall": "极小",
+    "imageSizeXSmall": "特小",
+    "imageSizeSmall": "小",
+    "imageSizeMedium": "中",
     "imageSizeLarge": "大",
     "imageSizeXLarge": "特大",
     "imageSizeXXLarge": "巨大",
@@ -708,54 +708,54 @@
     "settings_autoUploadDestinationInfo": "请选择相册或子相册，其中的照片和视频会被自动上传",
     "autoUploadError_Disabled": "自动上传选项在应用设置中被禁用",
     "autoUploadError_Failed": "由于出现多次传输失败，上传队列已暂停，请在应用程序中检查",
-    "uploadPhotoSize_title": "Max Photo Size",
-    "uploadPhotoSize_header": "Please select the maximum size of the photos which will be uploaded.",
-    "uploadPhotoSize_resolution": "Built-in cameras maximum resolution:",
-    "uploadVideoSize_title": "Max Video Size",
-    "uploadVideoSize_header": "Please select the maximum size of the videos which will be uploaded.",
-    "uploadVideoSize_resolution": "Built-in cameras maximum specifications:",
-    "uploadPhotoSize_original": "No Downsizing",
-    "settingsHeader_cache": "Cache Settings (Used/Total)",
-    "settings_cacheDisk": "Disk",
-    "settings_cacheMemory": "Memory",
+    "uploadPhotoSize_title": "最大照片大小",
+    "uploadPhotoSize_header": "请选择要上传的照片的最大大小",
+    "uploadPhotoSize_resolution": "内置摄像头最大分辨率",
+    "uploadVideoSize_title": "最大视频大小",
+    "uploadVideoSize_header": "请选择要上传的视频的最大大小",
+    "uploadVideoSize_resolution": "内置摄像头最大规格",
+    "uploadPhotoSize_original": "不缩小大小",
+    "settingsHeader_cache": "缓存设置 (已使用/总共)",
+    "settings_cacheDisk": "存储",
+    "settings_cacheMemory": "内存",
     "settings_cacheMegabytes": "MB",
-    "settings_cacheClear": "Clear Cache",
-    "settings_cacheClearAll": "Clear Photo Cache",
-    "settings_cacheClearMsg": "Are you sure you want to clear the photo cache? This will make albums and photos take a while to load again.",
-    "settingsHeader_appearance": "Appearance",
-    "settingsHeader_colorPalette": "Color Palette",
-    "settings_lightColor": "Light",
-    "settings_darkColor": "Dark",
-    "settings_switchPalette": "Automatic",
-    "settings_brightness": "Brightness",
-    "settings_brightnessHelp": "In low ambient brightness, the Automatic option uses a darker color palette to make photos stand out against darker backgrounds.",
-    "userCount": "{count, plural, =0{0 users} =1{1 user} other{{count} users}}",
+    "settings_cacheClear": "清除缓存",
+    "settings_cacheClearAll": "清除图片缓存",
+    "settings_cacheClearMsg": "您确定要清除照片缓存吗？这将使相册和照片花费一段时间再加载。",
+    "settingsHeader_appearance": "外观",
+    "settingsHeader_colorPalette": "调色板",
+    "settings_lightColor": "浅色",
+    "settings_darkColor": "深色",
+    "settings_switchPalette": "自动",
+    "settings_brightness": "亮度",
+    "settings_brightnessHelp": "在环境亮度低的情况下，自动选项会使用暗色外观来使照片在黑暗背景下易于观看",
+    "userCount": "{count, plural, =0{0 个用户} =1{1 个用户} other{{count} 个用户}}",
     "@userCount": {
         "placeholders": {
             "count": {}
         }
     },
-    "groupCount": "{count, plural, =0{0 groups} =1{1 group} other{{count} groups}}",
+    "groupCount": "{count, plural, =0{0 个组} =1{1 个组} other{{count} 个组}}",
     "@groupCount": {
         "placeholders": {
             "count": {}
         }
     },
-    "commentCount": "{count, plural, =0{0 comments} =1{1 comment} other{{count} comments}}",
+    "commentCount": "{count, plural, =0{0 个评论} =1{1 个评论} other{{count} 个评论}}",
     "@commentCount": {
         "placeholders": {
             "count": {}
         }
     },
     "settings_appName": "Piwigo NG",
-    "settings_language": "Choose language",
+    "settings_language": "选择语言",
     "settingsHeader_about": "相关信息",
     "settings_twitter": "@piwigo",
     "settings_twitterURL": "https://twitter.com/piwigo",
-    "settings_contactUs": "Contact Us",
-    "settings_feedback": "Feedback",
-    "settings_supportForum": "Support Forum",
-    "settings_releaseNotes": "Release Notes",
+    "settings_contactUs": "联系我们",
+    "settings_feedback": "反馈",
+    "settings_supportForum": "支持论坛",
+    "settings_releaseNotes": "更新日志",
     "settings_rateInAppStore": "给 Piwigo NG 评分",
     "settings_translateWithCrowdin": "协助翻译 Piwigo NG",
     "settings_crowdinURL": "https://crowdin.com/project/piwigo-ng",
