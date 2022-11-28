@@ -1,9 +1,18 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:path/path.dart' as path;
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:piwigo_ng/api/api_error.dart';
 import 'package:piwigo_ng/models/image_model.dart';
+import 'package:piwigo_ng/services/notification_service.dart';
+import 'package:piwigo_ng/services/preferences_service.dart';
+import 'package:share_plus/share_plus.dart';
 
 import 'api_client.dart';
 
@@ -28,11 +37,9 @@ Future<ApiResult<List<ImageModel>>> fetchImages(int albumID, int page) async {
       return ApiResult<List<ImageModel>>(data: images);
     }
   } on DioError catch (e) {
-    debugPrint('fetch images: ${e.message}');
+    debugPrint('Fetch images: ${e.message}');
   } on Error catch (e) {
-    debugPrint('fetch images: ${e.stackTrace}');
-  } catch (e) {
-    debugPrint('fetch images: $e');
+    debugPrint('Fetch images: ${e.stackTrace}');
   }
   return ApiResult(error: ApiErrors.fetchImagesError);
 }
@@ -66,11 +73,311 @@ Future<ApiResult<Map>> searchImages(String searchQuery, [int page = 0]) async {
       });
     }
   } on DioError catch (e) {
-    debugPrint('search images: ${e.message}');
+    debugPrint('Search images: ${e.message}');
   } on Error catch (e) {
-    debugPrint('search images: ${e.stackTrace}');
-  } catch (e) {
-    debugPrint('search images: $e');
+    debugPrint('Search images: ${e.stackTrace}');
   }
   return ApiResult(error: ApiErrors.searchImagesError);
+}
+
+Future<bool> _requestPermissions() async {
+  var permission = await Permission.storage.status;
+  if (permission != PermissionStatus.granted) {
+    await Permission.storage.request();
+    permission = await Permission.storage.status;
+  }
+
+  return permission == PermissionStatus.granted;
+}
+
+Future<String?> pickDirectoryPath() async {
+  return await FilePicker.platform.getDirectoryPath();
+}
+
+Future<void> _showNotification({bool success = true, String? payload}) async {
+  if (!(appPreferences.getBool('download_notification') ?? true)) return;
+  final android = AndroidNotificationDetails(
+    'id',
+    'Piwigo NG Download',
+    channelDescription: 'piwigo_ng',
+    priority: Priority.defaultPriority,
+    importance: Importance.defaultImportance,
+  );
+  final platform = NotificationDetails(android: android);
+
+  await localNotification.show(
+    0,
+    success ? 'Success' : 'Failure',
+    success ? 'All files has been downloaded successfully!' : 'There was an error while downloading the file.',
+    platform,
+    payload: payload,
+  );
+}
+
+Future<bool> share(List<ImageModel> images) async {
+  List<XFile>? filesPath = await downloadImages(
+    images,
+    showNotification: false,
+    cached: true,
+  );
+  print(filesPath);
+  if (filesPath == null || filesPath.isEmpty) return false;
+  try {
+    Share.shareXFiles(filesPath);
+    return true;
+  } catch (e) {
+    debugPrint("$e");
+  }
+  return false;
+}
+
+Future<List<XFile>?> downloadImages(
+  List<ImageModel> images, {
+  bool showNotification = true,
+  bool cached = false,
+}) async {
+  final isPermissionStatusGranted = await _requestPermissions();
+  if (!isPermissionStatusGranted) return null;
+  String? dirPath = (await getTemporaryDirectory()).path;
+  if (!cached) {
+    dirPath = await Preferences.getDownloadDestination;
+  }
+
+  if (dirPath == null) return null;
+  final List<XFile> files = [];
+
+  await Future.forEach(images, (ImageModel image) async {
+    XFile? file = await downloadImage(dirPath!, image);
+    if (file != null) {
+      files.add(file);
+    }
+  });
+
+  if (showNotification) {
+    if (files.isNotEmpty) {
+      await _showNotification(
+        success: true,
+        payload: files.length == 1 ? files.single.path : '$dirPath\\',
+      );
+    } else {
+      await _showNotification(success: false);
+    }
+  }
+  return files;
+}
+
+Future<XFile?> downloadImage(String dirPath, ImageModel image) async {
+  String localPath = path.join(dirPath, image.file);
+  try {
+    await ApiClient.download(
+      path: image.derivatives.medium.url,
+      outputPath: localPath,
+    );
+    return XFile(localPath);
+  } on DioError catch (e) {
+    debugPrint('Download images: ${e.message}');
+  } on Error catch (e) {
+    debugPrint('Download images: ${e.stackTrace}');
+  }
+  return null;
+}
+
+Future<int> deleteImages(List<int> imageIdList) async {
+  int nbSuccess = 0;
+  for (int id in imageIdList) {
+    bool response = await deleteImage(id);
+    if (response == true) {
+      nbSuccess++;
+    }
+  }
+  return nbSuccess;
+}
+
+Future<bool> deleteImage(int imageId) async {
+  Map<String, String> queries = {
+    "format": "json",
+    "method": "pwg.images.delete",
+  };
+  FormData formData = FormData.fromMap({
+    "image_id": imageId,
+    "pwg_token": appPreferences.getString(Preferences.tokenKey),
+  });
+  try {
+    Response response = await ApiClient.post(
+      data: formData,
+      queryParameters: queries,
+    );
+
+    if (response.statusCode == 200) {
+      return true;
+    }
+  } on DioError catch (e) {
+    debugPrint('Delete images: ${e.message}');
+  } on Error catch (e) {
+    debugPrint('Delete images: ${e.stackTrace}');
+  }
+  return false;
+}
+
+Future<int> removeImages(List<ImageModel> images, int albumId) async {
+  int nbSuccess = 0;
+  for (ImageModel image in images) {
+    bool response = await removeImage(image, albumId);
+    if (response == true) {
+      nbSuccess++;
+    }
+  }
+  return nbSuccess;
+}
+
+Future<bool> removeImage(ImageModel image, int albumId) async {
+  final List<int> albums = image.categories.map<int>((album) => album['id']).toList();
+  albums.removeWhere((album) => album == albumId);
+
+  if (albums.isEmpty) {
+    return await deleteImage(image.id);
+  }
+
+  final Map<String, dynamic> queries = {
+    'format': 'json',
+    'method': 'pwg.images.setInfo',
+  };
+  final FormData formData = FormData.fromMap({
+    'image_id': image.id,
+    'categories': albums,
+    'multiple_value_mode': 'replace',
+  });
+
+  try {
+    Response response = await ApiClient.post(data: formData, queryParameters: queries);
+
+    if (response.statusCode == 200) {
+      return true;
+    }
+  } on DioError catch (e) {
+    debugPrint('Remove images: ${e.message}');
+  } on Error catch (e) {
+    debugPrint('Remove images: ${e.stackTrace}');
+  }
+  return false;
+}
+
+Future<int> moveImages(List<ImageModel> images, int oldAlbumId, int newAlbumId) async {
+  int nbMoved = 0;
+  for (var image in images) {
+    bool response = await moveImage(image, oldAlbumId, newAlbumId);
+    if (response == false) {
+      nbMoved++;
+    }
+  }
+  return nbMoved;
+}
+
+Future<bool> moveImage(ImageModel image, int oldAlbumId, int newAlbumId) async {
+  final List<int> albums = image.categories.map<int>((album) => album['id']).toList();
+  albums.removeWhere((id) => id == oldAlbumId);
+  albums.add(newAlbumId);
+  Map<String, String> queries = {
+    'format': 'json',
+    'method': 'pwg.images.setInfo',
+  };
+
+  FormData formData = FormData.fromMap({
+    'image_id': image.id,
+    'categories': albums,
+    'multiple_value_mode': 'replace',
+  });
+
+  try {
+    Response response = await ApiClient.post(data: formData, queryParameters: queries);
+
+    if (response.statusCode == 200) {
+      return true;
+    }
+  } on DioError catch (e) {
+    debugPrint('Move images: ${e.message}');
+  } on Error catch (e) {
+    debugPrint('Move images: ${e.stackTrace}');
+  }
+  return false;
+}
+
+Future<int> assignImages(List<ImageModel> images, int albumId) async {
+  int nbAssigned = 0;
+  for (ImageModel image in images) {
+    final List<int> categories = image.categories.map<int>((album) => album['id']).toList();
+    categories.add(albumId);
+    bool response = await assignImage(image.id, categories);
+    if (response == true) {
+      nbAssigned++;
+    }
+  }
+  return nbAssigned;
+}
+
+Future<bool> assignImage(int imageId, List<int> categories) async {
+  final Map<String, dynamic> queries = {
+    'format': 'json',
+    'method': 'pwg.images.setInfo',
+  };
+
+  final FormData formData = FormData.fromMap({
+    'image_id': imageId,
+    'categories': categories,
+    'multiple_value_mode': 'append',
+  });
+
+  try {
+    Response response = await ApiClient.post(data: formData, queryParameters: queries);
+
+    if (response.statusCode == 200) {
+      return true;
+    }
+  } on DioError catch (e) {
+    debugPrint('Assign images: ${e.message}');
+  } on Error catch (e) {
+    debugPrint('Assign images: ${e.stackTrace}');
+  }
+  return false;
+}
+
+Future<int> editImages(List<ImageModel> images, List<int> tags, int level) async {
+  int nbEdited = 0;
+  for (ImageModel image in images) {
+    bool response = await editImage(image, tags, level);
+    if (response == true) {
+      nbEdited++;
+    }
+  }
+  return nbEdited;
+}
+
+Future<bool> editImage(ImageModel image, List<int> tags, int level) async {
+  final Map<String, String> queries = {
+    'format': 'json',
+    'method': 'pwg.images.setInfo',
+  };
+  Map<String, dynamic> form = {
+    'image_id': image.id,
+    'name': image.name,
+    'comment': image.comment,
+    'tag_ids': tags,
+    'single_value_mode': 'replace',
+    'multiple_value_mode': 'append',
+  };
+  if (level != -1) form['level'] = level;
+  final FormData formData = FormData.fromMap(form);
+
+  try {
+    Response response = await ApiClient.post(data: formData, queryParameters: queries);
+
+    if (response.statusCode == 200) {
+      return true;
+    }
+  } on DioError catch (e) {
+    debugPrint('Edit images: ${e.message}');
+  } on Error catch (e) {
+    debugPrint('Edit images: ${e.stackTrace}');
+  }
+  return false;
 }

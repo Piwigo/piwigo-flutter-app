@@ -155,50 +155,46 @@ Future<File?> compressFile(XFile file) async {
   return null;
 }
 
-Future<Map<String, dynamic>> uploadCompleted(List<int> imageId, int categoryId) async {
+Future<bool> uploadCompleted(List<int> imageId, int categoryId) async {
   Map<String, String> queries = {
-    "format": "json",
-    "method": "pwg.images.uploadCompleted",
+    'format': 'json',
+    'method': 'pwg.images.uploadCompleted',
   };
   FormData formData = FormData.fromMap({
-    "image_id": imageId,
-    "pwg_token": appPreferences.getString("PWG_TOKEN"),
-    "category_id": categoryId,
+    'image_id': imageId,
+    'pwg_token': appPreferences.getString(Preferences.tokenKey),
+    'category_id': categoryId,
   });
   try {
     Response response = await ApiClient.post(data: formData, queryParameters: queries);
     if (response.statusCode == 200) {
-      return json.decode(response.data);
-    } else {
-      return {'stat': 'fail', 'result': response.statusMessage};
+      return true;
     }
-  } catch (e) {
-    var error = e as DioError;
-    return {'stat': 'fail', 'result': error.message};
+  } on DioError catch (e) {
+    debugPrint("$e");
   }
+  return false;
 }
 
-Future<Map<String, dynamic>> communityUploadCompleted(List<int> imageId, int categoryId) async {
+Future<bool> communityUploadCompleted(List<int> imageId, int categoryId) async {
   Map<String, String> queries = {
-    "format": "json",
-    "method": "community.images.uploadCompleted",
+    'format': 'json',
+    'method': 'community.images.uploadCompleted',
   };
   FormData formData = FormData.fromMap({
-    "image_id": imageId,
-    "pwg_token": appPreferences.getString("PWG_TOKEN"),
-    "category_id": categoryId,
+    'image_id': imageId,
+    'pwg_token': appPreferences.getString(Preferences.tokenKey),
+    'category_id': categoryId,
   });
   try {
     Response response = await ApiClient.post(data: formData, queryParameters: queries);
     if (response.statusCode == 200) {
-      return json.decode(response.data);
-    } else {
-      return {'stat': 'fail', 'result': response.statusMessage};
+      return true;
     }
-  } catch (e) {
-    var error = e as DioError;
-    return {'stat': 'fail', 'result': error.message};
+  } on DioError catch (e) {
+    debugPrint("$e");
   }
+  return false;
 }
 
 class FlutterAbsolutePath {

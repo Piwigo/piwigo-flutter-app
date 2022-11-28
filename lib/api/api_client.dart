@@ -104,6 +104,30 @@ class ApiClient {
     );
     return response;
   }
+
+  static Future<Response> download({
+    required String path,
+    required String outputPath,
+    dynamic data,
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+    String lengthHeader = Headers.contentLengthHeader,
+    CancelToken? cancelToken,
+    void Function(int, int)? onReceiveProgress,
+  }) async {
+    Response response = await dio.download(
+      path,
+      outputPath,
+      data: data,
+      queryParameters: queryParameters,
+      options: options,
+      lengthHeader: lengthHeader,
+      cancelToken: cancelToken,
+      deleteOnError: true,
+      onReceiveProgress: onReceiveProgress,
+    );
+    return response;
+  }
 }
 
 class SSLHttpOverrides extends HttpOverrides {

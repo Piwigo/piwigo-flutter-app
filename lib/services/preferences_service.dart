@@ -1,4 +1,5 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:piwigo_ng/api/images.dart';
 import 'package:piwigo_ng/models/status_model.dart';
 import 'package:piwigo_ng/utils/settings.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -86,6 +87,11 @@ class Preferences {
   static const String uploadQualityKey = 'UPLOAD_QUALITY';
   static double get getUploadQuality {
     return appPreferences.getDouble(uploadQualityKey) ?? Settings.defaultUploadQuality;
+  }
+
+  static const String downloadDestination = 'DOWNLOAD_DESTINATION';
+  static Future<String?> get getDownloadDestination async {
+    return appPreferences.getString(downloadDestination) ?? await pickDirectoryPath();
   }
 
   // ------------ Set preferences ------------

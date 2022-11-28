@@ -50,6 +50,8 @@ dependencies:
   mime_type: ^1.0.0 # Check mime type of files (differentiate photos from videos)
   video_player: ^2.4.7 # Read video files in fullscreen mode
   flutter_image_compress: ^1.1.3 # Remove metadata
+  permission_handler: ^8.3.0 # Check and asks for permissions
+  share_plus: ^4.4.0 # Share files
 
   # Translations
   flutter_localizations:

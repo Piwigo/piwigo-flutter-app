@@ -38,8 +38,8 @@ class _MoveOrCopyModalState extends State<MoveOrCopyModal> {
     List<String> parentAlbums = widget.album.upperCategories.split(',');
     _disabledAlbums = [
       widget.album.id,
-      if (parentAlbums.length == 1) 0,
-      if (parentAlbums.length > 1) int.parse(parentAlbums[parentAlbums.length - 2]),
+      if (parentAlbums.length == 1 || widget.isImage) 0,
+      if (!widget.isImage && parentAlbums.length > 1) int.parse(parentAlbums[parentAlbums.length - 2]),
     ];
 
     super.initState();
@@ -165,7 +165,7 @@ class _MoveOrCopyModalState extends State<MoveOrCopyModal> {
               ),
               disabledAlbums: _disabledAlbums,
               onTap: _onTapAlbum,
-              isRoot: true,
+              isParent: true,
             );
           } else {
             return Center(
@@ -214,14 +214,14 @@ class ExpansionAlbumTile extends StatefulWidget {
     Key? key,
     required this.album,
     this.disabledAlbums = const [],
-    this.isRoot = false,
+    this.isParent = false,
     this.index = 0,
     this.onTap,
   }) : super(key: key);
 
   final AlbumModel album;
   final List<int> disabledAlbums;
-  final bool isRoot;
+  final bool isParent;
   final int index;
   final Function(AlbumModel)? onTap;
 
@@ -234,7 +234,7 @@ class _ExpansionAlbumTileState extends State<ExpansionAlbumTile> {
 
   @override
   void initState() {
-    if (widget.isRoot) {
+    if (widget.isParent) {
       _expanded = true;
     }
     super.initState();
@@ -281,7 +281,7 @@ class _ExpansionAlbumTileState extends State<ExpansionAlbumTile> {
                   ),
                 ),
               ),
-              if (widget.album.children.isNotEmpty && !widget.isRoot)
+              if (widget.album.children.isNotEmpty && !widget.isParent)
                 GestureDetector(
                   behavior: HitTestBehavior.opaque,
                   onTap: () => setState(() {
