@@ -146,6 +146,16 @@ class Preferences {
     return appPreferences.getBool(uploadNotificationKey) ?? true;
   }
 
+  static const String downloadNotification = 'DOWNLOAD_NOTIFICATION';
+  static bool get getDownloadNotification {
+    return appPreferences.getBool(downloadNotification) ?? true;
+  }
+
+  static const String uploadNotification = 'UPLOAD_NOTIFICATION';
+  static bool get getUploadNotification {
+    return appPreferences.getBool(uploadNotification) ?? true;
+  }
+
   // ------------ Set preferences ------------
 
   /// Save account login (username and password)

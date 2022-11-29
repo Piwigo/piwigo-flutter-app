@@ -41,6 +41,7 @@ class ImageModel {
     this.width = 1,
     this.height = 1,
     this.hit = 0,
+    this.favorite = false,
     this.file = '',
     required this.name,
     this.comment,
