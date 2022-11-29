@@ -4,6 +4,7 @@ enum ApiErrors {
   fetchAlbumsError,
   fetchAlbumListError,
   fetchImagesError,
+  fetchFavoritesError,
   searchImagesError,
   getStatusError,
   getInfoError,

@@ -9,11 +9,14 @@ import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:piwigo_ng/api/api_error.dart';
+import 'package:piwigo_ng/models/album_model.dart';
 import 'package:piwigo_ng/models/image_model.dart';
 import 'package:piwigo_ng/services/notification_service.dart';
 import 'package:piwigo_ng/services/preferences_service.dart';
+import 'package:piwigo_ng/utils/localizations.dart';
 import 'package:share_plus/share_plus.dart';
 
+import 'albums.dart';
 import 'api_client.dart';
 
 Future<ApiResult<List<ImageModel>>> fetchImages(int albumID, int page) async {
@@ -94,22 +97,20 @@ Future<String?> pickDirectoryPath() async {
   return await FilePicker.platform.getDirectoryPath();
 }
 
-Future<void> _showNotification({bool success = true, String? payload}) async {
-  if (!(appPreferences.getBool('download_notification') ?? true)) return;
+Future<void> _showDownloadNotification({bool success = true, String? payload}) async {
+  if (!Preferences.getDownloadNotification) return;
   final android = AndroidNotificationDetails(
-    'id',
+    'piwigo-ng-download',
     'Piwigo NG Download',
     channelDescription: 'piwigo_ng',
     priority: Priority.defaultPriority,
     importance: Importance.defaultImportance,
   );
-  final platform = NotificationDetails(android: android);
-
-  await localNotification.show(
-    0,
-    success ? 'Success' : 'Failure',
-    success ? 'All files has been downloaded successfully!' : 'There was an error while downloading the file.',
-    platform,
+  await showLocalNotification(
+    id: 0,
+    title: success ? appStrings.downloadImageSuccess_title : appStrings.downloadImageFail_title,
+    body: success ? appStrings.downloadImageSuccess_message : appStrings.deleteImageFail_message,
+    details: android,
     payload: payload,
   );
 }
@@ -155,12 +156,12 @@ Future<List<XFile>?> downloadImages(
 
   if (showNotification) {
     if (files.isNotEmpty) {
-      await _showNotification(
+      await _showDownloadNotification(
         success: true,
         payload: files.length == 1 ? files.single.path : '$dirPath\\',
       );
     } else {
-      await _showNotification(success: false);
+      await _showDownloadNotification(success: false);
     }
   }
   return files;
@@ -182,10 +183,22 @@ Future<XFile?> downloadImage(String dirPath, ImageModel image) async {
   return null;
 }
 
-Future<int> deleteImages(List<int> imageIdList) async {
+Future<int> deleteImages(
+  List<ImageModel> imageList,
+  AlbumModel album,
+  DeleteAlbumModes mode,
+) async {
   int nbSuccess = 0;
-  for (int id in imageIdList) {
-    bool response = await deleteImage(id);
+  for (ImageModel image in imageList) {
+    bool response = false;
+    switch (mode) {
+      case DeleteAlbumModes.noDelete:
+        response = await removeImage(image, album.id);
+        break;
+      default:
+        response = await deleteImage(image);
+        break;
+    }
     if (response == true) {
       nbSuccess++;
     }
@@ -193,13 +206,13 @@ Future<int> deleteImages(List<int> imageIdList) async {
   return nbSuccess;
 }
 
-Future<bool> deleteImage(int imageId) async {
+Future<bool> deleteImage(ImageModel image) async {
   Map<String, String> queries = {
     "format": "json",
     "method": "pwg.images.delete",
   };
   FormData formData = FormData.fromMap({
-    "image_id": imageId,
+    "image_id": image.id,
     "pwg_token": appPreferences.getString(Preferences.tokenKey),
   });
   try {
@@ -235,7 +248,7 @@ Future<bool> removeImage(ImageModel image, int albumId) async {
   albums.removeWhere((album) => album == albumId);
 
   if (albums.isEmpty) {
-    return await deleteImage(image.id);
+    deleteImage(image);
   }
 
   final Map<String, dynamic> queries = {

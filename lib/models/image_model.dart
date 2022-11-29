@@ -3,6 +3,7 @@ class ImageModel {
   int width;
   int height;
   int hit;
+  bool favorite;
   String file;
   String name;
   String? comment;
@@ -18,6 +19,7 @@ class ImageModel {
     this.width = 1,
     this.height = 1,
     this.hit = 0,
+    this.favorite = false,
     this.file = '',
     required this.name,
     this.comment,
@@ -34,6 +36,7 @@ class ImageModel {
         width = int.tryParse(json['width'].toString()) ?? 0,
         height = int.tryParse(json['height'].toString()) ?? 0,
         hit = int.tryParse(json['hit'].toString()) ?? 0,
+        favorite = json['is_favorite'] ?? false,
         file = json['file'].toString(),
         name = json['name'].toString(),
         comment = json['comment'],

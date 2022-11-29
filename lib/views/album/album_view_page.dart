@@ -4,10 +4,12 @@ import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:piwigo_ng/api/albums.dart';
 import 'package:piwigo_ng/api/api_error.dart';
+import 'package:piwigo_ng/api/users.dart';
 import 'package:piwigo_ng/components/dialogs/confirm_dialog.dart';
 import 'package:piwigo_ng/components/modals/choose_camera_picker_modal.dart';
 import 'package:piwigo_ng/components/modals/create_album_modal.dart';
 import 'package:piwigo_ng/components/modals/delete_album_mode_modal.dart';
+import 'package:piwigo_ng/components/modals/delete_images_modal.dart';
 import 'package:piwigo_ng/components/modals/edit_album_modal.dart';
 import 'package:piwigo_ng/components/modals/move_or_copy_modal.dart';
 import 'package:piwigo_ng/components/popup_list_item.dart';
@@ -60,6 +62,8 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
     ]);
     super.initState();
   }
+
+  bool get _hasNonFavorites => _selectedList.where((image) => !image.favorite).isNotEmpty;
 
   List<AlbumModel> _parseAlbums(List<AlbumModel> albums) {
     albums.removeWhere((album) {
@@ -124,9 +128,9 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
   }
 
   Future<bool> _onDeleteAlbum(AlbumModel album) async {
-    DeleteAlbumModes mode = DeleteAlbumModes.deleteOrphans;
+    DeleteAlbumModes? mode = DeleteAlbumModes.deleteOrphans;
     if (album.nbTotalImages != 0) {
-      final int? choice = await showModalBottomSheet<int>(
+      mode = await showModalBottomSheet<DeleteAlbumModes>(
         context: context,
         isScrollControlled: true,
         isDismissible: true,
@@ -134,18 +138,7 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
           albumModel: album,
         ),
       );
-      if (choice == null) return false;
-      switch (choice) {
-        case 0:
-          mode = DeleteAlbumModes.noDelete;
-          break;
-        case 1:
-          mode = DeleteAlbumModes.deleteOrphans;
-          break;
-        case 2:
-          mode = DeleteAlbumModes.forceDelete;
-          break;
-      }
+      if (mode == null) return false;
     }
     if (!await showConfirmDialog(
       context,
@@ -198,7 +191,52 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
 
   Future<void> _onEditPhotos() async {}
   Future<void> _onMovePhotos() async {}
-  Future<void> _onDeletePhotos() async {}
+  Future<void> _onDeletePhotos() async {
+    final DeleteAlbumModes? mode = await showModalBottomSheet<DeleteAlbumModes>(
+      context: context,
+      isScrollControlled: true,
+      isDismissible: true,
+      builder: (context) => DeleteImagesModal(
+        imageList: _selectedList,
+        album: _currentAlbum,
+      ),
+    );
+    if (mode == null) return;
+    if (!await showConfirmDialog(
+      context,
+      message: appStrings.deleteImage_message(
+        _selectedList.length,
+      ),
+    )) {
+      return;
+    }
+    final int result = await deleteImages(
+      _selectedList,
+      _currentAlbum,
+      mode,
+    );
+    if (result > 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        successSnackBar(message: appStrings.deleteImageSuccess_message(result)),
+      );
+      _onRefresh();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        errorSnackBar(message: appStrings.deleteImageFail_message),
+      );
+    }
+  }
+
+  Future<void> _onLikePhotos() async {
+    if (_hasNonFavorites) {
+      await addFavorites(
+        _selectedList.where((image) => !image.favorite).toList(),
+      );
+    } else {
+      await removeFavorites(_selectedList);
+    }
+    _onRefresh();
+  }
 
   Future<void> _onPickImages() async {
     try {
@@ -283,7 +321,7 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
                             child: Padding(
                               padding: const EdgeInsets.all(8),
                               child: Text(
-                                appStrings.imageCount(widget.album.nbImages),
+                                appStrings.imageCount(_currentAlbum.nbImages),
                                 style: Theme.of(context).textTheme.titleSmall,
                               ),
                             ),
@@ -319,10 +357,38 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
       pinned: true,
       titleSpacing: 0,
       title: Text(
-        widget.album.name,
+        _currentAlbum.name,
         style: Theme.of(context).appBarTheme.titleTextStyle,
       ),
       actions: [
+        Builder(builder: (context) {
+          const Duration duration = Duration(milliseconds: 300);
+          const Curve curve = Curves.ease;
+          bool isSelecting = _selectedList.isNotEmpty;
+          return AnimatedSlide(
+            duration: duration,
+            curve: curve,
+            offset: Offset(isSelecting ? 0 : 1, 0),
+            child: AnimatedOpacity(
+              duration: duration,
+              curve: curve,
+              opacity: isSelecting ? 1 : 0,
+              child: IgnorePointer(
+                ignoring: !isSelecting,
+                child: IconButton(
+                  visualDensity: VisualDensity.compact,
+                  padding: EdgeInsets.zero,
+                  onPressed: () => setState(() {
+                    _selectedList.clear();
+                  }),
+                  icon: Icon(
+                    Icons.cancel,
+                  ),
+                ),
+              ),
+            ),
+          );
+        }),
         PopupMenuButton(
           position: PopupMenuPosition.under,
           itemBuilder: (context) => [
@@ -338,6 +404,10 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
               ),
             if (_selectedList.isNotEmpty)
               PopupMenuItem(
+                onTap: () => Future.delayed(
+                  const Duration(seconds: 0),
+                  () => share(_selectedList),
+                ),
                 child: PopupListItem(
                   icon: Icons.share,
                   text: appStrings.imageOptions_share,
@@ -345,23 +415,46 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
               ),
             if (_selectedList.isNotEmpty)
               PopupMenuItem(
+                onTap: () => Future.delayed(
+                  const Duration(seconds: 0),
+                  () => _onLikePhotos(),
+                ),
+                child: PopupListItem(
+                  icon: _hasNonFavorites ? Icons.favorite_border : Icons.favorite,
+                  text: _hasNonFavorites ? appStrings.imageOptions_addFavorites : appStrings.imageOptions_removeFavorites,
+                ),
+              ),
+            if (_selectedList.isNotEmpty)
+              PopupMenuItem(
+                onTap: () => Future.delayed(
+                  const Duration(seconds: 0),
+                  () => downloadImages(_selectedList),
+                ),
                 child: PopupListItem(
                   icon: Icons.download,
                   text: appStrings.downloadImage_title(_selectedList.length),
                 ),
               ),
             PopupMenuItem(
-              onTap: () => _onEditAlbum(widget.album),
+              onTap: () => Future.delayed(
+                const Duration(seconds: 0),
+                () => _onEditAlbum(_currentAlbum),
+              ),
               child: PopupListItem(
                 icon: Icons.drive_file_rename_outline_sharp,
                 text: appStrings.renameCategory_title,
               ),
             ),
             PopupMenuItem(
-              onTap: () async {
-                if (await _onDeleteAlbum(widget.album)) {
-                  Navigator.of(context).pop();
-                }
+              onTap: () {
+                Future.delayed(
+                  const Duration(seconds: 0),
+                  () async {
+                    if (await _onDeleteAlbum(_currentAlbum)) {
+                      Navigator.of(context).pop();
+                    }
+                  },
+                );
               },
               child: PopupListItem(
                 color: Theme.of(context).errorColor,
@@ -439,6 +532,7 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
         child: Text(appStrings.noImages),
       );
     }
+    _selectedList = _imageList.where((image) => _selectedList.contains(image)).toList();
     return ImageGridView(
       imageList: _imageList,
       selectedList: _selectedList,
@@ -460,6 +554,37 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
   }
 
   Widget get _bottomBar {
+    if (widget.isAdmin) {
+      return BottomAppBar(
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+          height: _selectedList.isEmpty ? 0 : 56.0,
+          child: Row(
+            children: [
+              Expanded(
+                child: IconButton(
+                  onPressed: _onEditPhotos,
+                  icon: Icon(Icons.edit),
+                ),
+              ),
+              Expanded(
+                child: IconButton(
+                  onPressed: _onMovePhotos,
+                  icon: Icon(Icons.drive_file_move),
+                ),
+              ),
+              Expanded(
+                child: IconButton(
+                  onPressed: _onDeletePhotos,
+                  icon: Icon(Icons.delete),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
     return BottomAppBar(
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 300),
@@ -469,20 +594,27 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
           children: [
             Expanded(
               child: IconButton(
-                onPressed: _onEditPhotos,
-                icon: Icon(Icons.edit),
+                onPressed: () => share(_selectedList),
+                icon: Icon(Icons.share),
               ),
             ),
             Expanded(
               child: IconButton(
-                onPressed: _onMovePhotos,
-                icon: Icon(Icons.drive_file_move),
+                onPressed: _onLikePhotos,
+                icon: Builder(
+                  builder: (context) {
+                    if (_hasNonFavorites) {
+                      return Icon(Icons.favorite_border);
+                    }
+                    return Icon(Icons.favorite);
+                  },
+                ),
               ),
             ),
             Expanded(
               child: IconButton(
-                onPressed: _onDeletePhotos,
-                icon: Icon(Icons.delete),
+                onPressed: () => downloadImages(_selectedList),
+                icon: Icon(Icons.download),
               ),
             ),
           ],

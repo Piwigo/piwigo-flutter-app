@@ -190,12 +190,15 @@ class _RootAlbumViewPageState extends State<RootAlbumViewPage> {
             }
             _albumList = result.data!;
           }
-          return AlbumGridView(
-            albumList: _albumList,
-            onTap: _onTapAlbum,
-            onDelete: _onDeleteAlbum,
-            onEdit: _onEditAlbum,
-            onMove: _onMoveAlbum,
+          return Padding(
+            padding: widget.isAdmin ? const EdgeInsets.only(bottom: 72.0) : EdgeInsets.zero,
+            child: AlbumGridView(
+              albumList: _albumList,
+              onTap: _onTapAlbum,
+              onDelete: _onDeleteAlbum,
+              onEdit: _onEditAlbum,
+              onMove: _onMoveAlbum,
+            ),
           );
         }
         return const Center(

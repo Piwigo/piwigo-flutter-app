@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:piwigo_ng/api/albums.dart';
 import 'package:piwigo_ng/components/modals/piwigo_modal.dart';
 import 'package:piwigo_ng/models/album_model.dart';
 import 'package:piwigo_ng/utils/localizations.dart';
@@ -24,14 +25,14 @@ class DeleteAlbumModeModal extends StatelessWidget {
             leading: Icon(Icons.photo_library, color: Theme.of(context).primaryColor),
             title: Text(appStrings.deleteCategory_noImages),
             subtitle: Text(appStrings.deleteCategory_noImages_subtitle),
-            onTap: () => Navigator.of(context).pop(0),
+            onTap: () => Navigator.of(context).pop(DeleteAlbumModes.noDelete),
           ),
           ListTile(
             minLeadingWidth: 24,
             leading: Icon(Icons.delete, color: Theme.of(context).errorColor),
             title: Text(appStrings.deleteCategory_orphanedImages),
             subtitle: Text(appStrings.deleteCategory_orphanedImages_subtitle),
-            onTap: () => Navigator.of(context).pop(1),
+            onTap: () => Navigator.of(context).pop(DeleteAlbumModes.deleteOrphans),
           ),
           ListTile(
             minLeadingWidth: 24,
@@ -69,7 +70,7 @@ class DeleteAlbumModeModal extends StatelessWidget {
             ),
             title: Text(appStrings.deleteCategory_allImages(albumModel.nbTotalImages)),
             subtitle: Text(appStrings.deleteCategory_allImages_subtitle),
-            onTap: () => Navigator.of(context).pop(2),
+            onTap: () => Navigator.of(context).pop(DeleteAlbumModes.forceDelete),
           ),
         ],
       ),

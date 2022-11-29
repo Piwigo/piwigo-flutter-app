@@ -21,7 +21,7 @@ class PopupListItem extends StatelessWidget {
       horizontalTitleGap: 0,
       leading: Icon(icon),
       title: Text(
-        text!,
+        text ?? '',
         style: Theme.of(context).textTheme.bodyMedium,
       ),
     );

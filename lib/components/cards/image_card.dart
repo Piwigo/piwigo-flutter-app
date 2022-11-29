@@ -2,6 +2,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:piwigo_ng/models/image_model.dart';
 import 'package:piwigo_ng/services/preferences_service.dart';
+import 'package:piwigo_ng/utils/resources.dart';
 
 class ImageCard extends StatelessWidget {
   const ImageCard({
@@ -50,7 +51,7 @@ class ImageCard extends StatelessWidget {
               errorBuilder: (context, o, s) {
                 debugPrint("$o\n$s");
                 return Center(child: Icon(Icons.image_not_supported));
-                },
+              },
               loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
                 if (loadingProgress == null) return child;
                 return Center(
@@ -63,30 +64,52 @@ class ImageCard extends StatelessWidget {
               },
             );
           }),
-          if (Preferences.getShowThumbnailTitle)
-            Positioned(
-              bottom: 0,
-              right: 0,
-              left: 0,
-              child: Container(
-                padding: const EdgeInsets.all(2.0),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(colors: [
-                    Colors.black,
-                    Colors.black.withOpacity(0),
-                  ], begin: Alignment.bottomCenter, end: Alignment.topCenter),
-                ),
-                child: AutoSizeText(
-                  image.name,
-                  maxLines: 1,
-                  maxFontSize: 14,
-                  minFontSize: 8,
-                  textAlign: TextAlign.center,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(color: Colors.white, fontSize: 14),
-                ),
-              ),
+          Positioned(
+            bottom: 0,
+            right: 0,
+            left: 0,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (image.favorite)
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(2.0),
+                        child: Icon(
+                          Icons.favorite,
+                          color: Color(0xFFFFFFFF),
+                          size: 12,
+                          shadows: AppShadows.icon,
+                        ),
+                      ),
+                    ],
+                  ),
+                if (Preferences.getShowThumbnailTitle)
+                  Container(
+                    padding: const EdgeInsets.all(2.0),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(colors: [
+                        Colors.black,
+                        Colors.black.withOpacity(0),
+                      ], begin: Alignment.bottomCenter, end: Alignment.topCenter),
+                    ),
+                    child: AutoSizeText(
+                      image.name,
+                      maxLines: 1,
+                      maxFontSize: 14,
+                      minFontSize: 8,
+                      textAlign: TextAlign.center,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(color: Colors.white, fontSize: 14),
+                    ),
+                  ),
+              ],
             ),
+          ),
           AnimatedOpacity(
             duration: selectDuration,
             curve: selectCurve,

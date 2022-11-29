@@ -151,6 +151,7 @@
     "categoryDiscoverFavorites_title": "Your favorites",
 
 
+
     "categorySort_nameAscending": "Photo Title, A → Z",
     "categorySort_nameDescending": "Photo Title, Z → A",
     "categorySort_fileNameAscending": "File Name, A → Z",
@@ -363,6 +364,8 @@
     "imageOptions_edit": "Edit",
     "imageOptions_download": "Download",
     "imageOptions_share": "Share",
+    "imageOptions_addFavorites": "Add favorites",
+    "imageOptions_removeFavorites": "Remove favorites",
     "imageOptions_setAlbumImage": "Set Album Thumbnail",
 
 
@@ -480,6 +483,7 @@
         }
     },
     "removeSingleImage_title": "Remove from Album",
+    "removeSingleImage_subtitle": "Some photos are assigned to other albums",
     "removeImageHUD_removing": "{count, plural, =0{Removing Photos…} =1{Removing Photo…} other{Removing Photos…}}",
     "@removeImageHUD_removing": {
         "placeholders": {
@@ -533,6 +537,8 @@
         }
     },
 
+    "downloadImageSuccess_title": "Files downloaded",
+    "downloadImageSuccess_message": "All files are downloaded successfully",
     "downloadImageFail_title": "Download Fail",
     "downloadImageFail_message": "Failed to download photo!",
     "downloadVideoFail_message": "Failed to download video!",
