@@ -1,52 +1,46 @@
 import 'package:flutter/material.dart';
-import 'package:piwigo_ng/api/albums.dart';
 import 'package:piwigo_ng/api/api_error.dart';
+import 'package:piwigo_ng/api/tags.dart';
 import 'package:piwigo_ng/components/buttons/animated_piwigo_button.dart';
 import 'package:piwigo_ng/components/fields/app_field.dart';
 import 'package:piwigo_ng/components/modals/piwigo_modal.dart';
 import 'package:piwigo_ng/components/snackbars.dart';
+import 'package:piwigo_ng/models/tag_model.dart';
 import 'package:piwigo_ng/utils/localizations.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 
-class CreateAlbumModal extends StatefulWidget {
-  const CreateAlbumModal({Key? key, required this.albumId}) : super(key: key);
-
-  final int albumId;
+class CreateTagModal extends StatefulWidget {
+  const CreateTagModal({Key? key}) : super(key: key);
 
   @override
-  State<CreateAlbumModal> createState() => _CreateAlbumModalState();
+  State<CreateTagModal> createState() => _CreateTagModalState();
 }
 
-class _CreateAlbumModalState extends State<CreateAlbumModal> {
+class _CreateTagModalState extends State<CreateTagModal> {
   final RoundedLoadingButtonController _btnController = RoundedLoadingButtonController();
-  final TextEditingController _descriptionController = TextEditingController();
 
   String _name = '';
 
-  Future<void> _onCreateAlbum() async {
+  Future<void> _onCreateTag() async {
     if (_name.isEmpty) return;
     _btnController.start();
-    ApiResult result = await addAlbum(
-      parentId: widget.albumId,
-      name: _name,
-      description: _descriptionController.text,
-    );
+    ApiResult result = await createTag(_name);
     if (result.hasError) {
       _btnController.error();
       ScaffoldMessenger.of(context).showSnackBar(
         errorSnackBar(
-          message: appStrings.createAlbumError_title,
+          message: appStrings.tagsAddError_message,
         ),
       );
     } else {
       _btnController.success();
       ScaffoldMessenger.of(context).showSnackBar(
         successSnackBar(
-          message: appStrings.createNewAlbumHUD_created,
+          message: appStrings.tagsAddHUD_created,
           icon: Icons.add_circle_outlined,
         ),
       );
-      Navigator.of(context).pop();
+      Navigator.of(context).pop(result.data);
     }
     await Future.delayed(const Duration(seconds: 1));
     _btnController.reset();
@@ -56,7 +50,7 @@ class _CreateAlbumModalState extends State<CreateAlbumModal> {
   Widget build(BuildContext context) {
     return PiwigoModal(
       title: appStrings.createNewAlbum_title,
-      subtitle: appStrings.createNewAlbum_message,
+      subtitle: appStrings.tagsAdd_message,
       content: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
         child: Column(
@@ -72,18 +66,11 @@ class _CreateAlbumModalState extends State<CreateAlbumModal> {
             ),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: AppField(
-                controller: _descriptionController,
-                hint: appStrings.createNewAlbumDescription_placeholder,
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: AnimatedPiwigoButton(
                 controller: _btnController,
                 disabled: _name.isEmpty,
                 color: Theme.of(context).primaryColor,
-                onPressed: _onCreateAlbum,
+                onPressed: _onCreateTag,
                 child: Text(
                   appStrings.alertAddButton,
                   style: Theme.of(context).textTheme.displaySmall,
@@ -97,13 +84,13 @@ class _CreateAlbumModalState extends State<CreateAlbumModal> {
   }
 }
 
-Future<void> showCreateAlbumModal(BuildContext context, int parentId) async {
-  await showModalBottomSheet(
+Future<TagModel?> showCreateTagModal(BuildContext context) async {
+  return await showModalBottomSheet<TagModel?>(
     context: context,
     isScrollControlled: true,
     builder: (_) => Padding(
       padding: MediaQuery.of(context).padding,
-      child: CreateAlbumModal(albumId: parentId),
+      child: CreateTagModal(),
     ),
   );
 }

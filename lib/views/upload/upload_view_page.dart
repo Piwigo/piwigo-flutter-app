@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:mime_type/mime_type.dart';
 import 'package:piwigo_ng/components/buttons/animated_piwigo_button.dart';
 import 'package:piwigo_ng/components/fields/app_field.dart';
+import 'package:piwigo_ng/components/modals/add_tags_modal.dart';
 import 'package:piwigo_ng/components/sections/form_section.dart';
 import 'package:piwigo_ng/utils/resources.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
@@ -27,27 +28,27 @@ class UploadViewPage extends StatefulWidget {
 }
 
 class _UploadGalleryViewPage extends State<UploadViewPage> {
-  final _tagListKey = GlobalKey<AnimatedListState>();
   final ImagePicker _picker = ImagePicker();
-  final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _descController = TextEditingController();
+  final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
+  final TextEditingController _authorController = TextEditingController();
   final RoundedLoadingButtonController _btnController = RoundedLoadingButtonController();
 
-  final List<DropdownMenuItem<int>> _levelItems = [];
+  final List<DropdownMenuItem<int?>> _levelItems = [];
   final List<TagModel> _tags = [];
-  int _privacyLevel = -1;
+  int? _privacyLevel;
   bool _showFiles = false;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      privacyLevels.forEach((key, value) {
-        _levelItems.add(DropdownMenuItem<int>(
-          value: key,
+      PrivacyLevel.values.forEach((privacy) {
+        _levelItems.add(DropdownMenuItem<int?>(
+          value: privacy.value,
           child: Tooltip(
-            message: value,
-            child: Text(value, overflow: TextOverflow.fade),
+            message: privacy.localization,
+            child: Text(privacy.localization, overflow: TextOverflow.fade),
           ),
         ));
       });
@@ -112,12 +113,19 @@ class _UploadGalleryViewPage extends State<UploadViewPage> {
     });
   }
 
+  void _onDeselectTag(TagModel tag) {
+    setState(() {
+      _tags.remove(tag);
+    });
+  }
+
   Future<void> _onUpload() async {
     _btnController.start();
     List<int> tagIds = _tags.map<int>((tag) => tag.id).toList();
     var result = await uploadPhotos(widget.imageList, widget.albumId, info: {
-      'name': _nameController.text,
-      'comment': _descController.text,
+      'name': _titleController.text,
+      'comment': _descriptionController.text,
+      'author': _authorController.text,
       'tag_ids': tagIds,
       'level': _privacyLevel,
     });
@@ -255,61 +263,33 @@ class _UploadGalleryViewPage extends State<UploadViewPage> {
                     }),
                   ),
                   FormSection(
+                    margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                     title: appStrings.editImageDetails_title,
                     child: AppField(
-                      controller: _nameController,
-                      margin: const EdgeInsets.symmetric(vertical: 0.0),
-                      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                      controller: _titleController,
                       hint: appStrings.editImageDetails_titlePlaceholder,
                     ),
-                  ),
+                  ), // title
                   FormSection(
+                    margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                    title: appStrings.editImageDetails_author,
+                    child: AppField(
+                      controller: _authorController,
+                      hint: appStrings.settings_defaultAuthorPlaceholder,
+                    ),
+                  ), // author
+                  FormSection(
+                    margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                     title: appStrings.editImageDetails_description,
-                    child: AppDescriptionField(
-                      controller: _descController,
-                      margin: const EdgeInsets.symmetric(vertical: 0.0),
-                      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                    child: AppField(
+                      controller: _descriptionController,
                       hint: appStrings.editImageDetails_descriptionPlaceholder,
                       minLines: 5,
                       maxLines: 10,
                     ),
-                  ), // Description
+                  ), // description
                   FormSection(
-                    title: appStrings.tagsAdd_title,
-                    actions: [
-                      IconButton(
-                        tooltip: appStrings.tagsTitle_selectOne,
-                        onPressed: () {
-                          // Todo: tags
-                        },
-                        icon: const Icon(Icons.add_circle_outline),
-                      ),
-                    ],
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: AnimatedList(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        key: _tagListKey,
-                        initialItemCount: _tags.length,
-                        itemBuilder: (BuildContext context, int index, Animation<double> animation) {
-                          if (_tags.isEmpty) return const SizedBox();
-                          if (index == _tags.length - 1) {
-                            return tagItem(
-                              _tags[index],
-                              animation,
-                            );
-                          }
-                          return tagItem(
-                            _tags[index],
-                            animation,
-                            border: Border(bottom: BorderSide(color: Theme.of(context).scaffoldBackgroundColor)),
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-                  FormSection(
+                    margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                     title: appStrings.editImageDetails_privacyLevel,
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -317,7 +297,7 @@ class _UploadGalleryViewPage extends State<UploadViewPage> {
                         borderRadius: BorderRadius.circular(10),
                         color: Theme.of(context).inputDecorationTheme.fillColor,
                       ),
-                      child: DropdownButton<int>(
+                      child: DropdownButton<int?>(
                         onTap: () {
                           final FocusScopeNode currentFocus = FocusScope.of(context);
                           if (!currentFocus.hasPrimaryFocus) {
@@ -328,7 +308,6 @@ class _UploadGalleryViewPage extends State<UploadViewPage> {
                         underline: const SizedBox(),
                         value: _privacyLevel,
                         onChanged: (level) {
-                          if (level == null) return;
                           setState(() {
                             _privacyLevel = level;
                           });
@@ -337,7 +316,22 @@ class _UploadGalleryViewPage extends State<UploadViewPage> {
                         items: _levelItems,
                       ),
                     ),
-                  ),
+                  ), // privacy
+                  FormSection(
+                    margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                    title: appStrings.tagsAdd_title,
+                    onTapTitle: () {}, // todo add tags
+                    actions: [
+                      const Icon(Icons.add_circle_outline),
+                    ],
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: TagWrap(
+                        tags: _tags,
+                        onTap: _onDeselectTag,
+                      ),
+                    ),
+                  ), // tags
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     child: AnimatedPiwigoButton(
@@ -352,39 +346,6 @@ class _UploadGalleryViewPage extends State<UploadViewPage> {
                     ),
                   ),
                 ])),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget tagItem(TagModel tag, Animation<double> animation, {Border? border}) {
-    return SizeTransition(
-      axis: Axis.vertical,
-      sizeFactor: animation,
-      child: Container(
-        decoration: BoxDecoration(
-          color: Theme.of(context).cardColor,
-        ),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-          decoration: BoxDecoration(
-            border: border ?? const Border.fromBorderSide(BorderSide.none),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(tag.name, style: Theme.of(context).textTheme.subtitle1),
-              InkWell(
-                onTap: () async {
-                  _tagListKey.currentState?.removeItem(_tags.indexOf(tag), (context, animation) => tagItem(tag, animation));
-                  setState(() {
-                    _tags.remove(tag);
-                  });
-                },
-                child: Icon(Icons.remove_circle_outline, color: Theme.of(context).errorColor),
               ),
             ],
           ),

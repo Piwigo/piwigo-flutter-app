@@ -13,6 +13,9 @@ final ThemeData lightTheme = ThemeData.light().copyWith(
   focusColor: AppColors.accent,
   splashColor: AppColors.accent.withOpacity(0.3),
   cardColor: AppColors.cardLight,
+  chipTheme: ChipThemeData(
+    backgroundColor: AppColors.fieldLight,
+  ),
   colorScheme: const ColorScheme.highContrastLight(
     primary: AppColors.accent,
     secondary: AppColors.accent,
@@ -152,6 +155,9 @@ final ThemeData darkTheme = ThemeData.dark().copyWith(
   dialogBackgroundColor: AppColors.backgroundDark,
   focusColor: AppColors.accent,
   cardColor: AppColors.cardDark,
+  chipTheme: ChipThemeData(
+    backgroundColor: AppColors.fieldDark,
+  ),
   colorScheme: const ColorScheme.highContrastDark(
     primary: AppColors.accent,
     secondary: AppColors.accent,

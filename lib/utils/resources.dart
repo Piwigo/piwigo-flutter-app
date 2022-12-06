@@ -18,6 +18,7 @@ class AppColors {
   static const Color white = const Color(0xFFFFFFFF);
   static const Color black = const Color(0xFF000000);
   static const Color error = const Color(0xFFE02318);
+  static const Color success = const Color(0xFF4CAF50);
   static const Color disabled = const Color(0xFF9E9E9E);
   static const Color prefix = const Color(0xFF393939);
   static const Color textGrey = const Color(0xFF282828);

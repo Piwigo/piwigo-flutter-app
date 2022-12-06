@@ -28,14 +28,14 @@ class FormSection extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (title != null)
-            Row(
-              children: [
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: GestureDetector(
-                      behavior: HitTestBehavior.opaque,
-                      onTap: onTapTitle,
+            GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: onTapTitle,
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
                       child: Row(
                         children: [
                           Flexible(
@@ -56,12 +56,12 @@ class FormSection extends StatelessWidget {
                       ),
                     ),
                   ),
-                ),
-                ...actions
-              ],
+                  ...actions
+                ],
+              ),
             ),
           Padding(
-            padding: padding ?? const EdgeInsets.all(0.0),
+            padding: padding ?? EdgeInsets.zero,
             child: Builder(
               builder: (context) {
                 if (expanded != null) {

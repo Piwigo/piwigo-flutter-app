@@ -19,6 +19,33 @@ import 'package:share_plus/share_plus.dart';
 import 'albums.dart';
 import 'api_client.dart';
 
+Future<ApiResult<ImageModel>> getImage(int imageId) async {
+  Map<String, dynamic> queries = {
+    'format': 'json',
+    'method': 'pwg.images.getInfo',
+    'image_id': imageId,
+  };
+
+  try {
+    Response response = await ApiClient.get(queryParameters: queries);
+
+    if (response.statusCode == 200) {
+      var data = json.decode(response.data);
+      if (data['stat'] == 'fail') {
+        return ApiResult(error: ApiErrors.error);
+      }
+      var jsonImage = data['result'];
+      ImageModel image = ImageModel.fromJson(jsonImage);
+      return ApiResult<ImageModel>(data: image);
+    }
+  } on DioError catch (e) {
+    debugPrint('Fetch images: ${e.message}');
+  } on Error catch (e) {
+    debugPrint('Fetch images: $e\n${e.stackTrace}');
+  }
+  return ApiResult(error: ApiErrors.error);
+}
+
 Future<ApiResult<List<ImageModel>>> fetchImages(int albumID, int page) async {
   Map<String, dynamic> queries = {
     "format": "json",
@@ -354,10 +381,10 @@ Future<bool> assignImage(int imageId, List<int> categories) async {
   return false;
 }
 
-Future<int> editImages(List<ImageModel> images, List<int> tags, int level) async {
+Future<int> editImages(List<ImageModel> images, [Map<String, dynamic> info = const {}]) async {
   int nbEdited = 0;
   for (ImageModel image in images) {
-    bool response = await editImage(image, tags, level);
+    bool response = await editImage(image, info);
     if (response == true) {
       nbEdited++;
     }
@@ -365,20 +392,22 @@ Future<int> editImages(List<ImageModel> images, List<int> tags, int level) async
   return nbEdited;
 }
 
-Future<bool> editImage(ImageModel image, List<int> tags, int level) async {
+Future<bool> editImage(ImageModel image, [Map<String, dynamic> info = const {}]) async {
   final Map<String, String> queries = {
     'format': 'json',
     'method': 'pwg.images.setInfo',
   };
   Map<String, dynamic> form = {
     'image_id': image.id,
-    'name': image.name,
-    'comment': image.comment,
-    'tag_ids': tags,
     'single_value_mode': 'replace',
     'multiple_value_mode': 'append',
   };
-  if (level != -1) form['level'] = level;
+  if (info['title'] != null) form['name'] = info['title'];
+  if (info['description'] != null) form['comment'] = info['description'];
+  if (info['author'] != null) form['author'] = info['author'];
+  if (info['level'] != null) form['level'] = info['level'];
+  if (info['tags'] != null) form['tag_ids'] = info['tags'];
+
   final FormData formData = FormData.fromMap(form);
 
   try {

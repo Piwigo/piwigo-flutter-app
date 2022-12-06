@@ -3,9 +3,12 @@ import 'package:flutter/services.dart';
 import 'package:mime_type/mime_type.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
+import 'package:piwigo_ng/api/api_error.dart';
+import 'package:piwigo_ng/api/images.dart';
 import 'package:piwigo_ng/models/album_model.dart';
 import 'package:piwigo_ng/models/image_model.dart';
 import 'package:piwigo_ng/services/preferences_service.dart';
+import 'package:piwigo_ng/utils/image_actions.dart';
 import 'package:piwigo_ng/views/image/video_view.dart';
 
 /// Media Full Screen page
@@ -14,33 +17,57 @@ import 'package:piwigo_ng/views/image/video_view.dart';
 class ImageViewPage extends StatefulWidget {
   const ImageViewPage({
     Key? key,
-    this.imageList = const [],
+    this.images = const [],
     this.startId,
-    this.album,
+    required this.album,
   }) : super(key: key);
 
   static const String routeName = '/image';
 
-  final List<ImageModel> imageList;
+  final List<ImageModel> images;
   final int? startId;
-  final AlbumModel? album;
+  final AlbumModel album;
 
   @override
   State<ImageViewPage> createState() => _ImageViewPageState();
 }
 
 class _ImageViewPageState extends State<ImageViewPage> {
+  /// Duration of overlay animation
   final Duration _overlayAnimationDuration = const Duration(milliseconds: 300);
+
+  /// Curve of overlay animation
   final Curve _overlayAnimationCurve = Curves.ease;
+
+  /// Controller of [PhotoViewGallery]
   late final PageController _pageController;
+
+  /// Copy of album image list
+  late List<ImageModel> _imageList;
+
+  /// Copy of album image list
+  late AlbumModel _album;
+
+  /// Status of the overlay
   bool _showOverlay = true;
+
+  /// Current page of [PhotoViewGallery]
   int _page = 0;
 
+  /// API Image Pagination
+  int _imagePage = 0;
+
+  /// Initialize [PageView]
   @override
   void initState() {
-    final ImageModel? startImage = widget.imageList.firstWhere((image) => image.id == widget.startId);
+    _imageList = widget.images.sublist(0);
+    _album = widget.album;
+    final ImageModel? startImage = _imageList.firstWhere((image) => image.id == widget.startId);
     if (startImage != null) {
-      _page = widget.imageList.indexOf(startImage);
+      _page = _imageList.indexOf(startImage);
+      if (_imageList.last == startImage) {
+        _loadMoreImages();
+      }
     }
     _pageController = PageController(initialPage: _page);
     super.initState();
@@ -48,8 +75,24 @@ class _ImageViewPageState extends State<ImageViewPage> {
 
   @override
   void dispose() {
+    _pageController.dispose();
     super.dispose();
   }
+
+  /// Load more images with API pagination
+  /// Triggers when changing to last page
+  Future<void> _loadMoreImages() async {
+    if (_album.nbImages <= _imageList.length) return;
+    ApiResult<List<ImageModel>> result = await fetchImages(_album.id, _imagePage + 1);
+    if (result.hasError || !result.hasData) return;
+    setState(() {
+      _imagePage += 1;
+      _imageList.addAll(result.data!);
+    });
+  }
+
+  /// Get image that is shown in the [PhotoViewGallery] at [_page]
+  ImageModel get _currentImage => _imageList[_page];
 
   /// Handler before closing the page.
   /// * If overlay is hidden, show it.
@@ -79,13 +122,29 @@ class _ImageViewPageState extends State<ImageViewPage> {
   }
 
   /// Edit current image action.
-  void _onEdit() {}
+  Future<void> _onEdit() async {
+    bool? success = await onEditPhotos(context, [_currentImage]);
+    if (success == null || success == false) return;
+    ApiResult<ImageModel> result = await getImage(_currentImage.id);
+    if (!result.hasData) return;
+    setState(() {
+      _imageList[_page] = result.data!;
+    });
+  }
 
   /// Move current image action.
   void _onMove() {}
 
   /// Delete current image action.
-  void _onDelete() {}
+  Future<void> _onDelete() async {
+    bool success = await onDeletePhotos(context, [_currentImage], _album);
+    if (!success) return;
+    setState(() {
+      _imageList.remove(_currentImage);
+      _album.nbImages -= 1;
+      _album.nbTotalImages -= 1;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -151,7 +210,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
                 ),
                 Expanded(
                   child: Text(
-                    '${widget.imageList[_page].name}',
+                    '${_imageList[_page].name}',
                     softWrap: true,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
@@ -197,10 +256,13 @@ class _ImageViewPageState extends State<ImageViewPage> {
           pageController: _pageController,
           onPageChanged: (page) => setState(() {
             _page = page;
+            if (page == _imageList.length - 1) {
+              _loadMoreImages();
+            }
           }),
-          itemCount: widget.imageList.length,
+          itemCount: _imageList.length,
           builder: (context, index) {
-            final ImageModel image = widget.imageList[index];
+            final ImageModel image = _imageList[index];
             // Check mime type of file (multiple test to ensure it is not null)
             String? mimeType = mime(image.file) ?? mime(image.elementUrl) ?? mime(image.derivatives.medium.url);
             if (mimeType != null && mimeType.startsWith('video')) {

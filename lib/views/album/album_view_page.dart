@@ -1,23 +1,15 @@
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:piwigo_ng/api/albums.dart';
 import 'package:piwigo_ng/api/api_error.dart';
-import 'package:piwigo_ng/api/users.dart';
-import 'package:piwigo_ng/components/dialogs/confirm_dialog.dart';
-import 'package:piwigo_ng/components/modals/choose_camera_picker_modal.dart';
-import 'package:piwigo_ng/components/modals/create_album_modal.dart';
-import 'package:piwigo_ng/components/modals/delete_album_mode_modal.dart';
-import 'package:piwigo_ng/components/modals/delete_images_modal.dart';
-import 'package:piwigo_ng/components/modals/edit_album_modal.dart';
-import 'package:piwigo_ng/components/modals/move_or_copy_modal.dart';
 import 'package:piwigo_ng/components/popup_list_item.dart';
 import 'package:piwigo_ng/components/scroll_widgets/album_grid_view.dart';
 import 'package:piwigo_ng/components/scroll_widgets/image_grid_view.dart';
-import 'package:piwigo_ng/components/snackbars.dart';
 import 'package:piwigo_ng/models/album_model.dart';
 import 'package:piwigo_ng/models/image_model.dart';
+import 'package:piwigo_ng/utils/album_actions.dart';
+import 'package:piwigo_ng/utils/image_actions.dart';
 import 'package:piwigo_ng/utils/localizations.dart';
 import 'package:piwigo_ng/views/image/image_view_page.dart';
 import 'package:piwigo_ng/views/upload/upload_view_page.dart';
@@ -85,6 +77,7 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
       return _refreshController.loadComplete();
     }
     setState(() {
+      _page += 1;
       _imageList.addAll(result.data!);
     });
     _refreshController.loadComplete();
@@ -103,188 +96,49 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
       _page = 0;
       _albumList = _parseAlbums(albumsResult.data!);
       _imageList = imagesResult.data!;
+      _selectedList.removeWhere((image) => !_imageList.contains(image));
     });
     _refreshController.refreshCompleted();
   }
 
-  void _onTapAlbum(AlbumModel album) {
-    Navigator.of(context).pushNamed(
-      AlbumViewPage.routeName,
-      arguments: {
-        'album': album,
-      },
-    ).then((value) => _onRefresh());
-  }
+  void _onAddAlbum() => onAddAlbum(context, widget.album.id).whenComplete(() => _onRefresh());
+  void _onTapAlbum(AlbumModel album) => onOpenAlbum(context, album).whenComplete(() => _onRefresh());
+  void _onEditAlbum(AlbumModel album) => onEditAlbum(context, album).whenComplete(() => _onRefresh());
+  void _onMoveAlbum(AlbumModel album) => onMoveAlbum(context, album).whenComplete(() => _onRefresh());
+  Future<bool> _onDeleteAlbum(AlbumModel album) => onDeleteAlbum(context, album).then((success) {
+        if (success) _onRefresh();
+        return success;
+      });
 
-  Future<void> _onAddAlbum() async {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      builder: (_) => Padding(
-        padding: MediaQuery.of(context).padding,
-        child: CreateAlbumModal(albumId: widget.album.id),
-      ),
-    ).whenComplete(() => _onRefresh());
-  }
-
-  Future<bool> _onDeleteAlbum(AlbumModel album) async {
-    DeleteAlbumModes? mode = DeleteAlbumModes.deleteOrphans;
-    if (album.nbTotalImages != 0) {
-      mode = await showModalBottomSheet<DeleteAlbumModes>(
-        context: context,
-        isScrollControlled: true,
-        isDismissible: true,
-        builder: (context) => DeleteAlbumModeModal(
-          albumModel: album,
-        ),
-      );
-      if (mode == null) return false;
-    }
-    if (!await showConfirmDialog(
-      context,
-      message: appStrings.deleteCategoryConfirm_title,
-    )) {
-      return false;
-    }
-    final ApiResult result = await deleteAlbum(
-      album.id,
-      deletionMode: mode,
-    );
-    if (result.hasData && result.data == true) {
-      _onRefresh();
-      ScaffoldMessenger.of(context).showSnackBar(
-        successSnackBar(message: appStrings.deleteCategoryHUD_deleted),
-      );
-      return true;
-    }
-    ScaffoldMessenger.of(context).showSnackBar(
-      errorSnackBar(message: appStrings.deleteCategoryError_title),
-    );
-    return false;
-  }
-
-  Future<void> _onEditAlbum(AlbumModel album) async {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      builder: (_) => Padding(
-        padding: MediaQuery.of(context).padding,
-        child: EditAlbumModal(album: album),
-      ),
-    ).whenComplete(() => _onRefresh());
-  }
-
-  Future<void> _onMoveAlbum(AlbumModel album) async {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      builder: (_) => Padding(
-        padding: MediaQuery.of(context).padding,
-        child: MoveOrCopyModal(
-          title: appStrings.moveCategory,
-          subtitle: appStrings.moveCategory_select(album.name),
-          album: album,
-        ),
-      ),
-    ).whenComplete(() => _onRefresh());
-  }
-
-  Future<void> _onEditPhotos() async {}
+  void _onEditPhotos() => onEditPhotos(context, _selectedList).then((success) {
+        if (success == true) {
+          _selectedList.clear();
+          _onRefresh();
+        }
+      });
   Future<void> _onMovePhotos() async {}
-  Future<void> _onDeletePhotos() async {
-    final DeleteAlbumModes? mode = await showModalBottomSheet<DeleteAlbumModes>(
-      context: context,
-      isScrollControlled: true,
-      isDismissible: true,
-      builder: (context) => DeleteImagesModal(
-        imageList: _selectedList,
-        album: _currentAlbum,
-      ),
-    );
-    if (mode == null) return;
-    if (!await showConfirmDialog(
-      context,
-      message: appStrings.deleteImage_message(
-        _selectedList.length,
-      ),
-    )) {
-      return;
-    }
-    final int result = await deleteImages(
-      _selectedList,
-      _currentAlbum,
-      mode,
-    );
-    if (result > 0) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        successSnackBar(message: appStrings.deleteImageSuccess_message(result)),
-      );
-      _onRefresh();
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        errorSnackBar(message: appStrings.deleteImageFail_message),
-      );
-    }
-  }
-
-  Future<void> _onLikePhotos() async {
-    if (_hasNonFavorites) {
-      await addFavorites(
-        _selectedList.where((image) => !image.favorite).toList(),
-      );
-    } else {
-      await removeFavorites(_selectedList);
-    }
-    _onRefresh();
-  }
+  void _onLikePhotos() => onLikePhotos(_selectedList, _hasNonFavorites).whenComplete(() => _onRefresh());
+  _onDeletePhotos() => onDeletePhotos(context, _selectedList, _currentAlbum).then((success) {
+        if (success) _onRefresh();
+      });
 
   Future<void> _onPickImages() async {
-    try {
-      final FilePickerResult? result = await FilePicker.platform.pickFiles(
-        allowMultiple: true,
-        type: FileType.media,
-      );
-      if (result == null) return;
-      final List<XFile> images = result.files.map<XFile>((e) {
-        return XFile(e.path!, name: e.name, bytes: e.bytes);
-      }).toList();
-      if (images.isNotEmpty) {
-        Navigator.of(context).pushNamed(UploadViewPage.routeName, arguments: {
-          'images': images,
-          'category': widget.album.id,
-        }).then((value) => _refreshController.requestRefresh());
-      }
-    } catch (e) {
-      debugPrint('${e.toString()}');
+    List<XFile>? images = await onPickImages();
+    if (images == null || images.isNotEmpty) {
+      Navigator.of(context).pushNamed(UploadViewPage.routeName, arguments: {
+        'images': images,
+        'category': widget.album.id,
+      }).then((value) => _refreshController.requestRefresh());
     }
   }
 
   Future<void> _onTakePhoto() async {
-    final int? choice = await showModalBottomSheet<int>(
-      context: context,
-      builder: (context) => ChooseCameraPickerModal(),
-    );
-    if (choice == null) return;
-    try {
-      final ImagePicker picker = ImagePicker();
-      XFile? image;
-      switch (choice) {
-        case 0:
-          image = await picker.pickImage(source: ImageSource.camera);
-          break;
-        case 1:
-          image = await picker.pickVideo(source: ImageSource.camera);
-          break;
-      }
-
-      if (image != null) {
-        Navigator.of(context).pushNamed(UploadViewPage.routeName, arguments: {
-          'images': [image],
-          'category': widget.album.id,
-        }).then((value) => _refreshController.requestRefresh());
-      }
-    } catch (e) {
-      debugPrint('${e.toString()}');
+    XFile? image = await onTakePhoto(context);
+    if (image != null) {
+      Navigator.of(context).pushNamed(UploadViewPage.routeName, arguments: {
+        'images': [image],
+        'category': widget.album.id,
+      }).then((value) => _refreshController.requestRefresh());
     }
   }
 
@@ -361,109 +215,80 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
         style: Theme.of(context).appBarTheme.titleTextStyle,
       ),
       actions: [
-        Builder(builder: (context) {
-          const Duration duration = Duration(milliseconds: 300);
-          const Curve curve = Curves.ease;
-          bool isSelecting = _selectedList.isNotEmpty;
-          return AnimatedSlide(
-            duration: duration,
-            curve: curve,
-            offset: Offset(isSelecting ? 0 : 1, 0),
-            child: AnimatedOpacity(
-              duration: duration,
-              curve: curve,
-              opacity: isSelecting ? 1 : 0,
-              child: IgnorePointer(
-                ignoring: !isSelecting,
-                child: IconButton(
-                  visualDensity: VisualDensity.compact,
-                  padding: EdgeInsets.zero,
-                  onPressed: () => setState(() {
+        if (widget.isAdmin)
+          PopupMenuButton(
+            position: PopupMenuPosition.under,
+            itemBuilder: (context) => [
+              if (_selectedList.isNotEmpty)
+                PopupMenuItem(
+                  onTap: () => setState(() {
                     _selectedList.clear();
                   }),
-                  icon: Icon(
-                    Icons.cancel,
+                  child: PopupListItem(
+                    icon: Icons.cancel,
+                    text: appStrings.categoryImageList_deselectButton,
                   ),
                 ),
-              ),
-            ),
-          );
-        }),
-        PopupMenuButton(
-          position: PopupMenuPosition.under,
-          itemBuilder: (context) => [
-            if (_selectedList.isNotEmpty)
-              PopupMenuItem(
-                onTap: () => setState(() {
-                  _selectedList.clear();
-                }),
-                child: PopupListItem(
-                  icon: Icons.cancel,
-                  text: appStrings.categoryImageList_deselectButton,
+              if (_selectedList.isNotEmpty)
+                PopupMenuItem(
+                  onTap: () => Future.delayed(
+                    const Duration(seconds: 0),
+                    () => share(_selectedList),
+                  ),
+                  child: PopupListItem(
+                    icon: Icons.share,
+                    text: appStrings.imageOptions_share,
+                  ),
                 ),
-              ),
-            if (_selectedList.isNotEmpty)
-              PopupMenuItem(
-                onTap: () => Future.delayed(
-                  const Duration(seconds: 0),
-                  () => share(_selectedList),
+              if (_selectedList.isNotEmpty)
+                PopupMenuItem(
+                  onTap: () => Future.delayed(
+                    const Duration(seconds: 0),
+                    () => _onLikePhotos(),
+                  ),
+                  child: PopupListItem(
+                    icon: _hasNonFavorites ? Icons.favorite_border : Icons.favorite,
+                    text: _hasNonFavorites ? appStrings.imageOptions_addFavorites : appStrings.imageOptions_removeFavorites,
+                  ),
                 ),
-                child: PopupListItem(
-                  icon: Icons.share,
-                  text: appStrings.imageOptions_share,
+              if (_selectedList.isNotEmpty)
+                PopupMenuItem(
+                  onTap: () => Future.delayed(
+                    const Duration(seconds: 0),
+                    () => downloadImages(_selectedList),
+                  ),
+                  child: PopupListItem(
+                    icon: Icons.download,
+                    text: appStrings.downloadImage_title(_selectedList.length),
+                  ),
                 ),
-              ),
-            if (_selectedList.isNotEmpty)
-              PopupMenuItem(
-                onTap: () => Future.delayed(
-                  const Duration(seconds: 0),
-                  () => _onLikePhotos(),
-                ),
-                child: PopupListItem(
-                  icon: _hasNonFavorites ? Icons.favorite_border : Icons.favorite,
-                  text: _hasNonFavorites ? appStrings.imageOptions_addFavorites : appStrings.imageOptions_removeFavorites,
-                ),
-              ),
-            if (_selectedList.isNotEmpty)
               PopupMenuItem(
                 onTap: () => Future.delayed(
                   const Duration(seconds: 0),
-                  () => downloadImages(_selectedList),
+                  () => _onEditAlbum(_currentAlbum),
                 ),
                 child: PopupListItem(
-                  icon: Icons.download,
-                  text: appStrings.downloadImage_title(_selectedList.length),
+                  icon: Icons.drive_file_rename_outline_sharp,
+                  text: appStrings.renameCategory_title,
                 ),
               ),
-            PopupMenuItem(
-              onTap: () => Future.delayed(
-                const Duration(seconds: 0),
-                () => _onEditAlbum(_currentAlbum),
-              ),
-              child: PopupListItem(
-                icon: Icons.drive_file_rename_outline_sharp,
-                text: appStrings.renameCategory_title,
-              ),
-            ),
-            PopupMenuItem(
-              onTap: () {
-                Future.delayed(
+              PopupMenuItem(
+                onTap: () => Future.delayed(
                   const Duration(seconds: 0),
                   () async {
                     if (await _onDeleteAlbum(_currentAlbum)) {
                       Navigator.of(context).pop();
                     }
                   },
-                );
-              },
-              child: PopupListItem(
-                color: Theme.of(context).errorColor,
-                icon: Icons.delete,
-                text: appStrings.deleteCategory_title,
+                ),
+                child: PopupListItem(
+                  color: Theme.of(context).errorColor,
+                  icon: Icons.delete,
+                  text: appStrings.deleteCategory_title,
+                ),
               ),
-            ),
-          ],
-        ),
+            ],
+          ),
       ],
     );
   }
@@ -543,7 +368,7 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
           'startId': image.id,
           'album': _currentAlbum,
         },
-      ),
+      ).whenComplete(() => _onRefresh()),
       onSelectImage: (image) => setState(() {
         _selectedList.add(image);
       }),

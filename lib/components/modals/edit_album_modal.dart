@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:piwigo_ng/api/albums.dart';
 import 'package:piwigo_ng/api/api_error.dart';
 import 'package:piwigo_ng/components/buttons/animated_piwigo_button.dart';
-import 'package:piwigo_ng/components/buttons/piwigo_button.dart';
 import 'package:piwigo_ng/components/fields/app_field.dart';
 import 'package:piwigo_ng/components/modals/piwigo_modal.dart';
 import 'package:piwigo_ng/components/snackbars.dart';
@@ -25,14 +24,12 @@ class _EditAlbumModalState extends State<EditAlbumModal> {
   late final TextEditingController _descriptionController;
 
   late String _name;
-  late String _description;
 
   @override
   initState() {
     _name = widget.album.name;
-    _description = widget.album.comment ?? '';
     _nameController = TextEditingController(text: _name);
-    _descriptionController = TextEditingController(text: _description);
+    _descriptionController = TextEditingController(text: widget.album.comment);
     super.initState();
   }
 
@@ -42,7 +39,7 @@ class _EditAlbumModalState extends State<EditAlbumModal> {
     ApiResult result = await editAlbum(
       albumId: widget.album.id,
       name: _name,
-      description: _description,
+      description: _descriptionController.text,
     );
     if (result.hasError) {
       _btnController.error();
@@ -70,69 +67,36 @@ class _EditAlbumModalState extends State<EditAlbumModal> {
     return PiwigoModal(
       title: appStrings.renameCategory_title,
       subtitle: appStrings.renameCategory_message,
-      content: Padding(
+      content: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        constraints: BoxConstraints(maxWidth: 400),
         child: Column(
           children: [
-            Container(
-              constraints: BoxConstraints(
-                maxWidth: 400.0,
-              ),
-              margin: const EdgeInsets.symmetric(vertical: 16.0),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                color: Theme.of(context).inputDecorationTheme.fillColor,
-              ),
-              child: Column(
-                children: [
-                  AppField(
-                    controller: _nameController,
-                    textInputAction: TextInputAction.next,
-                    onChanged: (value) => setState(() {
-                      _name = value;
-                    }),
-                    hint: appStrings.createNewAlbum_placeholder,
-                  ),
-                  Divider(
-                    height: 1,
-                    thickness: 0.3,
-                    color: Theme.of(context).disabledColor,
-                  ),
-                  AppField(
-                    controller: _descriptionController,
-                    textInputAction: TextInputAction.done,
-                    onChanged: (value) => setState(() {
-                      _description = value;
-                    }),
-                    onFieldSubmitted: (value) => _onEditAlbum(),
-                    hint: appStrings.createNewAlbumDescription_placeholder,
-                  ),
-                ],
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: AppField(
+                controller: _nameController,
+                hint: appStrings.createNewAlbum_placeholder,
               ),
             ),
-            ConstrainedBox(
-              constraints: BoxConstraints(
-                maxWidth: 400,
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: AppField(
+                controller: _descriptionController,
+                hint: appStrings.createNewAlbumDescription_placeholder,
               ),
-              child: Column(
-                children: [
-                  AnimatedPiwigoButton(
-                    controller: _btnController,
-                    disabled: _name.isEmpty,
-                    color: Theme.of(context).primaryColor,
-                    onPressed: _onEditAlbum,
-                    child: Text(
-                      appStrings.categoryCellOption_rename,
-                      style: Theme.of(context).textTheme.displaySmall,
-                    ),
-                  ),
-                  PiwigoButton(
-                    color: Colors.transparent,
-                    style: Theme.of(context).textTheme.titleSmall,
-                    onPressed: () => Navigator.of(context).pop(),
-                    text: appStrings.alertCancelButton,
-                  ),
-                ],
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: AnimatedPiwigoButton(
+                controller: _btnController,
+                disabled: _name.isEmpty,
+                color: Theme.of(context).primaryColor,
+                onPressed: _onEditAlbum,
+                child: Text(
+                  appStrings.categoryCellOption_rename,
+                  style: Theme.of(context).textTheme.displaySmall,
+                ),
               ),
             ),
           ],

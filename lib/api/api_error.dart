@@ -1,4 +1,5 @@
 enum ApiErrors {
+  error,
   wrongLoginId,
   wrongServerUrl,
   fetchAlbumsError,

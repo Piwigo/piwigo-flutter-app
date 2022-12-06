@@ -3,14 +3,50 @@ import 'package:piwigo_ng/app.dart';
 
 AppLocalizations get appStrings => AppLocalizations.of(App.scaffoldMessengerKey.currentContext!)!;
 
-Map<int, String> get privacyLevels => {
-      -1: appStrings.privacyLevel_unchanged,
-      0: appStrings.privacyLevel_everybody,
-      1: appStrings.privacyLevel_adminsFamilyFriendsContacts,
-      2: appStrings.privacyLevel_adminsFamilyFriends,
-      4: appStrings.privacyLevel_adminFamily,
-      8: appStrings.privacyLevel_admin,
-    };
+enum PrivacyLevel {
+  unchanged,
+  everybody,
+  contacts,
+  friends,
+  family,
+  admins,
+}
+
+extension PrivacyLevelExtension on PrivacyLevel {
+  String get localization {
+    switch (this) {
+      case PrivacyLevel.unchanged:
+        return appStrings.privacyLevel_unchanged;
+      case PrivacyLevel.everybody:
+        return appStrings.privacyLevel_everybody;
+      case PrivacyLevel.contacts:
+        return appStrings.privacyLevel_adminsFamilyFriendsContacts;
+      case PrivacyLevel.friends:
+        return appStrings.privacyLevel_adminsFamilyFriends;
+      case PrivacyLevel.family:
+        return appStrings.privacyLevel_adminFamily;
+      case PrivacyLevel.admins:
+        return appStrings.privacyLevel_admin;
+    }
+  }
+
+  int? get value {
+    switch (this) {
+      case PrivacyLevel.unchanged:
+        return null;
+      case PrivacyLevel.everybody:
+        return 0;
+      case PrivacyLevel.contacts:
+        return 1;
+      case PrivacyLevel.friends:
+        return 2;
+      case PrivacyLevel.family:
+        return 4;
+      case PrivacyLevel.admins:
+        return 8;
+    }
+  }
+}
 
 String getLanguageFromCode(String code) {
   switch (code) {

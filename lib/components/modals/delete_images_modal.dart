@@ -40,40 +40,42 @@ class DeleteImagesModal extends StatelessWidget {
     return PiwigoModal(
       title: appStrings.deleteImage_delete,
       subtitle: appStrings.deleteImage_message(imageList.length),
-      canCancel: true,
-      content: Column(
-        children: [
-          ListTile(
-            minLeadingWidth: 24,
-            leading: Icon(Icons.delete, color: Theme.of(context).errorColor),
-            title: Text(appStrings.deleteImageCount_title(imageList.length)),
-            subtitle: _canMakeOrphans && _safeDelete ? Text(appStrings.deleteCategory_allImages_subtitle) : null,
-            onTap: () => Navigator.of(context).pop(DeleteAlbumModes.forceDelete),
-          ),
-          if (_safeDelete)
-            Builder(
-              builder: (context) {
-                if (_canMakeOrphans) {
+      content: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8.0),
+        child: Column(
+          children: [
+            ListTile(
+              minLeadingWidth: 24,
+              leading: Icon(Icons.delete, color: Theme.of(context).errorColor),
+              title: Text(appStrings.deleteImageCount_title(imageList.length)),
+              subtitle: _canMakeOrphans && _safeDelete ? Text(appStrings.deleteCategory_allImages_subtitle) : null,
+              onTap: () => Navigator.of(context).pop(DeleteAlbumModes.forceDelete),
+            ),
+            if (_safeDelete)
+              Builder(
+                builder: (context) {
+                  if (_canMakeOrphans) {
+                    return ListTile(
+                      minLeadingWidth: 24,
+                      leading: Icon(Icons.remove_circle, color: Theme.of(context).primaryColor),
+                      title: Text(appStrings.deleteCategory_orphanedImages),
+                      subtitle: Text(appStrings.deleteCategory_orphanedImages_subtitle),
+                      onTap: () => Navigator.of(context).pop(DeleteAlbumModes.noDelete),
+                    );
+                  }
                   return ListTile(
                     minLeadingWidth: 24,
                     leading: Icon(Icons.remove_circle, color: Theme.of(context).primaryColor),
-                    title: Text(appStrings.deleteCategory_orphanedImages),
-                    subtitle: Text(appStrings.deleteCategory_orphanedImages_subtitle),
+                    title: Text(_canMakeOrphans ? appStrings.deleteCategory_orphanedImages : appStrings.removeSingleImage_title),
+                    subtitle: Text(_canMakeOrphans
+                        ? appStrings.deleteCategory_orphanedImages_subtitle
+                        : appStrings.deleteCategory_noImages_subtitle),
                     onTap: () => Navigator.of(context).pop(DeleteAlbumModes.noDelete),
                   );
-                }
-                return ListTile(
-                  minLeadingWidth: 24,
-                  leading: Icon(Icons.remove_circle, color: Theme.of(context).primaryColor),
-                  title: Text(_canMakeOrphans ? appStrings.deleteCategory_orphanedImages : appStrings.removeSingleImage_title),
-                  subtitle: Text(_canMakeOrphans
-                      ? appStrings.deleteCategory_orphanedImages_subtitle
-                      : appStrings.deleteCategory_noImages_subtitle),
-                  onTap: () => Navigator.of(context).pop(DeleteAlbumModes.noDelete),
-                );
-              },
-            ),
-        ],
+                },
+              ),
+          ],
+        ),
       ),
     );
   }
