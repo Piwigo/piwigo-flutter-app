@@ -127,6 +127,7 @@ Route<dynamic> generateRoute(RouteSettings settings) {
           images: arguments['images'] ?? [],
           startId: arguments['startId'],
           album: arguments['album'],
+          isAdmin: arguments['isAdmin'] ?? isAdmin,
         ),
         settings: settings,
       );

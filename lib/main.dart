@@ -27,9 +27,9 @@ void main() async {
 
 void _clearUnusedStorage() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
-  if (!prefs.containsKey('STORAGE_VERSION') && prefs.getString('STORAGE_VERSION') != "2.0.0") {
+  if (!prefs.containsKey('STORAGE_VERSION') && prefs.getString('STORAGE_VERSION') != '2.0.0') {
     prefs.clear();
     const FlutterSecureStorage().deleteAll();
-    prefs.setString('STORAGE_VERSION', "2.0.0");
+    prefs.setString('STORAGE_VERSION', '2.0.0');
   }
 }

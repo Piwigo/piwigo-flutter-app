@@ -6,7 +6,9 @@ import 'package:piwigo_ng/api/images.dart';
 import 'package:piwigo_ng/api/users.dart';
 import 'package:piwigo_ng/components/dialogs/confirm_dialog.dart';
 import 'package:piwigo_ng/components/modals/choose_camera_picker_modal.dart';
+import 'package:piwigo_ng/components/modals/choose_move_option_modal.dart';
 import 'package:piwigo_ng/components/modals/delete_images_modal.dart';
+import 'package:piwigo_ng/components/modals/move_or_copy_modal.dart';
 import 'package:piwigo_ng/components/snackbars.dart';
 import 'package:piwigo_ng/models/album_model.dart';
 import 'package:piwigo_ng/models/image_model.dart';
@@ -57,6 +59,47 @@ Future<bool?> onEditPhotos(BuildContext context, List<ImageModel> images) async 
   });
 }
 
+Future<dynamic> onMovePhotos(BuildContext context, List<ImageModel> images, AlbumModel album) async {
+  return showModalBottomSheet<dynamic>(
+    context: context,
+    isScrollControlled: true,
+    builder: (_) => Padding(
+      padding: MediaQuery.of(context).padding,
+      child: MoveOrCopyModal(
+        title: appStrings.moveImage_title,
+        subtitle: appStrings.moveImage_selectAlbum(images.length, images.first),
+        isImage: true,
+        album: album,
+        onSelected: (selectedAlbum) async {
+          final int? choice = await showModalBottomSheet<int>(
+            context: context,
+            builder: (context) => ChooseMoveOptionModal(),
+          );
+          if (choice == null ||
+              !await showConfirmDialog(
+                context,
+                title: appStrings.moveImage_title,
+                message: appStrings.moveImage_message(images.length, images.first, selectedAlbum.name),
+              )) return false;
+          int results = 0;
+          switch (choice) {
+            case 0:
+              results = await moveImages(images, album.id, selectedAlbum.id);
+              break;
+            case 1:
+              results = await assignImages(images, selectedAlbum.id);
+              break;
+          }
+          if (results > 0) {
+            return choice;
+          }
+          return -1;
+        },
+      ),
+    ),
+  );
+}
+
 Future<bool> onDeletePhotos(BuildContext context, List<ImageModel> images, AlbumModel album) async {
   final DeleteAlbumModes? mode = await showModalBottomSheet<DeleteAlbumModes>(
     context: context,
@@ -94,10 +137,17 @@ Future<bool> onDeletePhotos(BuildContext context, List<ImageModel> images, Album
   return false;
 }
 
-Future<void> onLikePhotos(List<ImageModel> images, bool hasNonFavorites) async {
+Future<bool?> onLikePhotos(List<ImageModel> images, bool hasNonFavorites) async {
   if (hasNonFavorites) {
-    await addFavorites(images.where((image) => !image.favorite).toList());
+    int success = await addFavorites(images.where((image) => !image.favorite).toList());
+    if (success > 0) {
+      return true;
+    }
   } else {
-    await removeFavorites(images);
+    int success = await removeFavorites(images);
+    if (success > 0) {
+      return false;
+    }
   }
+  return null;
 }

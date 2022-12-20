@@ -110,13 +110,21 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
         return success;
       });
 
+  void _onTapPhoto(ImageModel image) => Navigator.of(context).pushNamed(
+        ImageViewPage.routeName,
+        arguments: {
+          'images': _imageList,
+          'startId': image.id,
+          'album': _currentAlbum,
+        },
+      ).whenComplete(() => _onRefresh());
   void _onEditPhotos() => onEditPhotos(context, _selectedList).then((success) {
         if (success == true) {
           _selectedList.clear();
           _onRefresh();
         }
       });
-  Future<void> _onMovePhotos() async {}
+  Future<void> _onMovePhotos() async => onMovePhotos(context, _selectedList, _currentAlbum).whenComplete(() => _onRefresh());
   void _onLikePhotos() => onLikePhotos(_selectedList, _hasNonFavorites).whenComplete(() => _onRefresh());
   _onDeletePhotos() => onDeletePhotos(context, _selectedList, _currentAlbum).then((success) {
         if (success) _onRefresh();
@@ -124,22 +132,20 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
 
   Future<void> _onPickImages() async {
     List<XFile>? images = await onPickImages();
-    if (images == null || images.isNotEmpty) {
-      Navigator.of(context).pushNamed(UploadViewPage.routeName, arguments: {
-        'images': images,
-        'category': widget.album.id,
-      }).then((value) => _refreshController.requestRefresh());
-    }
+    if (images == null || images.isEmpty) return;
+    Navigator.of(context).pushNamed(UploadViewPage.routeName, arguments: {
+      'images': images,
+      'category': widget.album.id,
+    }).then((value) => _refreshController.requestRefresh());
   }
 
   Future<void> _onTakePhoto() async {
     XFile? image = await onTakePhoto(context);
-    if (image != null) {
-      Navigator.of(context).pushNamed(UploadViewPage.routeName, arguments: {
-        'images': [image],
-        'category': widget.album.id,
-      }).then((value) => _refreshController.requestRefresh());
-    }
+    if (image == null) return;
+    Navigator.of(context).pushNamed(UploadViewPage.routeName, arguments: {
+      'images': [image],
+      'category': widget.album.id,
+    }).then((value) => _refreshController.requestRefresh());
   }
 
   @override
@@ -210,25 +216,32 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
     return SliverAppBar(
       pinned: true,
       titleSpacing: 0,
+      centerTitle: _selectedList.isNotEmpty,
       title: Text(
-        _currentAlbum.name,
+        _selectedList.isEmpty ? _currentAlbum.name : _selectedList.length.toString(),
         style: Theme.of(context).appBarTheme.titleTextStyle,
       ),
       actions: [
+        AnimatedScale(
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.ease,
+          scale: _selectedList.isEmpty ? 0 : 1,
+          child: AnimatedOpacity(
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.ease,
+            opacity: _selectedList.isEmpty ? 0 : 1,
+            child: IconButton(
+              onPressed: () => setState(() {
+                _selectedList.clear();
+              }),
+              icon: Icon(Icons.cancel),
+            ),
+          ),
+        ),
         if (widget.isAdmin)
           PopupMenuButton(
             position: PopupMenuPosition.under,
             itemBuilder: (context) => [
-              if (_selectedList.isNotEmpty)
-                PopupMenuItem(
-                  onTap: () => setState(() {
-                    _selectedList.clear();
-                  }),
-                  child: PopupListItem(
-                    icon: Icons.cancel,
-                    text: appStrings.categoryImageList_deselectButton,
-                  ),
-                ),
               if (_selectedList.isNotEmpty)
                 PopupMenuItem(
                   onTap: () => Future.delayed(
@@ -361,14 +374,7 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
     return ImageGridView(
       imageList: _imageList,
       selectedList: _selectedList,
-      onTapImage: (image) => Navigator.of(context).pushNamed(
-        ImageViewPage.routeName,
-        arguments: {
-          'images': _imageList,
-          'startId': image.id,
-          'album': _currentAlbum,
-        },
-      ).whenComplete(() => _onRefresh()),
+      onTapImage: _onTapPhoto,
       onSelectImage: (image) => setState(() {
         _selectedList.add(image);
       }),
@@ -379,70 +385,60 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
   }
 
   Widget get _bottomBar {
-    if (widget.isAdmin) {
-      return BottomAppBar(
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeInOut,
-          height: _selectedList.isEmpty ? 0 : 56.0,
-          child: Row(
-            children: [
-              Expanded(
-                child: IconButton(
-                  onPressed: _onEditPhotos,
-                  icon: Icon(Icons.edit),
-                ),
-              ),
-              Expanded(
-                child: IconButton(
-                  onPressed: _onMovePhotos,
-                  icon: Icon(Icons.drive_file_move),
-                ),
-              ),
-              Expanded(
-                child: IconButton(
-                  onPressed: _onDeletePhotos,
-                  icon: Icon(Icons.delete),
-                ),
-              ),
-            ],
-          ),
-        ),
-      );
-    }
     return BottomAppBar(
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
         height: _selectedList.isEmpty ? 0 : 56.0,
         child: Row(
-          children: [
-            Expanded(
-              child: IconButton(
-                onPressed: () => share(_selectedList),
-                icon: Icon(Icons.share),
-              ),
-            ),
-            Expanded(
-              child: IconButton(
-                onPressed: _onLikePhotos,
-                icon: Builder(
-                  builder: (context) {
-                    if (_hasNonFavorites) {
-                      return Icon(Icons.favorite_border);
-                    }
-                    return Icon(Icons.favorite);
-                  },
-                ),
-              ),
-            ),
-            Expanded(
-              child: IconButton(
-                onPressed: () => downloadImages(_selectedList),
-                icon: Icon(Icons.download),
-              ),
-            ),
-          ],
+          children: widget.isAdmin
+              ? [
+                  Expanded(
+                    child: IconButton(
+                      onPressed: _onEditPhotos,
+                      icon: Icon(Icons.edit),
+                    ),
+                  ),
+                  Expanded(
+                    child: IconButton(
+                      onPressed: _onMovePhotos,
+                      icon: Icon(Icons.drive_file_move),
+                    ),
+                  ),
+                  Expanded(
+                    child: IconButton(
+                      onPressed: _onDeletePhotos,
+                      icon: Icon(Icons.delete),
+                    ),
+                  ),
+                ]
+              : [
+                  Expanded(
+                    child: IconButton(
+                      onPressed: () => share(_selectedList),
+                      icon: Icon(Icons.share),
+                    ),
+                  ),
+                  Expanded(
+                    child: IconButton(
+                      onPressed: _onLikePhotos,
+                      icon: Builder(
+                        builder: (context) {
+                          if (_hasNonFavorites) {
+                            return Icon(Icons.favorite_border);
+                          }
+                          return Icon(Icons.favorite);
+                        },
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: IconButton(
+                      onPressed: () => downloadImages(_selectedList),
+                      icon: Icon(Icons.download),
+                    ),
+                  ),
+                ],
         ),
       ),
     );

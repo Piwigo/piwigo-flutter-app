@@ -306,7 +306,7 @@ Future<int> moveImages(List<ImageModel> images, int oldAlbumId, int newAlbumId) 
   int nbMoved = 0;
   for (var image in images) {
     bool response = await moveImage(image, oldAlbumId, newAlbumId);
-    if (response == false) {
+    if (response) {
       nbMoved++;
     }
   }

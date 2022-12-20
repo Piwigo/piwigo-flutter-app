@@ -56,15 +56,13 @@ Future<void> onMoveAlbum(BuildContext context, AlbumModel album) async {
               album.name,
               selectedAlbum.name,
             ),
-          )) return;
+          )) return false;
           ApiResult<bool> result = await moveAlbum(
             album.id,
             selectedAlbum.id,
           );
 
-          if (result.hasData && result.data == true) {
-            Navigator.of(context).pop();
-          }
+          return result.hasData && result.data == true;
         },
       ),
     ),

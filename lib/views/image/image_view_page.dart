@@ -5,10 +5,12 @@ import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
 import 'package:piwigo_ng/api/api_error.dart';
 import 'package:piwigo_ng/api/images.dart';
+import 'package:piwigo_ng/components/popup_list_item.dart';
 import 'package:piwigo_ng/models/album_model.dart';
 import 'package:piwigo_ng/models/image_model.dart';
 import 'package:piwigo_ng/services/preferences_service.dart';
 import 'package:piwigo_ng/utils/image_actions.dart';
+import 'package:piwigo_ng/utils/localizations.dart';
 import 'package:piwigo_ng/views/image/video_view.dart';
 
 /// Media Full Screen page
@@ -20,6 +22,7 @@ class ImageViewPage extends StatefulWidget {
     this.images = const [],
     this.startId,
     required this.album,
+    this.isAdmin = false,
   }) : super(key: key);
 
   static const String routeName = '/image';
@@ -27,6 +30,7 @@ class ImageViewPage extends StatefulWidget {
   final List<ImageModel> images;
   final int? startId;
   final AlbumModel album;
+  final bool isAdmin;
 
   @override
   State<ImageViewPage> createState() => _ImageViewPageState();
@@ -121,6 +125,24 @@ class _ImageViewPageState extends State<ImageViewPage> {
     });
   }
 
+  /// Handle when
+  Future<void> _onRemoveImage(ImageModel image) async {
+    if (_imageList.length == 1) {
+      Navigator.of(context).pop();
+    }
+    if (_imageList.length - 1 == _page) {
+      await _pageController.previousPage(
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.ease,
+      );
+    }
+    setState(() {
+      _imageList.remove(image);
+      _album.nbImages -= 1;
+      _album.nbTotalImages -= 1;
+    });
+  }
+
   /// Edit current image action.
   Future<void> _onEdit() async {
     bool? success = await onEditPhotos(context, [_currentImage]);
@@ -133,16 +155,27 @@ class _ImageViewPageState extends State<ImageViewPage> {
   }
 
   /// Move current image action.
-  void _onMove() {}
+  Future<void> _onMove() async {
+    ImageModel image = _currentImage;
+    int? success = await onMovePhotos(context, [image], _album);
+    if (success == null || success != 0) return;
+    _onRemoveImage(image);
+  }
 
   /// Delete current image action.
   Future<void> _onDelete() async {
-    bool success = await onDeletePhotos(context, [_currentImage], _album);
+    ImageModel image = _currentImage;
+    bool? success = await onDeletePhotos(context, [image], _album);
     if (!success) return;
+    _onRemoveImage(image);
+  }
+
+  /// Add or remove current photo from favorites
+  Future<void> _onLike() async {
+    bool? result = await onLikePhotos([_currentImage], !_currentImage.favorite);
+    if (result == null) return;
     setState(() {
-      _imageList.remove(_currentImage);
-      _album.nbImages -= 1;
-      _album.nbTotalImages -= 1;
+      _currentImage.favorite = result;
     });
   }
 
@@ -210,7 +243,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
                 ),
                 Expanded(
                   child: Text(
-                    '${_imageList[_page].name}',
+                    '${_currentImage.name}',
                     softWrap: true,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
@@ -231,10 +264,44 @@ class _ImageViewPageState extends State<ImageViewPage> {
                     icon: Icon(Icons.delete, color: Theme.of(context).errorColor),
                   ),
                 ],
-                IconButton(
-                  onPressed: () {},
-                  icon: Icon(Icons.more_vert),
-                ),
+                if (widget.isAdmin)
+                  PopupMenuButton(
+                    position: PopupMenuPosition.under,
+                    itemBuilder: (context) => [
+                      PopupMenuItem(
+                        onTap: () => Future.delayed(
+                          const Duration(seconds: 0),
+                          () => share([_currentImage]),
+                        ),
+                        child: PopupListItem(
+                          icon: Icons.share,
+                          text: appStrings.imageOptions_share,
+                        ),
+                      ),
+                      PopupMenuItem(
+                        onTap: () => Future.delayed(
+                          const Duration(seconds: 0),
+                          () => _onLike(),
+                        ),
+                        child: PopupListItem(
+                          icon: !_currentImage.favorite ? Icons.favorite_border : Icons.favorite,
+                          text: !_currentImage.favorite
+                              ? appStrings.imageOptions_addFavorites
+                              : appStrings.imageOptions_removeFavorites,
+                        ),
+                      ),
+                      PopupMenuItem(
+                        onTap: () => Future.delayed(
+                          const Duration(seconds: 0),
+                          () => downloadImages([_currentImage]),
+                        ),
+                        child: PopupListItem(
+                          icon: Icons.download,
+                          text: appStrings.downloadImage_title(1),
+                        ),
+                      ),
+                    ],
+                  ),
               ],
             ),
           ),
@@ -319,29 +386,54 @@ class _ImageViewPageState extends State<ImageViewPage> {
             height: 56.0,
             decoration: BoxDecoration(color: Colors.black.withOpacity(0.5)),
             child: Row(
-              children: [
-                // Edit
-                Expanded(
-                  child: IconButton(
-                    onPressed: _onEdit,
-                    icon: Icon(Icons.edit),
-                  ),
-                ),
-                // Move
-                Expanded(
-                  child: IconButton(
-                    onPressed: _onMove,
-                    icon: Icon(Icons.drive_file_move),
-                  ),
-                ),
-                // Delete
-                Expanded(
-                  child: IconButton(
-                    onPressed: _onDelete,
-                    icon: Icon(Icons.delete, color: Theme.of(context).errorColor),
-                  ),
-                ),
-              ],
+              children: widget.isAdmin
+                  ? [
+                      Expanded(
+                        child: IconButton(
+                          onPressed: _onEdit,
+                          icon: Icon(Icons.edit),
+                        ),
+                      ),
+                      Expanded(
+                        child: IconButton(
+                          onPressed: _onMove,
+                          icon: Icon(Icons.drive_file_move),
+                        ),
+                      ),
+                      Expanded(
+                        child: IconButton(
+                          onPressed: _onDelete,
+                          icon: Icon(Icons.delete, color: Theme.of(context).errorColor),
+                        ),
+                      ),
+                    ]
+                  : [
+                      Expanded(
+                        child: IconButton(
+                          onPressed: () => share([_currentImage]),
+                          icon: Icon(Icons.share),
+                        ),
+                      ),
+                      Expanded(
+                        child: IconButton(
+                          onPressed: _onLike,
+                          icon: Builder(
+                            builder: (context) {
+                              if (!_currentImage.favorite) {
+                                return Icon(Icons.favorite_border);
+                              }
+                              return Icon(Icons.favorite);
+                            },
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: IconButton(
+                          onPressed: () => downloadImages([_currentImage]),
+                          icon: Icon(Icons.download),
+                        ),
+                      ),
+                    ],
             ),
           ),
         ),

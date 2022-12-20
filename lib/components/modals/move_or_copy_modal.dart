@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:piwigo_ng/api/albums.dart';
 import 'package:piwigo_ng/api/api_error.dart';
-import 'package:piwigo_ng/components/dialogs/confirm_dialog.dart';
 import 'package:piwigo_ng/models/album_model.dart';
 import 'package:piwigo_ng/utils/localizations.dart';
 
@@ -19,7 +18,7 @@ class MoveOrCopyModal extends StatefulWidget {
   final bool isImage;
   final String? title;
   final String? subtitle;
-  final Function(AlbumModel)? onSelected;
+  final Future<dynamic> Function(AlbumModel)? onSelected;
 
   @override
   _MoveOrCopyModalState createState() => _MoveOrCopyModalState();
@@ -46,22 +45,8 @@ class _MoveOrCopyModalState extends State<MoveOrCopyModal> {
   }
 
   Future<void> _onTapAlbum(AlbumModel album) async {
-    if (!await showConfirmDialog(
-      context,
-      title: appStrings.moveCategory,
-      message: appStrings.moveCategory_message(
-        widget.album.name,
-        album.name,
-      ),
-    )) return;
-    ApiResult<bool> result = await moveAlbum(
-      widget.album.id,
-      album.id,
-    );
-
-    if (result.hasData && result.data == true) {
-      Navigator.of(context).pop();
-    }
+    bool? result = await widget.onSelected?.call(album);
+    Navigator.of(context).pop(result ?? false);
   }
 
   @override
@@ -77,20 +62,7 @@ class _MoveOrCopyModalState extends State<MoveOrCopyModal> {
       ),
       builder: (context) => Scaffold(
         backgroundColor: Colors.transparent,
-        appBar: AppBar(
-          shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(
-              top: Radius.circular(15.0),
-            ),
-          ),
-          elevation: 0.0,
-          scrolledUnderElevation: 5.0,
-          leading: IconButton(
-            icon: Icon(Icons.close),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-          title: Text(widget.title ?? ''),
-        ),
+        appBar: _appBar,
         body: Theme(
           data: Theme.of(context).copyWith(
             scrollbarTheme: ScrollbarThemeData(
@@ -135,6 +107,22 @@ class _MoveOrCopyModalState extends State<MoveOrCopyModal> {
       ),
     );
   }
+
+  PreferredSizeWidget get _appBar => AppBar(
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(15.0),
+          ),
+        ),
+        elevation: 0.0,
+        scrolledUnderElevation: 5.0,
+        centerTitle: true,
+        leading: IconButton(
+          icon: Icon(Icons.close),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+        title: Text(widget.title ?? ''),
+      );
 
   Widget get _albumTreeList => DecoratedBox(
         decoration: BoxDecoration(

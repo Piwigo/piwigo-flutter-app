@@ -8,6 +8,7 @@ import 'package:piwigo_ng/components/buttons/animated_piwigo_button.dart';
 import 'package:piwigo_ng/components/fields/app_field.dart';
 import 'package:piwigo_ng/components/modals/add_tags_modal.dart';
 import 'package:piwigo_ng/components/sections/form_section.dart';
+import 'package:piwigo_ng/services/preferences_service.dart';
 import 'package:piwigo_ng/utils/resources.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 import 'package:video_player/video_player.dart';
@@ -31,16 +32,19 @@ class _UploadGalleryViewPage extends State<UploadViewPage> {
   final ImagePicker _picker = ImagePicker();
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
-  final TextEditingController _authorController = TextEditingController();
+  late final TextEditingController _authorController;
   final RoundedLoadingButtonController _btnController = RoundedLoadingButtonController();
 
   final List<DropdownMenuItem<int?>> _levelItems = [];
   final List<TagModel> _tags = [];
+  List<XFile> _imageList = [];
   int? _privacyLevel;
   bool _showFiles = false;
 
   @override
   void initState() {
+    _imageList = widget.imageList;
+    _authorController = TextEditingController(text: Preferences.getUploadAuthor);
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       PrivacyLevel.values.forEach((privacy) {
@@ -58,6 +62,9 @@ class _UploadGalleryViewPage extends State<UploadViewPage> {
 
   @override
   void dispose() {
+    _titleController.dispose();
+    _descriptionController.dispose();
+    _authorController.dispose();
     super.dispose();
   }
 
@@ -84,11 +91,10 @@ class _UploadGalleryViewPage extends State<UploadViewPage> {
   Future<void> _takePhoto() async {
     try {
       final XFile? image = await _picker.pickImage(source: ImageSource.camera);
-      if (image != null) {
-        setState(() {
-          widget.imageList.add(image);
-        });
-      }
+      if (image == null) return;
+      setState(() {
+        widget.imageList.add(image);
+      });
     } catch (e) {
       debugPrint('Pick image error ${e.toString()}');
     }
@@ -97,11 +103,10 @@ class _UploadGalleryViewPage extends State<UploadViewPage> {
   Future<void> _takeVideo() async {
     try {
       final XFile? image = await _picker.pickVideo(source: ImageSource.camera);
-      if (image != null) {
-        setState(() {
-          widget.imageList.add(image);
-        });
-      }
+      if (image == null) return;
+      setState(() {
+        widget.imageList.add(image);
+      });
     } catch (e) {
       debugPrint('Pick image error ${e.toString()}');
     }
@@ -145,207 +150,212 @@ class _UploadGalleryViewPage extends State<UploadViewPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: true,
+      appBar: AppBar(
+        elevation: 0.0,
+        scrolledUnderElevation: 5.0,
+        centerTitle: true,
+        title: Text(appStrings.categoryUpload_images),
+        actions: [
+          IconButton(
+            onPressed: _onUpload,
+            icon: const Icon(Icons.upload_file),
+          ),
+        ],
+      ),
       body: SafeArea(
         child: Scrollbar(
-          thickness: 8,
+          thickness: 8.0,
           thumbVisibility: true,
-          radius: Radius.circular(8),
-          child: CustomScrollView(
-            slivers: [
-              SliverAppBar(
-                pinned: true,
-                centerTitle: true,
-                title: Text(appStrings.categoryUpload_images),
+          radius: Radius.circular(8.0),
+          child: ListView(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 16.0,
+              vertical: 8.0,
+            ),
+            children: [
+              FormSection(
+                expanded: _showFiles,
+                onTapTitle: () => setState(() {
+                  _showFiles = !_showFiles;
+                }),
+                title: appStrings.imageCount(widget.imageList.length),
                 actions: [
-                  IconButton(
-                    onPressed: _onUpload,
-                    icon: const Icon(Icons.upload_file),
+                  GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: _addFiles,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8),
+                      child: Icon(Icons.add_photo_alternate),
+                    ),
+                  ),
+                  GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: _takePhoto,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8),
+                      child: Icon(Icons.photo_camera_rounded),
+                    ),
+                  ),
+                  GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: _takeVideo,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8),
+                      child: Icon(Icons.video_camera_back),
+                    ),
                   ),
                 ],
-              ),
-              SliverPadding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                sliver: SliverList(
-                    delegate: SliverChildListDelegate([
-                  FormSection(
-                    expanded: _showFiles,
-                    onTapTitle: () => setState(() {
-                      _showFiles = !_showFiles;
-                    }),
-                    title: appStrings.imageCount(widget.imageList.length),
-                    actions: [
-                      GestureDetector(
-                        behavior: HitTestBehavior.opaque,
-                        onTap: _addFiles,
-                        child: Padding(
-                          padding: const EdgeInsets.all(8),
-                          child: Icon(Icons.add_photo_alternate),
-                        ),
+                child: Builder(builder: (context) {
+                  if (_showFiles) {
+                    return GridView.builder(
+                      gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                        maxCrossAxisExtent: 96,
                       ),
-                      GestureDetector(
-                        behavior: HitTestBehavior.opaque,
-                        onTap: _takePhoto,
-                        child: Padding(
-                          padding: const EdgeInsets.all(8),
-                          child: Icon(Icons.photo_camera_rounded),
-                        ),
-                      ),
-                      GestureDetector(
-                        behavior: HitTestBehavior.opaque,
-                        onTap: _takeVideo,
-                        child: Padding(
-                          padding: const EdgeInsets.all(8),
-                          child: Icon(Icons.video_camera_back),
-                        ),
-                      ),
-                    ],
-                    child: Builder(builder: (context) {
-                      if (_showFiles) {
-                        return GridView.builder(
-                          gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                            maxCrossAxisExtent: 96,
-                          ),
-                          padding: const EdgeInsets.all(0),
-                          physics: const NeverScrollableScrollPhysics(),
-                          shrinkWrap: true,
-                          itemCount: widget.imageList.length,
-                          itemBuilder: (context, index) {
-                            final File file = File(widget.imageList[index].path);
-                            return Stack(
-                              children: [
-                                Positioned.fill(
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(4.0),
-                                    child: Builder(builder: (context) {
-                                      List<String>? mimeType = mime(file.path.split('/').last)?.split('/');
-                                      if (mimeType?.first == 'image') {
-                                        return Image.file(
-                                          file,
-                                          fit: BoxFit.cover,
-                                          scale: 0.7,
-                                          cacheHeight: 128,
-                                          cacheWidth: 128,
-                                          errorBuilder: (context, object, stacktrace) => Center(
-                                            child: Icon(Icons.image_not_supported),
-                                          ),
-                                        );
-                                      }
-                                      if (mimeType?.first == 'video') {
-                                        return VideoUploadItem(
-                                          path: file.path,
-                                        );
-                                      }
-                                      return const Center(
+                      padding: const EdgeInsets.all(0),
+                      physics: const NeverScrollableScrollPhysics(),
+                      shrinkWrap: true,
+                      itemCount: widget.imageList.length,
+                      itemBuilder: (context, index) {
+                        final File file = File(widget.imageList[index].path);
+                        return Stack(
+                          children: [
+                            Positioned.fill(
+                              child: Padding(
+                                padding: const EdgeInsets.all(4.0),
+                                child: Builder(builder: (context) {
+                                  List<String>? mimeType = mime(file.path.split('/').last)?.split('/');
+                                  if (mimeType?.first == 'image') {
+                                    return Image.file(
+                                      file,
+                                      fit: BoxFit.cover,
+                                      scale: 0.7,
+                                      cacheHeight: 128,
+                                      cacheWidth: 128,
+                                      errorBuilder: (context, object, stacktrace) => Center(
                                         child: Icon(Icons.image_not_supported),
-                                      );
-                                    }),
-                                  ),
+                                      ),
+                                    );
+                                  }
+                                  if (mimeType?.first == 'video') {
+                                    return VideoUploadItem(
+                                      path: file.path,
+                                    );
+                                  }
+                                  return const Center(
+                                    child: Icon(Icons.image_not_supported),
+                                  );
+                                }),
+                              ),
+                            ),
+                            Positioned(
+                              top: 0,
+                              right: 0,
+                              child: GestureDetector(
+                                behavior: HitTestBehavior.opaque,
+                                onTap: () => _onRemoveFile(index),
+                                child: CircleAvatar(
+                                  backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                                  radius: 12,
+                                  child: Icon(Icons.remove_circle_outline, size: 20, color: Theme.of(context).errorColor),
                                 ),
-                                Positioned(
-                                  top: 0,
-                                  right: 0,
-                                  child: GestureDetector(
-                                    behavior: HitTestBehavior.opaque,
-                                    onTap: () => _onRemoveFile(index),
-                                    child: CircleAvatar(
-                                      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-                                      radius: 12,
-                                      child: Icon(Icons.remove_circle_outline, size: 20, color: Theme.of(context).errorColor),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            );
-                          },
+                              ),
+                            ),
+                          ],
                         );
+                      },
+                    );
+                  }
+                  return const SizedBox(width: double.infinity);
+                }),
+              ),
+              FormSection(
+                title: appStrings.editImageDetails_title,
+                child: AppField(
+                  controller: _titleController,
+                  hint: appStrings.editImageDetails_titlePlaceholder,
+                ),
+              ), // title
+              FormSection(
+                title: appStrings.editImageDetails_author,
+                child: AppField(
+                  controller: _authorController,
+                  hint: appStrings.settings_defaultAuthorPlaceholder,
+                ),
+              ), // author
+              FormSection(
+                title: appStrings.editImageDetails_description,
+                child: AppField(
+                  controller: _descriptionController,
+                  hint: appStrings.editImageDetails_descriptionPlaceholder,
+                  minLines: 5,
+                  maxLines: 10,
+                ),
+              ), // description
+              FormSection(
+                title: appStrings.editImageDetails_privacyLevel,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color: Theme.of(context).inputDecorationTheme.fillColor,
+                  ),
+                  child: DropdownButton<int?>(
+                    onTap: () {
+                      final FocusScopeNode currentFocus = FocusScope.of(context);
+                      if (!currentFocus.hasPrimaryFocus) {
+                        currentFocus.unfocus();
                       }
-                      return const SizedBox(width: double.infinity);
-                    }),
+                    },
+                    isExpanded: true,
+                    underline: const SizedBox(),
+                    value: _privacyLevel,
+                    onChanged: (level) {
+                      setState(() {
+                        _privacyLevel = level;
+                      });
+                    },
+                    style: Theme.of(context).textTheme.bodyMedium,
+                    items: _levelItems,
                   ),
-                  FormSection(
-                    margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                    title: appStrings.editImageDetails_title,
-                    child: AppField(
-                      controller: _titleController,
-                      hint: appStrings.editImageDetails_titlePlaceholder,
-                    ),
-                  ), // title
-                  FormSection(
-                    margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                    title: appStrings.editImageDetails_author,
-                    child: AppField(
-                      controller: _authorController,
-                      hint: appStrings.settings_defaultAuthorPlaceholder,
-                    ),
-                  ), // author
-                  FormSection(
-                    margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                    title: appStrings.editImageDetails_description,
-                    child: AppField(
-                      controller: _descriptionController,
-                      hint: appStrings.editImageDetails_descriptionPlaceholder,
-                      minLines: 5,
-                      maxLines: 10,
-                    ),
-                  ), // description
-                  FormSection(
-                    margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                    title: appStrings.editImageDetails_privacyLevel,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        color: Theme.of(context).inputDecorationTheme.fillColor,
-                      ),
-                      child: DropdownButton<int?>(
-                        onTap: () {
-                          final FocusScopeNode currentFocus = FocusScope.of(context);
-                          if (!currentFocus.hasPrimaryFocus) {
-                            currentFocus.unfocus();
-                          }
-                        },
-                        isExpanded: true,
-                        underline: const SizedBox(),
-                        value: _privacyLevel,
-                        onChanged: (level) {
-                          setState(() {
-                            _privacyLevel = level;
-                          });
-                        },
-                        style: Theme.of(context).textTheme.bodyMedium,
-                        items: _levelItems,
+                ),
+              ), // privacy
+              FormSection(
+                title: appStrings.tagsAdd_title,
+                onTapTitle: () {
+                  showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    builder: (_) => Padding(
+                      padding: MediaQuery.of(context).padding,
+                      child: AddTagsModal(
+                        selectedTags: _tags,
                       ),
                     ),
-                  ), // privacy
-                  FormSection(
-                    margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                    title: appStrings.tagsAdd_title,
-                    onTapTitle: () {}, // todo add tags
-                    actions: [
-                      const Icon(Icons.add_circle_outline),
-                    ],
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: TagWrap(
-                        tags: _tags,
-                        onTap: _onDeselectTag,
-                      ),
-                    ),
-                  ), // tags
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    child: AnimatedPiwigoButton(
-                      controller: _btnController,
-                      color: Theme.of(context).primaryColor,
-                      disabled: widget.imageList.isEmpty,
-                      onPressed: _onUpload,
-                      child: Text(
-                        widget.imageList.isEmpty ? appStrings.noImages : appStrings.imageUploadDetailsButton_title,
-                        style: Theme.of(context).textTheme.displaySmall,
-                      ),
-                    ),
+                  ).whenComplete(() => setState(() {}));
+                },
+                actions: [
+                  const Icon(Icons.add_circle_outline),
+                ],
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: TagWrap(
+                    tags: _tags,
+                    onTap: _onDeselectTag,
                   ),
-                ])),
+                ),
+              ), // tags
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16.0),
+                child: AnimatedPiwigoButton(
+                  controller: _btnController,
+                  color: Theme.of(context).primaryColor,
+                  disabled: widget.imageList.isEmpty,
+                  onPressed: _onUpload,
+                  child: Text(
+                    widget.imageList.isEmpty ? appStrings.noImages : appStrings.imageUploadDetailsButton_title,
+                    style: Theme.of(context).textTheme.displaySmall,
+                  ),
+                ),
               ),
             ],
           ),
