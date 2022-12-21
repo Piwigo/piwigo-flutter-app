@@ -18,11 +18,11 @@ void main() async {
     statusBarColor: Colors.black.withOpacity(0.1),
   ));
   HttpOverrides.global = SSLHttpOverrides();
+  appPreferences = await SharedPreferences.getInstance();
   runApp(const App());
   _clearUnusedStorage();
   initLocalNotifications();
   initializeWorkManager();
-  appPreferences = await SharedPreferences.getInstance();
 }
 
 void _clearUnusedStorage() async {

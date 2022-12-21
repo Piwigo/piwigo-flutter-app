@@ -25,6 +25,8 @@ final ThemeData lightTheme = ThemeData.light().copyWith(
   ),
   appBarTheme: const AppBarTheme(
     backgroundColor: AppColors.backgroundLight,
+    elevation: 0.0,
+    scrolledUnderElevation: 5.0,
     iconTheme: IconThemeData(
       color: AppColors.accent,
     ),
@@ -167,6 +169,8 @@ final ThemeData darkTheme = ThemeData.dark().copyWith(
   ),
   appBarTheme: const AppBarTheme(
     backgroundColor: AppColors.backgroundDark,
+    elevation: 0.0,
+    scrolledUnderElevation: 5.0,
     iconTheme: IconThemeData(
       color: AppColors.accent,
     ),

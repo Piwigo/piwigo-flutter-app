@@ -19,6 +19,7 @@ import 'package:piwigo_ng/utils/localizations.dart';
 import 'package:piwigo_ng/utils/settings.dart';
 import 'package:piwigo_ng/views/authentication/login_view_page.dart';
 import 'package:piwigo_ng/views/settings/privacy_policy_view_page.dart';
+import 'package:piwigo_ng/views/settings/select_language_view_page.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -521,6 +522,11 @@ class _SettingsViewPageState extends State<SettingsViewPage> {
                 ),
               );
             },
+          ),
+          SettingsSectionItemButton(
+            title: appStrings.settings_language,
+            icon: const Icon(Icons.language),
+            onPressed: () => Navigator.of(context).pushNamed(SelectLanguageViewPage.routeName),
           ),
           SettingsSectionItemButton(
             title: appStrings.settings_translateWithCrowdin,

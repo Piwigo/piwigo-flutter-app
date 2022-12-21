@@ -14,6 +14,7 @@ import 'package:piwigo_ng/views/image/edit_image_page.dart';
 import 'package:piwigo_ng/views/image/image_search_view_page.dart';
 import 'package:piwigo_ng/views/image/image_view_page.dart';
 import 'package:piwigo_ng/views/settings/privacy_policy_view_page.dart';
+import 'package:piwigo_ng/views/settings/select_language_view_page.dart';
 import 'package:piwigo_ng/views/settings/settings_view_page.dart';
 import 'package:piwigo_ng/views/unknown_route_page.dart';
 import 'package:piwigo_ng/views/upload/upload_view_page.dart';
@@ -28,7 +29,7 @@ class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AppProviders(
-      builder: (themeNotifier) {
+      builder: (localNotifier, themeNotifier) {
         return MaterialApp(
           title: 'Piwigo NG',
           key: appKey,
@@ -44,7 +45,9 @@ class App extends StatelessWidget {
             Locale('en'),
             Locale('de'),
             Locale('fr'),
+            Locale('zh'),
           ],
+          locale: localNotifier.locale,
           themeMode: themeNotifier.isDark ? ThemeMode.dark : ThemeMode.light,
           darkTheme: darkTheme,
           theme: lightTheme,
@@ -146,6 +149,11 @@ Route<dynamic> generateRoute(RouteSettings settings) {
     case PrivacyPolicyViewPage.routeName:
       return MaterialPageRoute(
         builder: (_) => const PrivacyPolicyViewPage(),
+        settings: settings,
+      );
+    case SelectLanguageViewPage.routeName:
+      return MaterialPageRoute(
+        builder: (_) => const SelectLanguageViewPage(),
         settings: settings,
       );
     default:
