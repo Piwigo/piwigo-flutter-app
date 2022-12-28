@@ -113,7 +113,9 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       );
     case ImageSearchViewPage.routeName:
       return SlideUpPageRoute(
-        page: const ImageSearchViewPage(),
+        page: ImageSearchViewPage(
+          isAdmin: arguments['isAdmin'] ?? isAdmin,
+        ),
         settings: settings,
       );
     case UploadViewPage.routeName:

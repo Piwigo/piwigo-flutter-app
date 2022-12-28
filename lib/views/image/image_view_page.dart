@@ -86,6 +86,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
   /// Load more images with API pagination
   /// Triggers when changing to last page
   Future<void> _loadMoreImages() async {
+    if (_album.id == -1) return;
     if (_album.nbImages <= _imageList.length) return;
     ApiResult<List<ImageModel>> result = await fetchImages(_album.id, _imagePage + 1);
     if (result.hasError || !result.hasData) return;

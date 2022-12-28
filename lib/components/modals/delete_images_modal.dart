@@ -9,11 +9,11 @@ class DeleteImagesModal extends StatelessWidget {
   const DeleteImagesModal({
     Key? key,
     required this.imageList,
-    required this.album,
+    this.album,
   }) : super(key: key);
 
   final List<ImageModel> imageList;
-  final AlbumModel album;
+  final AlbumModel? album;
 
   bool get _safeDelete {
     for (ImageModel image in imageList) {
@@ -27,7 +27,9 @@ class DeleteImagesModal extends StatelessWidget {
   bool get _canMakeOrphans {
     for (ImageModel image in imageList) {
       List<int> albums = image.categories.map<int>((a) => a['id']).toList();
-      albums.removeWhere((a) => a == album.id);
+      if (album != null) {
+        albums.removeWhere((a) => a == album!.id);
+      }
       if (albums.isEmpty) {
         return true;
       }

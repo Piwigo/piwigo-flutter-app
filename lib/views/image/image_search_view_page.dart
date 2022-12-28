@@ -4,17 +4,22 @@ import 'package:piwigo_ng/api/api_error.dart';
 import 'package:piwigo_ng/api/images.dart';
 import 'package:piwigo_ng/components/popup_list_item.dart';
 import 'package:piwigo_ng/components/scroll_widgets/image_grid_view.dart';
+import 'package:piwigo_ng/models/album_model.dart';
 import 'package:piwigo_ng/models/image_model.dart';
+import 'package:piwigo_ng/utils/image_actions.dart';
 import 'package:piwigo_ng/utils/localizations.dart';
 import 'package:piwigo_ng/utils/page_routes.dart';
+import 'package:piwigo_ng/views/image/image_view_page.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import '../../components/fields/app_field.dart';
 
 class ImageSearchViewPage extends StatefulWidget {
-  const ImageSearchViewPage({Key? key}) : super(key: key);
+  const ImageSearchViewPage({Key? key, this.isAdmin = false}) : super(key: key);
 
   static const String routeName = '/images/search';
+
+  final bool isAdmin;
 
   @override
   State<ImageSearchViewPage> createState() => _ImageSearchViewPageState();
@@ -53,6 +58,8 @@ class _ImageSearchViewPageState extends State<ImageSearchViewPage> {
     _searchController.dispose();
     super.dispose();
   }
+
+  bool get _hasNonFavorites => _selectedList.where((image) => !image.favorite).isNotEmpty;
 
   Future<bool> _onWillPop() async {
     if (_selectedList.isNotEmpty) {
@@ -104,11 +111,26 @@ class _ImageSearchViewPageState extends State<ImageSearchViewPage> {
     _refreshController.loadComplete();
   }
 
-  void _onEdit() {}
-  void _onMove() {}
-  void _onDelete() {}
-  void _onDownload() {}
-  void _onShare() {}
+  void _onTapPhoto(ImageModel image) => Navigator.of(context).pushNamed(
+        ImageViewPage.routeName,
+        arguments: {
+          'images': _searchList,
+          'startId': image.id,
+          'album': AlbumModel(
+            id: -1,
+            name: 'Search',
+            nbImages: _nbImages,
+            nbTotalImages: _nbImages,
+          ),
+        },
+      ).whenComplete(() => _onRefresh());
+  void _onEditPhotos() => onEditPhotos(context, _selectedList).then((success) {
+        if (success == true) {
+          _selectedList.clear();
+          _onRefresh();
+        }
+      });
+  void _onLikePhotos() => onLikePhotos(_selectedList, _hasNonFavorites).whenComplete(() => _onRefresh());
 
   @override
   Widget build(BuildContext context) {
@@ -180,36 +202,65 @@ class _ImageSearchViewPageState extends State<ImageSearchViewPage> {
         ),
       ),
       actions: [
-        if (_selectedList.isNotEmpty)
-          PopupMenuButton(
-            position: PopupMenuPosition.under,
-            itemBuilder: (context) => [
-              if (_selectedList.isNotEmpty)
-                PopupMenuItem(
-                  onTap: () => setState(() {
+        AnimatedSize(
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.ease,
+          child: SizedBox(
+            width: _selectedList.isEmpty ? (widget.isAdmin ? 0.0 : 16.0) : null,
+            child: AnimatedScale(
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.ease,
+              scale: _selectedList.isEmpty ? 0 : 1,
+              child: AnimatedOpacity(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.ease,
+                opacity: _selectedList.isEmpty ? 0 : 1,
+                child: IconButton(
+                  onPressed: () => setState(() {
                     _selectedList.clear();
                   }),
-                  child: PopupListItem(
-                    icon: Icons.cancel,
-                    text: appStrings.categoryImageList_deselectButton,
-                  ),
+                  icon: Icon(Icons.cancel),
                 ),
-              if (_selectedList.isNotEmpty)
-                PopupMenuItem(
-                  onTap: _onShare,
-                  child: PopupListItem(
-                    icon: Icons.share,
-                    text: appStrings.imageOptions_share,
-                  ),
+              ),
+            ),
+          ),
+        ),
+        if (widget.isAdmin)
+          PopupMenuButton(
+            padding: EdgeInsets.zero,
+            enabled: _selectedList.isNotEmpty,
+            position: PopupMenuPosition.under,
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                onTap: () => Future.delayed(
+                  const Duration(seconds: 0),
+                  () => share(_selectedList),
                 ),
-              if (_selectedList.isNotEmpty)
-                PopupMenuItem(
-                  onTap: _onDownload,
-                  child: PopupListItem(
-                    icon: Icons.download,
-                    text: appStrings.downloadImage_title(_selectedList.length),
-                  ),
+                child: PopupListItem(
+                  icon: Icons.share,
+                  text: appStrings.imageOptions_share,
                 ),
+              ),
+              PopupMenuItem(
+                onTap: () => Future.delayed(
+                  const Duration(seconds: 0),
+                  () => _onLikePhotos(),
+                ),
+                child: PopupListItem(
+                  icon: _hasNonFavorites ? Icons.favorite_border : Icons.favorite,
+                  text: _hasNonFavorites ? appStrings.imageOptions_addFavorites : appStrings.imageOptions_removeFavorites,
+                ),
+              ),
+              PopupMenuItem(
+                onTap: () => Future.delayed(
+                  const Duration(seconds: 0),
+                  () => downloadImages(_selectedList),
+                ),
+                child: PopupListItem(
+                  icon: Icons.download,
+                  text: appStrings.downloadImage_title(_selectedList.length),
+                ),
+              ),
             ],
           ),
       ],
@@ -251,6 +302,7 @@ class _ImageSearchViewPageState extends State<ImageSearchViewPage> {
             onDeselectImage: (image) => setState(() {
               _selectedList.remove(image);
             }),
+            onTapImage: _onTapPhoto,
           );
         }
         return Center(child: CircularProgressIndicator());
@@ -265,26 +317,54 @@ class _ImageSearchViewPageState extends State<ImageSearchViewPage> {
         curve: Curves.easeInOut,
         height: _selectedList.isEmpty ? 0 : 56.0,
         child: Row(
-          children: [
-            Expanded(
-              child: IconButton(
-                onPressed: _onEdit,
-                icon: Icon(Icons.edit),
-              ),
-            ),
-            Expanded(
-              child: IconButton(
-                onPressed: _onMove,
-                icon: Icon(Icons.drive_file_move),
-              ),
-            ),
-            Expanded(
-              child: IconButton(
-                onPressed: _onDelete,
-                icon: Icon(Icons.delete),
-              ),
-            ),
-          ],
+          children: widget.isAdmin
+              ? [
+                  Expanded(
+                    child: IconButton(
+                      onPressed: _onEditPhotos,
+                      icon: Icon(Icons.edit),
+                    ),
+                  ),
+                  Expanded(
+                    child: IconButton(
+                      onPressed: () {}, // todo: on move
+                      icon: Icon(Icons.drive_file_move),
+                    ),
+                  ),
+                  Expanded(
+                    child: IconButton(
+                      onPressed: () {}, // todo: on delete
+                      icon: Icon(Icons.delete),
+                    ),
+                  ),
+                ]
+              : [
+                  Expanded(
+                    child: IconButton(
+                      onPressed: () => share(_selectedList),
+                      icon: Icon(Icons.share),
+                    ),
+                  ),
+                  Expanded(
+                    child: IconButton(
+                      onPressed: _onLikePhotos,
+                      icon: Builder(
+                        builder: (context) {
+                          if (_hasNonFavorites) {
+                            return Icon(Icons.favorite_border);
+                          }
+                          return Icon(Icons.favorite);
+                        },
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: IconButton(
+                      onPressed: () => downloadImages(_selectedList),
+                      icon: Icon(Icons.download),
+                    ),
+                  ),
+                ],
         ),
       ),
     );

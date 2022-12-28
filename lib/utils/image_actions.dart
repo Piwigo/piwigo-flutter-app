@@ -60,6 +60,13 @@ Future<bool?> onEditPhotos(BuildContext context, List<ImageModel> images) async 
 }
 
 Future<dynamic> onMovePhotos(BuildContext context, List<ImageModel> images, AlbumModel album) async {
+  AlbumModel origin = album;
+  if (images.length == 1) {
+    origin = AlbumModel(
+      id: images.first.categories.first['id'],
+      name: '',
+    );
+  }
   return showModalBottomSheet<dynamic>(
     context: context,
     isScrollControlled: true,
@@ -69,7 +76,7 @@ Future<dynamic> onMovePhotos(BuildContext context, List<ImageModel> images, Albu
         title: appStrings.moveImage_title,
         subtitle: appStrings.moveImage_selectAlbum(images.length, images.first),
         isImage: true,
-        album: album,
+        album: origin,
         onSelected: (selectedAlbum) async {
           final int? choice = await showModalBottomSheet<int>(
             context: context,
