@@ -86,10 +86,11 @@ class _RootSearchAppBarState extends State<RootSearchAppBar> {
         ),
       ),
       actions: [
-        IconButton(
-          onPressed: () {},
-          icon: const Icon(Icons.more_vert),
-        ),
+        SizedBox(width: 16.0),
+        // IconButton(
+        //   onPressed: () {},
+        //   icon: const Icon(Icons.more_vert),
+        // ),
       ],
       expandedHeight: _expandedHeight,
       flexibleSpace: FlexibleSpaceBar(

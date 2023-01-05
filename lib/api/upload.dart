@@ -141,7 +141,7 @@ Future<File?> compressFile(XFile file) async {
     final filePath = file.path;
     var dir = await getTemporaryDirectory();
     String filename = filePath.split('/').last;
-    final outPath = "${dir.path}/compressed_$filename";
+    final outPath = "${dir.path}/compressed/$filename";
 
     var result = await FlutterImageCompress.compressAndGetFile(
       filePath,

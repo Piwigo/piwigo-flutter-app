@@ -1,6 +1,7 @@
 class StatusModel {
   String username;
   String status;
+  String? realStatus;
   String? theme;
   String language;
   String pwgToken;
@@ -14,6 +15,7 @@ class StatusModel {
   StatusModel.fromJson(Map<String, dynamic> json)
       : username = json['username'] ?? 'guest',
         status = json['status'] ?? 'guest',
+        realStatus = json['real_user_status'],
         theme = json['theme'],
         language = json['language'] ?? 'en_US',
         pwgToken = json['pwg_token'] ?? '',

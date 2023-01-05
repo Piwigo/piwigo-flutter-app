@@ -7,6 +7,7 @@ import 'package:piwigo_ng/models/album_model.dart';
 import 'package:piwigo_ng/services/preferences_service.dart';
 
 import 'api_client.dart';
+import 'authentication.dart';
 
 Future<ApiResult<List<AlbumModel>>> fetchAlbums(int albumID) async {
   final Map<String, dynamic> queries = {
@@ -14,6 +15,57 @@ Future<ApiResult<List<AlbumModel>>> fetchAlbums(int albumID) async {
     'method': 'pwg.categories.getList',
     'cat_id': albumID,
     'thumbnail_size': Preferences.getAlbumThumbnailSize,
+  };
+
+  try {
+    List<String> uploadCategoryIdList = [];
+    if (await methodExist('community.categories.getList')) {
+      queries['faked_by_community'] = false;
+      ApiResult communityResult = await fetchCommunityAlbums(albumID);
+      if (communityResult.hasData) {
+        uploadCategoryIdList = communityResult.data.map<String>(
+          (cat) {
+            return cat.id.toString();
+          },
+        ).toList();
+      }
+    }
+
+    Response response = await ApiClient.get(
+      queryParameters: queries,
+    );
+
+    if (response.statusCode == 200) {
+      List<dynamic> jsonAlbums = json.decode(response.data)['result']['categories'];
+      List<AlbumModel> albums = List<AlbumModel>.from(jsonAlbums.map(
+        (album) {
+          print(album);
+          bool canUpload = false;
+          if ((appPreferences.getBool(Preferences.isAdminKey) ?? false) ||
+              uploadCategoryIdList.contains(album['id'].toString())) {
+            canUpload = true;
+          }
+          album['can_upload'] = canUpload;
+          return AlbumModel.fromJson(album);
+        },
+      ));
+      return ApiResult<List<AlbumModel>>(
+        data: albums,
+      );
+    }
+  } on DioError catch (e) {
+    debugPrint(e.message);
+  } catch (e) {
+    debugPrint("$e");
+  }
+  return ApiResult(error: ApiErrors.fetchAlbumsError);
+}
+
+Future<ApiResult<List<AlbumModel>>> fetchCommunityAlbums(int albumID) async {
+  final Map<String, dynamic> queries = {
+    'format': 'json',
+    'method': 'community.categories.getList',
+    'cat_id': albumID,
   };
 
   try {

@@ -11,10 +11,12 @@ class UploadProvider extends ChangeNotifier {
 
   void addItem(UploadItem item) {
     _uploadList.add(item);
+    notifyListeners();
   }
 
   void removeItem(UploadItem item) {
     _uploadList.remove(item);
+    notifyListeners();
   }
 
   List<UploadItem> get uploadList => _uploadList;

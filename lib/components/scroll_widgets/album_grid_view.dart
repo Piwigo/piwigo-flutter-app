@@ -15,6 +15,7 @@ class AlbumGridView extends StatelessWidget {
     this.onDelete,
     this.onEdit,
     this.onMove,
+    this.isAdmin = false,
   }) : super(key: key);
 
   final List<AlbumModel> albumList;
@@ -23,6 +24,7 @@ class AlbumGridView extends StatelessWidget {
   final Function(AlbumModel)? onEdit;
   final Function(AlbumModel)? onMove;
   final EdgeInsetsGeometry? padding;
+  final bool isAdmin;
 
   @override
   Widget build(BuildContext context) {
@@ -40,6 +42,7 @@ class AlbumGridView extends StatelessWidget {
       itemBuilder: (context, index) {
         AlbumModel album = albumList[index];
         return AlbumCard(
+          showActions: isAdmin,
           album: album,
           onTap: () => onTap?.call(album),
           onDelete: () => onDelete?.call(album),

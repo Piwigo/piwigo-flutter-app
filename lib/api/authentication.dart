@@ -10,15 +10,40 @@ import 'package:piwigo_ng/services/preferences_service.dart';
 
 import 'api_client.dart';
 
+Future<ApiResult<String>> pingAPI() async {
+  Map<String, String> queries = {
+    'format': 'json',
+    'method': 'pwg.getVersion',
+  };
+
+  try {
+    Response response = await ApiClient.get(queryParameters: queries);
+    var data = json.decode(response.data);
+    if (data['stat'] == 'ok') {
+      return ApiResult<String>(data: data['result']);
+    }
+  } on DioError catch (e) {
+    debugPrint(e.message);
+  } catch (e) {
+    debugPrint('Error $e');
+  }
+  return ApiResult(error: ApiErrors.error);
+}
+
 Future<ApiResult<bool>> loginUser(
   String url, {
   String username = '',
   String password = '',
 }) async {
-  if (url.isEmpty) {}
+  if (url.isEmpty) {
+    return ApiResult<bool>(
+      data: false,
+      error: ApiErrors.wrongServerUrl,
+    );
+  }
+
   FlutterSecureStorage secureStorage = const FlutterSecureStorage();
   await secureStorage.write(key: 'SERVER_URL', value: url);
-  print(url);
 
   if (username.isEmpty && password.isEmpty) {
     ApiResult<StatusModel> status = await sessionStatus();
@@ -83,6 +108,10 @@ Future<ApiResult<StatusModel>> sessionStatus() async {
     Response response = await ApiClient.get(queryParameters: queries);
     var data = json.decode(response.data);
     if (data['stat'] == 'ok') {
+      if (await methodExist('community.session.getStatus')) {
+        String? community = await communityStatus();
+        data['result']['real_user_status'] = community;
+      }
       return ApiResult<StatusModel>(
         data: StatusModel.fromJson(data['result']),
       );
@@ -95,6 +124,23 @@ Future<ApiResult<StatusModel>> sessionStatus() async {
   return ApiResult(
     error: ApiErrors.getStatusError,
   );
+}
+
+Future<String?> communityStatus() async {
+  Map<String, String> queries = {'format': 'json', 'method': 'community.session.getStatus'};
+
+  try {
+    Response response = await ApiClient.get(queryParameters: queries);
+    var data = json.decode(response.data);
+    if (data['stat'] == 'ok') {
+      return data['result']['real_user_status'];
+    }
+  } on DioError catch (e) {
+    debugPrint(e.message);
+  } catch (e) {
+    debugPrint('Error $e');
+  }
+  return null;
 }
 
 Future<ApiResult<InfoModel>> getInfo() async {

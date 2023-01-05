@@ -19,6 +19,7 @@ class Preferences {
 
   static const String accountUsernameKey = 'ACCOUNT_USERNAME';
   static const String userStatusKey = 'USER_STATUS';
+  static const String communityStatusKey = 'COMMUNITY_STATUS';
   static const String tokenKey = 'PWG_TOKEN';
   static const String versionKey = 'VERSION';
   static const String availableSizesKey = 'AVAILABLE_SIZES';
@@ -125,7 +126,11 @@ class Preferences {
     appPreferences.setString(tokenKey, status.pwgToken);
     appPreferences.setString(versionKey, status.version);
     appPreferences.setStringList(availableSizesKey, status.availableSizes);
-    if (["admin", "webmaster"].contains(status.status)) {
+    if (status.realStatus != null) {
+      appPreferences.setString(communityStatusKey, status.status);
+      status.status = status.realStatus!;
+    }
+    if (['admin', 'webmaster'].contains(status.status)) {
       appPreferences.setBool(isAdminKey, true);
       appPreferences.setInt(uploadChunkSizeKey, status.uploadFormChunkSize ?? 0);
       appPreferences.setString(fileTypesKey, status.uploadFileTypes ?? '');

@@ -111,6 +111,7 @@ class _RootAlbumViewPageState extends State<RootAlbumViewPage> {
           return Padding(
             padding: widget.isAdmin ? const EdgeInsets.only(bottom: 72.0) : EdgeInsets.zero,
             child: AlbumGridView(
+              isAdmin: widget.isAdmin,
               albumList: _albumList,
               onTap: _onTapAlbum,
               onDelete: _onDeleteAlbum,

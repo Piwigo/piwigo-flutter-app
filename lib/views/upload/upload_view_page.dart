@@ -127,13 +127,14 @@ class _UploadGalleryViewPage extends State<UploadViewPage> {
   Future<void> _onUpload() async {
     _btnController.start();
     List<int> tagIds = _tags.map<int>((tag) => tag.id).toList();
-    var result = await uploadPhotos(widget.imageList, widget.albumId, info: {
+    var result = await uploadPhotos(_imageList, widget.albumId, info: {
       'name': _titleController.text,
       'comment': _descriptionController.text,
       'author': _authorController.text,
       'tag_ids': tagIds,
       'level': _privacyLevel,
     });
+    print(_btnController.currentState);
     if (!mounted) return;
     if (result.isEmpty) {
       _btnController.error();
@@ -208,10 +209,10 @@ class _UploadGalleryViewPage extends State<UploadViewPage> {
                 child: Builder(builder: (context) {
                   if (_showFiles) {
                     return GridView.builder(
+                      padding: EdgeInsets.zero,
                       gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                        maxCrossAxisExtent: 96,
+                        maxCrossAxisExtent: 96.0,
                       ),
-                      padding: const EdgeInsets.all(0),
                       physics: const NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
                       itemCount: widget.imageList.length,
@@ -219,33 +220,32 @@ class _UploadGalleryViewPage extends State<UploadViewPage> {
                         final File file = File(widget.imageList[index].path);
                         return Stack(
                           children: [
-                            Positioned.fill(
-                              child: Padding(
-                                padding: const EdgeInsets.all(4.0),
-                                child: Builder(builder: (context) {
-                                  List<String>? mimeType = mime(file.path.split('/').last)?.split('/');
-                                  if (mimeType?.first == 'image') {
-                                    return Image.file(
-                                      file,
-                                      fit: BoxFit.cover,
-                                      scale: 0.7,
-                                      cacheHeight: 128,
-                                      cacheWidth: 128,
-                                      errorBuilder: (context, object, stacktrace) => Center(
-                                        child: Icon(Icons.image_not_supported),
-                                      ),
-                                    );
-                                  }
-                                  if (mimeType?.first == 'video') {
-                                    return VideoUploadItem(
-                                      path: file.path,
-                                    );
-                                  }
-                                  return const Center(
-                                    child: Icon(Icons.image_not_supported),
+                            Positioned(
+                              top: 4.0,
+                              right: 4.0,
+                              left: 4.0,
+                              bottom: 4.0,
+                              child: Builder(builder: (context) {
+                                List<String>? mimeType = mime(file.path.split('/').last)?.split('/');
+                                if (mimeType?.first == 'image') {
+                                  return Image.file(
+                                    file,
+                                    fit: BoxFit.cover,
+                                    scale: 0.7,
+                                    errorBuilder: (context, object, stacktrace) => Center(
+                                      child: Icon(Icons.image_not_supported),
+                                    ),
                                   );
-                                }),
-                              ),
+                                }
+                                if (mimeType?.first == 'video') {
+                                  return VideoUploadItem(
+                                    path: file.path,
+                                  );
+                                }
+                                return const Center(
+                                  child: Icon(Icons.image_not_supported),
+                                );
+                              }),
                             ),
                             Positioned(
                               top: 0,

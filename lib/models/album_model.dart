@@ -17,6 +17,7 @@ class AlbumModel {
   String? dateLast;
   String? dateLastMax;
   List<AlbumModel> children;
+  bool canUpload;
 
   AlbumModel({
     required this.id,
@@ -36,6 +37,7 @@ class AlbumModel {
     this.idRepresentative,
     this.dateLast,
     this.dateLastMax,
+    this.canUpload = true,
     List<AlbumModel>? children,
   })  : children = children ?? [],
         fullName = fullName ?? name;
@@ -58,5 +60,6 @@ class AlbumModel {
         children = json['sub_categories']?.map<AlbumModel>((a) => AlbumModel.fromJson(a)).toList() ?? [],
         idRepresentative = json['representative_picture_id'],
         dateLast = json['date_last'],
-        dateLastMax = json['max_date_last'];
+        dateLastMax = json['max_date_last'],
+        canUpload = json['can_upload'] ?? true;
 }

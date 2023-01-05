@@ -307,7 +307,7 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
   }
 
   Widget? get _adminActionsSpeedDial {
-    if (!widget.isAdmin) return null;
+    if (!widget.isAdmin && !widget.album.canUpload) return null;
     final Color childBackgroundColor = Theme.of(context).primaryColorLight;
     final Color childIconColor = Theme.of(context).primaryColor;
     return SpeedDial(
@@ -346,6 +346,7 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
     }
     if (_albumList.isEmpty) return const SizedBox();
     return AlbumGridView(
+      isAdmin: widget.isAdmin,
       albumList: _albumList,
       onTap: _onTapAlbum,
       onEdit: _onEditAlbum,

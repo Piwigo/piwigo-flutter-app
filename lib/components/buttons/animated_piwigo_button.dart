@@ -27,10 +27,10 @@ class AnimatedPiwigoButton extends StatelessWidget {
         child: LayoutBuilder(builder: (context, constraints) {
           return RoundedLoadingButton(
             controller: controller,
-            duration: const Duration(milliseconds: 300),
+            duration: const Duration(milliseconds: 500),
             completionDuration: const Duration(milliseconds: 300),
-            resetDuration: const Duration(seconds: 1),
-            resetAfterDuration: true,
+            // resetDuration: const Duration(seconds: 1),
+            resetAfterDuration: false,
             animateOnTap: false,
             color: color,
             elevation: 0.0,

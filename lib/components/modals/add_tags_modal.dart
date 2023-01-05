@@ -53,9 +53,13 @@ class _AddTagsModalState extends State<AddTagsModal> {
     TagModel? addedTag = await showCreateTagModal(context);
     if (addedTag == null) return;
     await _onRefresh();
-    setState(() {
-      _selectedTagList.add(_tagList.firstWhere((tag) => tag.id == addedTag.id));
-    });
+    try {
+      setState(() {
+        _selectedTagList.add(_tagList.where((tag) => tag.id == addedTag.id).first);
+      });
+    } on StateError catch (e) {
+      debugPrint('Can\'t fetch new tag');
+    }
   }
 
   void _onSelectTag(TagModel tag) {
