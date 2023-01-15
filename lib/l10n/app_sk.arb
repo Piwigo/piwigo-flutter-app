@@ -226,8 +226,8 @@
     "moveCategoryHUD_moving": "Presúvam album…",
     "moveCategoryHUD_moved": "Album presunutý",
     "moveCategoryError_title": "Presunutie zlyhalo",
-    "moveCategoryError_message": "Failed to move your album",
-    "categorySelection_setThumbnail": "Please select the album which will use the photo {photo} as a thumbnail.",
+    "moveCategoryError_message": "Nepodarilo sa presunúť tvoj album",
+    "categorySelection_setThumbnail": "Vyber prosím album, v ktorom bude fotka {photo} použitá na obal.",
     "@categorySelection_setThumbnail": {
         "placeholders": {
             "photo": {}
@@ -396,8 +396,8 @@
             "count": {}
         }
     },
-    "removeSelectedImage_title": "Remove Selected Image",
-    "removeSelectedImage_message": "Are you sure you want to remove this image from the selection ?",
+    "removeSelectedImage_title": "Odstrániť vybraný obrázok",
+    "removeSelectedImage_message": "Naozaj chcete odstrániť tento obrázok z výberu?",
     "downloadImage_title": "{count, plural, =0{Download Photos} =1{Download Photo} other{Download {count} Photos}}",
     "@downloadImage_title": {
         "placeholders": {
@@ -426,9 +426,9 @@
     "downloadImageFail_message": "Failed to download photo!",
     "downloadVideoFail_message": "Failed to download video!",
     "downloadVideoFail_Photos": "Video format not accepted by Photos!",
-    "imageSaveError_title": "Fail Saving Photo",
-    "imageSaveError_message": "Failed to save photo",
-    "videoSaveError_title": "Fail Saving Video",
+    "imageSaveError_title": "Nepodarilo sa uložiť fotku",
+    "imageSaveError_message": "Nepodarilo sa uložiť fotku",
+    "videoSaveError_title": "Nepodarilo sa uložiť video",
     "videoSaveError_message": "Failed to save video",
     "moveOrCopyImage_title": "{count, plural, =1{Do you want to move or copy this image ?} other{Do you want to move or copy {count} images ?}}",
     "@moveOrCopyImage_title": {
