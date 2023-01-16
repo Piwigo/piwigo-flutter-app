@@ -11,8 +11,11 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:piwigo_ng/api/api_client.dart';
 import 'package:piwigo_ng/api/authentication.dart';
+import 'package:piwigo_ng/app.dart';
 import 'package:piwigo_ng/services/preferences_service.dart';
+import 'package:piwigo_ng/services/upload_notifier.dart';
 import 'package:piwigo_ng/utils/localizations.dart';
+import 'package:provider/provider.dart';
 
 import '../services/chunked_uploader.dart';
 import '../services/notification_service.dart';
@@ -38,7 +41,7 @@ Future<void> _showUploadNotification({bool success = true}) async {
 Future<List<Map<String, dynamic>>> uploadPhotos(
   List<XFile> photos,
   int albumId, {
-  Map<String, dynamic>? info,
+  Map<String, dynamic> info = const {},
 }) async {
   List<Map<String, dynamic>> result = [];
   List<int> uploadCompletedList = [];
@@ -47,13 +50,22 @@ Future<List<Map<String, dynamic>>> uploadPhotos(
   if (url == null) return [];
   String? username = await storage.read(key: 'SERVER_USERNAME');
   String? password = await storage.read(key: 'SERVER_PASSWORD');
-  try {
-    for (var photo in photos) {
-      File? compressedFile = await compressFile(photo);
-      if (compressedFile == null) {
+  UploadNotifier uploadNotifier = App.appKey.currentContext!.read<UploadNotifier>();
+
+  for (var photo in photos) {
+    File? compressedFile;
+    UploadItem? item;
+    try {
+      if (Preferences.getRemoveMetadata) {
+        compressedFile = await compressFile(photo);
+      } else {
         compressedFile = File(photo.path);
       }
-      // todo: upload video without chunk
+      item = UploadItem(
+        file: compressedFile,
+        albumId: albumId,
+      );
+      uploadNotifier.addItem(item);
       Response? response = await uploadChunk(
         photo: compressedFile,
         category: albumId,
@@ -63,30 +75,41 @@ Future<List<Map<String, dynamic>>> uploadPhotos(
         info: info,
         onProgress: (progress) {
           debugPrint("$progress");
+          item?.progress.sink.add(progress);
         },
       );
-      print(response);
       if (response != null) {
         var data = json.decode(response.data);
-        if (data["stat"] != "fail") {
+        if (data['stat'] != 'fail') {
           result.add({
-            "name": photo.name,
-            "filename": photo.path.split("/").last,
-            "url": data["result"]["element_url"],
+            'id': data['result']['id'],
+            'name': photo.name,
+            'filename': photo.path.split('/').last,
+            'url': data['result']['element_url'],
           });
-          uploadCompletedList.add(data["result"]["id"]);
+          uploadNotifier.itemUploadCompleted(item);
+          if (Preferences.getDeleteAfterUpload) {
+            // todo: delete real file path, not the cached one.
+          }
+        } else {
+          uploadNotifier.itemUploadCompleted(item, error: true);
         }
+      } else {
+        uploadNotifier.itemUploadCompleted(item, error: true);
       }
+    } catch (e) {
+      if (item != null) {
+        uploadNotifier.itemUploadCompleted(item, error: true);
+      }
+      debugPrint("$e");
     }
-    _showUploadNotification(success: true);
-  } on DioError catch (e) {
-    _showUploadNotification(success: false);
-    debugPrint(e.message);
-  } on Error catch (e) {
-    debugPrint(e.toString());
   }
-  if (uploadCompletedList.isEmpty) return [];
-
+  if (result.isEmpty) {
+    _showUploadNotification(success: false);
+    return [];
+  }
+  _showUploadNotification(success: true);
+  uploadCompletedList = result.map<int>((e) => e['id']).toList();
   try {
     await uploadCompleted(uploadCompletedList, albumId);
     if (await methodExist('community.images.uploadCompleted')) {
@@ -103,7 +126,7 @@ Future<Response?> uploadChunk({
   required File photo,
   required int category,
   required String url,
-  Map<String, dynamic>? info,
+  Map<String, dynamic> info = const {},
   Function(double)? onProgress,
   String? username,
   String? password,
@@ -115,6 +138,11 @@ Future<Response?> uploadChunk({
     'filename': photo.path.split('/').last,
     'category': category,
   };
+
+  if (info['name'] != '' && info['name'] != null) fields['name'] = info['name'];
+  if (info['comment'] != '' && info['comment'] != null) fields['comment'] = info['comment'];
+  if (info['tag_ids'].isNotEmpty) fields['tag_ids'] = info['tag_ids'];
+  if (info['level'] != -1) fields['level'] = info['level'];
 
   ChunkedUploader chunkedUploader = ChunkedUploader(Dio(
     BaseOptions(
@@ -136,23 +164,25 @@ Future<Response?> uploadChunk({
   );
 }
 
-Future<File?> compressFile(XFile file) async {
+Future<File> compressFile(XFile file) async {
   try {
     final filePath = file.path;
     var dir = await getTemporaryDirectory();
-    String filename = filePath.split('/').last;
-    final outPath = "${dir.path}/compressed/$filename";
+    final String filename = filePath.split('/').last;
+    final outPath = "${dir.absolute.path}/$filename";
 
     var result = await FlutterImageCompress.compressAndGetFile(
       filePath,
       outPath,
-      quality: 10,
+      quality: (Preferences.getUploadQuality * 100).round(),
+      keepExif: false,
     );
-    return result;
+    debugPrint("Upload Compress $result");
+    if (result != null) return result;
   } catch (e) {
     debugPrint(e.toString());
   }
-  return null;
+  return File(file.path);
 }
 
 Future<bool> uploadCompleted(List<int> imageId, int categoryId) async {

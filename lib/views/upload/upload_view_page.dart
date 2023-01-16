@@ -134,7 +134,6 @@ class _UploadGalleryViewPage extends State<UploadViewPage> {
       'tag_ids': tagIds,
       'level': _privacyLevel,
     });
-    print(_btnController.currentState);
     if (!mounted) return;
     if (result.isEmpty) {
       _btnController.error();

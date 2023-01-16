@@ -394,43 +394,43 @@ class _SettingsViewPageState extends State<SettingsViewPage> {
               );
             }),
           ),
-          SettingsSectionItemSwitch(
-            title: appStrings.settings_photoCompress,
-            value: _compressBeforeUpload,
-            onChanged: (value) => setState(() {
-              _compressBeforeUpload = value;
-              appPreferences.setBool(
-                Preferences.compressUploadKey,
-                _compressBeforeUpload,
-              );
-            }),
-          ),
-          SettingsSectionItemSwitch(
-            title: appStrings.settings_wifiOnly,
-            value: _wifiOnly,
-            onChanged: (value) => setState(() {
-              _wifiOnly = value;
-              appPreferences.setBool(
-                Preferences.wifiUploadKey,
-                _wifiOnly,
-              );
-            }),
-          ),
+          // SettingsSectionItemSwitch(
+          //   title: appStrings.settings_photoCompress,
+          //   value: _compressBeforeUpload,
+          //   onChanged: (value) => setState(() {
+          //     _compressBeforeUpload = value;
+          //     appPreferences.setBool(
+          //       Preferences.compressUploadKey,
+          //       _compressBeforeUpload,
+          //     );
+          //   }),
+          // ),
+          // SettingsSectionItemSwitch(
+          //   title: appStrings.settings_wifiOnly,
+          //   value: _wifiOnly,
+          //   onChanged: (value) => setState(() {
+          //     _wifiOnly = value;
+          //     appPreferences.setBool(
+          //       Preferences.wifiUploadKey,
+          //       _wifiOnly,
+          //     );
+          //   }),
+          // ),
           // const SettingsSectionItemButton(
           //   title: "Auto Upload",
           //   text: "Off",
           // ),
-          SettingsSectionItemSwitch(
-            title: appStrings.settings_deleteImage,
-            value: _deleteAfterUpload,
-            onChanged: (value) => setState(() {
-              _deleteAfterUpload = value;
-              appPreferences.setBool(
-                Preferences.deleteAfterUploadKey,
-                _deleteAfterUpload,
-              );
-            }),
-          ),
+          // SettingsSectionItemSwitch(
+          //   title: appStrings.settings_deleteImage,
+          //   value: _deleteAfterUpload,
+          //   onChanged: (value) => setState(() {
+          //     _deleteAfterUpload = value;
+          //     appPreferences.setBool(
+          //       Preferences.deleteAfterUploadKey,
+          //       _deleteAfterUpload,
+          //     );
+          //   }),
+          // ),
         ],
       );
   Widget get _privacySection => SettingsSection(

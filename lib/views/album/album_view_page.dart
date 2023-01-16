@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:image_picker/image_picker.dart';
@@ -8,11 +10,13 @@ import 'package:piwigo_ng/components/scroll_widgets/album_grid_view.dart';
 import 'package:piwigo_ng/components/scroll_widgets/image_grid_view.dart';
 import 'package:piwigo_ng/models/album_model.dart';
 import 'package:piwigo_ng/models/image_model.dart';
+import 'package:piwigo_ng/services/upload_notifier.dart';
 import 'package:piwigo_ng/utils/album_actions.dart';
 import 'package:piwigo_ng/utils/image_actions.dart';
 import 'package:piwigo_ng/utils/localizations.dart';
 import 'package:piwigo_ng/views/image/image_view_page.dart';
 import 'package:piwigo_ng/views/upload/upload_view_page.dart';
+import 'package:provider/provider.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import '../../api/images.dart';
@@ -307,34 +311,80 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
   }
 
   Widget? get _adminActionsSpeedDial {
-    if (!widget.isAdmin && !widget.album.canUpload) return null;
     final Color childBackgroundColor = Theme.of(context).primaryColorLight;
     final Color childIconColor = Theme.of(context).primaryColor;
-    return SpeedDial(
-      spacing: 5,
-      overlayOpacity: 0.3,
-      overlayColor: Colors.black,
-      animatedIcon: AnimatedIcons.menu_close,
-      activeBackgroundColor: Colors.red,
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        SpeedDialChild(
-          backgroundColor: childBackgroundColor,
-          foregroundColor: childIconColor,
-          onTap: _onAddAlbum,
-          child: Icon(Icons.create_new_folder),
+        FloatingActionButton(
+          backgroundColor: Colors.grey.withOpacity(0.8),
+          onPressed: () => Navigator.of(context).popUntil((route) => route.isFirst),
+          child: Consumer<UploadNotifier>(
+            builder: (context, uploadNotifier, child) {
+              if (uploadNotifier.uploadList.isNotEmpty) {
+                UploadItem item = uploadNotifier.uploadList.first;
+                return Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    SizedBox.expand(
+                      child: StreamBuilder<double>(
+                          stream: item.progress.stream,
+                          initialData: 0.0,
+                          builder: (context, snapshot) {
+                            if (snapshot.hasData) {
+                              return CircularProgressIndicator(
+                                strokeWidth: 5.0,
+                                value: min(snapshot.data!, 1.0),
+                              );
+                            }
+                            return CircularProgressIndicator(strokeWidth: 5.0);
+                          }),
+                    ),
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        "${uploadNotifier.uploadList.length}", // todo: upload files remaining
+                        style: TextStyle(fontSize: 20),
+                      ),
+                    ),
+                  ],
+                );
+              }
+              return child!;
+            },
+            child: Icon(Icons.home, color: Colors.white),
+          ),
         ),
-        SpeedDialChild(
-          backgroundColor: childBackgroundColor,
-          foregroundColor: childIconColor,
-          onTap: _onPickImages,
-          child: Icon(Icons.add_photo_alternate),
-        ),
-        SpeedDialChild(
-          backgroundColor: childBackgroundColor,
-          foregroundColor: childIconColor,
-          onTap: _onTakePhoto,
-          child: Icon(Icons.add_a_photo),
-        ),
+        if (widget.isAdmin || widget.album.canUpload) ...[
+          SizedBox(width: 16.0),
+          SpeedDial(
+            heroTag: '<default FloatingActionButton tag>',
+            spacing: 5,
+            overlayOpacity: 0.3,
+            overlayColor: Colors.black,
+            animatedIcon: AnimatedIcons.menu_close,
+            children: [
+              SpeedDialChild(
+                backgroundColor: childBackgroundColor,
+                foregroundColor: childIconColor,
+                onTap: _onAddAlbum,
+                child: Icon(Icons.create_new_folder),
+              ),
+              SpeedDialChild(
+                backgroundColor: childBackgroundColor,
+                foregroundColor: childIconColor,
+                onTap: _onPickImages,
+                child: Icon(Icons.add_photo_alternate),
+              ),
+              SpeedDialChild(
+                backgroundColor: childBackgroundColor,
+                foregroundColor: childIconColor,
+                onTap: _onTakePhoto,
+                child: Icon(Icons.add_a_photo),
+              ),
+            ],
+          ),
+        ],
       ],
     );
   }

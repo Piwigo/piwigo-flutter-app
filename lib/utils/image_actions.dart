@@ -12,6 +12,7 @@ import 'package:piwigo_ng/components/modals/move_or_copy_modal.dart';
 import 'package:piwigo_ng/components/snackbars.dart';
 import 'package:piwigo_ng/models/album_model.dart';
 import 'package:piwigo_ng/models/image_model.dart';
+import 'package:piwigo_ng/services/preferences_service.dart';
 import 'package:piwigo_ng/utils/localizations.dart';
 import 'package:piwigo_ng/views/image/edit_image_page.dart';
 
@@ -40,7 +41,11 @@ Future<XFile?> onTakePhoto(BuildContext context) async {
     XFile? image;
     switch (choice) {
       case 0:
-        image = await picker.pickImage(source: ImageSource.camera);
+        image = await picker.pickImage(
+          source: ImageSource.camera,
+          imageQuality: (Preferences.getUploadQuality * 100).round(),
+          requestFullMetadata: Preferences.getRemoveMetadata,
+        );
         break;
       case 1:
         image = await picker.pickVideo(source: ImageSource.camera);

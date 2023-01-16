@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:piwigo_ng/services/theme_provider.dart';
+import 'package:piwigo_ng/services/upload_notifier.dart';
 import 'package:piwigo_ng/utils/LocaleProvider.dart';
 import 'package:provider/provider.dart';
 
@@ -14,13 +15,18 @@ class AppProviders extends StatelessWidget {
       create: (_) => LocaleNotifier(),
       child: ChangeNotifierProvider(
         create: (_) => ThemeNotifier(),
-        child: Consumer<LocaleNotifier>(builder: (context, localNotifier, child) {
-          return Consumer<ThemeNotifier>(
-            builder: (context, themeNotifier, child) {
-              return builder(localNotifier, themeNotifier);
+        child: ChangeNotifierProvider(
+          create: (_) => UploadNotifier(),
+          child: Consumer<LocaleNotifier>(
+            builder: (context, localNotifier, child) {
+              return Consumer<ThemeNotifier>(
+                builder: (context, themeNotifier, child) {
+                  return builder(localNotifier, themeNotifier);
+                },
+              );
             },
-          );
-        }),
+          ),
+        ),
       ),
     );
   }
