@@ -164,8 +164,6 @@ Future<List<XFile>?> downloadImages(
   bool showNotification = true,
   bool cached = false,
 }) async {
-  final isPermissionStatusGranted = await _requestPermissions();
-  if (!isPermissionStatusGranted) return null;
   String? dirPath = (await getTemporaryDirectory()).path;
   if (!cached) {
     dirPath = await Preferences.getDownloadDestination;
@@ -181,7 +179,7 @@ Future<List<XFile>?> downloadImages(
     }
   });
 
-  if (showNotification) {
+  if (showNotification && Preferences.getDownloadNotification) {
     if (files.isNotEmpty) {
       await _showDownloadNotification(
         success: true,
@@ -235,12 +233,12 @@ Future<int> deleteImages(
 
 Future<bool> deleteImage(ImageModel image) async {
   Map<String, String> queries = {
-    "format": "json",
-    "method": "pwg.images.delete",
+    'format': 'json',
+    'method': 'pwg.images.delete',
   };
   FormData formData = FormData.fromMap({
-    "image_id": image.id,
-    "pwg_token": appPreferences.getString(Preferences.tokenKey),
+    'image_id': image.id,
+    'pwg_token': appPreferences.getString(Preferences.tokenKey),
   });
   try {
     Response response = await ApiClient.post(

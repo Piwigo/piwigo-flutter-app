@@ -39,7 +39,6 @@ Future<ApiResult<List<AlbumModel>>> fetchAlbums(int albumID) async {
       List<dynamic> jsonAlbums = json.decode(response.data)['result']['categories'];
       List<AlbumModel> albums = List<AlbumModel>.from(jsonAlbums.map(
         (album) {
-          print(album);
           bool canUpload = false;
           if ((appPreferences.getBool(Preferences.isAdminKey) ?? false) ||
               uploadCategoryIdList.contains(album['id'].toString())) {

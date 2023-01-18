@@ -185,7 +185,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
     return WillPopScope(
       onWillPop: _onWillPop,
       child: AnnotatedRegion<SystemUiOverlayStyle>(
-        // Changes System overlay colors to match black background
+        /// Changes System overlay colors to match black background
         value: SystemUiOverlayStyle.light.copyWith(
           systemNavigationBarColor: Colors.black.withOpacity(0.1),
           statusBarColor: Colors.black.withOpacity(0.1),
@@ -202,8 +202,9 @@ class _ImageViewPageState extends State<ImageViewPage> {
                 children: [
                   _content,
                   _top,
-                  // Show bottom on portrait mode only
-                  // (to keep vertical space in landscape mode).
+
+                  /// Show bottom on portrait mode only
+                  /// (to keep vertical space in landscape mode).
                   if (orientation == Orientation.portrait) _bottom,
                 ],
               );
@@ -320,7 +321,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
         behavior: HitTestBehavior.opaque,
         onTap: () => _onToggleOverlay(MediaQuery.of(context).orientation),
         child: PhotoViewGallery.builder(
-          // Compatibility with PageView and PhotoView
+          /// Compatibility with PageView and PhotoView
           pageController: _pageController,
           onPageChanged: (page) => setState(() {
             _page = page;
@@ -331,10 +332,12 @@ class _ImageViewPageState extends State<ImageViewPage> {
           itemCount: _imageList.length,
           builder: (context, index) {
             final ImageModel image = _imageList[index];
-            // Check mime type of file (multiple test to ensure it is not null)
+            print(image.derivatives);
+
+            /// Check mime type of file (multiple test to ensure it is not null)
             String? mimeType = mime(image.file) ?? mime(image.elementUrl) ?? mime(image.derivatives.medium.url);
             if (mimeType != null && mimeType.startsWith('video')) {
-              // Returns video player
+              /// Returns video player
               return PhotoViewGalleryPageOptions.customChild(
                 disableGestures: true,
                 child: VideoView(
@@ -346,7 +349,8 @@ class _ImageViewPageState extends State<ImageViewPage> {
                 ),
               );
             }
-            // Default behavior: Zoomable image
+
+            /// Default behavior: Zoomable image
             return PhotoViewGalleryPageOptions(
               imageProvider: NetworkImage(
                 image.getDerivativeFromString(Preferences.getImageFullScreenSize)?.url ?? '',

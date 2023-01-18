@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:open_file/open_file.dart';
+import 'package:open_filex/open_filex.dart';
 
 final FlutterLocalNotificationsPlugin localNotification = FlutterLocalNotificationsPlugin();
 
@@ -18,7 +18,7 @@ void initLocalNotifications() {
 Future<void> onSelectNotification(NotificationResponse response) async {
   debugPrint("Notification payload: ${response.payload}");
   if (response.payload == null) return;
-  OpenResult result = await OpenFile.open(response.payload);
+  OpenResult result = await OpenFilex.open(response.payload);
   debugPrint(result.message);
 }
 

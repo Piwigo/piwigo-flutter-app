@@ -42,6 +42,7 @@ Future<ApiResult<bool>> loginUser(
     );
   }
 
+  ApiClient.cookieJar.deleteAll();
   FlutterSecureStorage secureStorage = const FlutterSecureStorage();
   await secureStorage.write(key: 'SERVER_URL', value: url);
 

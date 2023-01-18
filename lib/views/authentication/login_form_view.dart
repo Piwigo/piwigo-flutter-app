@@ -257,10 +257,10 @@ class _LoginFormViewState extends State<LoginFormView> {
                 : null,
           ),
           Padding(
-            padding: const EdgeInsets.only(top: 12),
+            padding: const EdgeInsets.only(top: 12.0),
             child: AnimatedPiwigoButton(
               controller: _btnController,
-              disabled: _urlError,
+              // disabled: _urlError,
               color: Theme.of(context).primaryColor,
               onPressed: _onLogin,
               child: Text(

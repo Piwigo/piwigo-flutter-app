@@ -45,6 +45,7 @@ Future<List<Map<String, dynamic>>> uploadPhotos(
 }) async {
   List<Map<String, dynamic>> result = [];
   List<int> uploadCompletedList = [];
+  List<UploadItem> items = [];
   FlutterSecureStorage storage = const FlutterSecureStorage();
   String? url = await storage.read(key: 'SERVER_URL');
   if (url == null) return [];
@@ -52,22 +53,28 @@ Future<List<Map<String, dynamic>>> uploadPhotos(
   String? password = await storage.read(key: 'SERVER_PASSWORD');
   UploadNotifier uploadNotifier = App.appKey.currentContext!.read<UploadNotifier>();
 
+  /// Creates Upload Item list for the upload notifier
   for (var photo in photos) {
     File? compressedFile;
-    UploadItem? item;
+    if (Preferences.getRemoveMetadata) {
+      compressedFile = await compressFile(photo);
+    } else {
+      compressedFile = File(photo.path);
+    }
+    items.add(UploadItem(
+      file: compressedFile,
+      albumId: albumId,
+    ));
+  }
+
+  uploadNotifier.addItems(items);
+
+  /// Upload loop
+  for (var item in items) {
     try {
-      if (Preferences.getRemoveMetadata) {
-        compressedFile = await compressFile(photo);
-      } else {
-        compressedFile = File(photo.path);
-      }
-      item = UploadItem(
-        file: compressedFile,
-        albumId: albumId,
-      );
-      uploadNotifier.addItem(item);
+      /// Make Request
       Response? response = await uploadChunk(
-        photo: compressedFile,
+        photo: item.file,
         category: albumId,
         url: url,
         username: username,
@@ -75,7 +82,7 @@ Future<List<Map<String, dynamic>>> uploadPhotos(
         info: info,
         onProgress: (progress) {
           debugPrint("$progress");
-          item?.progress.sink.add(progress);
+          item.progress.sink.add(progress);
         },
       );
       if (response != null) {
@@ -83,10 +90,10 @@ Future<List<Map<String, dynamic>>> uploadPhotos(
         if (data['stat'] != 'fail') {
           result.add({
             'id': data['result']['id'],
-            'name': photo.name,
-            'filename': photo.path.split('/').last,
             'url': data['result']['element_url'],
           });
+
+          /// Notify provider upload completed
           uploadNotifier.itemUploadCompleted(item);
           if (Preferences.getDeleteAfterUpload) {
             // todo: delete real file path, not the cached one.
@@ -98,17 +105,16 @@ Future<List<Map<String, dynamic>>> uploadPhotos(
         uploadNotifier.itemUploadCompleted(item, error: true);
       }
     } catch (e) {
-      if (item != null) {
-        uploadNotifier.itemUploadCompleted(item, error: true);
-      }
       debugPrint("$e");
     }
   }
-  if (result.isEmpty) {
-    _showUploadNotification(success: false);
-    return [];
+  if (Preferences.getUploadNotification) {
+    if (result.isEmpty) {
+      _showUploadNotification(success: false);
+    }
+    _showUploadNotification(success: true);
   }
-  _showUploadNotification(success: true);
+  if (result.isEmpty) return [];
   uploadCompletedList = result.map<int>((e) => e['id']).toList();
   try {
     await uploadCompleted(uploadCompletedList, albumId);
@@ -131,7 +137,10 @@ Future<Response?> uploadChunk({
   String? username,
   String? password,
 }) async {
-  Map<String, String> queries = {"format": "json", "method": "pwg.images.uploadAsync"};
+  Map<String, String> queries = {
+    'format': 'json',
+    'method': 'pwg.images.uploadAsync',
+  };
   Map<String, dynamic> fields = {
     'username': username,
     'password': password,
@@ -151,7 +160,7 @@ Future<Response?> uploadChunk({
   ));
 
   return await chunkedUploader.upload(
-    path: "/ws.php",
+    path: '/ws.php',
     filePath: photo.absolute.path,
     maxChunkSize: 100000,
     params: queries,

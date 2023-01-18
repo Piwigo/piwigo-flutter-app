@@ -14,6 +14,11 @@ class UploadNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
+  void addItems(List<UploadItem> item) {
+    _uploadList.addAll(item);
+    notifyListeners();
+  }
+
   void itemUploadCompleted(UploadItem item, {bool error = false}) {
     _uploadList.remove(item);
     item.error = error;
@@ -44,5 +49,5 @@ class UploadItem {
     required this.file,
     required this.albumId,
     this.error = false,
-  }) : progress = StreamController<double>();
+  }) : progress = StreamController<double>.broadcast();
 }

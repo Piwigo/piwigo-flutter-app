@@ -39,11 +39,11 @@ dependencies:
   flutter_secure_storage: ^6.0.0 # Local storage secured for logins
   provider: ^6.0.3 # Notifiers for theme and language changes
   image_picker: ^0.8.5+3 # Pick images from camera
-  file_picker: ^4.6.1 # Pick images and videos at a time for upload
+  file_picker: ^5.2.5 # Pick images and videos at a time for upload
 
   # Device
   flutter_local_notifications: ^12.0.2 # Throws notifications on download or upload
-  open_file: ^3.2.1 # Open files with devices apps
+  open_filex: ^4.3.2 # Open files with devices apps
   workmanager: ^0.5.0 # Background processes (auto upload)
 
   # Utils

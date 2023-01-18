@@ -16,8 +16,15 @@ import 'package:piwigo_ng/services/preferences_service.dart';
 import 'package:piwigo_ng/utils/localizations.dart';
 import 'package:piwigo_ng/views/image/edit_image_page.dart';
 
+final ImagePicker _picker = ImagePicker();
+
 Future<List<XFile>?> onPickImages() async {
   try {
+    // List<XFile> images = await _picker.pickMultiImage(
+    //   imageQuality: (Preferences.getUploadQuality * 100).round(),
+    //   requestFullMetadata: Preferences.getRemoveMetadata,
+    // );
+    // if (images.isNotEmpty) return images;
     final FilePickerResult? result = await FilePicker.platform.pickFiles(
       allowMultiple: true,
       type: FileType.media,
@@ -37,18 +44,17 @@ Future<XFile?> onTakePhoto(BuildContext context) async {
   );
   if (choice == null) return null;
   try {
-    final ImagePicker picker = ImagePicker();
     XFile? image;
     switch (choice) {
       case 0:
-        image = await picker.pickImage(
+        image = await _picker.pickImage(
           source: ImageSource.camera,
           imageQuality: (Preferences.getUploadQuality * 100).round(),
           requestFullMetadata: Preferences.getRemoveMetadata,
         );
         break;
       case 1:
-        image = await picker.pickVideo(source: ImageSource.camera);
+        image = await _picker.pickVideo(source: ImageSource.camera);
         break;
     }
     return image;

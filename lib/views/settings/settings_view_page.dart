@@ -10,8 +10,6 @@ import 'package:piwigo_ng/api/api_error.dart';
 import 'package:piwigo_ng/api/authentication.dart';
 import 'package:piwigo_ng/app.dart';
 import 'package:piwigo_ng/components/appbars/settings_app_bar.dart';
-import 'package:piwigo_ng/components/scroll_widgets/album_grid_view.dart';
-import 'package:piwigo_ng/components/scroll_widgets/image_grid_view.dart';
 import 'package:piwigo_ng/components/sections/settings_section.dart';
 import 'package:piwigo_ng/models/info_model.dart';
 import 'package:piwigo_ng/services/preferences_service.dart';
@@ -49,6 +47,8 @@ class _SettingsViewPageState extends State<SettingsViewPage> {
   late bool _compressBeforeUpload;
   late bool _wifiOnly;
   late bool _deleteAfterUpload;
+  late bool _downloadNotification;
+  late bool _uploadNotification;
   late double _quality;
 
   @override
@@ -65,6 +65,8 @@ class _SettingsViewPageState extends State<SettingsViewPage> {
     _deleteAfterUpload = Preferences.getDeleteAfterUpload;
     _wifiOnly = Preferences.getWifiUpload;
     _quality = Preferences.getUploadQuality;
+    _downloadNotification = Preferences.getDownloadNotification;
+    _uploadNotification = Preferences.getUploadNotification;
     super.initState();
     _infoFuture = getInfo();
   }
@@ -246,9 +248,10 @@ class _SettingsViewPageState extends State<SettingsViewPage> {
               ),
             ],
           ),
-          ExampleAlbumGridView(
-            albumThumbnailSize: _albumThumbnailSize,
-          ),
+          // todo: Get images dynamically from Demo servers
+          // ExampleAlbumGridView(
+          //   albumThumbnailSize: _albumThumbnailSize,
+          // ),
         ],
       );
   Widget get _photosSection => Column(
@@ -344,10 +347,11 @@ class _SettingsViewPageState extends State<SettingsViewPage> {
               ),
             ],
           ),
-          ExampleImageGridView(
-            nbImageRow: _imageRowNumber,
-            imageThumbnailSize: _imageThumbnailSize,
-          ),
+          // todo: Get images dynamically from Demo servers
+          // ExampleImageGridView(
+          //   nbImageRow: _imageRowNumber,
+          //   imageThumbnailSize: _imageThumbnailSize,
+          // ),
         ],
       );
   Widget get _uploadSection => SettingsSection(
@@ -431,6 +435,28 @@ class _SettingsViewPageState extends State<SettingsViewPage> {
           //     );
           //   }),
           // ),
+          SettingsSectionItemSwitch(
+            title: appStrings.settings_uploadNotification,
+            value: _uploadNotification,
+            onChanged: (value) => setState(() {
+              _uploadNotification = value;
+              appPreferences.setBool(
+                Preferences.uploadNotificationKey,
+                _uploadNotification,
+              );
+            }),
+          ),
+          SettingsSectionItemSwitch(
+            title: appStrings.settings_downloadNotification,
+            value: _downloadNotification,
+            onChanged: (value) => setState(() {
+              _downloadNotification = value;
+              appPreferences.setBool(
+                Preferences.downloadNotificationKey,
+                _downloadNotification,
+              );
+            }),
+          ),
         ],
       );
   Widget get _privacySection => SettingsSection(

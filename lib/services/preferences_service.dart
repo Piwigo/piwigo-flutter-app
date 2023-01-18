@@ -90,19 +90,19 @@ class Preferences {
     return appPreferences.getDouble(uploadQualityKey) ?? Settings.defaultUploadQuality;
   }
 
-  static const String downloadDestination = 'DOWNLOAD_DESTINATION';
+  static const String downloadDestinationKey = 'DOWNLOAD_DESTINATION';
   static Future<String?> get getDownloadDestination async {
-    return appPreferences.getString(downloadDestination) ?? await pickDirectoryPath();
+    return appPreferences.getString(downloadDestinationKey) ?? await pickDirectoryPath();
   }
 
-  static const String downloadNotification = 'DOWNLOAD_NOTIFICATION';
+  static const String downloadNotificationKey = 'DOWNLOAD_NOTIFICATION';
   static bool get getDownloadNotification {
-    return appPreferences.getBool(downloadNotification) ?? true;
+    return appPreferences.getBool(downloadNotificationKey) ?? true;
   }
 
-  static const String uploadNotification = 'UPLOAD_NOTIFICATION';
+  static const String uploadNotificationKey = 'UPLOAD_NOTIFICATION';
   static bool get getUploadNotification {
-    return appPreferences.getBool(uploadNotification) ?? true;
+    return appPreferences.getBool(uploadNotificationKey) ?? true;
   }
 
   // ------------ Set preferences ------------
