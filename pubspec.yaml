@@ -78,8 +78,6 @@ flutter:
   assets:
     - assets/logo/piwigo_logo.png
     - assets/
-    - assets/example/
-    - assets/example/weird_cat/
 
   # To add custom fonts to your application, add a fonts section here,
   # in this "flutter" section. Each entry in this list should have a
