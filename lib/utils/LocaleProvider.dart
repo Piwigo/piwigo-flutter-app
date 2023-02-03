@@ -8,7 +8,6 @@ class LocaleNotifier extends ChangeNotifier {
   late Locale _locale;
 
   LocaleNotifier() {
-    _locale = Locale('en');
     _loadFromPrefs();
   }
 
@@ -21,7 +20,7 @@ class LocaleNotifier extends ChangeNotifier {
   }
 
   _loadFromPrefs() {
-    _locale = Locale(appPreferences.getString(key) ?? Platform.localeName.substring(0, 1));
+    _locale = Locale(appPreferences.getString(key) ?? Platform.localeName.split('_').first);
     notifyListeners();
   }
 

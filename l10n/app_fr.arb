@@ -84,7 +84,7 @@
     "logoutConfirmation_title": "Déconnexion",
     "logoutConfirmation_message": "Êtes-vous sûr de vouloir vous déconnecter ?",
     "logoutFail_title": "Echec de la Déconnexion",
-    "albumCount": "{count, plural, one {} =0{0 albums} =1{1 album} other{{count} albums}}",
+    "albumCount": "{count, plural, =0{0 albums} =1{1 album} other{{count} albums}}",
     "@albumCount": {
         "placeholders": {
             "count": {}
@@ -179,7 +179,7 @@
     "refreshCategoryError_title": "Impossible d'actualiser",
     "refreshCategoryError_message": "Impossible d'actualiser la miniature de votre album",
     "deleteCategory_title": "EFFACER L'ALBUM",
-    "deleteCategory_message": "{count, plural, =0{ÊTES VOUS SÛR DE VOULOIR SUPPRIMER L'ALBUM {album}} =1{ÊTES VOUS SÛR DE VOULOIR SUPPRIMER L'ALBUM {album} ET SA PHOTO} other{ÊTES VOUS SÛR DE VOULOIR SUPPRIMER L'ALBUM {album} ET SES {count} PHOTOS ?}",
+    "deleteCategory_message": "{count, plural, =0{ÊTES VOUS SÛR DE VOULOIR SUPPRIMER L'ALBUM {album}} =1{ÊTES VOUS SÛR DE VOULOIR SUPPRIMER L'ALBUM {album} ET SA PHOTO} other{ÊTES VOUS SÛR DE VOULOIR SUPPRIMER L'ALBUM {album} ET SES {count} PHOTOS ?}}",
     "@deleteCategory_message": {
         "placeholders": {
             "count": {},
@@ -247,7 +247,7 @@
     "categoryImageSetError_title": "Echec d'affectation",
     "categoryImageSetError_message": "Impossible de changer la photo de l’album",
     "singleImage": "Photo",
-    "imageCount": "{count, plural, one {} =0{0 photos} =1{1 photo} other{{count} photos}}",
+    "imageCount": "{count, plural, =0{0 photos} =1{1 photo} other{{count} photos}}",
     "@imageCount": {
         "placeholders": {
             "count": {}
@@ -315,7 +315,7 @@
     "none": "aucun",
     "tag": "Tag",
     "tags": "Tags",
-    "tagCount": "{count, plural, one {} =0{0 tags} =1{1 tag} other{{count} tags}}",
+    "tagCount": "{count, plural, =0{0 tags} =1{1 tag} other{{count} tags}}",
     "@tagCount": {
         "placeholders": {
             "count": {}
@@ -342,7 +342,7 @@
     "selectAll": "Tout Sélectionner",
     "selectLimit": "Limite de sélection atteinte",
     "renameImage_title": "Fichier d'origine",
-    "renameImage_message": "Entrez un nouveau nom de fichier pour cette photo",
+    "renameImage_message": "Entrez un nouveau nom de fichier pour cette photo \"{file}\"",
     "@renameImage_message": {
         "placeholders": {
             "file": {}
@@ -741,7 +741,7 @@
             "count": {}
         }
     },
-    "commentCount": "{count, plural, one {} =0{0 commentaires} =1{1 commentaire} other{{count} commentaires}}",
+    "commentCount": "{count, plural, =0{0 commentaires} =1{1 commentaire} other{{count} commentaires}}",
     "@commentCount": {
         "placeholders": {
             "count": {}

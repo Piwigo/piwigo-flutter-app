@@ -85,13 +85,13 @@
     "logoutConfirmation_title": "Abmelden",
     "logoutConfirmation_message": "Wollen Sie sich wirklich abmelden?",
     "logoutFail_title": "Abmeldung fehlgeschlagen",
-    "albumCount": "{count, plural, one {} =0{0 Alben} =1{1 Album} other{{count} Alben}}",
+    "albumCount": "{count, plural, =0{0 Alben} =1{1 Album} other{{count} Alben}}",
     "@albumCount": {
         "placeholders": {
             "count": {}
         }
     },
-    "subAlbumCount": "{count, plural, one {}=0{0 Unteralben} =1{1 Unteralbum} other{{count} Unteralben}}",
+    "subAlbumCount": "{count, plural,=0{0 Unteralben} =1{1 Unteralbum} other{{count} Unteralben}}",
     "@subAlbumCount": {
         "placeholders": {
             "count": {}
@@ -180,7 +180,7 @@
     "refreshCategoryError_title": "Aktualisierung fehlgeschlagen",
     "refreshCategoryError_message": "Fehler beim Aktualisieren des Referenzfotos",
     "deleteCategory_title": "ALBUM LÖSCHEN",
-    "deleteCategory_message": "{count, plural, =0{SOLL DAS ALBUM {album} WIRKLICH GELÖSCHT WERDEN} =1{SOLL DAS ALBUM {album} UND DAS ENTHALTENE FOTO WIRKLICH GELÖSCHT WERDEN} other{SOLL DAS ALBUM {album} UND SÄMTLICHE {count} FOTOS GELÖSCHT WERDEN ?}",
+    "deleteCategory_message": "{count, plural, =0{SOLL DAS ALBUM {album} WIRKLICH GELÖSCHT WERDEN} =1{SOLL DAS ALBUM {album} UND DAS ENTHALTENE FOTO WIRKLICH GELÖSCHT WERDEN} other{SOLL DAS ALBUM {album} UND SÄMTLICHE {count} FOTOS GELÖSCHT WERDEN ?}}",
     "@deleteCategory_message": {
         "placeholders": {
             "count": {},
@@ -190,7 +190,7 @@
     "deleteCategory_empty": "Leeres Album löschen",
     "deleteCategory_noImages": "Fotos behalten",
     "deleteCategory_orphanedImages": "Verwaiste Bilder löschen",
-    "deleteCategory_allImages": "{count, plural, one {} =0{Fotos löschen} =1{Foto löschen} other{{count} Fotos löschen}}",
+    "deleteCategory_allImages": "{count, plural, =0{Fotos löschen} =1{Foto löschen} other{{count} Fotos löschen}}",
     "@deleteCategory_allImages": {
         "placeholders": {
             "count": {}
@@ -248,7 +248,7 @@
     "categoryImageSetError_title": "Foto-Einstellungsfehler",
     "categoryImageSetError_message": "Albumfoto konnte nicht gesetzt werden",
     "singleImage": "Foto",
-    "imageCount": "{count, plural, one {} =0{0 Fotos} =1{1 Foto} other{{count} Fotos}}",
+    "imageCount": "{count, plural, =0{0 Fotos} =1{1 Foto} other{{count} Fotos}}",
     "@imageCount": {
         "placeholders": {
             "count": {}
@@ -294,7 +294,7 @@
     "editImageDetails_dateMonthDec": "-1 Monat",
     "editImageDetails_dateYearInc": "+1 Jahr",
     "editImageDetails_dateYearDec": "-1 Jahr",
-    "editImageDetailsHUD_updating": "{count, plural, one {} =1{Foto aktualiieren…} other{Fotos aktualisieren…}}",
+    "editImageDetailsHUD_updating": "{count, plural, =1{Foto aktualiieren…} other{Fotos aktualisieren…}}",
     "@editImageDetailsHUD_updating": {
         "placeholders": {
             "count": {}
@@ -315,7 +315,7 @@
     "none": "Keine",
     "tag": "Schlagwort",
     "tags": "Schlagworte",
-    "tagCount": "{count, plural, one {} =0{0 Schlagworte} =1{1 tag} other{{count} Schlagworte}}",
+    "tagCount": "{count, plural, =0{0 Schlagworte} =1{1 tag} other{{count} Schlagworte}}",
     "@tagCount": {
         "placeholders": {
             "count": {}
@@ -333,7 +333,7 @@
     "tagsAddError_message": "Erstellen des neuen Schlagwortes fehlgeschlagen",
     "tagsAddError_title": "Erstellen fehlgeschlagen",
     "selectImages": "Fotos auswählen",
-    "selectImageSelectedCount": "{count, plural, one {} =0{0 Fotos ausgewählt} =1{1 Foto ausgewählt} other{{count} Fotos ausgewählt}}",
+    "selectImageSelectedCount": "{count, plural, =0{0 Fotos ausgewählt} =1{1 Foto ausgewählt} other{{count} Fotos ausgewählt}}",
     "@selectImageSelectedCount": {
         "placeholders": {
             "count": {}
@@ -349,7 +349,7 @@
         }
     },
     "renameImageHUD_label": "Datei umbenennen…",
-    "renameImageHUD_renamed": "{count, plural, one {} =0{0 Dateien umbenannt} =1{Datei umbenannt} other{{count} Dateien umbenannt}}",
+    "renameImageHUD_renamed": "{count, plural, =0{0 Dateien umbenannt} =1{Datei umbenannt} other{{count} Dateien umbenannt}}",
     "@renameImageHUD_renamed": {
         "placeholders": {
             "count": {}
@@ -363,20 +363,20 @@
             "count": {}
         }
     },
-    "deleteImageCount_title": "{count, plural, one {} =0{Fotos löschen} =1{Foto löschen} other{{count} Fotos löschen}}",
+    "deleteImageCount_title": "{count, plural, =0{Fotos löschen} =1{Foto löschen} other{{count} Fotos löschen}}",
     "@deleteImageCount_title": {
         "placeholders": {
             "count": {}
         }
     },
-    "deleteImageHUD_deleting": "{count, plural, one {} =0{Fotos löschen…} =1{Foto löschen…} other{Fotos löschen…}}",
+    "deleteImageHUD_deleting": "{count, plural, =0{Fotos löschen…} =1{Foto löschen…} other{Fotos löschen…}}",
     "@deleteImageHUD_deleting": {
         "placeholders": {
             "count": {}
         }
     },
     "removeSingleImage_title": "Aus Album entfernen",
-    "removeImageHUD_removing": "{count, plural, one {} =0{Fotos entfernen…} =1{Foto entfernen…} other{Fotos entfernen…}}",
+    "removeImageHUD_removing": "{count, plural, =0{Fotos entfernen…} =1{Foto entfernen…} other{Fotos entfernen…}}",
     "@removeImageHUD_removing": {
         "placeholders": {
             "count": {}
@@ -390,7 +390,7 @@
     },
     "deleteImageFail_title": "Löschen fehlgeschlagen",
     "deleteImageFail_message": "Foto konnte nicht gelöscht werden.",
-    "deleteImageSuccess_message": "{count, plural, one {} =0{0 Bilder erfolgreich gelöscht} =1{1 Foto erfolgreich gelöscht} other{{count} Fotos erfolgreich gelöscht}}",
+    "deleteImageSuccess_message": "{count, plural, =0{0 Bilder erfolgreich gelöscht} =1{1 Foto erfolgreich gelöscht} other{{count} Fotos erfolgreich gelöscht}}",
     "@deleteImageSuccess_message": {
         "placeholders": {
             "count": {}
@@ -398,25 +398,25 @@
     },
     "removeSelectedImage_title": "Ausgewähltes Bild entfernen",
     "removeSelectedImage_message": "Soll dieses Bild wirklich aus der Auswahl entfernt werden?",
-    "downloadImage_title": "{count, plural, one {} =0{Fotos herunterladen} =1{Foto herunterladen} other{{count} Fotos herunterladen}}",
+    "downloadImage_title": "{count, plural, =0{Fotos herunterladen} =1{Foto herunterladen} other{{count} Fotos herunterladen}}",
     "@downloadImage_title": {
         "placeholders": {
             "count": {}
         }
     },
-    "downloadImage_confirmation": "{count, plural, one {} =1{Soll das ausgewählte Foto wirklich heruntergeladen werden?} other{Sollen die ausgewählten {count} Fotos wirklich alle heruntergeladen werden?}}",
+    "downloadImage_confirmation": "{count, plural, =1{Soll das ausgewählte Foto wirklich heruntergeladen werden?} other{Sollen die ausgewählten {count} Fotos wirklich alle heruntergeladen werden?}}",
     "@downloadImage_confirmation": {
         "placeholders": {
             "count": {}
         }
     },
-    "downloadingImages": "{count, plural, one {} =1{Foto herunterladen} other{Fotos herunterladen}}",
+    "downloadingImages": "{count, plural, =1{Foto herunterladen} other{Fotos herunterladen}}",
     "@downloadingImages": {
         "placeholders": {
             "count": {}
         }
     },
-    "downloadingVideos": "{count, plural, one {} =1{Video herunterladen} other{Videos herunterladen}}",
+    "downloadingVideos": "{count, plural, =1{Video herunterladen} other{Videos herunterladen}}",
     "@downloadingVideos": {
         "placeholders": {
             "count": {}
@@ -430,21 +430,21 @@
     "imageSaveError_message": "Fehler beim Speichern des Fotos",
     "videoSaveError_title": "Fehler beim Speichern des Videos",
     "videoSaveError_message": "Fehler beim Speichern des Videos",
-    "moveOrCopyImage_title": "{count, plural, one {} =1{Soll dieses Bild verschoben oder kopiert werden ?} other{Sollen {count} Bilder verschoben oder kopiert werden ?}}",
+    "moveOrCopyImage_title": "{count, plural, =1{Soll dieses Bild verschoben oder kopiert werden ?} other{Sollen {count} Bilder verschoben oder kopiert werden ?}}",
     "@moveOrCopyImage_title": {
         "placeholders": {
             "count": {}
         }
     },
     "moveImage_title": "In Album verschieben",
-    "moveImage_selectAlbum": "{count, plural, one {} =1{Bitte Album auswählen, in welches das Foto {photo} verschoben werden soll.} other{Bitte Album auswählen, in welches die Fotos verschoben werden sollen.}}",
+    "moveImage_selectAlbum": "{count, plural, =1{Bitte Album auswählen, in welches das Foto {photo} verschoben werden soll.} other{Bitte Album auswählen, in welches die Fotos verschoben werden sollen.}}",
     "@moveImage_selectAlbum": {
         "placeholders": {
             "count": {},
             "photo": {}
         }
     },
-    "moveImage_message": "{count, plural, one {} =1{Soll das Foto {photo} ins Album {album} verschoben werden?} other{Sollen die Fotos ins Album {album} verschoben werden?}}",
+    "moveImage_message": "{count, plural, =1{Soll das Foto {photo} ins Album {album} verschoben werden?} other{Sollen die Fotos ins Album {album} verschoben werden?}}",
     "@moveImage_message": {
         "placeholders": {
             "count": {},
@@ -452,34 +452,34 @@
             "album": {}
         }
     },
-    "moveImageHUD_moving": "{count, plural, one {} =1{Foto verschieben…} other{Fotos verschieben…}}",
+    "moveImageHUD_moving": "{count, plural, =1{Foto verschieben…} other{Fotos verschieben…}}",
     "@moveImageHUD_moving": {
         "placeholders": {
             "count": {}
         }
     },
-    "moveImageHUD_moved": "{count, plural, one {} =1{Foto verschoben} other{Fotos verschoben}}",
+    "moveImageHUD_moved": "{count, plural, =1{Foto verschoben} other{Fotos verschoben}}",
     "@moveImageHUD_moved": {
         "placeholders": {
             "count": {}
         }
     },
     "moveImageError_title": "Verschieben fehlgeschlagen",
-    "moveImageError_message": "{count, plural, one {} =1{Verschieben des Fotos fehlgeschlagen} other{Verschieben einiger Fotos fehlgeschlagen}}",
+    "moveImageError_message": "{count, plural, =1{Verschieben des Fotos fehlgeschlagen} other{Verschieben einiger Fotos fehlgeschlagen}}",
     "@moveImageError_message": {
         "placeholders": {
             "count": {}
         }
     },
     "copyImage_title": "In Album kopieren",
-    "copyImage_selectAlbum": "{count, plural, one {} =1{Bitte Album auswählen, in welches das Foto {photo} verschoben werden soll.} other{Bitte Album auswählen, in welches die Fotos verschoben werden sollen.}}",
+    "copyImage_selectAlbum": "{count, plural, =1{Bitte Album auswählen, in welches das Foto {photo} verschoben werden soll.} other{Bitte Album auswählen, in welches die Fotos verschoben werden sollen.}}",
     "@copyImage_selectAlbum": {
         "placeholders": {
             "count": {},
             "photo": {}
         }
     },
-    "copyImage_message": "{count, plural, one {} =1{Soll das Foto {photo} ins Album {album} verschoben werden?} other{Sollen die Fotos ins Album {album} verschoben werden?}}",
+    "copyImage_message": "{count, plural, =1{Soll das Foto {photo} ins Album {album} verschoben werden?} other{Sollen die Fotos ins Album {album} verschoben werden?}}",
     "@copyImage_message": {
         "placeholders": {
             "count": {},
@@ -487,20 +487,20 @@
             "album": {}
         }
     },
-    "copyImageHUD_copying": "{count, plural, one {} =1{Foto kopieren…} other{Fotos kopieren…}}",
+    "copyImageHUD_copying": "{count, plural, =1{Foto kopieren…} other{Fotos kopieren…}}",
     "@copyImageHUD_copying": {
         "placeholders": {
             "count": {}
         }
     },
-    "copyImageHUD_copied": "{count, plural, one {} =1{Foto kopiert} other{Fotos kopiert}}",
+    "copyImageHUD_copied": "{count, plural, =1{Foto kopiert} other{Fotos kopiert}}",
     "@copyImageHUD_copied": {
         "placeholders": {
             "count": {}
         }
     },
     "copyImageError_title": "Kopieren fehlgeschlagen",
-    "copyImageError_message": "{count, plural, one {} =1{Kopieren des Fotos fehlgeschlagen} other{Kopieren einiger Fotos fehlgeschlagen}}",
+    "copyImageError_message": "{count, plural, =1{Kopieren des Fotos fehlgeschlagen} other{Kopieren einiger Fotos fehlgeschlagen}}",
     "@copyImageError_message": {
         "placeholders": {
             "count": {}
@@ -528,19 +528,19 @@
     "imageUploadTableCell_uploading": "Hochladen...",
     "imageUploadTableCell_uploaded": "Hochgeladen",
     "imageUploadTableCell_finishing": "Beenden...",
-    "imageUploadClearFailed": "{count, plural, one {} =1{Fehlgeschlagener Upload zurücksetzen} other{{count} fehlgeschlagenene Uploads zurücksetzen}}",
+    "imageUploadClearFailed": "{count, plural, =1{Fehlgeschlagener Upload zurücksetzen} other{{count} fehlgeschlagenene Uploads zurücksetzen}}",
     "@imageUploadClearFailed": {
         "placeholders": {
             "count": {}
         }
     },
-    "imageUploadClearCompleted": "{count, plural, one {} =1{Abgeschlossener Upload zurücksetzen} other{{count} abgeschlossene Uploads zurücksetzen}}",
+    "imageUploadClearCompleted": "{count, plural, =1{Abgeschlossener Upload zurücksetzen} other{{count} abgeschlossene Uploads zurücksetzen}}",
     "@imageUploadClearCompleted": {
         "placeholders": {
             "count": {}
         }
     },
-    "imageUploadResume": "{count, plural, one {} =1{Upload fortsetzen} other{{count} Uploads fortsetzen}}",
+    "imageUploadResume": "{count, plural, =1{Upload fortsetzen} other{{count} Uploads fortsetzen}}",
     "@imageUploadResume": {
         "placeholders": {
             "count": {}
@@ -726,19 +726,19 @@
     "settings_switchPalette": "Automatisch",
     "settings_brightness": "Helligkeit",
     "settings_brightnessHelp": "Bei geringer Umgebungshelligkeit verwendet die Option »Automatisch« eine dunklere Farbpalette, um Fotos vor einem dunkleren Hintergrund hervorzuheben.",
-    "userCount": "{count, plural, one {} =0{0 Benutzer} =1{1 Benutzer} other{{count} Benutzer}}",
+    "userCount": "{count, plural, =0{0 Benutzer} =1{1 Benutzer} other{{count} Benutzer}}",
     "@userCount": {
         "placeholders": {
             "count": {}
         }
     },
-    "groupCount": "{count, plural, one {} =0{0 Gruppen} =1{1 Gruppe} other{{count} Gruppen}}",
+    "groupCount": "{count, plural, =0{0 Gruppen} =1{1 Gruppe} other{{count} Gruppen}}",
     "@groupCount": {
         "placeholders": {
             "count": {}
         }
     },
-    "commentCount": "{count, plural, one {} =0{0 Kommentare} =1{1 Kommentar} other{{count} Kommentare}}",
+    "commentCount": "{count, plural, =0{0 Kommentare} =1{1 Kommentar} other{{count} Kommentare}}",
     "@commentCount": {
         "placeholders": {
             "count": {}
