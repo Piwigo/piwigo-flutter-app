@@ -86,6 +86,15 @@ class Preferences {
     return Settings.sortFromValue(sortValue);
   }
 
+  static const String imageSortKey = 'IMAGE_SORT';
+  static SortMethods get getImageSort {
+    String? sortValue = appPreferences.getString(imageSortKey);
+    if (sortValue == null) {
+      return Settings.defaultImageSort;
+    }
+    return Settings.sortFromValue(sortValue);
+  }
+
   static const String albumThumbnailSizeKey = 'ALBUM_THUMBNAIL_SIZE';
 
   static String get getAlbumThumbnailSize {
