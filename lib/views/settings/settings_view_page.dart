@@ -433,17 +433,17 @@ class _SettingsViewPageState extends State<SettingsViewPage> {
           //     );
           //   }),
           // ),
-          // SettingsSectionItemSwitch(
-          //   title: appStrings.settings_wifiOnly,
-          //   value: _wifiOnly,
-          //   onChanged: (value) => setState(() {
-          //     _wifiOnly = value;
-          //     appPreferences.setBool(
-          //       Preferences.wifiUploadKey,
-          //       _wifiOnly,
-          //     );
-          //   }),
-          // ),
+          SettingsSectionItemSwitch(
+            title: appStrings.settings_wifiOnly,
+            value: _wifiOnly,
+            onChanged: (value) => setState(() {
+              _wifiOnly = value;
+              appPreferences.setBool(
+                Preferences.wifiUploadKey,
+                _wifiOnly,
+              );
+            }),
+          ),
           // const SettingsSectionItemButton(
           //   title: "Auto Upload",
           //   text: "Off",

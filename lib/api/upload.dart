@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -12,6 +13,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:piwigo_ng/api/api_client.dart';
 import 'package:piwigo_ng/api/authentication.dart';
 import 'package:piwigo_ng/app.dart';
+import 'package:piwigo_ng/components/dialogs/confirm_dialog.dart';
 import 'package:piwigo_ng/services/preferences_service.dart';
 import 'package:piwigo_ng/services/upload_notifier.dart';
 import 'package:piwigo_ng/utils/localizations.dart';
@@ -43,6 +45,21 @@ Future<List<Map<String, dynamic>>> uploadPhotos(
   int albumId, {
   Map<String, dynamic> info = const {},
 }) async {
+  /// Check if Wifi is enabled and working
+  if (Preferences.getWifiUpload) {
+    var connectivity = await Connectivity().checkConnectivity();
+    if (connectivity != ConnectivityResult.wifi) {
+      if (!(await showConfirmDialog(
+        App.navigatorKey.currentContext!,
+        title: appStrings.uploadNoWiFiNetwork,
+        cancel: appStrings.alertCancelButton,
+        confirm: appStrings.imageUploadDetailsButton_title,
+      ))) {
+        return [];
+      }
+    }
+  }
+
   List<Map<String, dynamic>> result = [];
   List<int> uploadCompletedList = [];
   List<UploadItem> items = [];

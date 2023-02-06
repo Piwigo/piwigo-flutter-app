@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:piwigo_ng/services/locale_provider.dart';
 import 'package:piwigo_ng/services/theme_provider.dart';
 import 'package:piwigo_ng/services/upload_notifier.dart';
-import 'package:piwigo_ng/utils/LocaleProvider.dart';
 import 'package:provider/provider.dart';
 
 class AppProviders extends StatelessWidget {

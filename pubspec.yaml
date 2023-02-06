@@ -18,6 +18,7 @@ dependencies:
   dio: ^4.0.6 # Requests to API
   dio_cookie_manager: ^2.0.0 # Compatibility between dio and cookie_far
   cookie_jar: ^3.0.1 # Handles cookies
+  connectivity_plus: ^3.0.2 # Check if Wifi is enabled
 
   # UI
   auto_size_text: ^3.0.0 # Text that auto-sizes (image thumbnail title)
