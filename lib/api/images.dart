@@ -14,6 +14,7 @@ import 'package:piwigo_ng/models/image_model.dart';
 import 'package:piwigo_ng/services/notification_service.dart';
 import 'package:piwigo_ng/services/preferences_service.dart';
 import 'package:piwigo_ng/utils/localizations.dart';
+import 'package:piwigo_ng/utils/settings.dart';
 import 'package:share_plus/share_plus.dart';
 
 import 'albums.dart';
@@ -48,11 +49,12 @@ Future<ApiResult<ImageModel>> getImage(int imageId) async {
 
 Future<ApiResult<List<ImageModel>>> fetchImages(int albumID, int page) async {
   Map<String, dynamic> queries = {
-    "format": "json",
-    "method": "pwg.categories.getImages",
-    "cat_id": albumID,
-    "per_page": "100",
-    "page": page.toString(),
+    'format': 'json',
+    'method': 'pwg.categories.getImages',
+    'cat_id': albumID,
+    'order': Preferences.getImageSort.value,
+    'per_page': Settings.defaultElementPerPage,
+    'page': page,
   };
 
   try {

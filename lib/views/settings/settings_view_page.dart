@@ -42,6 +42,7 @@ class _SettingsViewPageState extends State<SettingsViewPage> {
   late String _imageThumbnailSize;
   late String _albumThumbnailSize;
   late String _imageFullScreenSize;
+  late SortMethods _imageSort;
   late bool _stripMetadata;
   late String _author;
   late bool _compressBeforeUpload;
@@ -57,6 +58,7 @@ class _SettingsViewPageState extends State<SettingsViewPage> {
     _thumbnailTitle = Preferences.getShowThumbnailTitle;
     _imageThumbnailSize = Preferences.getImageThumbnailSize;
     _imageFullScreenSize = Preferences.getImageFullScreenSize;
+    _imageSort = Preferences.getImageSort;
     _albumThumbnailSize = Preferences.getAlbumThumbnailSize;
     _availableSizes = Preferences.getAvailableSizes;
     _author = Preferences.getUploadAuthor ?? '';
@@ -263,12 +265,11 @@ class _SettingsViewPageState extends State<SettingsViewPage> {
                 title: appStrings.defaultThumbnailFile320px,
                 value: _imageThumbnailSize,
                 onChanged: (size) {
-                  if (size != null) {
-                    setState(() {
-                      _imageThumbnailSize = size;
-                      appPreferences.setString(Preferences.imageThumbnailSizeKey, _imageThumbnailSize);
-                    });
-                  }
+                  if (size == null) return;
+                  setState(() {
+                    _imageThumbnailSize = size;
+                    appPreferences.setString(Preferences.imageThumbnailSizeKey, _imageThumbnailSize);
+                  });
                 },
                 selectedItemBuilder: (context) {
                   return List.generate(_availableSizes.length, (index) {
@@ -291,15 +292,11 @@ class _SettingsViewPageState extends State<SettingsViewPage> {
                 title: appStrings.defaultPreviewFile320px,
                 value: _imageFullScreenSize,
                 onChanged: (size) {
-                  if (size != null) {
-                    setState(() {
-                      _imageFullScreenSize = size;
-                      appPreferences.setString(
-                        Preferences.imageFullScreenSizeKey,
-                        _imageFullScreenSize,
-                      );
-                    });
-                  }
+                  if (size == null) return;
+                  setState(() {
+                    _imageFullScreenSize = size;
+                    appPreferences.setString(Preferences.imageFullScreenSizeKey, _imageFullScreenSize);
+                  });
                 },
                 selectedItemBuilder: (context) {
                   return List.generate(_availableSizes.length, (index) {
@@ -313,6 +310,33 @@ class _SettingsViewPageState extends State<SettingsViewPage> {
                     value: size,
                     child: Text(
                       "${photoSize(size)} ${Settings.getDerivativeRatio(size)}",
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                  );
+                }),
+              ),
+              SettingsSectionDropdown<SortMethods>(
+                title: appStrings.defaultImageSort,
+                value: _imageSort,
+                onChanged: (sort) {
+                  if (sort == null) return;
+                  setState(() {
+                    _imageSort = sort;
+                    appPreferences.setString(Preferences.imageSortKey, _imageSort.value);
+                  });
+                },
+                selectedItemBuilder: (context) {
+                  return List.generate(SortMethods.values.length, (index) {
+                    SortMethods method = SortMethods.values[index];
+                    return Center(child: Text("${method.label}"));
+                  });
+                },
+                items: List.generate(SortMethods.values.length, (index) {
+                  SortMethods method = SortMethods.values[index];
+                  return DropdownMenuItem<SortMethods>(
+                    value: method,
+                    child: Text(
+                      "${method.label}",
                       style: Theme.of(context).textTheme.bodyMedium,
                     ),
                   );

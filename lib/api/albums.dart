@@ -9,6 +9,18 @@ import 'package:piwigo_ng/services/preferences_service.dart';
 import 'api_client.dart';
 import 'authentication.dart';
 
+Map<String, dynamic> tryParseJson(String data) {
+  try {
+    return json.decode(data);
+  } on FormatException catch (e) {
+    debugPrint('Invalid json data');
+    int start = data.indexOf('{');
+    int end = data.lastIndexOf('}');
+    String parsedData = data.substring(start, end + 1);
+    return json.decode(parsedData);
+  }
+}
+
 Future<ApiResult<List<AlbumModel>>> fetchAlbums(int albumID) async {
   final Map<String, dynamic> queries = {
     'format': 'json',
@@ -35,8 +47,11 @@ Future<ApiResult<List<AlbumModel>>> fetchAlbums(int albumID) async {
       queryParameters: queries,
     );
 
+    debugPrint('hello');
+    debugPrint(response.data.toString());
+
     if (response.statusCode == 200) {
-      List<dynamic> jsonAlbums = json.decode(response.data)['result']['categories'];
+      List<dynamic> jsonAlbums = tryParseJson(response.data)['result']['categories'];
       List<AlbumModel> albums = List<AlbumModel>.from(jsonAlbums.map(
         (album) {
           bool canUpload = false;

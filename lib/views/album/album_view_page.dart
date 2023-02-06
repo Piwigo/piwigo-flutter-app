@@ -185,7 +185,7 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
                             child: Padding(
                               padding: const EdgeInsets.all(8),
                               child: Text(
-                                appStrings.imageCount(_currentAlbum.nbImages),
+                                appStrings.imageCount(_currentAlbum.nbTotalImages),
                                 style: Theme.of(context).textTheme.titleSmall,
                               ),
                             ),
@@ -392,9 +392,10 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
   Widget _albumGrid(AsyncSnapshot snapshot) {
     if (_albumList.isEmpty) {
       final ApiResult<List<AlbumModel>> result = snapshot.data!.first as ApiResult<List<AlbumModel>>;
+      List<AlbumModel> albums = _parseAlbums(result.data!);
+      if (albums.isEmpty) return const SizedBox();
       _albumList = _parseAlbums(result.data!);
     }
-    if (_albumList.isEmpty) return const SizedBox();
     return AlbumGridView(
       isAdmin: widget.isAdmin,
       albumList: _albumList,
@@ -410,17 +411,18 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
       final ApiResult<List<ImageModel>> result = snapshot.data!.last as ApiResult<List<ImageModel>>;
       if (result.hasError || !result.hasData) {
         return Center(
-          child: Text(appStrings.noImages),
+          child: Text(appStrings.categoryImageList_noDataError),
         );
       }
       _imageList = result.data!;
       WidgetsBinding.instance.addPostFrameCallback((timeStamp) => setState(() {}));
     }
-    if (_imageList.isEmpty) {
-      return Center(
-        child: Text(appStrings.noImages),
-      );
-    }
+    // todo: useless display
+    // if (_imageList.isEmpty) {
+    //   return Center(
+    //     child: Text(appStrings.noImages),
+    //   );
+    // }
     _selectedList = _imageList.where((image) => _selectedList.contains(image)).toList();
     return ImageGridView(
       imageList: _imageList,
