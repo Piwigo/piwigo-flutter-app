@@ -71,7 +71,7 @@
     "serverConnectionError_title": "连接失败",
     "serverConnectionError_message": "无法建立安全的 HTTPS 连接。请检查地址或尝试未加密的 HTTP模式？",
     "serverVersionNotCompatible_title": "服务器不兼容",
-    "serverVersionNotCompatible_message": "您的Piwigo服务器版本为 %@. Piwigo Mobile仅支持高于2.8的版本。请更新您的服务器使用Piwigo Mobile。您仍然要继续吗？",
+    "serverVersionNotCompatible_message": "您的Piwigo服务器版本为 {version}. Piwigo Mobile仅支持高于2.8的版本。请更新您的服务器使用Piwigo Mobile。您仍然要继续吗？",
     "@serverVersionNotCompatible_message": {
         "placeholders": {
             "version": {}
@@ -103,7 +103,7 @@
         }
     },
     "showPhotos": "显示照片",
-    "categoryMainEmtpy": "您的Piwigo没有相册。\n您可以尝试下拉刷新或重新登录。",
+    "categoryMainEmpty": "您的Piwigo没有相册。\n您可以尝试下拉刷新或重新登录。",
     "categoryImageList_selectButton": "选择",
     "categoryImageList_deselectButton": "取消选择",
     "categoryImageList_noDataError": "错误：没有数据",
@@ -150,7 +150,7 @@
     "categoryUpload_take": "拍照",
     "setDefaultCategory_select": "请选择一个相册或子相册作为新的根相册",
     "setDefaultCategory_title": "默认相册",
-    "setDefaultCategory_message": "您确定要设置相册\"%@\"作为默认相册？",
+    "setDefaultCategory_message": "您确定要设置相册 {album} 作为默认相册？",
     "@setDefaultCategory_message": {
         "placeholders": {
             "album": {}
@@ -179,7 +179,7 @@
     "refreshCategoryError_title": "刷新失败",
     "refreshCategoryError_message": "无法刷新相册封面",
     "deleteCategory_title": "删除相册",
-    "deleteCategory_message": "{count, plural, =0{是否确定删除相册 {album}} =1{是否确定删除相册 {album} AND ITS PHOTO} other{是否确定删除相册 {album} 和共计 {count} 张照片 ?}",
+    "deleteCategory_message": "{count, plural, =0{是否确定删除相册 {album}} =1{是否确定删除相册 {album} AND ITS PHOTO} other{是否确定删除相册 {album} 和共计 {count} 张照片 ?}}",
     "@deleteCategory_message": {
         "placeholders": {
             "count": {},
@@ -751,15 +751,12 @@
     "settings_language": "选择语言",
     "settingsHeader_about": "相关信息",
     "settings_twitter": "@piwigo",
-    "settings_twitterURL": "https://twitter.com/piwigo",
     "settings_contactUs": "联系我们",
     "settings_feedback": "反馈",
     "settings_supportForum": "支持论坛",
     "settings_releaseNotes": "更新日志",
     "settings_rateInAppStore": "给 Piwigo NG 评分",
     "settings_translateWithCrowdin": "协助翻译 Piwigo NG",
-    "settings_crowdinURL": "https://crowdin.com/project/piwigo-ng",
-    "settings_pwgForumURL": "https://piwigo.org/forum",
     "settings_acknowledgements": "鸣谢",
     "settings_privacy": "隐私政策",
     "settings_privacyUrl": "&lang=en_EN"

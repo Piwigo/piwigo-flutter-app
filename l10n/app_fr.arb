@@ -84,7 +84,7 @@
     "logoutConfirmation_title": "Déconnexion",
     "logoutConfirmation_message": "Êtes-vous sûr de vouloir vous déconnecter ?",
     "logoutFail_title": "Echec de la Déconnexion",
-    "albumCount": "{count, plural, one {} =0{0 albums} =1{1 album} other{{count} albums}}",
+    "albumCount": "{count, plural, =0{0 albums} =1{1 album} other{{count} albums}}",
     "@albumCount": {
         "placeholders": {
             "count": {}
@@ -103,7 +103,7 @@
         }
     },
     "showPhotos": "Afficher les Photos",
-    "categoryMainEmtpy": "Pas encore d'albums dans votre Piwigo.\nVous pouvez tirer vers le bas pour actualiser ou vous reconnecter.",
+    "categoryMainEmpty": "Pas encore d'albums dans votre Piwigo.\nVous pouvez tirer vers le bas pour actualiser ou vous reconnecter.",
     "categoryImageList_selectButton": "Sélectionner",
     "categoryImageList_deselectButton": "Désélectionner",
     "categoryImageList_noDataError": "Erreur Aucune Donnée",
@@ -179,7 +179,7 @@
     "refreshCategoryError_title": "Impossible d'actualiser",
     "refreshCategoryError_message": "Impossible d'actualiser la miniature de votre album",
     "deleteCategory_title": "EFFACER L'ALBUM",
-    "deleteCategory_message": "{count, plural, =0{ÊTES VOUS SÛR DE VOULOIR SUPPRIMER L'ALBUM {album}} =1{ÊTES VOUS SÛR DE VOULOIR SUPPRIMER L'ALBUM {album} ET SA PHOTO} other{ÊTES VOUS SÛR DE VOULOIR SUPPRIMER L'ALBUM {album} ET SES {count} PHOTOS ?}",
+    "deleteCategory_message": "{count, plural, =0{ÊTES VOUS SÛR DE VOULOIR SUPPRIMER L'ALBUM {album}} =1{ÊTES VOUS SÛR DE VOULOIR SUPPRIMER L'ALBUM {album} ET SA PHOTO} other{ÊTES VOUS SÛR DE VOULOIR SUPPRIMER L'ALBUM {album} ET SES {count} PHOTOS ?}}",
     "@deleteCategory_message": {
         "placeholders": {
             "count": {},
@@ -247,7 +247,7 @@
     "categoryImageSetError_title": "Echec d'affectation",
     "categoryImageSetError_message": "Impossible de changer la photo de l’album",
     "singleImage": "Photo",
-    "imageCount": "{count, plural, one {} =0{0 photos} =1{1 photo} other{{count} photos}}",
+    "imageCount": "{count, plural, =0{0 photos} =1{1 photo} other{{count} photos}}",
     "@imageCount": {
         "placeholders": {
             "count": {}
@@ -276,7 +276,7 @@
     "imageOptions_title": "Options",
     "imageOptions_edit": "Editer",
     "imageOptions_download": "Télécharger",
-    "imageOptions_share": "Share",
+    "imageOptions_share": "Partager",
     "imageOptions_setAlbumImage": "Définir comme vignette d’album",
     "imageDetailsView_title": "Propriétés",
     "editImageDetails_title": "Titre",
@@ -315,7 +315,7 @@
     "none": "aucun",
     "tag": "Tag",
     "tags": "Tags",
-    "tagCount": "{count, plural, one {} =0{0 tags} =1{1 tag} other{{count} tags}}",
+    "tagCount": "{count, plural, =0{0 tags} =1{1 tag} other{{count} tags}}",
     "@tagCount": {
         "placeholders": {
             "count": {}
@@ -342,7 +342,7 @@
     "selectAll": "Tout Sélectionner",
     "selectLimit": "Limite de sélection atteinte",
     "renameImage_title": "Fichier d'origine",
-    "renameImage_message": "Entrez un nouveau nom de fichier pour cette photo",
+    "renameImage_message": "Entrez un nouveau nom de fichier pour cette photo \"{file}\"",
     "@renameImage_message": {
         "placeholders": {
             "file": {}
@@ -690,9 +690,9 @@
     "settings_deleteImage375px": "Effacer la photo après envoi",
     "settings_wifiOnly": "Wi-Fi uniquement",
     "settings_deleteImage": "Effacer après Envoi",
-    "settings_uploadNotification": "Upload Notification",
-    "settings_downloadNotification": "Download Notification",
-    "settings_downloadDestination": "Download Folder",
+    "settings_uploadNotification": "Notifications de transfert",
+    "settings_downloadNotification": "Notification de téléchargement",
+    "settings_downloadDestination": "Dossier de téléchargement",
     "settings_autoUpload": "Télécharger automatiquement",
     "settings_autoUpload414px": "Télécharger automatiquement des photos",
     "settings_autoUploadEnabled": "Activé",
@@ -741,14 +741,14 @@
             "count": {}
         }
     },
-    "commentCount": "{count, plural, one {} =0{0 commentaires} =1{1 commentaire} other{{count} commentaires}}",
+    "commentCount": "{count, plural, =0{0 commentaires} =1{1 commentaire} other{{count} commentaires}}",
     "@commentCount": {
         "placeholders": {
             "count": {}
         }
     },
     "settings_appName": "Piwigo NG",
-    "settings_language": "Choose language",
+    "settings_language": "Choisir la langue",
     "settingsHeader_about": "Informations",
     "settings_twitter": "@piwigo",
     "settings_twitterURL": "https://twitter.com/piwigo",

@@ -137,7 +137,7 @@
     "showPhotos": "Show Photos",
 
 
-    "categoryMainEmtpy": "No albums in your Piwigo yet.\rYou may pull down to refresh or re-login.",
+    "categoryMainEmpty": "No albums in your Piwigo yet.\rYou may pull down to refresh or re-login.",
     "categoryImageList_selectButton": "Select",
     "categoryImageList_deselectButton": "Deselect",
     "categoryImageList_noDataError": "Error No Data",
@@ -191,7 +191,8 @@
     "categoryUpload_loadSubCategories": "load",
     "categoryUpload_images": "Upload Photos",
     "categoryUpload_videos": "Upload Videos",
-    "categoryUpload_take": "Take Photo",
+    "categoryUpload_takePhoto": "Take Photo",
+    "categoryUpload_takeVideo": "Take Video",
 
 
     "setDefaultCategory_select": "Please select an album or sub-album which will become the new root album.",
@@ -241,7 +242,7 @@
 
 
     "deleteCategory_title": "DELETE ALBUM",
-    "deleteCategory_message": "{count, plural, =0{ARE YOU SURE YOU WANT TO DELETE THE ALBUM {album}} =1{ARE YOU SURE YOU WANT TO DELETE THE ALBUM {album} AND ITS PHOTO} other{ARE YOU SURE YOU WANT TO DELETE THE ALBUM {album} AND ALL {count} PHOTOS ?}",
+    "deleteCategory_message": "{count, plural, =0{ARE YOU SURE YOU WANT TO DELETE THE ALBUM {album} ?} =1{ARE YOU SURE YOU WANT TO DELETE THE ALBUM {album} AND ITS PHOTO ?} other{ARE YOU SURE YOU WANT TO DELETE THE ALBUM {album} AND ALL {count} PHOTOS ?}}",
     "@deleteCategory_message" : {
         "placeholders": {
             "count": {},
@@ -250,13 +251,16 @@
     },
     "deleteCategory_empty": "Delete Empty Album",
     "deleteCategory_noImages": "Keep Photos",
+    "deleteCategory_noImages_subtitle": "may create orphan photos",
     "deleteCategory_orphanedImages": "Delete Orphans",
+    "deleteCategory_orphanedImages_subtitle": "Default mode, only deletes photos linked to no other album",
     "deleteCategory_allImages": "{count, plural, =0{Delete Photos} =1{Delete Photo} other{Delete {count} Photos}}",
     "@deleteCategory_allImages" : {
         "placeholders": {
             "count": {}
         }
     },
+    "deleteCategory_allImages_subtitle": "Delete all photos, even those linked to other albums",
     "deleteCategoryConfirm_title": "Are you sure?",
     "deleteCategoryConfirm_message": "Please enter the number of photos in order to delete this album. Number of photos: {count}",
     "@deleteCategoryConfirm_message" : {
@@ -359,6 +363,8 @@
     "imageOptions_edit": "Edit",
     "imageOptions_download": "Download",
     "imageOptions_share": "Share",
+    "imageOptions_addFavorites": "Add favorites",
+    "imageOptions_removeFavorites": "Remove favorites",
     "imageOptions_setAlbumImage": "Set Album Thumbnail",
 
 
@@ -476,6 +482,7 @@
         }
     },
     "removeSingleImage_title": "Remove from Album",
+    "removeSingleImage_subtitle": "Some photos are assigned to other albums",
     "removeImageHUD_removing": "{count, plural, =0{Removing Photos…} =1{Removing Photo…} other{Removing Photos…}}",
     "@removeImageHUD_removing": {
         "placeholders": {
@@ -529,6 +536,8 @@
         }
     },
 
+    "downloadImageSuccess_title": "Files downloaded",
+    "downloadImageSuccess_message": "All files are downloaded successfully",
     "downloadImageFail_title": "Download Fail",
     "downloadImageFail_message": "Failed to download photo!",
     "downloadVideoFail_message": "Failed to download video!",
@@ -539,6 +548,7 @@
 
     "videoSaveError_title": "Fail Saving Video",
     "videoSaveError_message": "Failed to save video",
+    "videoLoadError_message": "Failed to load video",
 
     "moveOrCopyImage_title": "{count, plural, =1{Do you want to move or copy this image ?} other{Do you want to move or copy {count} images ?}}",
     "@moveOrCopyImage_title": {
@@ -781,9 +791,8 @@
     "defaultThumbnailSize": "Size",
     "defaultThumbnailSize320px": "Thumbnails Size",
     "defaultThumbnailSize414px": "Default Size of Thumbnails",
+    "defaultNberOfThumbnailsShort": "Number per row",
     "defaultNberOfThumbnails": "Number of thumbnails per row",
-    "defaultNberOfThumbnails_portrait": "Portrait Mode",
-    "defaultNberOfThumbnails_landscape": "Landscape Mode",
     "defaultThumbnailSizeTitle": "Default Size",
     "defaultThumbnailSizeHeader": "Please select a photo thumbnail size",
     "settings_displayTitles": "Titles on Thumbnails",
@@ -871,9 +880,10 @@
     "uploadPhotoSize_original": "No Downsizing",
 
 
-    "settingsHeader_cache": "Cache Settings (Used/Total)",
+    "settingsHeader_cache": "Cache Settings",
     "settings_cacheDisk": "Disk",
     "settings_cacheMemory": "Memory",
+    "settings_cacheSize": "Cache size",
     "settings_cacheMegabytes": "MB",
     "settings_cacheClear": "Clear Cache",
     "settings_cacheClearAll": "Clear Photo Cache",
@@ -913,15 +923,12 @@
     "settings_language": "Choose language",
     "settingsHeader_about": "Information",
     "settings_twitter": "@piwigo",
-    "settings_twitterURL": "https://twitter.com/piwigo",
     "settings_contactUs": "Contact Us",
     "settings_feedback": "Feedback",
     "settings_supportForum": "Support Forum",
     "settings_releaseNotes": "Release Notes",
-    "settings_rateInAppStore": "Rate Piwigo NG",
+    "settings_rateInAppStore": "Rate on Play Store",
     "settings_translateWithCrowdin": "Translate Piwigo NG",
-    "settings_crowdinURL": "https://crowdin.com/project/piwigo-ng",
-    "settings_pwgForumURL": "https://piwigo.org/forum",
     "settings_acknowledgements": "Acknowledgements",
     "settings_privacy": "Privacy Policy",
     "settings_privacyUrl": "&lang=en_EN"
