@@ -91,7 +91,7 @@
             "count": {}
         }
     },
-    "subAlbumCount": "{count, plural,=0{0 Unteralben} =1{1 Unteralbum} other{{count} Unteralben}}",
+    "subAlbumCount": "{count, plural, =0{0 Unteralben} =1{1 Unteralbum} other{{count} Unteralben}}",
     "@subAlbumCount": {
         "placeholders": {
             "count": {}
@@ -277,6 +277,7 @@
     "imageOptions_title": "Foto-Optionen",
     "imageOptions_edit": "Bearbeiten",
     "imageOptions_download": "Herunterladen",
+    "imageOptions_share": "Teilen",
     "imageOptions_setAlbumImage": "Album-Vorschaubild festlegen",
     "imageDetailsView_title": "Eigenschaften",
     "editImageDetails_title": "Titel",
@@ -690,6 +691,9 @@
     "settings_deleteImage375px": "Foto nach dem Hochladen löschen",
     "settings_wifiOnly": "Nur über WLAN",
     "settings_deleteImage": "Nach dem Hochladen löschen",
+    "settings_uploadNotification": "Upload-Benachrichtigung",
+    "settings_downloadNotification": "Download-Benachrichtigung",
+    "settings_downloadDestination": "Download-Verzeichnis",
     "settings_autoUpload": "Automatisch hochladen",
     "settings_autoUpload414px": "Fotos automatisch hochladen",
     "settings_autoUploadEnabled": "Ein",
