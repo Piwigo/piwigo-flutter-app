@@ -156,7 +156,7 @@ class _SettingsViewPageState extends State<SettingsViewPage> {
   }
 
   Widget get _serverSection => SettingsSection(
-        title: "Piwigo Server ${appPreferences.getString('VERSION')}",
+        title: appStrings.settingsHeader_server(appPreferences.getString('VERSION') ?? ''),
         children: [
           SettingsSectionItemInfo(
             title: appStrings.settings_server,
@@ -408,7 +408,7 @@ class _SettingsViewPageState extends State<SettingsViewPage> {
             }),
           ),
           // const SettingsSectionItemButton(
-          //   title: "Privacy",
+          //   title: appStrings.settings_defaultPrivacy,
           //   text: "Everybody",
           // ),
           SettingsSectionItemSwitch(
@@ -445,8 +445,8 @@ class _SettingsViewPageState extends State<SettingsViewPage> {
             }),
           ),
           // const SettingsSectionItemButton(
-          //   title: "Auto Upload",
-          //   text: "Off",
+          //   title: appStrings.settings_autoUpload,
+          //   text: appStrings.settings_autoUploadDisabled,
           // ),
           // SettingsSectionItemSwitch(
           //   title: appStrings.settings_deleteImage,
@@ -493,12 +493,12 @@ class _SettingsViewPageState extends State<SettingsViewPage> {
         ],
       ); // todo: use biometry unlock
   Widget get _appearanceSection => SettingsSection(
-        title: "Appearance",
+        title: appStrings.settingsHeader_appearance,
         children: [
           Consumer<ThemeNotifier>(
             builder: (context, themeNotifier, _) {
               return SettingsSectionItemSwitch(
-                title: "Dark Theme",
+                title: appStrings.settingsHeader_theme,
                 value: themeNotifier.isDark,
                 onChanged: (value) => themeNotifier.toggleTheme(),
               );
@@ -548,7 +548,7 @@ class _SettingsViewPageState extends State<SettingsViewPage> {
             icon: const FaIcon(FontAwesomeIcons.twitter),
             onPressed: () async {
               await launchUrl(
-                Uri.parse('https://twitter.com/piwigo'),
+                Uri.parse(Settings.twitterUrl),
               );
             },
           ),
@@ -557,7 +557,7 @@ class _SettingsViewPageState extends State<SettingsViewPage> {
             icon: const Icon(Icons.message),
             onPressed: () async {
               await launchUrl(
-                Uri.parse("https://piwigo.org/forum"),
+                Uri.parse(Settings.forumUrl),
               );
             },
           ),
@@ -567,9 +567,7 @@ class _SettingsViewPageState extends State<SettingsViewPage> {
             onPressed: () async {
               PackageInfo package = await PackageInfo.fromPlatform();
               await launchUrl(
-                Uri.parse(
-                  "market://details?id=${package.packageName}",
-                ),
+                Uri.parse(Settings.playStorePrefixUrl + package.packageName),
               );
             },
           ),
@@ -583,9 +581,7 @@ class _SettingsViewPageState extends State<SettingsViewPage> {
             icon: const Icon(Icons.translate),
             onPressed: () async {
               await launchUrl(
-                Uri.parse(
-                  "https://crowdin.com/project/piwigo-ng",
-                ),
+                Uri.parse(Settings.crowdinUrl),
               );
             },
           ),

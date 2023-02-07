@@ -73,7 +73,7 @@ class _LoginFormViewState extends State<LoginFormView> {
 
   bool _urlValidator(String? value) {
     RegExp urlCheck = RegExp(
-      r"[(www\.)?a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)",
+      r"[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,256}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)",
     );
     if (value == null || value.isEmpty || !urlCheck.hasMatch(value)) {
       return false;

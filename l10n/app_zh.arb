@@ -759,5 +759,5 @@
     "settings_translateWithCrowdin": "协助翻译 Piwigo NG",
     "settings_acknowledgements": "鸣谢",
     "settings_privacy": "隐私政策",
-    "settings_privacyUrl": "&lang=en_EN"
+    "settings_privacyLocale": "&lang=en_EN"
 }

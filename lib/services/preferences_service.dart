@@ -20,7 +20,6 @@ class Preferences {
   static const String accountUsernameKey = 'ACCOUNT_USERNAME';
   static const String userStatusKey = 'USER_STATUS';
   static String get getUserStatus {
-    print(appPreferences.getString(userStatusKey));
     return appPreferences.getString(userStatusKey) ?? 'guest';
   }
 
@@ -150,7 +149,6 @@ class Preferences {
     } else {
       appPreferences.setBool(isAdminKey, false);
     }
-    print(status.status);
     appPreferences.setString(userStatusKey, status.status);
   }
 }

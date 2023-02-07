@@ -98,7 +98,7 @@ Future<List<Map<String, dynamic>>> uploadPhotos(
         password: password,
         info: info,
         onProgress: (progress) {
-          debugPrint("$progress");
+          // debugPrint("$progress");
           item.progress.sink.add(progress);
         },
       );
@@ -162,7 +162,7 @@ Future<Response?> uploadChunk({
 
   if (info['name'] != '' && info['name'] != null) fields['name'] = info['name'];
   if (info['comment'] != '' && info['comment'] != null) fields['comment'] = info['comment'];
-  if (info['tag_ids'].isNotEmpty) fields['tag_ids'] = info['tag_ids'];
+  if (info['tag_ids'].isNotEmpty) fields['tag_ids'] = info['tag_ids'].join(',');
   if (info['level'] != -1) fields['level'] = info['level'];
 
   ChunkedUploader chunkedUploader = ChunkedUploader(Dio(

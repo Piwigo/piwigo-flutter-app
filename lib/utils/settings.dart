@@ -83,6 +83,12 @@ extension SortMethodsExtension on SortMethods {
 }
 
 class Settings {
+  static const String privacyPolicyUrl = 'https://piwigo.org/mobile-apps-privacy-policy&webview';
+  static const String twitterUrl = 'https://twitter.com/piwigo';
+  static const String forumUrl = 'https://piwigo.org/forum';
+  static const String playStorePrefixUrl = 'market://details?id=';
+  static const String crowdinUrl = 'https://crowdin.com/project/piwigo-ng';
+
   static const String defaultAlbumThumbnailSize = 'medium';
   static const String defaultImageThumbnailSize = 'medium';
   static const String defaultImageFullScreenSize = 'medium';

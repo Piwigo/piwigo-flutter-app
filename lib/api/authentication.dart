@@ -69,7 +69,6 @@ Future<ApiResult<bool>> loginUser(
       options: Options(contentType: Headers.formUrlEncodedContentType),
       queryParameters: queries,
     );
-    debugPrint("Login: ${response.data}");
 
     if (response.statusCode == 200) {
       var data = json.decode(response.data);
