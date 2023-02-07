@@ -19,6 +19,11 @@ class Preferences {
 
   static const String accountUsernameKey = 'ACCOUNT_USERNAME';
   static const String userStatusKey = 'USER_STATUS';
+  static String get getUserStatus {
+    print(appPreferences.getString(userStatusKey));
+    return appPreferences.getString(userStatusKey) ?? 'guest';
+  }
+
   static const String communityStatusKey = 'COMMUNITY_STATUS';
   static const String tokenKey = 'PWG_TOKEN';
   static const String versionKey = 'VERSION';
@@ -131,7 +136,6 @@ class Preferences {
   /// Saves server info retrieved from pwg.session.getStatus API call
   static void saveStatus(StatusModel status) async {
     appPreferences.setString(accountUsernameKey, status.username);
-    appPreferences.setString(userStatusKey, status.status);
     appPreferences.setString(tokenKey, status.pwgToken);
     appPreferences.setString(versionKey, status.version);
     appPreferences.setStringList(availableSizesKey, status.availableSizes);
@@ -146,5 +150,7 @@ class Preferences {
     } else {
       appPreferences.setBool(isAdminKey, false);
     }
+    print(status.status);
+    appPreferences.setString(userStatusKey, status.status);
   }
 }

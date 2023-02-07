@@ -158,7 +158,12 @@ class _ImageViewPageState extends State<ImageViewPage> {
   /// Move current image action.
   Future<void> _onMove() async {
     ImageModel image = _currentImage;
-    int? success = await onMovePhotos(context, [image], _album);
+    int? success;
+    if (_album.id == -1) {
+      success = await onMovePhotos(context, [image]);
+    } else {
+      success = await onMovePhotos(context, [image], _album);
+    }
     if (success == null || success != 0) return;
     _onRemoveImage(image);
   }
@@ -257,10 +262,11 @@ class _ImageViewPageState extends State<ImageViewPage> {
                     onPressed: _onEdit,
                     icon: Icon(Icons.edit),
                   ),
-                  IconButton(
-                    onPressed: _onMove,
-                    icon: Icon(Icons.drive_file_move),
-                  ),
+                  if (_album.id != -1)
+                    IconButton(
+                      onPressed: _onMove,
+                      icon: Icon(Icons.drive_file_move),
+                    ),
                   IconButton(
                     onPressed: _onDelete,
                     icon: Icon(Icons.delete, color: Theme.of(context).errorColor),
@@ -280,18 +286,19 @@ class _ImageViewPageState extends State<ImageViewPage> {
                           text: appStrings.imageOptions_share,
                         ),
                       ),
-                      PopupMenuItem(
-                        onTap: () => Future.delayed(
-                          const Duration(seconds: 0),
-                          () => _onLike(),
+                      if (Preferences.getUserStatus != 'guest')
+                        PopupMenuItem(
+                          onTap: () => Future.delayed(
+                            const Duration(seconds: 0),
+                            _onLike,
+                          ),
+                          child: PopupListItem(
+                            icon: !_currentImage.favorite ? Icons.favorite_border : Icons.favorite,
+                            text: !_currentImage.favorite
+                                ? appStrings.imageOptions_addFavorites
+                                : appStrings.imageOptions_removeFavorites,
+                          ),
                         ),
-                        child: PopupListItem(
-                          icon: !_currentImage.favorite ? Icons.favorite_border : Icons.favorite,
-                          text: !_currentImage.favorite
-                              ? appStrings.imageOptions_addFavorites
-                              : appStrings.imageOptions_removeFavorites,
-                        ),
-                      ),
                       PopupMenuItem(
                         onTap: () => Future.delayed(
                           const Duration(seconds: 0),
@@ -332,7 +339,6 @@ class _ImageViewPageState extends State<ImageViewPage> {
           itemCount: _imageList.length,
           builder: (context, index) {
             final ImageModel image = _imageList[index];
-            print(image.derivatives);
 
             /// Check mime type of file (multiple test to ensure it is not null)
             String? mimeType = mime(image.file) ?? mime(image.elementUrl) ?? mime(image.derivatives.medium.url);
@@ -399,12 +405,13 @@ class _ImageViewPageState extends State<ImageViewPage> {
                           icon: Icon(Icons.edit),
                         ),
                       ),
-                      Expanded(
-                        child: IconButton(
-                          onPressed: _onMove,
-                          icon: Icon(Icons.drive_file_move),
+                      if (_album.id != -1)
+                        Expanded(
+                          child: IconButton(
+                            onPressed: _onMove,
+                            icon: Icon(Icons.drive_file_move),
+                          ),
                         ),
-                      ),
                       Expanded(
                         child: IconButton(
                           onPressed: _onDelete,
@@ -419,19 +426,20 @@ class _ImageViewPageState extends State<ImageViewPage> {
                           icon: Icon(Icons.share),
                         ),
                       ),
-                      Expanded(
-                        child: IconButton(
-                          onPressed: _onLike,
-                          icon: Builder(
-                            builder: (context) {
-                              if (!_currentImage.favorite) {
-                                return Icon(Icons.favorite_border);
-                              }
-                              return Icon(Icons.favorite);
-                            },
+                      if (Preferences.getUserStatus != 'guest')
+                        Expanded(
+                          child: IconButton(
+                            onPressed: _onLike,
+                            icon: Builder(
+                              builder: (context) {
+                                if (!_currentImage.favorite) {
+                                  return Icon(Icons.favorite_border);
+                                }
+                                return Icon(Icons.favorite);
+                              },
+                            ),
                           ),
                         ),
-                      ),
                       Expanded(
                         child: IconButton(
                           onPressed: () => downloadImages([_currentImage]),

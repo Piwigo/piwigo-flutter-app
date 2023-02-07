@@ -58,8 +58,12 @@ String getLanguageFromCode(String code) {
       return 'Español';
     case 'fr':
       return 'Français';
+    case 'lt':
+      return 'Lietuvių kalba';
+    case 'sk':
+      return 'Slovenčina';
     case 'zh':
-      return '中国人';
+      return '中文';
     default:
       return code;
   }

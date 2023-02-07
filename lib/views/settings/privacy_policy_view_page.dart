@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:piwigo_ng/utils/localizations.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class PrivacyPolicyViewPage extends StatefulWidget {
@@ -38,16 +39,9 @@ class _PrivacyPolicyViewPageState extends State<PrivacyPolicyViewPage> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        title: const Text(
-          'Privacy Policy',
-          style: TextStyle(fontWeight: FontWeight.w500), // Todo: appbar title
-        ),
-        leading: IconButton(
-          icon: Icon(
-            Icons.chevron_left,
-            color: Theme.of(context).iconTheme.color,
-          ),
-          onPressed: Navigator.of(context).pop,
+        title: Text(
+          appStrings.settings_privacy,
+          style: Theme.of(context).appBarTheme.titleTextStyle,
         ),
       ),
       body: Stack(
