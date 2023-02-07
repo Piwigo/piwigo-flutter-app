@@ -4,6 +4,7 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:piwigo_ng/components/clippers/album_card_clipper.dart';
 import 'package:piwigo_ng/components/clippers/clip_shadow_path.dart';
 import 'package:piwigo_ng/models/album_model.dart';
+import 'package:piwigo_ng/utils/localizations.dart';
 
 import 'album_card_action.dart';
 
@@ -267,7 +268,7 @@ class AlbumCardContent extends StatelessWidget {
                 FittedBox(
                   fit: BoxFit.fitWidth,
                   child: Text(
-                    "${album.nbTotalImages} photos", // Todo: use variable
+                    appStrings.imageCount(album.nbTotalImages),
                     style: Theme.of(context).textTheme.labelSmall,
                   ),
                 ),

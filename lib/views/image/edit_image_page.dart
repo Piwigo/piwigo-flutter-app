@@ -201,7 +201,7 @@ class _EditImagePageState extends State<EditImagePage> {
                   ),
                 ),
               ).whenComplete(() => setState(() {}));
-            }, // todo add tags
+            },
             actions: [
               const Icon(Icons.add_circle_outline),
             ],

@@ -212,19 +212,23 @@ Future<XFile?> downloadImage(String dirPath, ImageModel image) async {
 
 Future<int> deleteImages(
   List<ImageModel> imageList,
-  AlbumModel album,
+  AlbumModel? album,
   DeleteAlbumModes mode,
 ) async {
   int nbSuccess = 0;
   for (ImageModel image in imageList) {
     bool response = false;
-    switch (mode) {
-      case DeleteAlbumModes.noDelete:
-        response = await removeImage(image, album.id);
-        break;
-      default:
-        response = await deleteImage(image);
-        break;
+    if (album == null) {
+      response = await deleteImage(image);
+    } else {
+      switch (mode) {
+        case DeleteAlbumModes.noDelete:
+          response = await removeImage(image, album.id);
+          break;
+        default:
+          response = await deleteImage(image);
+          break;
+      }
     }
     if (response == true) {
       nbSuccess++;

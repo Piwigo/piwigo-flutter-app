@@ -10,6 +10,7 @@ import 'package:piwigo_ng/components/scroll_widgets/album_grid_view.dart';
 import 'package:piwigo_ng/components/scroll_widgets/image_grid_view.dart';
 import 'package:piwigo_ng/models/album_model.dart';
 import 'package:piwigo_ng/models/image_model.dart';
+import 'package:piwigo_ng/services/preferences_service.dart';
 import 'package:piwigo_ng/services/upload_notifier.dart';
 import 'package:piwigo_ng/utils/album_actions.dart';
 import 'package:piwigo_ng/utils/image_actions.dart';
@@ -257,11 +258,11 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
                     text: appStrings.imageOptions_share,
                   ),
                 ),
-              if (_selectedList.isNotEmpty)
+              if (_selectedList.isNotEmpty && Preferences.getUserStatus != 'guest')
                 PopupMenuItem(
                   onTap: () => Future.delayed(
                     const Duration(seconds: 0),
-                    () => _onLikePhotos(),
+                    _onLikePhotos,
                   ),
                   child: PopupListItem(
                     icon: _hasNonFavorites ? Icons.favorite_border : Icons.favorite,
@@ -417,12 +418,6 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
       _imageList = result.data!;
       WidgetsBinding.instance.addPostFrameCallback((timeStamp) => setState(() {}));
     }
-    // todo: useless display
-    // if (_imageList.isEmpty) {
-    //   return Center(
-    //     child: Text(appStrings.noImages),
-    //   );
-    // }
     _selectedList = _imageList.where((image) => _selectedList.contains(image)).toList();
     return ImageGridView(
       imageList: _imageList,
@@ -472,19 +467,20 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
                       icon: Icon(Icons.share),
                     ),
                   ),
-                  Expanded(
-                    child: IconButton(
-                      onPressed: _onLikePhotos,
-                      icon: Builder(
-                        builder: (context) {
-                          if (_hasNonFavorites) {
-                            return Icon(Icons.favorite_border);
-                          }
-                          return Icon(Icons.favorite);
-                        },
+                  if (Preferences.getUserStatus != 'guest') // Todo: enum roles
+                    Expanded(
+                      child: IconButton(
+                        onPressed: _onLikePhotos,
+                        icon: Builder(
+                          builder: (context) {
+                            if (_hasNonFavorites) {
+                              return Icon(Icons.favorite_border);
+                            }
+                            return Icon(Icons.favorite);
+                          },
+                        ),
                       ),
                     ),
-                  ),
                   Expanded(
                     child: IconButton(
                       onPressed: () => downloadImages(_selectedList),

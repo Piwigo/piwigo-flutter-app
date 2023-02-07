@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:piwigo_ng/models/image_model.dart';
+import 'package:piwigo_ng/services/locale_provider.dart';
 import 'package:piwigo_ng/services/preferences_service.dart';
+import 'package:provider/provider.dart';
 
 class ImageDetailsCard extends StatelessWidget {
   const ImageDetailsCard({Key? key, required this.image, this.onRemove}) : super(key: key);
@@ -39,11 +41,15 @@ class ImageDetailsCard extends StatelessWidget {
                         Flexible(
                           child: Padding(
                             padding: const EdgeInsets.only(top: 4.0),
-                            child: Text(
-                              DateFormat.yMMMMd().format(DateTime.parse(image.dateAvailable!)), // todo locale
-                              maxLines: 2,
-                              style: Theme.of(context).textTheme.bodyMedium,
-                            ),
+                            child: Builder(builder: (context) {
+                              LocaleNotifier localeNotifier = Provider.of<LocaleNotifier>(context, listen: false);
+                              return Text(
+                                DateFormat.yMMMMd(localeNotifier.locale.languageCode)
+                                    .format(DateTime.parse(image.dateAvailable!)),
+                                maxLines: 2,
+                                style: Theme.of(context).textTheme.bodyMedium,
+                              );
+                            }),
                           ),
                         ),
                     ],
