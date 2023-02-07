@@ -244,6 +244,7 @@ class AlbumCardContent extends StatelessWidget {
               children: [
                 Text(
                   album.name,
+                  textAlign: TextAlign.center,
                   softWrap: true,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,

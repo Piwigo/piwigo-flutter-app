@@ -47,9 +47,6 @@ Future<ApiResult<List<AlbumModel>>> fetchAlbums(int albumID) async {
       queryParameters: queries,
     );
 
-    debugPrint('hello');
-    debugPrint(response.data.toString());
-
     if (response.statusCode == 200) {
       List<dynamic> jsonAlbums = tryParseJson(response.data)['result']['categories'];
       List<AlbumModel> albums = List<AlbumModel>.from(jsonAlbums.map(

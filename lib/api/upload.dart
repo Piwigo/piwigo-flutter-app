@@ -23,7 +23,6 @@ import '../services/chunked_uploader.dart';
 import '../services/notification_service.dart';
 
 Future<void> _showUploadNotification({bool success = true}) async {
-  if (!(appPreferences.getBool('upload_notification') ?? true)) return;
   final android = AndroidNotificationDetails(
     'piwigo-ng-upload',
     'Piwigo NG Upload',
@@ -221,6 +220,7 @@ Future<bool> uploadCompleted(List<int> imageId, int categoryId) async {
     'pwg_token': appPreferences.getString(Preferences.tokenKey),
     'category_id': categoryId,
   });
+
   try {
     Response response = await ApiClient.post(data: formData, queryParameters: queries);
     if (response.statusCode == 200) {

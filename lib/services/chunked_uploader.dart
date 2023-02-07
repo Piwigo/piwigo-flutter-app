@@ -21,14 +21,12 @@ class ChunkedUploader {
     required int maxChunkSize,
     required Function(double) onUploadProgress,
     String method = 'POST',
-    String fileKey = 'file',
   }) =>
       UploadRequest(_dio,
               filePath: filePath,
               path: path,
               contentType: contentType,
               params: params,
-              fileKey: fileKey,
               method: method,
               data: data,
               cancelToken: cancelToken,
@@ -39,7 +37,7 @@ class ChunkedUploader {
 
 class UploadRequest {
   final Dio dio;
-  final String filePath, fileName, path, fileKey;
+  final String filePath, fileName, path;
   final Map<String, String> params;
   final String method;
   final String contentType;
@@ -55,7 +53,6 @@ class UploadRequest {
       required this.params,
       required this.contentType,
       required this.path,
-      required this.fileKey,
       required this.method,
       required this.data,
       this.cancelToken,
