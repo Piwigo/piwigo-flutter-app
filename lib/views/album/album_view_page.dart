@@ -176,6 +176,15 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
                   future: _data,
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
+                      if (snapshot.data!.first.hasError && snapshot.data!.last.hasError) {
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                          child: Text(
+                            appStrings.categoryImageList_noDataError,
+                            textAlign: TextAlign.center,
+                          ),
+                        );
+                      }
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
@@ -410,11 +419,6 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
   Widget _imageGrid(AsyncSnapshot snapshot) {
     if (_imageList.isEmpty && _page == 0) {
       final ApiResult<List<ImageModel>> result = snapshot.data!.last as ApiResult<List<ImageModel>>;
-      if (result.hasError || !result.hasData) {
-        return Center(
-          child: Text(appStrings.categoryImageList_noDataError),
-        );
-      }
       _imageList = result.data!;
       WidgetsBinding.instance.addPostFrameCallback((timeStamp) => setState(() {}));
     }
