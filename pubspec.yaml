@@ -58,6 +58,7 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   intl: ^0.17.0 # Used for translations
+  html_unescape: ^2.0.0
 
 dev_dependencies:
   flutter_test:
