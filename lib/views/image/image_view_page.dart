@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:mime_type/mime_type.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
 import 'package:piwigo_ng/api/api_error.dart';
@@ -340,10 +339,9 @@ class _ImageViewPageState extends State<ImageViewPage> {
           builder: (context, index) {
             final ImageModel image = _imageList[index];
 
-            /// Check mime type of file (multiple test to ensure it is not null)
-            String? mimeType = mime(image.file) ?? mime(image.elementUrl) ?? mime(image.derivatives.medium.url);
-            if (mimeType != null && mimeType.startsWith('video')) {
-              /// Returns video player
+            // Check mime type of file (multiple test to ensure it is not null)
+            if (image.isVideo) {
+              // Returns video player
               return PhotoViewGalleryPageOptions.customChild(
                 disableGestures: true,
                 child: VideoView(
@@ -356,7 +354,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
               );
             }
 
-            /// Default behavior: Zoomable image
+            // Default behavior: Zoomable image
             return PhotoViewGalleryPageOptions(
               imageProvider: NetworkImage(
                 image.getDerivativeFromString(Preferences.getImageFullScreenSize)?.url ?? '',
@@ -365,7 +363,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
               minScale: PhotoViewComputedScale.contained,
               errorBuilder: (context, o, s) {
                 debugPrint("$o");
-                return Center();
+                return SizedBox();
               },
             );
           },

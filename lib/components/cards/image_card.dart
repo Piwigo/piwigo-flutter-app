@@ -72,11 +72,21 @@ class ImageCard extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                if (image.favorite)
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    if (image.isVideo)
+                      Padding(
+                        padding: const EdgeInsets.all(2.0),
+                        child: Icon(
+                          Icons.local_movies,
+                          color: Color(0xFFFFFFFF),
+                          size: 12,
+                          shadows: AppShadows.icon,
+                        ),
+                      ),
+                    if (image.favorite)
                       Padding(
                         padding: const EdgeInsets.all(2.0),
                         child: Icon(
@@ -86,8 +96,8 @@ class ImageCard extends StatelessWidget {
                           shadows: AppShadows.icon,
                         ),
                       ),
-                    ],
-                  ),
+                  ],
+                ),
                 if (Preferences.getShowThumbnailTitle)
                   Container(
                     padding: const EdgeInsets.all(2.0),

@@ -1,3 +1,5 @@
+import 'package:mime_type/mime_type.dart';
+
 class ImageModel {
   int id;
   int width;
@@ -72,6 +74,11 @@ class ImageModel {
       default:
         return null;
     }
+  }
+
+  bool get isVideo {
+    String? mimeType = mime(file) ?? mime(elementUrl) ?? mime(derivatives.medium.url);
+    return mimeType != null && mimeType.startsWith('video');
   }
 
   @override
