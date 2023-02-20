@@ -213,6 +213,7 @@ Future<ApiResult<bool>> editAlbum({required String name, required int albumId, S
     'name': name,
     'comment': description,
   });
+
   try {
     Response response = await ApiClient.post(
       data: formData,
