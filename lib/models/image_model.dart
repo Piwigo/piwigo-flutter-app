@@ -48,7 +48,7 @@ class ImageModel {
     this.dateCreation,
     this.dateAvailable,
     this.pageUrl,
-    this.elementUrl,
+    required this.elementUrl,
     required this.derivatives,
     this.categories = const [],
   });
