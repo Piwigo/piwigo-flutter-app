@@ -17,6 +17,7 @@ import 'package:piwigo_ng/views/settings/privacy_policy_view_page.dart';
 import 'package:piwigo_ng/views/settings/select_language_view_page.dart';
 import 'package:piwigo_ng/views/settings/settings_view_page.dart';
 import 'package:piwigo_ng/views/unknown_route_page.dart';
+import 'package:piwigo_ng/views/upload/upload_status_page.dart';
 import 'package:piwigo_ng/views/upload/upload_view_page.dart';
 
 class App extends StatelessWidget {
@@ -127,6 +128,11 @@ Route<dynamic> generateRoute(RouteSettings settings) {
           imageList: arguments["images"] ?? <XFile>[],
           albumId: arguments["category"],
         ),
+        settings: settings,
+      );
+    case UploadStatusPage.routeName:
+      return MaterialPageRoute(
+        builder: (_) => UploadStatusPage(),
         settings: settings,
       );
     case ImageViewPage.routeName:

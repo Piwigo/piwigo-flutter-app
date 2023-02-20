@@ -197,20 +197,15 @@ Future<List<XFile>?> downloadImages(
 Future<XFile?> downloadImage(String dirPath, ImageModel image) async {
   String localPath = path.join(dirPath, image.file);
   try {
-    List<String> sizes = Preferences.getAvailableSizes;
-
-    debugPrint(localPath);
-    debugPrint(image.getDerivativeFromString(sizes.last)?.url ?? image.derivatives.medium.url);
-
     await ApiClient.download(
-      path: image.getDerivativeFromString(sizes.last)?.url ?? image.derivatives.medium.url,
+      path: image.elementUrl,
       outputPath: localPath,
     );
     return XFile(localPath);
   } on DioError catch (e) {
-    debugPrint('Download images: ${e.message}');
+    debugPrint("Download images: ${e.message}");
   } on Error catch (e) {
-    debugPrint('Download images: ${e.stackTrace}');
+    debugPrint("Download images: ${e.stackTrace}");
   }
   return null;
 }

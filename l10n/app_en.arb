@@ -692,6 +692,7 @@
     "imageUploadCompleted_title": "Upload Completed",
     "imageUploadCompleted_message": "photo uploaded to your Piwigo server.",
     "imageUploadCompleted_message1": "photos uploaded to your Piwigo server.",
+    "imageUploadCompleted_warning": "some of your photos could not be uploaded.",
 
 
     "uploadError_title": "Upload Error",

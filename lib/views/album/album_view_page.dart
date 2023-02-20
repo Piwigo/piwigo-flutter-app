@@ -16,6 +16,7 @@ import 'package:piwigo_ng/utils/album_actions.dart';
 import 'package:piwigo_ng/utils/image_actions.dart';
 import 'package:piwigo_ng/utils/localizations.dart';
 import 'package:piwigo_ng/views/image/image_view_page.dart';
+import 'package:piwigo_ng/views/upload/upload_status_page.dart';
 import 'package:piwigo_ng/views/upload/upload_view_page.dart';
 import 'package:provider/provider.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
@@ -165,7 +166,7 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
           onRefresh: _onRefresh,
           header: MaterialClassicHeader(
             backgroundColor: Theme.of(context).cardColor,
-            color: Theme.of(context).colorScheme.primary,
+            color: Theme.of(context).colorScheme.secondary,
           ),
           child: CustomScrollView(
             controller: _scrollController,
@@ -326,18 +327,26 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        FloatingActionButton(
-          backgroundColor: Colors.grey.withOpacity(0.8),
-          onPressed: () => Navigator.of(context).popUntil((route) => route.isFirst),
-          child: Consumer<UploadNotifier>(
-            builder: (context, uploadNotifier, child) {
-              if (uploadNotifier.uploadList.isNotEmpty) {
-                UploadItem item = uploadNotifier.uploadList.first;
-                return Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    SizedBox.expand(
-                      child: StreamBuilder<double>(
+        Consumer<UploadNotifier>(
+          builder: (context, uploadNotifier, child) {
+            return FloatingActionButton(
+              backgroundColor: Colors.grey.withOpacity(0.8),
+              onPressed: () {
+                print(uploadNotifier.uploadList.isNotEmpty);
+                if (uploadNotifier.uploadList.isNotEmpty) {
+                  Navigator.of(context).pushNamed(UploadStatusPage.routeName);
+                } else {
+                  Navigator.of(context).popUntil((route) => route.isFirst);
+                }
+              },
+              child: Builder(builder: (context) {
+                if (uploadNotifier.uploadList.isNotEmpty) {
+                  UploadItem item = uploadNotifier.uploadList.first;
+                  return Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      SizedBox.expand(
+                        child: StreamBuilder<double>(
                           stream: item.progress.stream,
                           initialData: 0.0,
                           builder: (context, snapshot) {
@@ -348,22 +357,24 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
                               );
                             }
                             return CircularProgressIndicator(strokeWidth: 5.0);
-                          }),
-                    ),
-                    FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: Text(
-                        "${uploadNotifier.uploadList.length}", // todo: upload files remaining
-                        style: TextStyle(fontSize: 20),
+                          },
+                        ),
                       ),
-                    ),
-                  ],
-                );
-              }
-              return child!;
-            },
-            child: Icon(Icons.home, color: Colors.white),
-          ),
+                      FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          "${uploadNotifier.uploadList.length}",
+                          style: TextStyle(fontSize: 20),
+                        ),
+                      ),
+                    ],
+                  );
+                }
+                return child!;
+              }),
+            );
+          },
+          child: Icon(Icons.home, color: Colors.white),
         ),
         if (widget.isAdmin || widget.album.canUpload) ...[
           SizedBox(width: 16.0),
