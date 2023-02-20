@@ -112,7 +112,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
   }
 
   /// Toggle overlay action (orientation was necessary, *see comments*).
-  void _onToggleOverlay(Orientation orientation) {
+  void _onToggleOverlay(Orientation orientation, [bool? value]) {
     // if (_showOverlay) {
     //   SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
     // } else {
@@ -121,7 +121,11 @@ class _ImageViewPageState extends State<ImageViewPage> {
     //   ]);
     // }
     setState(() {
-      _showOverlay = !_showOverlay;
+      if (value != null) {
+        _showOverlay = value;
+      } else {
+        _showOverlay = !_showOverlay;
+      }
     });
   }
 
@@ -344,12 +348,12 @@ class _ImageViewPageState extends State<ImageViewPage> {
               // Returns video player
               return PhotoViewGalleryPageOptions.customChild(
                 disableGestures: true,
-                child: VideoView(
+                child: VideoPlayerView(
                   videoUrl: image.elementUrl,
                   thumbnailUrl: image.derivatives.medium.url,
                   showOverlay: _showOverlay,
                   screenPadding: const EdgeInsets.only(bottom: 56.0),
-                  onToggleOverlay: () => _onToggleOverlay(MediaQuery.of(context).orientation),
+                  onToggleOverlay: (value) => _onToggleOverlay(MediaQuery.of(context).orientation, value),
                 ),
               );
             }

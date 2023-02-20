@@ -17,7 +17,7 @@ final ThemeData lightTheme = ThemeData.light().copyWith(
     backgroundColor: AppColors.fieldLight,
   ),
   colorScheme: const ColorScheme.highContrastLight(
-    primary: AppColors.accent,
+    primary: AppColors.white,
     secondary: AppColors.accent,
   ),
   progressIndicatorTheme: const ProgressIndicatorThemeData(
@@ -161,7 +161,7 @@ final ThemeData darkTheme = ThemeData.dark().copyWith(
     backgroundColor: AppColors.fieldDark,
   ),
   colorScheme: const ColorScheme.highContrastDark(
-    primary: AppColors.accent,
+    primary: AppColors.white,
     secondary: AppColors.accent,
   ),
   progressIndicatorTheme: const ProgressIndicatorThemeData(
