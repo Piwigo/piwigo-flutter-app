@@ -213,7 +213,10 @@ class AlbumCardContent extends StatelessWidget {
             }
             return CachedNetworkImage(
               imageUrl: album.urlRepresentative!,
-              fit: BoxFit.cover,
+              imageBuilder: (context, provider) => Image(
+                image: provider,
+                fit: BoxFit.cover,
+              ),
               progressIndicatorBuilder: (context, url, download) => Center(
                 child: CircularProgressIndicator(
                   value: download.progress,

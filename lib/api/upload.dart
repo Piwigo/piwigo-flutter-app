@@ -17,6 +17,7 @@ import 'package:piwigo_ng/components/dialogs/confirm_dialog.dart';
 import 'package:piwigo_ng/services/preferences_service.dart';
 import 'package:piwigo_ng/services/upload_notifier.dart';
 import 'package:piwigo_ng/utils/localizations.dart';
+import 'package:piwigo_ng/views/upload/upload_status_page.dart';
 import 'package:provider/provider.dart';
 
 import '../services/chunked_uploader.dart';
@@ -98,6 +99,8 @@ Future<List<int>> uploadPhotos(
   }
 
   uploadNotifier.addItems(items);
+
+  App.navigatorKey.currentState?.popAndPushNamed(UploadStatusPage.routeName);
 
   await Future.wait(List<Future<void>>.generate(items.length, (index) async {
     UploadItem item = items[index];

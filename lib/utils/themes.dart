@@ -36,6 +36,20 @@ final ThemeData lightTheme = ThemeData.light().copyWith(
     foregroundColor: AppColors.accent,
     titleTextStyle: TextStyle(fontSize: 20.0, color: AppColors.black),
   ),
+  bottomNavigationBarTheme: BottomNavigationBarThemeData(
+    selectedItemColor: AppColors.accent,
+    selectedLabelStyle: TextStyle(
+      fontSize: 14,
+      color: AppColors.accent,
+      fontWeight: FontWeight.w500,
+    ),
+    unselectedItemColor: AppColors.black,
+    unselectedLabelStyle: TextStyle(
+      fontSize: 14,
+      color: AppColors.black,
+      fontWeight: FontWeight.normal,
+    ),
+  ),
   iconTheme: const IconThemeData(
     color: AppColors.accent,
   ),
@@ -175,6 +189,20 @@ final ThemeData darkTheme = ThemeData.dark().copyWith(
       color: AppColors.accent,
     ),
     titleTextStyle: TextStyle(fontSize: 20.0, color: AppColors.white),
+  ),
+  bottomNavigationBarTheme: BottomNavigationBarThemeData(
+    selectedItemColor: AppColors.accent,
+    selectedLabelStyle: TextStyle(
+      fontSize: 14,
+      color: AppColors.accent,
+      fontWeight: FontWeight.w500,
+    ),
+    unselectedItemColor: AppColors.white,
+    unselectedLabelStyle: TextStyle(
+      fontSize: 14,
+      color: AppColors.white,
+      fontWeight: FontWeight.normal,
+    ),
   ),
   iconTheme: const IconThemeData(
     color: AppColors.accent,

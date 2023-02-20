@@ -195,6 +195,10 @@
     "categoryUpload_takePhoto": "Take Photo",
     "categoryUpload_takeVideo": "Take Video",
 
+    "uploadList_title": "Upload Status",
+    "uploadList_uploading": "Uploading",
+    "uploadList_history": "History",
+
 
     "setDefaultCategory_select": "Please select an album or sub-album which will become the new root album.",
     "setDefaultCategory_title": "Default Album",
