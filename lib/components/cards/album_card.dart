@@ -14,13 +14,11 @@ class AlbumCard extends StatelessWidget {
     required this.album,
     this.onTap,
     this.showActions = true,
-    this.example = false,
     this.onDelete,
     this.onEdit,
     this.onMove,
   }) : super(key: key);
 
-  final bool example;
   final AlbumModel album;
   final Function()? onTap;
   final Function()? onDelete;
@@ -126,7 +124,6 @@ class AlbumCard extends StatelessWidget {
               ),
               child: AlbumCardContent(
                 album: album,
-                example: example,
               ),
             ),
           ),
@@ -151,7 +148,6 @@ class AlbumCard extends StatelessWidget {
           ),
           child: AlbumCardContent(
             album: album,
-            example: example,
           ),
         ),
       );
@@ -163,11 +159,9 @@ class AlbumCardContent extends StatelessWidget {
   const AlbumCardContent({
     Key? key,
     required this.album,
-    this.example = false,
   }) : super(key: key);
 
   final AlbumModel album;
-  final bool example;
 
   @override
   Widget build(BuildContext context) {
@@ -201,33 +195,25 @@ class AlbumCardContent extends StatelessWidget {
                 ),
               );
             }
-            if (example) {
-              return Image.asset(
-                album.urlRepresentative!,
-                fit: BoxFit.cover,
-                errorBuilder: (context, o, s) {
-                  debugPrint("$o");
-                  return Center(child: Icon(Icons.image_not_supported));
-                },
-              );
-            }
             return CachedNetworkImage(
               imageUrl: album.urlRepresentative!,
-              imageBuilder: (context, provider) => Image(
-                image: provider,
-                fit: BoxFit.cover,
-              ),
-              progressIndicatorBuilder: (context, url, download) => Center(
-                child: CircularProgressIndicator(
-                  value: download.progress,
-                ),
-              ),
+              fit: BoxFit.cover,
+              progressIndicatorBuilder: (context, url, download) {
+                if (download.downloaded >= (download.totalSize ?? 0)) {
+                  return const SizedBox();
+                }
+                return Center(
+                  child: CircularProgressIndicator(
+                    value: download.progress,
+                  ),
+                );
+              },
               errorWidget: (context, url, error) {
                 debugPrint("[$url] $error");
                 return FittedBox(
                   fit: BoxFit.cover,
                   child: Container(
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(16.0),
                     decoration: BoxDecoration(
                       color: Theme.of(context).scaffoldBackgroundColor,
                     ),

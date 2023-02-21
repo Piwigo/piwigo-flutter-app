@@ -360,6 +360,9 @@ class _ImageViewPageState extends State<ImageViewPage> {
 
             // Default behavior: Zoomable image
             return PhotoViewGalleryPageOptions(
+              heroAttributes: PhotoViewHeroAttributes(
+                tag: "<hero image ${image.id}>",
+              ),
               imageProvider: NetworkImage(
                 image.getDerivativeFromString(Preferences.getImageFullScreenSize)?.url ?? '',
               ),
