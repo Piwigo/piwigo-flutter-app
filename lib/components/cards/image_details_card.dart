@@ -67,63 +67,62 @@ class ImageDetailsCard extends StatelessWidget {
         ),
       );
 
-  Widget _imageDetails(context) => Container(
-        margin: EdgeInsets.symmetric(vertical: 8.0),
-        padding: EdgeInsets.only(top: 8.0, bottom: 8.0, right: 8.0),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.horizontal(right: Radius.circular(10.0)),
-          color: Theme.of(context).cardColor,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(
-              "${image.width}x${image.height} pixels",
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: Theme.of(context).textTheme.bodySmall,
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 4.0),
-              child: Row(
-                children: [
-                  Flexible(
-                    child: Text(
-                      image.file.replaceAll('', '\u200B').split(path.extension(image.file))[0],
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
-                  ),
-                  Text(
-                    path.extension(image.file),
+  Widget _imageDetails(context) {
+    return Container(
+      margin: EdgeInsets.symmetric(vertical: 8.0),
+      padding: EdgeInsets.only(top: 8.0, bottom: 8.0, right: 8.0),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.horizontal(right: Radius.circular(10.0)),
+        color: Theme.of(context).cardColor,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            "${image.width}x${image.height} pixels",
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 4.0),
+            child: Row(
+              children: [
+                Flexible(
+                  child: Text(
+                    image.file.replaceAll('', '\u200B').split(path.extension(image.file))[0],
+                    maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
-                ],
-              ),
-            ),
-            if (image.dateAvailable != null)
-              Padding(
-                padding: const EdgeInsets.only(top: 4.0),
-                child: Flexible(
-                  child: Builder(builder: (context) {
-                    LocaleNotifier localeNotifier = Provider.of<LocaleNotifier>(context, listen: false);
-                    String date =
-                        DateFormat.yMMMMd(localeNotifier.locale.languageCode).format(DateTime.parse(image.dateAvailable!));
-                    String time = DateFormat.Hms(localeNotifier.locale.languageCode).format(DateTime.parse(image.dateAvailable!));
-                    return Text(
-                      "$date $time",
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: Theme.of(context).textTheme.bodySmall,
-                    );
-                  }),
                 ),
-              ),
-          ],
-        ),
-      );
+                Text(
+                  path.extension(image.file),
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+              ],
+            ),
+          ),
+          if (image.dateAvailable != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 4.0),
+              child: Builder(builder: (context) {
+                LocaleNotifier localeNotifier = Provider.of<LocaleNotifier>(context, listen: false);
+                String date = DateFormat.yMMMMd(localeNotifier.locale.languageCode).format(DateTime.parse(image.dateAvailable!));
+                String time = DateFormat.Hms(localeNotifier.locale.languageCode).format(DateTime.parse(image.dateAvailable!));
+                return Text(
+                  "$date $time",
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.bodySmall,
+                );
+              }),
+            ),
+        ],
+      ),
+    );
+  }
 
   Widget _removeButton(context) => Positioned(
         bottom: 0.0,
