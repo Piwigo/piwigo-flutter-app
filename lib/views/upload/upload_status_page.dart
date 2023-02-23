@@ -27,7 +27,7 @@ class _UploadStatusPageState extends State<UploadStatusPage> {
         centerTitle: true,
         scrolledUnderElevation: 5.0,
         title: Text(
-          appStrings.uploadList_title,
+          appStrings.uploadSection_queue,
           style: Theme.of(context).appBarTheme.titleTextStyle,
         ),
       ),
@@ -69,7 +69,7 @@ class _UploadStatusPageState extends State<UploadStatusPage> {
     return Consumer<UploadNotifier>(builder: (context, uploadNotifier, child) {
       if (uploadNotifier.uploadList.isEmpty) {
         return Center(
-          child: Text(appStrings.noImages),
+          child: Text(appStrings.uploadList_empty),
         );
       }
       return ListView.separated(
@@ -126,7 +126,7 @@ class _UploadStatusPageState extends State<UploadStatusPage> {
     return Consumer<UploadNotifier>(builder: (context, uploadNotifier, child) {
       if (uploadNotifier.uploadHistoryList.isEmpty) {
         return Center(
-          child: Text(appStrings.noImages),
+          child: Text(appStrings.uploadList_empty),
         );
       }
       return ListView.separated(

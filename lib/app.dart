@@ -11,6 +11,7 @@ import 'package:piwigo_ng/views/album/album_view_page.dart';
 import 'package:piwigo_ng/views/album/root_album_view_page.dart';
 import 'package:piwigo_ng/views/authentication/login_view_page.dart';
 import 'package:piwigo_ng/views/image/edit_image_page.dart';
+import 'package:piwigo_ng/views/image/image_favorites_page.dart';
 import 'package:piwigo_ng/views/image/image_search_view_page.dart';
 import 'package:piwigo_ng/views/image/image_view_page.dart';
 import 'package:piwigo_ng/views/settings/privacy_policy_view_page.dart';
@@ -116,8 +117,15 @@ Route<dynamic> generateRoute(RouteSettings settings) {
         settings: settings,
       );
     case ImageSearchViewPage.routeName:
-      return SlideUpPageRoute(
-        page: ImageSearchViewPage(
+      return MaterialPageRoute(
+        builder: (_) => ImageSearchViewPage(
+          isAdmin: arguments['isAdmin'] ?? isAdmin,
+        ),
+        settings: settings,
+      );
+    case ImageFavoritesPage.routeName:
+      return MaterialPageRoute(
+        builder: (_) => ImageFavoritesPage(
           isAdmin: arguments['isAdmin'] ?? isAdmin,
         ),
         settings: settings,

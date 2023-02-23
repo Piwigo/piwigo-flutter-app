@@ -47,7 +47,7 @@ Future<ApiResult<ImageModel>> getImage(int imageId) async {
   return ApiResult(error: ApiErrors.error);
 }
 
-Future<ApiResult<List<ImageModel>>> fetchImages(int albumID, int page) async {
+Future<ApiResult<List<ImageModel>>> fetchImages(int albumID, [int page = 0]) async {
   Map<String, dynamic> queries = {
     'format': 'json',
     'method': 'pwg.categories.getImages',
@@ -61,7 +61,7 @@ Future<ApiResult<List<ImageModel>>> fetchImages(int albumID, int page) async {
     Response response = await ApiClient.get(queryParameters: queries);
 
     if (response.statusCode == 200) {
-      var jsonImages = json.decode(response.data)["result"]["images"];
+      var jsonImages = json.decode(response.data)['result']['images'];
       List<ImageModel> images = List<ImageModel>.from(
         jsonImages.map((image) => ImageModel.fromJson(image)),
       );
@@ -78,10 +78,12 @@ Future<ApiResult<List<ImageModel>>> fetchImages(int albumID, int page) async {
 
 Future<ApiResult<Map>> searchImages(String searchQuery, [int page = 0]) async {
   Map<String, dynamic> query = {
-    "format": "json",
-    "method": "pwg.images.search",
-    "query": searchQuery,
-    "page": page,
+    'format': 'json',
+    'method': 'pwg.images.search',
+    'query': searchQuery,
+    'order': Preferences.getImageSort.value,
+    'per_page': Settings.defaultElementPerPage,
+    'page': page,
   };
 
   try {
@@ -91,17 +93,17 @@ Future<ApiResult<Map>> searchImages(String searchQuery, [int page = 0]) async {
       final Map<String, dynamic> result = json.decode(response.data);
       if (result['err'] == 1002) {
         return ApiResult<Map>(data: {
-          "total_count": 0,
-          "images": [],
+          'total_count': 0,
+          'images': [],
         });
       }
-      final jsonImages = result["result"]["images"];
+      final jsonImages = result['result']['images'];
       List<ImageModel> images = List<ImageModel>.from(
         jsonImages.map((image) => ImageModel.fromJson(image)),
       );
       return ApiResult<Map>(data: {
-        "total_count": result["result"]["paging"]["total_count"],
-        "images": images,
+        'total_count': result['result']['paging']['total_count'],
+        'images': images,
       });
     }
   } on DioError catch (e) {
@@ -110,6 +112,46 @@ Future<ApiResult<Map>> searchImages(String searchQuery, [int page = 0]) async {
     debugPrint('Search images: ${e.stackTrace}');
   }
   return ApiResult(error: ApiErrors.searchImagesError);
+}
+
+Future<ApiResult<Map>> fetchFavorites([int page = 0]) async {
+  Map<String, dynamic> query = {
+    'format': 'json',
+    'method': 'pwg.users.favorites.getList',
+    'order': Preferences.getImageSort.value,
+    'per_page': Settings.defaultElementPerPage,
+    'page': page,
+  };
+
+  try {
+    Response response = await ApiClient.get(queryParameters: query);
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> result = json.decode(response.data);
+      if (result['stat'] == 'fail') {
+        return ApiResult<Map>(data: {
+          'total_count': 0,
+          'images': [],
+        });
+      }
+      final jsonImages = result['result']['images'];
+      List<ImageModel> images = List<ImageModel>.from(
+        jsonImages.map((image) {
+          image['is_favorite'] = true;
+          return ImageModel.fromJson(image);
+        }),
+      );
+      return ApiResult<Map>(data: {
+        'total_count': result['result']['paging']['count'],
+        'images': images,
+      });
+    }
+  } on DioError catch (e) {
+    debugPrint('Fetch favorites: ${e.message}');
+  } on Error catch (e) {
+    debugPrint('Fetch favorites: ${e.stackTrace}');
+  }
+  return ApiResult(error: ApiErrors.error);
 }
 
 Future<bool> _requestPermissions() async {
