@@ -5,7 +5,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:piwigo_ng/services/app_providers.dart';
 import 'package:piwigo_ng/services/preferences_service.dart';
 import 'package:piwigo_ng/utils/overscroll_behavior.dart';
-import 'package:piwigo_ng/utils/page_routes.dart';
 import 'package:piwigo_ng/utils/themes.dart';
 import 'package:piwigo_ng/views/album/album_view_page.dart';
 import 'package:piwigo_ng/views/album/root_album_view_page.dart';
@@ -92,7 +91,6 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       settings: settings,
     );
   }
-  Iterable<String> routePath = settings.name!.split('/').where((path) => path != '');
 
   switch (settings.name) {
     case LoginViewPage.routeName:
