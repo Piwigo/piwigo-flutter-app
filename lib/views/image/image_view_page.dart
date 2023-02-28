@@ -1,7 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:mime_type/mime_type.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
+import 'package:piwigo_ng/api/api_client.dart';
 import 'package:piwigo_ng/api/api_error.dart';
 import 'package:piwigo_ng/api/images.dart';
 import 'package:piwigo_ng/components/popup_list_item.dart';
@@ -11,6 +16,7 @@ import 'package:piwigo_ng/services/preferences_service.dart';
 import 'package:piwigo_ng/utils/image_actions.dart';
 import 'package:piwigo_ng/utils/localizations.dart';
 import 'package:piwigo_ng/views/image/video_view.dart';
+import 'package:html_unescape/html_unescape.dart';
 
 /// Media Full Screen page
 /// * Video player
@@ -60,6 +66,9 @@ class _ImageViewPageState extends State<ImageViewPage> {
   /// API Image Pagination
   int _imagePage = 0;
 
+  /// Server Cookie String
+  String _serverCookie = '';
+
   /// Initialize [PageView]
   @override
   void initState() {
@@ -73,6 +82,9 @@ class _ImageViewPageState extends State<ImageViewPage> {
       }
     }
     _pageController = PageController(initialPage: _page);
+
+    _loadCookies();
+
     super.initState();
   }
 
@@ -92,6 +104,17 @@ class _ImageViewPageState extends State<ImageViewPage> {
     setState(() {
       _imagePage += 1;
       _imageList.addAll(result.data!);
+    });
+  }
+
+  Future<void> _loadCookies() async {
+    FlutterSecureStorage secureStorage = const FlutterSecureStorage();
+    String? serverUrl = await secureStorage.read(key: 'SERVER_URL');
+    List<Cookie> cookies = await ApiClient.cookieJar.loadForRequest(Uri.parse(serverUrl!));
+
+    String cookiesStr = cookies.map((cookie) => '${cookie.name}=${cookie.value}').join('; ');
+    setState(() {
+      _serverCookie = cookiesStr;
     });
   }
 
@@ -330,7 +353,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: () => _onToggleOverlay(MediaQuery.of(context).orientation),
-        child: PhotoViewGallery.builder(
+        child: _serverCookie == '' ? null : PhotoViewGallery.builder(
           /// Compatibility with PageView and PhotoView
           pageController: _pageController,
           onPageChanged: (page) => setState(() {
@@ -358,13 +381,24 @@ class _ImageViewPageState extends State<ImageViewPage> {
               );
             }
 
+            String imageUrl = '';
+            if (Preferences.getImageFullScreenSize == 'full') {
+              imageUrl = image.elementUrl ?? '';
+              imageUrl = HtmlUnescape().convert(imageUrl);
+            } else {
+              imageUrl = image.getDerivativeFromString(Preferences.getImageFullScreenSize)?.url ?? '';
+            }
+
+            ApiClient.cookieJar.loadForRequest(Uri.parse(imageUrl));
+
             // Default behavior: Zoomable image
+
             return PhotoViewGalleryPageOptions(
               heroAttributes: PhotoViewHeroAttributes(
                 tag: "<hero image ${image.id}>",
               ),
               imageProvider: NetworkImage(
-                image.getDerivativeFromString(Preferences.getImageFullScreenSize)?.url ?? '',
+                imageUrl, headers: {HttpHeaders.cookieHeader: _serverCookie},
               ),
               maxScale: 2.0,
               minScale: PhotoViewComputedScale.contained,

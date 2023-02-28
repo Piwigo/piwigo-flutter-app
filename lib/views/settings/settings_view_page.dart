@@ -37,6 +37,7 @@ class _SettingsViewPageState extends State<SettingsViewPage> {
   late final Future<ApiResult<InfoModel>> _infoFuture;
 
   late final List<String> _availableSizes;
+  late final List<String> _availablePreviewSizes;
   late int _imageRowNumber;
   late bool _thumbnailTitle;
   late String _imageThumbnailSize;
@@ -61,6 +62,7 @@ class _SettingsViewPageState extends State<SettingsViewPage> {
     _imageSort = Preferences.getImageSort;
     _albumThumbnailSize = Preferences.getAlbumThumbnailSize;
     _availableSizes = Preferences.getAvailableSizes;
+    _availablePreviewSizes = Preferences.getAvailableSizes;
     _author = Preferences.getUploadAuthor ?? '';
     _stripMetadata = Preferences.getRemoveMetadata;
     _compressBeforeUpload = Preferences.getCompressUpload;
@@ -69,6 +71,11 @@ class _SettingsViewPageState extends State<SettingsViewPage> {
     _quality = Preferences.getUploadQuality;
     _downloadNotification = Preferences.getDownloadNotification;
     _uploadNotification = Preferences.getUploadNotification;
+
+    if (!_availablePreviewSizes.contains('full')) {
+      _availablePreviewSizes.add('full');
+    }
+
     super.initState();
     _infoFuture = getInfo();
   }
@@ -299,13 +306,13 @@ class _SettingsViewPageState extends State<SettingsViewPage> {
                   });
                 },
                 selectedItemBuilder: (context) {
-                  return List.generate(_availableSizes.length, (index) {
-                    String size = _availableSizes[index];
+                  return List.generate(_availablePreviewSizes.length, (index) {
+                    String size = _availablePreviewSizes[index];
                     return Center(child: Text("${thumbnailSize(size)}"));
                   });
                 },
-                items: List.generate(_availableSizes.length, (index) {
-                  String size = _availableSizes[index];
+                items: List.generate(_availablePreviewSizes.length, (index) {
+                  String size = _availablePreviewSizes[index];
                   return DropdownMenuItem<String>(
                     value: size,
                     child: Text(
