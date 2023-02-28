@@ -45,8 +45,8 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
   late AlbumModel _currentAlbum;
 
   late final Future<List<ApiResult>> _data;
-  List<ImageModel> _imageList = [];
-  List<AlbumModel> _albumList = [];
+  List<ImageModel>? _imageList;
+  List<AlbumModel>? _albumList;
   List<ImageModel> _selectedList = [];
 
   int _page = 0;
@@ -63,6 +63,11 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
 
   bool get _hasNonFavorites => _selectedList.where((image) => !image.favorite).isNotEmpty;
 
+  bool get _enableLoad {
+    if (_imageList == null || _imageList!.isEmpty) return false;
+    return _currentAlbum.nbImages > _imageList!.length;
+  }
+
   List<AlbumModel> _parseAlbums(List<AlbumModel> albums) {
     albums.removeWhere((album) {
       if (album.id == widget.album.id) {
@@ -75,7 +80,8 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
   }
 
   Future<void> _loadMoreImages() async {
-    if (_currentAlbum.nbImages <= _imageList.length) return;
+    if (_imageList == null) return;
+    if (_currentAlbum.nbImages <= _imageList!.length) return;
     ApiResult<List<ImageModel>> result = await fetchImages(widget.album.id, _page + 1);
     if (result.hasError || !result.hasData) {
       _refreshController.loadFailed();
@@ -84,7 +90,7 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
     }
     setState(() {
       _page += 1;
-      _imageList.addAll(result.data!);
+      _imageList!.addAll(result.data!);
     });
     _refreshController.loadComplete();
   }
@@ -102,7 +108,7 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
       _page = 0;
       _albumList = _parseAlbums(albumsResult.data!);
       _imageList = imagesResult.data!;
-      _selectedList.removeWhere((image) => !_imageList.contains(image));
+      _selectedList.removeWhere((image) => !(_imageList ?? []).contains(image));
     });
     _refreshController.refreshCompleted();
   }
@@ -161,7 +167,7 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
         child: SmartRefresher(
           controller: _refreshController,
           scrollController: _scrollController,
-          enablePullUp: _imageList.isNotEmpty && _currentAlbum.nbImages > _imageList.length,
+          enablePullUp: _enableLoad,
           onLoading: _loadMoreImages,
           onRefresh: _onRefresh,
           header: MaterialClassicHeader(
@@ -192,9 +198,9 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
                           _albumGrid(snapshot),
                           _imageGrid(snapshot),
                           SizedBox(
-                            height: 72,
+                            height: 72.0,
                             child: Padding(
-                              padding: const EdgeInsets.all(8),
+                              padding: const EdgeInsets.all(8.0),
                               child: Text(
                                 appStrings.imageCount(_currentAlbum.nbTotalImages),
                                 style: Theme.of(context).textTheme.titleSmall,
@@ -411,15 +417,21 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
   }
 
   Widget _albumGrid(AsyncSnapshot snapshot) {
-    if (_albumList.isEmpty) {
+    // initialize album list
+    if (_albumList == null) {
       final ApiResult<List<AlbumModel>> result = snapshot.data!.first as ApiResult<List<AlbumModel>>;
-      List<AlbumModel> albums = _parseAlbums(result.data!);
-      if (albums.isEmpty) return const SizedBox();
+      // if only albums has error
+      if (!result.hasData) {
+        return Center(
+          child: Text(appStrings.categoryImageList_noDataError),
+        );
+      }
       _albumList = _parseAlbums(result.data!);
     }
+    if (_albumList!.isEmpty) return const SizedBox();
     return AlbumGridView(
       isAdmin: widget.isAdmin,
-      albumList: _albumList,
+      albumList: _albumList!,
       onTap: _onTapAlbum,
       onEdit: _onEditAlbum,
       onDelete: _onDeleteAlbum,
@@ -428,14 +440,24 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
   }
 
   Widget _imageGrid(AsyncSnapshot snapshot) {
-    if (_imageList.isEmpty && _page == 0) {
+    // Initialize image list
+    if (_imageList == null) {
       final ApiResult<List<ImageModel>> result = snapshot.data!.last as ApiResult<List<ImageModel>>;
+      // if only images has error
+      if (!result.hasData) {
+        return Center(
+          child: Text(appStrings.categoryImageList_noDataError),
+        );
+      }
       _imageList = result.data!;
+      // Refresh after build (for _enableLoad)
       WidgetsBinding.instance.addPostFrameCallback((timeStamp) => setState(() {}));
     }
-    _selectedList = _imageList.where((image) => _selectedList.contains(image)).toList();
+    if (_imageList!.isEmpty) return const SizedBox();
+    // rebuild current selection with new images
+    _selectedList = _imageList!.where((image) => _selectedList.contains(image)).toList();
     return ImageGridView(
-      imageList: _imageList,
+      imageList: _imageList!,
       selectedList: _selectedList,
       onTapImage: _onTapPhoto,
       onSelectImage: (image) => setState(() {

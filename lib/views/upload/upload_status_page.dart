@@ -15,10 +15,7 @@ class UploadStatusPage extends StatefulWidget {
 }
 
 class _UploadStatusPageState extends State<UploadStatusPage> {
-  final PageController _pageController = PageController();
   final ScrollController _scrollController = ScrollController();
-
-  int _page = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -31,110 +28,67 @@ class _UploadStatusPageState extends State<UploadStatusPage> {
           style: Theme.of(context).appBarTheme.titleTextStyle,
         ),
       ),
-      body: PageView(
-        controller: _pageController,
-        onPageChanged: (page) => setState(() {
-          _page = page;
-        }),
-        children: [
-          _buildUploadList,
-          _buildHistoryList,
-        ],
-      ),
+      body: _buildUploadList,
       floatingActionButton: ScrollUpFloatingButton(
         controller: _scrollController,
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _page,
-        onTap: (index) => _pageController.animateToPage(
-          index,
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.ease,
-        ),
-        items: [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.list),
-            label: appStrings.uploadList_uploading,
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.history),
-            label: appStrings.uploadList_history,
-          ),
-        ],
       ),
     );
   }
 
   Widget get _buildUploadList {
     return Consumer<UploadNotifier>(builder: (context, uploadNotifier, child) {
-      if (uploadNotifier.uploadList.isEmpty) {
+      if (uploadNotifier.uploadList.isEmpty && uploadNotifier.uploadHistoryList.isEmpty) {
         return Center(
           child: Text(appStrings.uploadList_empty),
         );
       }
       return ListView.separated(
         padding: EdgeInsets.symmetric(vertical: 8.0),
-        itemCount: uploadNotifier.uploadList.length,
+        controller: _scrollController,
+        itemCount: uploadNotifier.uploadList.length + uploadNotifier.uploadHistoryList.length,
         itemBuilder: (context, index) {
-          UploadItem item = uploadNotifier.uploadList[index];
-          return ListTile(
-            dense: true,
-            leading: ClipRRect(
-              borderRadius: BorderRadius.circular(5.0),
-              child: AspectRatio(
-                aspectRatio: 1,
-                child: Image.file(
-                  item.file,
-                  fit: BoxFit.cover,
+          late UploadItem item;
+          if (index < uploadNotifier.uploadList.length) {
+            item = uploadNotifier.uploadList[index];
+            return ListTile(
+              dense: true,
+              leading: ClipRRect(
+                borderRadius: BorderRadius.circular(5.0),
+                child: AspectRatio(
+                  aspectRatio: 1,
+                  child: Image.file(
+                    item.file,
+                    fit: BoxFit.cover,
+                  ),
                 ),
               ),
-            ),
-            title: Text(
-              item.file.path.split('/').last,
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
-            subtitle: StreamBuilder<double>(
-              stream: item.progress.stream,
-              initialData: 0.0,
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  return LinearProgressIndicator(
-                    backgroundColor: Theme.of(context).colorScheme.secondary.withOpacity(0.3),
-                    value: min(snapshot.data!, 1.0),
-                  );
-                }
-                return LinearProgressIndicator();
-              },
-            ),
-            trailing: IconButton(
-              onPressed: () {
-                item.cancelToken.cancel();
-                uploadNotifier.itemUploadCompleted(item);
-              },
-              icon: Icon(Icons.close),
-            ),
-          );
-        },
-        separatorBuilder: (context, index) {
-          return const Divider();
-        },
-      );
-    });
-  }
-
-  Widget get _buildHistoryList {
-    return Consumer<UploadNotifier>(builder: (context, uploadNotifier, child) {
-      if (uploadNotifier.uploadHistoryList.isEmpty) {
-        return Center(
-          child: Text(appStrings.uploadList_empty),
-        );
-      }
-      return ListView.separated(
-        controller: _scrollController,
-        padding: EdgeInsets.symmetric(vertical: 8.0),
-        itemCount: uploadNotifier.uploadHistoryList.length,
-        itemBuilder: (context, index) {
-          UploadItem item = uploadNotifier.uploadHistoryList[index];
+              title: Text(
+                item.file.path.split('/').last,
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+              subtitle: StreamBuilder<double>(
+                stream: item.progress.stream,
+                initialData: 0.0,
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    return LinearProgressIndicator(
+                      backgroundColor: Theme.of(context).colorScheme.secondary.withOpacity(0.3),
+                      value: min(snapshot.data!, 1.0),
+                    );
+                  }
+                  return LinearProgressIndicator();
+                },
+              ),
+              trailing: IconButton(
+                onPressed: () {
+                  item.cancelToken.cancel();
+                  uploadNotifier.itemUploadCompleted(item);
+                },
+                icon: Icon(Icons.close),
+              ),
+            );
+          }
+          item = uploadNotifier.uploadHistoryList[index - uploadNotifier.uploadList.length];
           return ListTile(
             dense: true,
             leading: ClipRRect(
