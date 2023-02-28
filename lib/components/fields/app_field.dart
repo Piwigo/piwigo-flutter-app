@@ -45,7 +45,6 @@ class AppField extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10.0),
         color: color ?? Theme.of(context).inputDecorationTheme.fillColor,
-        //border: error ? Border.all(color: Theme.of(context).errorColor, width: 1) : null,
       ),
       child: TextFormField(
         controller: controller,

@@ -462,8 +462,6 @@ class VideoPlayerView extends StatefulWidget {
 }
 
 class _VideoPlayerViewState extends State<VideoPlayerView> {
-  static const Duration overlayAnimationDuration = Duration(milliseconds: 300);
-  static const Curve overlayAnimationCurve = Curves.ease;
   late VideoPlayerController _videoPlayerController;
   late PlayerProvider _provider;
   ChewieController? _chewieController;

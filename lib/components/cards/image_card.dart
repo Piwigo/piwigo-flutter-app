@@ -30,55 +30,7 @@ class ImageCard extends StatelessWidget {
       child: Stack(
         fit: StackFit.expand,
         children: [
-          Builder(builder: (context) {
-            final String? imageUrl = image.getDerivativeFromString(Preferences.getImageThumbnailSize)?.url;
-            return CachedNetworkImage(
-              imageUrl: imageUrl ?? '',
-              imageBuilder: (context, provider) => Hero(
-                tag: "<hero image ${image.id}>",
-                child: Image(
-                  image: provider,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, o, s) {
-                    debugPrint("$o\n$s");
-                    return FittedBox(
-                      fit: BoxFit.cover,
-                      child: Container(
-                        padding: const EdgeInsets.all(16.0),
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).scaffoldBackgroundColor,
-                        ),
-                        child: const Icon(Icons.broken_image_outlined),
-                      ),
-                    );
-                  },
-                ),
-              ),
-              progressIndicatorBuilder: (context, url, download) {
-                if (download.downloaded >= (download.totalSize ?? 0)) {
-                  return const SizedBox();
-                }
-                return Center(
-                  child: CircularProgressIndicator(
-                    value: download.progress,
-                  ),
-                );
-              },
-              errorWidget: (context, url, error) {
-                debugPrint("[$url] $error");
-                return FittedBox(
-                  fit: BoxFit.cover,
-                  child: Container(
-                    padding: const EdgeInsets.all(16.0),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).scaffoldBackgroundColor,
-                    ),
-                    child: const Icon(Icons.broken_image_outlined),
-                  ),
-                );
-              },
-            );
-          }),
+          _buildThumbnail(context),
           Positioned(
             bottom: 0,
             right: 0,
@@ -135,54 +87,106 @@ class ImageCard extends StatelessWidget {
               ],
             ),
           ),
-          AnimatedOpacity(
-            duration: selectDuration,
-            curve: selectCurve,
-            opacity: selected == true ? 0.5 : 0.0,
-            child: Container(
-              color: Colors.black,
-              child: const Center(),
-            ),
-          ),
-          Positioned(
-            top: 4,
-            right: 4,
-            child: Stack(
-              children: [
-                AnimatedScale(
-                  duration: selectDuration,
-                  curve: selectCurve,
-                  scale: selected == false ? 1 : 0,
-                  child: AnimatedOpacity(
-                    duration: selectDuration,
-                    curve: selectCurve,
-                    opacity: selected == false ? 1 : 0,
-                    child: Container(
-                      height: 20,
-                      width: 20,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(color: Theme.of(context).primaryColor),
-                        color: Colors.black.withOpacity(0.3),
-                      ),
-                    ),
-                  ),
-                ),
-                AnimatedScale(
-                  duration: selectDuration,
-                  curve: selectCurve,
-                  scale: selected == true ? 1 : 0,
-                  child: AnimatedOpacity(
-                    duration: selectDuration,
-                    curve: selectCurve,
-                    opacity: selected == true ? 1 : 0,
-                    child: Icon(Icons.check_circle, size: 20),
-                  ),
-                ),
-              ],
-            ),
-          ),
+          ..._buildSelectOverlay(context),
         ],
+      ),
+    );
+  }
+
+  Widget _buildThumbnail(context) {
+    final String? imageUrl = image.getDerivativeFromString(Preferences.getImageThumbnailSize)?.url;
+    return CachedNetworkImage(
+      imageUrl: imageUrl ?? '',
+      fadeInDuration: const Duration(milliseconds: 300),
+      imageBuilder: (context, provider) => Hero(
+        tag: "<hero image ${image.id}>",
+        child: Image(
+          image: provider,
+          fit: BoxFit.cover,
+          errorBuilder: (context, o, s) {
+            debugPrint("$o\n$s");
+            return _buildErrorWidget(context);
+          },
+        ),
+      ),
+      progressIndicatorBuilder: (context, url, download) {
+        if (download.downloaded >= (download.totalSize ?? 0)) {
+          return const SizedBox();
+        }
+        return Center(
+          child: CircularProgressIndicator(
+            value: download.progress,
+          ),
+        );
+      },
+      errorWidget: (context, url, error) {
+        debugPrint("[$url] $error");
+        return _buildErrorWidget(context);
+      },
+    );
+  }
+
+  List<Widget> _buildSelectOverlay(context) {
+    return [
+      AnimatedOpacity(
+        duration: selectDuration,
+        curve: selectCurve,
+        opacity: selected == true ? 0.5 : 0.0,
+        child: Container(
+          color: Colors.black,
+          child: const Center(),
+        ),
+      ),
+      Positioned(
+        top: 4,
+        right: 4,
+        child: Stack(
+          children: [
+            AnimatedScale(
+              duration: selectDuration,
+              curve: selectCurve,
+              scale: selected == false ? 1 : 0,
+              child: AnimatedOpacity(
+                duration: selectDuration,
+                curve: selectCurve,
+                opacity: selected == false ? 1 : 0,
+                child: Container(
+                  height: 20,
+                  width: 20,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Theme.of(context).primaryColor),
+                    color: Colors.black.withOpacity(0.3),
+                  ),
+                ),
+              ),
+            ),
+            AnimatedScale(
+              duration: selectDuration,
+              curve: selectCurve,
+              scale: selected == true ? 1 : 0,
+              child: AnimatedOpacity(
+                duration: selectDuration,
+                curve: selectCurve,
+                opacity: selected == true ? 1 : 0,
+                child: Icon(Icons.check_circle, size: 20),
+              ),
+            ),
+          ],
+        ),
+      ),
+    ];
+  }
+
+  Widget _buildErrorWidget(BuildContext context) {
+    return FittedBox(
+      fit: BoxFit.cover,
+      child: Container(
+        padding: const EdgeInsets.all(16.0),
+        decoration: BoxDecoration(
+          color: Theme.of(context).scaffoldBackgroundColor,
+        ),
+        child: const Icon(Icons.broken_image_outlined),
       ),
     );
   }

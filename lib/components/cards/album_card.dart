@@ -198,6 +198,7 @@ class AlbumCardContent extends StatelessWidget {
             return CachedNetworkImage(
               imageUrl: album.urlRepresentative!,
               fit: BoxFit.cover,
+              fadeInDuration: const Duration(milliseconds: 300),
               progressIndicatorBuilder: (context, url, download) {
                 if (download.downloaded >= (download.totalSize ?? 0)) {
                   return const SizedBox();

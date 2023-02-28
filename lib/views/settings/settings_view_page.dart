@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -89,6 +90,7 @@ class _SettingsViewPageState extends State<SettingsViewPage> {
   Future<double?> _getCacheSize() async {
     int? totalSize = 0;
     final cacheDir = await getTemporaryDirectory();
+
     try {
       if (cacheDir.existsSync()) {
         cacheDir.listSync(recursive: true, followLinks: false).forEach((FileSystemEntity entity) {
@@ -107,9 +109,13 @@ class _SettingsViewPageState extends State<SettingsViewPage> {
 
   Future<void> _clearCache() async {
     final cacheDir = await getTemporaryDirectory();
+    final imageCache = DefaultCacheManager();
+
     if (cacheDir.existsSync()) {
       cacheDir.deleteSync(recursive: true);
     }
+    await imageCache.emptyCache();
+
     setState(() {});
   }
 
