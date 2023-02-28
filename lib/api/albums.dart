@@ -14,6 +14,7 @@ Map<String, dynamic> tryParseJson(String data) {
     return json.decode(data);
   } on FormatException catch (e) {
     debugPrint('Invalid json data');
+    debugPrint(data);
     int start = data.indexOf('{');
     int end = data.lastIndexOf('}');
     String parsedData = data.substring(start, end + 1);
@@ -213,6 +214,7 @@ Future<ApiResult<bool>> editAlbum({required String name, required int albumId, S
     'name': name,
     'comment': description,
   });
+
   try {
     Response response = await ApiClient.post(
       data: formData,

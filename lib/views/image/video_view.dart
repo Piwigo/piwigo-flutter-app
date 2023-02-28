@@ -1,9 +1,13 @@
 import 'dart:math';
 
+import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
+import 'package:piwigo_ng/components/player_controls.dart';
+import 'package:piwigo_ng/services/player_provider.dart';
 import 'package:piwigo_ng/utils/localizations.dart';
 import 'package:piwigo_ng/utils/resources.dart';
 import 'package:piwigo_ng/utils/themes.dart';
+import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
 
 class VideoView extends StatefulWidget {
@@ -433,6 +437,87 @@ class _VideoViewState extends State<VideoView> {
             ),
           ),
       ],
+    );
+  }
+}
+
+class VideoPlayerView extends StatefulWidget {
+  const VideoPlayerView(
+      {Key? key,
+      this.videoUrl,
+      this.thumbnailUrl,
+      this.onToggleOverlay,
+      this.showOverlay = false,
+      this.screenPadding = EdgeInsets.zero})
+      : super(key: key);
+
+  final String? videoUrl;
+  final String? thumbnailUrl;
+  final Function(bool)? onToggleOverlay;
+  final bool showOverlay;
+  final EdgeInsets screenPadding;
+
+  @override
+  State<VideoPlayerView> createState() => _VideoPlayerViewState();
+}
+
+class _VideoPlayerViewState extends State<VideoPlayerView> {
+  static const Duration overlayAnimationDuration = Duration(milliseconds: 300);
+  static const Curve overlayAnimationCurve = Curves.ease;
+  late VideoPlayerController _videoPlayerController;
+  late PlayerProvider _provider;
+  ChewieController? _chewieController;
+
+  @override
+  void initState() {
+    super.initState();
+    initializePlayer();
+    _provider = PlayerProvider.init(widget.showOverlay);
+  }
+
+  @override
+  void dispose() {
+    _videoPlayerController.dispose();
+    _chewieController?.dispose();
+    super.dispose();
+  }
+
+  Future<void> initializePlayer() async {
+    if (widget.videoUrl == null) return;
+    _videoPlayerController = VideoPlayerController.network(widget.videoUrl!);
+    await _videoPlayerController.initialize();
+    _createChewieController();
+    setState(() {});
+  }
+
+  void _createChewieController() {
+    _chewieController = ChewieController(
+      videoPlayerController: _videoPlayerController,
+      autoPlay: false,
+      allowFullScreen: false,
+      showOptions: false,
+      hideControlsTimer: const Duration(seconds: 3),
+      customControls: PlayerControls(onToggleOverlay: widget.onToggleOverlay),
+    )..setVolume(0);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (widget.videoUrl == null) {
+      return Center(
+        child: Text(appStrings.errorHUD_label),
+      );
+    }
+    if (_chewieController == null || !_chewieController!.videoPlayerController.value.isInitialized) {
+      return Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+    return ChangeNotifierProvider<PlayerProvider>.value(
+      value: _provider,
+      child: Chewie(
+        controller: _chewieController!,
+      ),
     );
   }
 }

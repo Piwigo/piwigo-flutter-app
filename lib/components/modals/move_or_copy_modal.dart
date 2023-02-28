@@ -52,7 +52,7 @@ class _MoveOrCopyModalState extends State<MoveOrCopyModal> {
   @override
   Widget build(BuildContext context) {
     return BottomSheet(
-      backgroundColor: Theme.of(context).backgroundColor,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       enableDrag: false,
       onClosing: () {},
       shape: const RoundedRectangleBorder(

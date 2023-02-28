@@ -111,9 +111,9 @@ Future<dynamic> onMovePhotos(BuildContext context, List<ImageModel> images, [Alb
               break;
           }
           if (results > 0) {
-            return choice;
+            return true;
           }
-          return -1;
+          return false;
         },
       ),
     ),

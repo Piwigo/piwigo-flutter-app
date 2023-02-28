@@ -195,6 +195,12 @@
     "categoryUpload_takePhoto": "Take Photo",
     "categoryUpload_takeVideo": "Take Video",
 
+    "uploadList_title": "Upload Status",
+    "uploadList_uploading": "Uploading",
+    "uploadList_history": "History",
+
+    "uploadList_empty": "Empty",
+
 
     "setDefaultCategory_select": "Please select an album or sub-album which will become the new root album.",
     "setDefaultCategory_title": "Default Album",
@@ -364,8 +370,8 @@
     "imageOptions_edit": "Edit",
     "imageOptions_download": "Download",
     "imageOptions_share": "Share",
-    "imageOptions_addFavorites": "Add favorites",
-    "imageOptions_removeFavorites": "Remove favorites",
+    "imageOptions_addFavorites": "Add to favorites",
+    "imageOptions_removeFavorites": "Remove from favorites",
     "imageOptions_setAlbumImage": "Set Album Thumbnail",
 
 
@@ -692,6 +698,7 @@
     "imageUploadCompleted_title": "Upload Completed",
     "imageUploadCompleted_message": "photo uploaded to your Piwigo server.",
     "imageUploadCompleted_message1": "photos uploaded to your Piwigo server.",
+    "imageUploadCompleted_warning": "some of your photos could not be uploaded.",
 
 
     "uploadError_title": "Upload Error",

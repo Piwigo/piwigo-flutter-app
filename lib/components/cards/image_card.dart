@@ -1,4 +1,5 @@
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:piwigo_ng/models/image_model.dart';
 import 'package:piwigo_ng/services/preferences_service.dart';
@@ -11,16 +12,12 @@ class ImageCard extends StatelessWidget {
     this.selected,
     required this.image,
     this.onLongPress,
-    this.example = false,
-    this.derivative,
   }) : super(key: key);
 
   final Function()? onPressed;
   final Function()? onLongPress;
   final bool? selected;
-  final bool example;
   final ImageModel image;
-  final String? derivative;
 
   final Duration selectDuration = const Duration(milliseconds: 200);
   final Curve selectCurve = Curves.easeInOut;
@@ -34,31 +31,49 @@ class ImageCard extends StatelessWidget {
         fit: StackFit.expand,
         children: [
           Builder(builder: (context) {
-            final String? imageUrl = image.getDerivativeFromString(derivative ?? Preferences.getImageThumbnailSize)?.url;
-            if (example) {
-              return Image.asset(
-                imageUrl ?? '',
-                fit: BoxFit.cover,
-                errorBuilder: (context, o, s) {
-                  debugPrint("$o\n$s");
-                  return Center(child: Icon(Icons.image_not_supported));
-                },
-              );
-            }
-            return Image.network(
-              imageUrl ?? '',
-              fit: BoxFit.cover,
-              errorBuilder: (context, o, s) {
-                debugPrint("$o\n$s");
-                return Center(child: Icon(Icons.image_not_supported));
-              },
-              loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
-                if (loadingProgress == null) return child;
+            final String? imageUrl = image.getDerivativeFromString(Preferences.getImageThumbnailSize)?.url;
+            return CachedNetworkImage(
+              imageUrl: imageUrl ?? '',
+              imageBuilder: (context, provider) => Hero(
+                tag: "<hero image ${image.id}>",
+                child: Image(
+                  image: provider,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, o, s) {
+                    debugPrint("$o\n$s");
+                    return FittedBox(
+                      fit: BoxFit.cover,
+                      child: Container(
+                        padding: const EdgeInsets.all(16.0),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).scaffoldBackgroundColor,
+                        ),
+                        child: const Icon(Icons.broken_image_outlined),
+                      ),
+                    );
+                  },
+                ),
+              ),
+              progressIndicatorBuilder: (context, url, download) {
+                if (download.downloaded >= (download.totalSize ?? 0)) {
+                  return const SizedBox();
+                }
                 return Center(
                   child: CircularProgressIndicator(
-                    value: loadingProgress.expectedTotalBytes != null
-                        ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
-                        : null,
+                    value: download.progress,
+                  ),
+                );
+              },
+              errorWidget: (context, url, error) {
+                debugPrint("[$url] $error");
+                return FittedBox(
+                  fit: BoxFit.cover,
+                  child: Container(
+                    padding: const EdgeInsets.all(16.0),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).scaffoldBackgroundColor,
+                    ),
+                    child: const Icon(Icons.broken_image_outlined),
                   ),
                 );
               },
@@ -72,11 +87,21 @@ class ImageCard extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                if (image.favorite)
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    if (image.isVideo)
+                      Padding(
+                        padding: const EdgeInsets.all(2.0),
+                        child: Icon(
+                          Icons.local_movies,
+                          color: Color(0xFFFFFFFF),
+                          size: 12,
+                          shadows: AppShadows.icon,
+                        ),
+                      ),
+                    if (image.favorite)
                       Padding(
                         padding: const EdgeInsets.all(2.0),
                         child: Icon(
@@ -86,8 +111,8 @@ class ImageCard extends StatelessWidget {
                           shadows: AppShadows.icon,
                         ),
                       ),
-                    ],
-                  ),
+                  ],
+                ),
                 if (Preferences.getShowThumbnailTitle)
                   Container(
                     padding: const EdgeInsets.all(2.0),

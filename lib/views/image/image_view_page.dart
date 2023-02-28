@@ -135,7 +135,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
   }
 
   /// Toggle overlay action (orientation was necessary, *see comments*).
-  void _onToggleOverlay(Orientation orientation) {
+  void _onToggleOverlay(Orientation orientation, [bool? value]) {
     // if (_showOverlay) {
     //   SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
     // } else {
@@ -144,7 +144,11 @@ class _ImageViewPageState extends State<ImageViewPage> {
     //   ]);
     // }
     setState(() {
-      _showOverlay = !_showOverlay;
+      if (value != null) {
+        _showOverlay = value;
+      } else {
+        _showOverlay = !_showOverlay;
+      }
     });
   }
 
@@ -362,18 +366,17 @@ class _ImageViewPageState extends State<ImageViewPage> {
           builder: (context, index) {
             final ImageModel image = _imageList[index];
 
-            /// Check mime type of file (multiple test to ensure it is not null)
-            String? mimeType = mime(image.file) ?? mime(image.elementUrl) ?? mime(image.derivatives.medium.url);
-            if (mimeType != null && mimeType.startsWith('video')) {
-              /// Returns video player
+            // Check mime type of file (multiple test to ensure it is not null)
+            if (image.isVideo) {
+              // Returns video player
               return PhotoViewGalleryPageOptions.customChild(
                 disableGestures: true,
-                child: VideoView(
+                child: VideoPlayerView(
                   videoUrl: image.elementUrl,
                   thumbnailUrl: image.derivatives.medium.url,
                   showOverlay: _showOverlay,
                   screenPadding: const EdgeInsets.only(bottom: 56.0),
-                  onToggleOverlay: () => _onToggleOverlay(MediaQuery.of(context).orientation),
+                  onToggleOverlay: (value) => _onToggleOverlay(MediaQuery.of(context).orientation, value),
                 ),
               );
             }
@@ -388,8 +391,12 @@ class _ImageViewPageState extends State<ImageViewPage> {
 
             ApiClient.cookieJar.loadForRequest(Uri.parse(imageUrl));
 
-            /// Default behavior: Zoomable image
+            // Default behavior: Zoomable image
+
             return PhotoViewGalleryPageOptions(
+              heroAttributes: PhotoViewHeroAttributes(
+                tag: "<hero image ${image.id}>",
+              ),
               imageProvider: NetworkImage(
                 imageUrl, headers: {HttpHeaders.cookieHeader: _serverCookie},
               ),
@@ -397,7 +404,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
               minScale: PhotoViewComputedScale.contained,
               errorBuilder: (context, o, s) {
                 debugPrint("$o");
-                return Center();
+                return SizedBox();
               },
             );
           },

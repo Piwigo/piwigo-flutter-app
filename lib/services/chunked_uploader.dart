@@ -93,6 +93,7 @@ class UploadRequest {
         path,
         data: formData,
         queryParameters: params,
+        cancelToken: cancelToken,
         options: Options(method: method, contentType: contentType),
         onSendProgress: (current, total) => _updateProgress(i, current, total),
       );

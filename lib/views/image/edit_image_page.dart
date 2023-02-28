@@ -29,6 +29,8 @@ class EditImagePage extends StatefulWidget {
 }
 
 class _EditImagePageState extends State<EditImagePage> {
+  static const double maxCarouselElementWidth = 300.0;
+  static const double carouselHeight = 128.0;
   late final TextEditingController _authorController;
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
@@ -113,25 +115,7 @@ class _EditImagePageState extends State<EditImagePage> {
       body: ListView(
         padding: const EdgeInsets.symmetric(vertical: 8.0),
         children: [
-          SizedBox(
-            height: 128.0,
-            child: OrientationBuilder(builder: (context, orientation) {
-              return PageView.builder(
-                controller: PageController(
-                  viewportFraction: min(300.0 / MediaQuery.of(context).size.width, 0.9),
-                ),
-                padEnds: false,
-                itemCount: _imageList.length,
-                itemBuilder: (context, index) {
-                  ImageModel image = _imageList[index];
-                  return ImageDetailsCard(
-                    image: image,
-                    onRemove: () => _onRemoveImage(image),
-                  );
-                },
-              );
-            }),
-          ),
+          _carousel,
           FormSection(
             margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
             title: appStrings.editImageDetails_title,
@@ -227,6 +211,37 @@ class _EditImagePageState extends State<EditImagePage> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget get _carousel {
+    return SizedBox(
+      height: carouselHeight,
+      child: OrientationBuilder(builder: (context, orientation) {
+        return PageView.builder(
+          controller: PageController(
+            viewportFraction: min(
+              maxCarouselElementWidth / MediaQuery.of(context).size.width,
+              0.9,
+            ),
+          ),
+          padEnds: false,
+          itemCount: _imageList.length,
+          itemBuilder: (context, index) {
+            ImageModel image = _imageList[index];
+            return Padding(
+              padding: EdgeInsets.only(
+                left: index == 0 ? 8.0 : 0.0,
+                right: index == _imageList.length - 1 ? 8.0 : 0.0,
+              ),
+              child: ImageDetailsCard(
+                image: image,
+                onRemove: () => _onRemoveImage(image),
+              ),
+            );
+          },
+        );
+      }),
     );
   }
 }
