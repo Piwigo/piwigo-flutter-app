@@ -23,7 +23,7 @@ class UploadNotifier extends ChangeNotifier {
   void itemUploadCompleted(UploadItem item, {bool error = false}) {
     _uploadList.remove(item);
     item.error = error;
-    _uploadHistoryList.add(item);
+    _uploadHistoryList.insert(0, item);
     notifyListeners();
   }
 
