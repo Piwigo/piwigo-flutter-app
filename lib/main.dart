@@ -5,9 +5,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:piwigo_ng/api/api_client.dart';
 import 'package:piwigo_ng/app.dart';
+import 'package:piwigo_ng/services/auto_upload_manager.dart';
 import 'package:piwigo_ng/services/notification_service.dart';
 import 'package:piwigo_ng/services/preferences_service.dart';
-import 'package:piwigo_ng/services/work_manager.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {

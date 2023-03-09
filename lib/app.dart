@@ -13,6 +13,7 @@ import 'package:piwigo_ng/views/image/edit_image_page.dart';
 import 'package:piwigo_ng/views/image/image_favorites_page.dart';
 import 'package:piwigo_ng/views/image/image_search_view_page.dart';
 import 'package:piwigo_ng/views/image/image_view_page.dart';
+import 'package:piwigo_ng/views/settings/auto_upload_page.dart';
 import 'package:piwigo_ng/views/settings/privacy_policy_view_page.dart';
 import 'package:piwigo_ng/views/settings/select_language_view_page.dart';
 import 'package:piwigo_ng/views/settings/settings_view_page.dart';
@@ -139,6 +140,11 @@ Route<dynamic> generateRoute(RouteSettings settings) {
     case UploadStatusPage.routeName:
       return MaterialPageRoute(
         builder: (_) => UploadStatusPage(),
+        settings: settings,
+      );
+    case AutoUploadPage.routeName:
+      return MaterialPageRoute(
+        builder: (_) => AutoUploadPage(),
         settings: settings,
       );
     case ImageViewPage.routeName:

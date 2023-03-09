@@ -17,6 +17,7 @@ import 'package:piwigo_ng/services/preferences_service.dart';
 import 'package:piwigo_ng/utils/localizations.dart';
 import 'package:piwigo_ng/utils/settings.dart';
 import 'package:piwigo_ng/views/authentication/login_view_page.dart';
+import 'package:piwigo_ng/views/settings/auto_upload_page.dart';
 import 'package:piwigo_ng/views/settings/privacy_policy_view_page.dart';
 import 'package:piwigo_ng/views/settings/select_language_view_page.dart';
 import 'package:provider/provider.dart';
@@ -457,10 +458,11 @@ class _SettingsViewPageState extends State<SettingsViewPage> {
               );
             }),
           ),
-          // const SettingsSectionItemButton(
-          //   title: appStrings.settings_autoUpload,
-          //   text: appStrings.settings_autoUploadDisabled,
-          // ),
+          SettingsSectionItemButton(
+            title: appStrings.settings_autoUpload,
+            text: appStrings.settings_autoUploadDisabled,
+            onPressed: () => Navigator.of(context).pushNamed(AutoUploadPage.routeName),
+          ),
           // SettingsSectionItemSwitch(
           //   title: appStrings.settings_deleteImage,
           //   value: _deleteAfterUpload,

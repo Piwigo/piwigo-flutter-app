@@ -1,5 +1,4 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:piwigo_ng/api/images.dart';
 import 'package:piwigo_ng/models/status_model.dart';
 import 'package:piwigo_ng/utils/settings.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -103,9 +102,24 @@ class Preferences {
     return appPreferences.getDouble(uploadQualityKey) ?? Settings.defaultUploadQuality;
   }
 
+  static const String autoUploadKey = 'AUTO_UPLOAD';
+  static bool get getAutoUpload {
+    return appPreferences.getBool(autoUploadKey) ?? false;
+  }
+
+  static const String autoUploadSourceKey = 'AUTO_UPLOAD_SOURCE';
+  static String? get getAutoUploadSource {
+    return appPreferences.getString(autoUploadSourceKey);
+  }
+
+  static const String autoUploadDestinationKey = 'AUTO_UPLOAD_DESTINATION';
+  static int? get getAutoUploadDestination {
+    return appPreferences.getInt(autoUploadDestinationKey);
+  }
+
   static const String downloadDestinationKey = 'DOWNLOAD_DESTINATION';
-  static Future<String?> get getDownloadDestination async {
-    return appPreferences.getString(downloadDestinationKey) ?? await pickDirectoryPath();
+  static String? get getDownloadDestination {
+    return appPreferences.getString(downloadDestinationKey);
   }
 
   static const String downloadNotificationKey = 'DOWNLOAD_NOTIFICATION';

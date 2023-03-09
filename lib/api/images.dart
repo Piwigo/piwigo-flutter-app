@@ -210,7 +210,7 @@ Future<List<XFile>?> downloadImages(
 }) async {
   String? dirPath = (await getTemporaryDirectory()).path;
   if (!cached) {
-    dirPath = await Preferences.getDownloadDestination;
+    dirPath = Preferences.getDownloadDestination ?? await pickDirectoryPath();
   }
 
   if (dirPath == null) return null;

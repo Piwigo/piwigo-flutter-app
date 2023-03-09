@@ -159,12 +159,14 @@ class SettingsSectionItemButton extends StatelessWidget {
     this.title,
     this.onPressed,
     this.disabled = false,
+    this.expandedChild = false,
     this.icon,
   }) : super(key: key);
 
   final String? title;
   final String? text;
   final bool disabled;
+  final bool expandedChild;
   final Function()? onPressed;
   final Widget? icon;
 
@@ -175,12 +177,13 @@ class SettingsSectionItemButton extends StatelessWidget {
       child: SettingsSectionItem(
         title: title,
         disabled: disabled,
+        expandedChild: expandedChild,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
             Text(
-              text ?? "",
-              textAlign: TextAlign.end,
+              text ?? '',
+              overflow: TextOverflow.ellipsis,
               style: Theme.of(context).textTheme.bodySmall,
             ),
             Padding(
