@@ -1,6 +1,5 @@
 {
     "tabBar_albums": "Alben",
-    "settings_language": "Wählen Sie die Sprache",
     "tabBar_upload": "Hochladen",
     "tabBar_preferences": "Einstellungen",
     "alertOkButton": "OK",
@@ -148,7 +147,8 @@
     "categoryUpload_loadSubCategories": "laden",
     "categoryUpload_images": "Fotos hochladen",
     "categoryUpload_videos": "Videos hochladen",
-    "categoryUpload_take": "Foto aufnehmen",
+    "categoryUpload_takePhoto": "Foto aufnehmen",
+    "categoryUpload_takeVideo": "Video aufnehmen",
     "setDefaultCategory_select": "Bitte ein Album oder Unteralbum auswählen, welches das neue Wurzelalbum wird.",
     "setDefaultCategory_title": "Standard-Album",
     "setDefaultCategory_message": "Sind Sie sicher, dass Sie das Album {album} als Standard-Album festlegen möchten?",
@@ -189,13 +189,16 @@
     },
     "deleteCategory_empty": "Leeres Album löschen",
     "deleteCategory_noImages": "Fotos behalten",
+    "deleteCategory_noImages_subtitle": "Es könnten verwaiste Fotos zurückbleiben",
     "deleteCategory_orphanedImages": "Verwaiste Bilder löschen",
+    "deleteCategory_orphanedImages_subtitle": "Standardmodus, es werden nur Fotos gelöscht, die mit keinem anderen Album verknüpft sind",
     "deleteCategory_allImages": "{count, plural, =0{Fotos löschen} =1{Foto löschen} other{{count} Fotos löschen}}",
     "@deleteCategory_allImages": {
         "placeholders": {
             "count": {}
         }
     },
+    "deleteCategory_allImages_subtitle": "Sämtliche Fotos löschen, auch diejenigen, die mit anderen Alben verknüpft sind",
     "deleteCategoryConfirm_title": "Sind Sie sicher?",
     "deleteCategoryConfirm_message": "Anzahl der Fotos eingeben, um dieses Album zu löschen. Anzahl der Fotos: {count}",
     "@deleteCategoryConfirm_message": {
@@ -278,6 +281,8 @@
     "imageOptions_edit": "Bearbeiten",
     "imageOptions_download": "Herunterladen",
     "imageOptions_share": "Teilen",
+    "imageOptions_addFavorites": "Favoriten hinzufügen",
+    "imageOptions_removeFavorites": "Favoriten entfernen",
     "imageOptions_setAlbumImage": "Album-Vorschaubild festlegen",
     "imageDetailsView_title": "Eigenschaften",
     "editImageDetails_title": "Titel",
@@ -377,6 +382,7 @@
         }
     },
     "removeSingleImage_title": "Aus Album entfernen",
+    "removeSingleImage_subtitle": "Einige Fotos sind anderen Alben zugeordnet",
     "removeImageHUD_removing": "{count, plural, =0{Fotos entfernen…} =1{Foto entfernen…} other{Fotos entfernen…}}",
     "@removeImageHUD_removing": {
         "placeholders": {
@@ -423,6 +429,8 @@
             "count": {}
         }
     },
+    "downloadImageSuccess_title": "Dateien heruntergeladen",
+    "downloadImageSuccess_message": "Alle Dateien wurden erfolgreich heruntergeladen",
     "downloadImageFail_title": "Herunterladen fehlgeschlagen",
     "downloadImageFail_message": "Foto konnte nicht heruntergeladen werden!",
     "downloadVideoFail_message": "Video konnte nicht heruntergeladen werden!",
@@ -431,6 +439,7 @@
     "imageSaveError_message": "Fehler beim Speichern des Fotos",
     "videoSaveError_title": "Fehler beim Speichern des Videos",
     "videoSaveError_message": "Fehler beim Speichern des Videos",
+    "videoLoadError_message": "Video konnte nicht geladen werden",
     "moveOrCopyImage_title": "{count, plural, =1{Soll dieses Bild verschoben oder kopiert werden ?} other{Sollen {count} Bilder verschoben oder kopiert werden ?}}",
     "@moveOrCopyImage_title": {
         "placeholders": {
@@ -637,9 +646,8 @@
     "defaultThumbnailSize": "Größe",
     "defaultThumbnailSize320px": "Größe der Vorschaubilder",
     "defaultThumbnailSize414px": "Standardgröße der Vorschaubilder",
+    "defaultNberOfThumbnailsShort": "Anzahl pro Zeile",
     "defaultNberOfThumbnails": "Anzahl Vorschaubilder pro Zeile",
-    "defaultNberOfThumbnails_portrait": "Hochformat",
-    "defaultNberOfThumbnails_landscape": "Querformat",
     "defaultThumbnailSizeTitle": "Standardgröße",
     "defaultThumbnailSizeHeader": "Bitte eine Miniaturfotogröße auswählen",
     "settings_displayTitles": "Titel auf Vorschaubildern",
@@ -719,6 +727,7 @@
     "settingsHeader_cache": "Cache-Einstellungen (Verwendet/Total)",
     "settings_cacheDisk": "Datenträger",
     "settings_cacheMemory": "Speicher",
+    "settings_cacheSize": "Cache-Größe",
     "settings_cacheMegabytes": "MB",
     "settings_cacheClear": "Zwischenspeicher löschen",
     "settings_cacheClearAll": "Foto-Cache löschen",
@@ -749,6 +758,7 @@
         }
     },
     "settings_appName": "Piwigo NG",
+    "settings_language": "Wählen Sie die Sprache",
     "settingsHeader_about": "Hinweis",
     "settings_twitter": "@piwigo",
     "settings_contactUs": "Kontakt",
@@ -759,5 +769,6 @@
     "settings_translateWithCrowdin": "Piwigo NG übersetzen",
     "settings_acknowledgements": "Danksagungen",
     "settings_privacy": "Datenschutzerklärung",
+    "settings_unknownVersion": "Unbekannte Version",
     "settings_privacyUrl": "&lang=de_DE"
 }
