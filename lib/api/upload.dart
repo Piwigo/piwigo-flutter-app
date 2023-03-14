@@ -23,6 +23,7 @@ import '../services/chunked_uploader.dart';
 import '../services/notification_service.dart';
 
 Future<void> _showUploadNotification({bool success = true}) async {
+  if (!Preferences.getUploadNotification) return;
   final android = AndroidNotificationDetails(
     'piwigo-ng-upload',
     'Piwigo NG Upload',
@@ -124,12 +125,7 @@ Future<List<Map<String, dynamic>>> uploadPhotos(
       debugPrint("$e");
     }
   }
-  if (Preferences.getUploadNotification) {
-    if (result.isEmpty) {
-      _showUploadNotification(success: false);
-    }
-    _showUploadNotification(success: true);
-  }
+  _showUploadNotification(success: result.isNotEmpty);
   if (result.isEmpty) return [];
   uploadCompletedList = result.map<int>((e) => e['id']).toList();
   try {

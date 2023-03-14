@@ -70,13 +70,15 @@ Future<bool?> onEditPhotos(BuildContext context, List<ImageModel> images) async 
   });
 }
 
-Future<dynamic> onMovePhotos(BuildContext context, List<ImageModel> images, AlbumModel album) async {
-  AlbumModel origin = album;
-  if (images.length == 1) {
+Future<dynamic> onMovePhotos(BuildContext context, List<ImageModel> images, [AlbumModel? album]) async {
+  late AlbumModel origin;
+  if (album == null || images.length == 1) {
     origin = AlbumModel(
       id: images.first.categories.first['id'],
       name: '',
     );
+  } else {
+    origin = album;
   }
   return showModalBottomSheet<dynamic>(
     context: context,
@@ -85,7 +87,7 @@ Future<dynamic> onMovePhotos(BuildContext context, List<ImageModel> images, Albu
       padding: MediaQuery.of(context).padding,
       child: MoveOrCopyModal(
         title: appStrings.moveImage_title,
-        subtitle: appStrings.moveImage_selectAlbum(images.length, images.first),
+        subtitle: appStrings.moveImage_selectAlbum(images.length, images.first.name),
         isImage: true,
         album: origin,
         onSelected: (selectedAlbum) async {
@@ -102,7 +104,7 @@ Future<dynamic> onMovePhotos(BuildContext context, List<ImageModel> images, Albu
           int results = 0;
           switch (choice) {
             case 0:
-              results = await moveImages(images, album.id, selectedAlbum.id);
+              results = await moveImages(images, origin.id, selectedAlbum.id);
               break;
             case 1:
               results = await assignImages(images, selectedAlbum.id);
@@ -118,7 +120,7 @@ Future<dynamic> onMovePhotos(BuildContext context, List<ImageModel> images, Albu
   );
 }
 
-Future<bool> onDeletePhotos(BuildContext context, List<ImageModel> images, AlbumModel album) async {
+Future<bool> onDeletePhotos(BuildContext context, List<ImageModel> images, [AlbumModel? album]) async {
   final DeleteAlbumModes? mode = await showModalBottomSheet<DeleteAlbumModes>(
     context: context,
     isScrollControlled: true,

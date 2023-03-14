@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:piwigo_ng/utils/localizations.dart';
 
 class SettingsAppBar extends StatefulWidget {
   const SettingsAppBar({
@@ -32,8 +33,7 @@ class _SettingsAppBarState extends State<SettingsAppBar> {
       }
 
       // In case 0%-100% of the expanded height is viewed
-      double scrollDelta =
-          (_expandedHeight - widget.scrollController.offset) / _expandedHeight;
+      double scrollDelta = (_expandedHeight - widget.scrollController.offset) / _expandedHeight;
       double scrollPercent = (scrollDelta * 2 - 1);
       return (1 - scrollPercent) * delta * basePadding + basePadding;
     }
@@ -44,9 +44,8 @@ class _SettingsAppBarState extends State<SettingsAppBar> {
   @override
   Widget build(BuildContext context) {
     return SliverAppBar(
-      leading: IconButton(
+      leading: BackButton(
         onPressed: () => Navigator.of(context).pop(),
-        icon: const Icon(Icons.arrow_back),
       ),
       pinned: true,
       expandedHeight: _expandedHeight,
@@ -56,7 +55,7 @@ class _SettingsAppBarState extends State<SettingsAppBar> {
           vertical: 16,
         ),
         title: Text(
-          'Settings', // Todo: Use translations
+          appStrings.tabBar_preferences,
           textScaleFactor: 1,
           style: Theme.of(context).appBarTheme.titleTextStyle,
         ),

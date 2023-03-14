@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:piwigo_ng/app.dart';
+import 'package:piwigo_ng/utils/localizations.dart';
 import 'package:piwigo_ng/views/settings/privacy_policy_view_page.dart';
 
 import '../../components/buttons/app_text_button.dart';
@@ -61,7 +62,7 @@ class _LoginViewPageState extends State<LoginViewPage> {
                         ),
                       ),
                       AppTextButton(
-                        text: "Privacy Policy", // Todo: Use translations
+                        text: appStrings.settings_privacy,
                         onPressed: () {
                           App.navigatorKey.currentState?.pushNamed(
                             PrivacyPolicyViewPage.routeName,
@@ -73,13 +74,9 @@ class _LoginViewPageState extends State<LoginViewPage> {
                         builder: (context, snapshot) {
                           if (snapshot.hasData) {
                             PackageInfo packageInfo = snapshot.data!;
-                            return Text(
-                              packageInfo.version,
-                            );
+                            return Text(packageInfo.version);
                           }
-                          return const Text(
-                            "Unknown version",
-                          ); // Todo: Add to translations
+                          return Text(appStrings.settings_unknownVersion);
                         },
                       ),
                     ],

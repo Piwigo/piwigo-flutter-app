@@ -6,6 +6,7 @@ import 'package:piwigo_ng/components/popup_list_item.dart';
 import 'package:piwigo_ng/components/scroll_widgets/image_grid_view.dart';
 import 'package:piwigo_ng/models/album_model.dart';
 import 'package:piwigo_ng/models/image_model.dart';
+import 'package:piwigo_ng/services/preferences_service.dart';
 import 'package:piwigo_ng/utils/image_actions.dart';
 import 'package:piwigo_ng/utils/localizations.dart';
 import 'package:piwigo_ng/utils/page_routes.dart';
@@ -131,6 +132,9 @@ class _ImageSearchViewPageState extends State<ImageSearchViewPage> {
         }
       });
   void _onLikePhotos() => onLikePhotos(_selectedList, _hasNonFavorites).whenComplete(() => _onRefresh());
+  _onDeletePhotos() => onDeletePhotos(context, _selectedList).then((success) {
+        if (success) _onRefresh();
+      });
 
   @override
   Widget build(BuildContext context) {
@@ -241,16 +245,17 @@ class _ImageSearchViewPageState extends State<ImageSearchViewPage> {
                   text: appStrings.imageOptions_share,
                 ),
               ),
-              PopupMenuItem(
-                onTap: () => Future.delayed(
-                  const Duration(seconds: 0),
-                  () => _onLikePhotos(),
+              if (Preferences.getUserStatus != 'guest')
+                PopupMenuItem(
+                  onTap: () => Future.delayed(
+                    const Duration(seconds: 0),
+                    _onLikePhotos,
+                  ),
+                  child: PopupListItem(
+                    icon: _hasNonFavorites ? Icons.favorite_border : Icons.favorite,
+                    text: _hasNonFavorites ? appStrings.imageOptions_addFavorites : appStrings.imageOptions_removeFavorites,
+                  ),
                 ),
-                child: PopupListItem(
-                  icon: _hasNonFavorites ? Icons.favorite_border : Icons.favorite,
-                  text: _hasNonFavorites ? appStrings.imageOptions_addFavorites : appStrings.imageOptions_removeFavorites,
-                ),
-              ),
               PopupMenuItem(
                 onTap: () => Future.delayed(
                   const Duration(seconds: 0),
@@ -327,13 +332,7 @@ class _ImageSearchViewPageState extends State<ImageSearchViewPage> {
                   ),
                   Expanded(
                     child: IconButton(
-                      onPressed: () {}, // todo: on move
-                      icon: Icon(Icons.drive_file_move),
-                    ),
-                  ),
-                  Expanded(
-                    child: IconButton(
-                      onPressed: () {}, // todo: on delete
+                      onPressed: _onDeletePhotos,
                       icon: Icon(Icons.delete),
                     ),
                   ),
@@ -345,19 +344,20 @@ class _ImageSearchViewPageState extends State<ImageSearchViewPage> {
                       icon: Icon(Icons.share),
                     ),
                   ),
-                  Expanded(
-                    child: IconButton(
-                      onPressed: _onLikePhotos,
-                      icon: Builder(
-                        builder: (context) {
-                          if (_hasNonFavorites) {
-                            return Icon(Icons.favorite_border);
-                          }
-                          return Icon(Icons.favorite);
-                        },
+                  if (Preferences.getUserStatus != 'guest') // Todo: enum roles
+                    Expanded(
+                      child: IconButton(
+                        onPressed: _onLikePhotos,
+                        icon: Builder(
+                          builder: (context) {
+                            if (_hasNonFavorites) {
+                              return Icon(Icons.favorite_border);
+                            }
+                            return Icon(Icons.favorite);
+                          },
+                        ),
                       ),
                     ),
-                  ),
                   Expanded(
                     child: IconButton(
                       onPressed: () => downloadImages(_selectedList),

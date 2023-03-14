@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:piwigo_ng/utils/localizations.dart';
 
 import '../../views/settings/settings_view_page.dart';
 import '../fields/app_field.dart';
@@ -99,7 +100,7 @@ class _RootSearchAppBarState extends State<RootSearchAppBar> {
           vertical: 16,
         ),
         title: Text(
-          'Albums', // Todo: Use translations
+          appStrings.tabBar_albums,
           textScaleFactor: 1,
           style: Theme.of(context).appBarTheme.titleTextStyle,
         ),
