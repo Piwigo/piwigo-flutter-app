@@ -1,8 +1,17 @@
+import 'dart:convert';
 import 'dart:io';
 
+import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:piwigo_ng/api/api_error.dart';
+import 'package:piwigo_ng/api/authentication.dart';
+import 'package:piwigo_ng/api/upload.dart';
+import 'package:piwigo_ng/models/album_model.dart';
+import 'package:piwigo_ng/services/notification_service.dart';
 import 'package:piwigo_ng/services/preferences_service.dart';
+import 'package:piwigo_ng/utils/settings.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:workmanager/workmanager.dart';
 
@@ -16,44 +25,133 @@ class AutoUploadManager {
   }
 
   Future<void> endAutoUpload() async {
-    appPreferences.setBool(
-      Preferences.autoUploadKey,
-      false,
-    );
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setBool(AutoUploadPrefs.autoUploadKey, false);
     await _manager.cancelByUniqueName(taskKey);
   }
 
   Future<void> startAutoUpload() async {
-    appPreferences.setBool(
-      Preferences.autoUploadKey,
-      true,
-    );
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    int hours = prefs.getInt(AutoUploadPrefs.autoUploadFrequencyKey) ?? Settings.defaultAutoUploadFrequency;
+    prefs.setBool(AutoUploadPrefs.autoUploadKey, true);
     await _manager.registerPeriodicTask(
       taskKey,
       taskKey,
-      frequency: const Duration(minutes: 15),
+      frequency: Duration(hours: hours),
     );
   }
 
+  Future<bool> autoUpload() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    if (prefs.getBool(Preferences.wifiUploadKey) ?? false) {
+      print('Check wifi only');
+      var connectivity = await Connectivity().checkConnectivity();
+      if (connectivity != ConnectivityResult.wifi) {
+        print('No wifi');
+        return Future.value(false);
+      }
+      print('Has wifi');
+    }
+    final Directory? appDocDir = await getUploadDirectory();
+    if (appDocDir == null) return false;
+    print(appDocDir.listSync());
+    List<FileSystemEntity> dirFiles = appDocDir.listSync();
+    print(dirFiles);
+    List<File> files = dirFiles
+        .where((file) {
+          print(file.runtimeType);
+          return file is File;
+        })
+        .map<File>((e) => e as File)
+        .toList();
+    debugPrint(files.toString());
+    autoUploadPhotos(files);
+    return Future.value(true);
+  }
+
   Future<Directory?> getUploadDirectory() async {
-    return await getTemporaryDirectory();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? path = prefs.getString(AutoUploadPrefs.autoUploadSourceKey);
+    if (path == null) return null;
+    return Directory(path);
+  }
+
+  Future<void> autoUploadPhotos(List<File> photos) async {
+    if (photos.isEmpty) return;
+    List<int> result = [];
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    FlutterSecureStorage storage = const FlutterSecureStorage();
+    String? url = await storage.read(key: 'SERVER_URL');
+    if (url == null) return;
+    String? username = await storage.read(key: 'SERVER_USERNAME');
+    String? password = await storage.read(key: 'SERVER_PASSWORD');
+    int nbError = 0;
+    String? albumJson = appPreferences.getString(AutoUploadPrefs.autoUploadDestinationKey);
+    if (albumJson == null) return null;
+    AlbumModel destination = AlbumModel.fromJson(json.decode(albumJson));
+
+    // todo: login
+    // login
+    ApiResult<bool> success = await loginUser(url, username: username ?? '', password: password ?? '');
+    if (!(success.data ?? false)) {
+      debugPrint('login error');
+      return;
+    }
+
+    // upload
+    await Future.wait(List<Future<void>>.generate(photos.length, (index) async {
+      File file = photos[index];
+      try {
+        // Make Request
+        Response? response = await uploadChunk(
+          photo: file,
+          category: destination.id,
+          url: url,
+          username: username,
+          password: password,
+          onProgress: (progress) {
+            debugPrint("${file.path} | $progress");
+          },
+        );
+
+        // Handle result
+        if (response == null || json.decode(response.data)['stat'] == 'fail') {
+          nbError++;
+        } else {
+          var data = json.decode(response.data);
+          result.add(data['result']['id']);
+          if (prefs.getBool(Preferences.deleteAfterUploadKey) ?? false) {
+            // todo: delete file
+          }
+        }
+      } on DioError catch (e) {
+        debugPrint("${e.type}");
+      } catch (e) {
+        debugPrint("$e");
+        nbError++;
+      }
+    }));
+
+    // notifications
+    showAutoUploadNotification(nbError, result.length);
+    if (result.isEmpty) return;
+    // empty lunge
+    try {
+      await uploadCompleted(result, destination.id);
+      if (await methodExist('community.images.uploadCompleted')) {
+        await communityUploadCompleted(result, destination.id);
+      }
+    } on DioError catch (e) {
+      debugPrint(e.message);
+    }
   }
 }
 
 @pragma('vm:entry-point')
 void callbackDispatcher() {
   Workmanager().executeTask((task, inputData) async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
     debugPrint("Background $task");
-    debugPrint(prefs.getString('UPLOAD_AUTHOR_NAME') ?? '');
-    final Directory? appDocDir = await AutoUploadManager().getUploadDirectory();
-    if (appDocDir == null) return false;
-    debugPrint(appDocDir.listSync().toString());
-    // final List<File> files = appDocDir.listSync().whereType<File>().toList();
-    // List<XFile> uploadFiles = files.map<XFile>((file) => XFile(file.path)).toList();
-    // final result = await uploadPhotos(uploadFiles, 92);
-    // debugPrint(result.toString());
-    return Future.value(true);
+    return await AutoUploadManager().autoUpload();
   });
 }
 

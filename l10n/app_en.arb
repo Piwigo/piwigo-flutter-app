@@ -875,21 +875,21 @@
     "settings_autoUploadDestination": "Destination",
     "settings_autoUploadDestinationInvalid": "Invalid destination album",
     "settings_autoUploadDestinationInfo": "Please select the album or sub-album into which photos and videos will be auto-uploaded.",
-    "settings_autoUploadPeriod": "Every",
-    "settings_autoUploadPeriodMinutes": "{count, plural, =1{1 minute} other{{count} minutes}}",
-    "@settings_autoUploadPeriodMinutes" : {
+    "settings_autoUploadFrequency": "Every",
+    "settings_autoUploadFrequencyMinutes": "{count, plural, =1{1 minute} other{{count} minutes}}",
+    "@settings_autoUploadFrequencyMinutes" : {
         "placeholders": {
             "count": {}
         }
     },
-    "settings_autoUploadPeriodHours": "{count, plural, =1{1 hour} other{{count} hours}}",
-    "@settings_autoUploadPeriodHours" : {
+    "settings_autoUploadFrequencyHours": "{count, plural, =1{1 hour} other{{count} hours}}",
+    "@settings_autoUploadFrequencyHours" : {
         "placeholders": {
             "count": {}
         }
     },
-    "settings_autoUploadPeriodDays": "{count, plural, =1{1 day} other{{count} days}}",
-    "@settings_autoUploadPeriodDays" : {
+    "settings_autoUploadFrequencyDays": "{count, plural, =1{1 day} other{{count} days}}",
+    "@settings_autoUploadFrequencyDays" : {
         "placeholders": {
             "count": {}
         }

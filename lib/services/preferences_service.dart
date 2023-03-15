@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:piwigo_ng/models/album_model.dart';
 import 'package:piwigo_ng/models/status_model.dart';
 import 'package:piwigo_ng/utils/settings.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -102,21 +105,6 @@ class Preferences {
     return appPreferences.getDouble(uploadQualityKey) ?? Settings.defaultUploadQuality;
   }
 
-  static const String autoUploadKey = 'AUTO_UPLOAD';
-  static bool get getAutoUpload {
-    return appPreferences.getBool(autoUploadKey) ?? false;
-  }
-
-  static const String autoUploadSourceKey = 'AUTO_UPLOAD_SOURCE';
-  static String? get getAutoUploadSource {
-    return appPreferences.getString(autoUploadSourceKey);
-  }
-
-  static const String autoUploadDestinationKey = 'AUTO_UPLOAD_DESTINATION';
-  static int? get getAutoUploadDestination {
-    return appPreferences.getInt(autoUploadDestinationKey);
-  }
-
   static const String downloadDestinationKey = 'DOWNLOAD_DESTINATION';
   static String? get getDownloadDestination {
     return appPreferences.getString(downloadDestinationKey);
@@ -164,5 +152,44 @@ class Preferences {
       appPreferences.setBool(isAdminKey, false);
     }
     appPreferences.setString(userStatusKey, status.status);
+  }
+}
+
+class AutoUploadPrefs {
+  static const String autoUploadKey = 'AUTO_UPLOAD';
+  static bool get getAutoUpload {
+    return appPreferences.getBool(autoUploadKey) ?? false;
+  }
+
+  static const String autoUploadSourceKey = 'AUTO_UPLOAD_SOURCE';
+  static String? get getAutoUploadSource {
+    return appPreferences.getString(autoUploadSourceKey);
+  }
+
+  static Future<bool> setAutoUploadSource(String sourcePath) async {
+    return appPreferences.setString(autoUploadSourceKey, sourcePath);
+  }
+
+  static const String autoUploadDestinationKey = 'AUTO_UPLOAD_DESTINATION';
+  static AlbumModel? get getAutoUploadDestination {
+    String? albumJson = appPreferences.getString(autoUploadDestinationKey);
+    if (albumJson == null) return null;
+    //return null;
+    return AlbumModel.fromJson(json.decode(albumJson));
+  }
+
+  static Future<bool> setAutoUploadDestination(AlbumModel album) async {
+    print(json.encode(album.toJson()));
+    return appPreferences.setString(autoUploadDestinationKey, json.encode(album.toJson()));
+  }
+
+  static const String autoUploadFrequencyKey = 'AUTO_UPLOAD_FREQUENCY';
+  static Duration get getAutoUploadFrequency {
+    int hours = appPreferences.getInt(autoUploadFrequencyKey) ?? Settings.defaultAutoUploadFrequency;
+    return Duration(hours: hours);
+  }
+
+  static Future<bool> setAutoUploadFrequency(Duration duration) async {
+    return appPreferences.setInt(autoUploadDestinationKey, duration.inHours);
   }
 }

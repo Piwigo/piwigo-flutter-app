@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:piwigo_ng/api/images.dart';
+import 'package:piwigo_ng/components/buttons/piwigo_button.dart';
 import 'package:piwigo_ng/components/modals/move_or_copy_modal.dart';
 import 'package:piwigo_ng/components/sections/settings_section.dart';
 import 'package:piwigo_ng/models/album_model.dart';
 import 'package:piwigo_ng/services/auto_upload_manager.dart';
 import 'package:piwigo_ng/services/preferences_service.dart';
 import 'package:piwigo_ng/utils/localizations.dart';
+import 'package:piwigo_ng/utils/settings.dart';
 
 class AutoUploadPage extends StatefulWidget {
   const AutoUploadPage({Key? key}) : super(key: key);
@@ -17,22 +19,18 @@ class AutoUploadPage extends StatefulWidget {
 }
 
 class _AutoUploadPageState extends State<AutoUploadPage> {
-  final List<Duration> _periods = [
-    Duration(hours: 1),
-    Duration(hours: 6),
-    Duration(hours: 12),
-    Duration(days: 1),
-    Duration(days: 7),
-  ];
   AutoUploadManager _manager = AutoUploadManager();
   late bool _autoUploadEnabled;
-  late Duration _selectedPeriod;
+  late Duration _selectedFrequency;
   AlbumModel? _album;
+  String? _sourcePath;
 
   @override
   void initState() {
-    _autoUploadEnabled = Preferences.getAutoUpload;
-    _selectedPeriod = _periods.first;
+    _sourcePath = AutoUploadPrefs.getAutoUploadSource;
+    _album = AutoUploadPrefs.getAutoUploadDestination;
+    _autoUploadEnabled = AutoUploadPrefs.getAutoUpload;
+    _selectedFrequency = AutoUploadPrefs.getAutoUploadFrequency;
     super.initState();
   }
 
@@ -43,7 +41,7 @@ class _AutoUploadPageState extends State<AutoUploadPage> {
         title: Text(appStrings.settings_autoUpload),
       ),
       body: ListView(
-        padding: EdgeInsets.symmetric(horizontal: 16),
+        padding: EdgeInsets.symmetric(horizontal: 16.0),
         children: [
           SettingsSection(
             children: [
@@ -53,7 +51,7 @@ class _AutoUploadPageState extends State<AutoUploadPage> {
                 onChanged: (value) => setState(() {
                   _autoUploadEnabled = value;
                   if (value) {
-                    if (Preferences.getAutoUploadDestination == null || Preferences.getAutoUploadSource == null) {
+                    if (AutoUploadPrefs.getAutoUploadDestination == null || AutoUploadPrefs.getAutoUploadSource == null) {
                       _autoUploadEnabled = false;
                       return;
                     }
@@ -69,16 +67,16 @@ class _AutoUploadPageState extends State<AutoUploadPage> {
             children: [
               SettingsSectionItemButton(
                 title: appStrings.settings_autoUploadSource,
-                text: Preferences.getAutoUploadSource ?? appStrings.none,
+                text: _sourcePath ?? appStrings.none,
                 onPressed: () async {
                   String? dir = await pickDirectoryPath();
-                  if (dir == null) return;
-                  setState(() async {
-                    await appPreferences.setString(
-                      Preferences.autoUploadSourceKey,
-                      dir,
-                    );
+                  if (dir == null || dir == _sourcePath) return;
+                  bool success = await AutoUploadPrefs.setAutoUploadSource(dir);
+                  if (!success) return;
+                  setState(() {
+                    _sourcePath = dir;
                   });
+                  _manager.endAutoUpload();
                 },
               ),
               SettingsSectionItemButton(
@@ -95,9 +93,13 @@ class _AutoUploadPageState extends State<AutoUploadPage> {
                         subtitle: appStrings.settings_autoUploadDestinationInfo,
                         isImage: true,
                         onSelected: (selectedAlbum) async {
+                          if (_album == selectedAlbum) return true;
+                          bool success = await AutoUploadPrefs.setAutoUploadDestination(selectedAlbum);
+                          if (!success) return false;
                           setState(() {
                             _album = selectedAlbum;
                           });
+                          _manager.endAutoUpload();
                           return true;
                         },
                       ),
@@ -106,39 +108,46 @@ class _AutoUploadPageState extends State<AutoUploadPage> {
                 },
               ),
               SettingsSectionDropdown<Duration>(
-                title: appStrings.settings_autoUploadPeriod,
-                value: _selectedPeriod,
-                onChanged: (value) {
-                  if (value == null) return;
+                title: appStrings.settings_autoUploadFrequency,
+                value: _selectedFrequency,
+                onChanged: (value) async {
+                  if (value == null || _selectedFrequency == value) return;
+                  bool success = await AutoUploadPrefs.setAutoUploadFrequency(value);
+                  if (!success) return;
                   setState(() {
-                    _selectedPeriod = value;
+                    _selectedFrequency = value;
                   });
                   _manager.endAutoUpload();
-                  _manager.startAutoUpload();
                 },
-                items: List.generate(
-                  _periods.length,
-                  (index) => DropdownMenuItem<Duration>(
-                    value: _periods[index],
+                items: List.generate(Settings.autoUploadFrequencies.length, (index) {
+                  Duration frequency = Settings.autoUploadFrequencies[index];
+                  return DropdownMenuItem<Duration>(
+                    value: frequency,
                     child: Text(
-                      _getPeriodText(_periods[index]),
+                      _getFrequencyText(frequency),
                     ),
-                  ),
-                ),
+                  );
+                }),
               ),
             ],
+          ),
+          // todo: remove
+          PiwigoButton(
+            color: Theme.of(context).colorScheme.secondary,
+            text: 'Debug auto upload',
+            onPressed: () => AutoUploadManager().autoUpload(),
           ),
         ],
       ),
     );
   }
 
-  String _getPeriodText(Duration period) {
-    if (period.inHours == 0) {
-      return appStrings.settings_autoUploadPeriodMinutes(period.inMinutes);
-    } else if (period.inDays == 0) {
-      return appStrings.settings_autoUploadPeriodHours(period.inHours);
+  String _getFrequencyText(Duration frequency) {
+    if (frequency.inHours == 0) {
+      return appStrings.settings_autoUploadFrequencyMinutes(frequency.inMinutes);
+    } else if (frequency.inDays == 0) {
+      return appStrings.settings_autoUploadFrequencyHours(frequency.inHours);
     }
-    return appStrings.settings_autoUploadPeriodDays(period.inDays);
+    return appStrings.settings_autoUploadFrequencyDays(frequency.inDays);
   }
 }

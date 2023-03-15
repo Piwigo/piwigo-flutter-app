@@ -60,8 +60,14 @@ Future<ApiResult<bool>> loginUser(
     );
   }
 
-  Map<String, String> queries = {'format': 'json', 'method': 'pwg.session.login'};
-  Map<String, String> fields = {'username': username, 'password': password};
+  Map<String, String> queries = {
+    'format': 'json',
+    'method': 'pwg.session.login',
+  };
+  Map<String, String> fields = {
+    'username': username,
+    'password': password,
+  };
 
   try {
     Response response = await ApiClient.post(

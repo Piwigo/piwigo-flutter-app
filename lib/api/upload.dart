@@ -6,7 +6,6 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
@@ -22,37 +21,6 @@ import 'package:provider/provider.dart';
 
 import '../services/chunked_uploader.dart';
 import '../services/notification_service.dart';
-
-Future<void> _showUploadNotification([int nbError = 0, int nbImage = 0]) async {
-  if (!Preferences.getUploadNotification) return;
-  final android = AndroidNotificationDetails(
-    'piwigo-ng-upload',
-    'Piwigo NG Upload',
-    channelDescription: 'piwigo-ng',
-    priority: Priority.high,
-    importance: Importance.high,
-  );
-  final platform = NotificationDetails(android: android);
-  late String title;
-  String? message;
-  if (nbError == 0 && nbImage == 0) {
-    // Upload cancelled
-    title = appStrings.uploadCancelled_title;
-  } else if (nbError == 0 && nbImage > 0) {
-    // Upload completed
-    title = appStrings.imageUploadCompleted_title;
-    message = nbImage == 1 ? appStrings.imageUploadCompleted_message : appStrings.imageUploadCompleted_message1;
-  } else if (nbError > 0 && nbImage != nbError) {
-    // Upload partially completed
-    title = appStrings.coreDataStore_WarningTitle;
-    message = appStrings.imageUploadCompleted_warning;
-  } else {
-    // Upload failed
-    title = appStrings.uploadError_title;
-    message = appStrings.uploadError_message;
-  }
-  await localNotification.show(1, title, message, platform);
-}
 
 Future<List<int>> uploadPhotos(
   List<XFile> photos,
@@ -143,7 +111,7 @@ Future<List<int>> uploadPhotos(
     }
   }));
 
-  _showUploadNotification(nbError, result.length);
+  showUploadNotification(nbError, result.length);
   if (result.isEmpty) return [];
   try {
     await uploadCompleted(result, albumId);

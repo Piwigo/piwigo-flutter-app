@@ -62,4 +62,32 @@ class AlbumModel {
         dateLast = json['date_last'],
         dateLastMax = json['max_date_last'],
         canUpload = json['can_upload'] ?? true;
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'name': name,
+        'fullname': fullName,
+        'comment': comment,
+        'url': url,
+        'tn_url': urlRepresentative,
+        'permalink': permalink,
+        'status': status,
+        'uppercats': upperCategories,
+        'id_uppercat': idUpperCategory,
+        'global_rank': globalRank,
+        'nb_images': nbImages,
+        'total_nb_images': nbTotalImages,
+        'nb_categories': nbCategories,
+        'sub_categories': List.generate(children.length, (i) => children[i].toJson()),
+        'representative_picture_id': idRepresentative,
+        'date_last': dateLast,
+        'max_date_last': dateLastMax,
+        'can_upload': canUpload,
+      };
+
+  @override
+  operator ==(other) => other is AlbumModel && id == other.id;
+
+  @override
+  int get hashCode => Object.hash(id, name);
 }
