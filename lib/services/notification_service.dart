@@ -4,6 +4,7 @@ import 'package:open_filex/open_filex.dart';
 import 'package:piwigo_ng/services/preferences_service.dart';
 import 'package:piwigo_ng/utils/localizations.dart';
 import 'package:piwigo_ng/utils/settings.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 final FlutterLocalNotificationsPlugin localNotification = FlutterLocalNotificationsPlugin();
 
@@ -91,10 +92,11 @@ Future<void> showUploadNotification([int nbError = 0, int nbImage = 0]) async {
 }
 
 Future<void> showAutoUploadNotification([int nbError = 0, int nbImage = 0]) async {
-  if (!Preferences.getUploadNotification) return;
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  if (!(prefs.getBool(Preferences.uploadNotificationKey) ?? false)) return;
   final android = AndroidNotificationDetails(
-    'piwigo-ng-upload',
-    'Piwigo NG Upload',
+    'piwigo-ng-auto-upload',
+    'Piwigo NG Auto Upload',
     channelDescription: 'piwigo-ng',
     priority: Priority.high,
     importance: Importance.high,

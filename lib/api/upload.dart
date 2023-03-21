@@ -18,6 +18,7 @@ import 'package:piwigo_ng/services/upload_notifier.dart';
 import 'package:piwigo_ng/utils/localizations.dart';
 import 'package:piwigo_ng/views/upload/upload_status_page.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../services/chunked_uploader.dart';
 import '../services/notification_service.dart';
@@ -104,9 +105,17 @@ Future<List<int>> uploadPhotos(
         }
       }
     } on DioError catch (e) {
-      debugPrint("${e.type}");
+      debugPrint("${e.message}");
+      debugPrint("${e.stackTrace}");
+      uploadNotifier.itemUploadCompleted(item, error: true);
+      nbError++;
     } catch (e) {
+      if (e is Error) {
+        debugPrint("$e");
+        debugPrint("${e.stackTrace}");
+      }
       debugPrint("$e");
+      uploadNotifier.itemUploadCompleted(item, error: true);
       nbError++;
     }
   }));
@@ -148,7 +157,7 @@ Future<Response?> uploadChunk({
 
   if (info['name'] != '' && info['name'] != null) fields['name'] = info['name'];
   if (info['comment'] != '' && info['comment'] != null) fields['comment'] = info['comment'];
-  if (info['tag_ids'].isNotEmpty) fields['tag_ids'] = info['tag_ids'].join(',');
+  if (info['tag_ids']?.isNotEmpty ?? false) fields['tag_ids'] = info['tag_ids'].join(',');
   if (info['level'] != -1) fields['level'] = info['level'];
 
   ChunkedUploader chunkedUploader = ChunkedUploader(Dio(
@@ -194,13 +203,14 @@ Future<File> compressFile(XFile file) async {
 }
 
 Future<bool> uploadCompleted(List<int> imageId, int categoryId) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
   Map<String, String> queries = {
     'format': 'json',
     'method': 'pwg.images.uploadCompleted',
   };
   FormData formData = FormData.fromMap({
     'image_id': imageId,
-    'pwg_token': appPreferences.getString(Preferences.tokenKey),
+    'pwg_token': prefs.getString(Preferences.tokenKey),
     'category_id': categoryId,
   });
 
@@ -216,13 +226,14 @@ Future<bool> uploadCompleted(List<int> imageId, int categoryId) async {
 }
 
 Future<bool> communityUploadCompleted(List<int> imageId, int categoryId) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
   Map<String, String> queries = {
     'format': 'json',
     'method': 'community.images.uploadCompleted',
   };
   FormData formData = FormData.fromMap({
     'image_id': imageId,
-    'pwg_token': appPreferences.getString(Preferences.tokenKey),
+    'pwg_token': prefs.getString(Preferences.tokenKey),
     'category_id': categoryId,
   });
   try {

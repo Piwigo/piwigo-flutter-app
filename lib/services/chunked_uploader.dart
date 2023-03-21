@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
@@ -69,6 +70,7 @@ class UploadRequest {
     String originalSum;
     List<String> chunkSums = [];
     originalSum = await generateMd5(_file.openRead());
+
     for (int i = 0; i < _chunksCount; i++) {
       final start = _getChunkStart(i);
       final end = _getChunkEnd(i);
@@ -82,14 +84,15 @@ class UploadRequest {
       final chunkStream = _getChunkStream(start, end);
 
       final formData = FormData.fromMap({
-        "chunks": _chunksCount,
-        "chunk": i,
-        "chunk_sum": chunkSums[i],
-        "original_sum": originalSum,
-        "file": MultipartFile(chunkStream, end - start, filename: fileName),
+        'chunks': _chunksCount,
+        'chunk': i,
+        'chunk_sum': chunkSums[i],
+        'original_sum': originalSum,
+        'file': MultipartFile(chunkStream, end - start, filename: fileName),
         ...data
       });
-      finalResponse = await dio.request(
+
+      Response response = await dio.request(
         path,
         data: formData,
         queryParameters: params,
@@ -97,6 +100,10 @@ class UploadRequest {
         options: Options(method: method, contentType: contentType),
         onSendProgress: (current, total) => _updateProgress(i, current, total),
       );
+
+      if (response.data != null && json.decode(response.data)?['result']?['id'] != null) {
+        finalResponse = response;
+      }
     }
     return finalResponse;
   }

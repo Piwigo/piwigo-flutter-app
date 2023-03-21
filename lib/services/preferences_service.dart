@@ -136,22 +136,23 @@ class Preferences {
 
   /// Saves server info retrieved from pwg.session.getStatus API call
   static void saveStatus(StatusModel status) async {
-    appPreferences.setString(accountUsernameKey, status.username);
-    appPreferences.setString(tokenKey, status.pwgToken);
-    appPreferences.setString(versionKey, status.version);
-    appPreferences.setStringList(availableSizesKey, status.availableSizes);
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString(accountUsernameKey, status.username);
+    prefs.setString(tokenKey, status.pwgToken);
+    prefs.setString(versionKey, status.version);
+    prefs.setStringList(availableSizesKey, status.availableSizes);
     if (status.realStatus != null) {
-      appPreferences.setString(communityStatusKey, status.status);
+      prefs.setString(communityStatusKey, status.status);
       status.status = status.realStatus!;
     }
     if (['admin', 'webmaster'].contains(status.status)) {
-      appPreferences.setBool(isAdminKey, true);
-      appPreferences.setInt(uploadChunkSizeKey, status.uploadFormChunkSize ?? 0);
-      appPreferences.setString(fileTypesKey, status.uploadFileTypes ?? '');
+      prefs.setBool(isAdminKey, true);
+      prefs.setInt(uploadChunkSizeKey, status.uploadFormChunkSize ?? 0);
+      prefs.setString(fileTypesKey, status.uploadFileTypes ?? '');
     } else {
-      appPreferences.setBool(isAdminKey, false);
+      prefs.setBool(isAdminKey, false);
     }
-    appPreferences.setString(userStatusKey, status.status);
+    prefs.setString(userStatusKey, status.status);
   }
 }
 
