@@ -144,6 +144,7 @@ Future<Response?> uploadChunk({
   String? password,
   CancelToken? cancelToken,
 }) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
   Map<String, String> queries = {
     'format': 'json',
     'method': 'pwg.images.uploadAsync',
@@ -169,7 +170,7 @@ Future<Response?> uploadChunk({
   return await chunkedUploader.upload(
     path: '/ws.php',
     filePath: photo.absolute.path,
-    maxChunkSize: 100000,
+    maxChunkSize: (prefs.getInt(Preferences.uploadChunkSizeKey) ?? 100) * 1000,
     params: queries,
     method: 'POST',
     data: fields,

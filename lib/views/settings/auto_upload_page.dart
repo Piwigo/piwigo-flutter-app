@@ -133,6 +133,7 @@ class _AutoUploadPageState extends State<AutoUploadPage> {
           ),
           // todo: remove
           PiwigoButton(
+            margin: const EdgeInsets.symmetric(vertical: 16.0),
             color: Theme.of(context).colorScheme.secondary,
             text: 'Debug auto upload',
             onPressed: () => AutoUploadManager().autoUpload(),
