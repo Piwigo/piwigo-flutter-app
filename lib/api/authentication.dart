@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:piwigo_ng/api/api_error.dart';
+import 'package:piwigo_ng/api/upload.dart';
 import 'package:piwigo_ng/models/info_model.dart';
 import 'package:piwigo_ng/models/status_model.dart';
 import 'package:piwigo_ng/services/preferences_service.dart';
@@ -54,6 +55,7 @@ Future<ApiResult<bool>> loginUser(
         data: true,
       );
     }
+    askMediaPermission();
     return ApiResult<bool>(
       data: false,
       error: ApiErrors.wrongServerUrl,
@@ -86,16 +88,14 @@ Future<ApiResult<bool>> loginUser(
       }
       ApiResult<StatusModel> status = await sessionStatus();
       if (status.hasData) {
-        Preferences.saveId(status.data!, username: username, password: password);
+        Preferences.saveId(status.data!,
+            username: username, password: password);
       }
+      askMediaPermission();
       return ApiResult<bool>(
         data: true,
       );
     }
-    return ApiResult<bool>(
-      data: false,
-      error: ApiErrors.wrongLoginId,
-    );
   } on DioError catch (e) {
     debugPrint(e.message);
   } catch (e) {
@@ -108,7 +108,10 @@ Future<ApiResult<bool>> loginUser(
 }
 
 Future<ApiResult<StatusModel>> sessionStatus() async {
-  Map<String, String> queries = {'format': 'json', 'method': 'pwg.session.getStatus'};
+  Map<String, String> queries = {
+    'format': 'json',
+    'method': 'pwg.session.getStatus'
+  };
 
   try {
     Response response = await ApiClient.get(queryParameters: queries);
@@ -133,7 +136,10 @@ Future<ApiResult<StatusModel>> sessionStatus() async {
 }
 
 Future<String?> communityStatus() async {
-  Map<String, String> queries = {'format': 'json', 'method': 'community.session.getStatus'};
+  Map<String, String> queries = {
+    'format': 'json',
+    'method': 'community.session.getStatus'
+  };
 
   try {
     Response response = await ApiClient.get(queryParameters: queries);
@@ -171,12 +177,16 @@ Future<ApiResult<InfoModel>> getInfo() async {
 }
 
 Future<ApiResult<List<String>>> getMethods() async {
-  Map<String, String> queries = {'format': 'json', 'method': 'reflection.getMethodList'};
+  Map<String, String> queries = {
+    'format': 'json',
+    'method': 'reflection.getMethodList'
+  };
 
   try {
     Response response = await ApiClient.get(queryParameters: queries);
     Map<String, dynamic> data = json.decode(response.data);
-    final List<String> methods = data['result']['methods'].map<String>((e) => e.toString()).toList();
+    final List<String> methods =
+        data['result']['methods'].map<String>((e) => e.toString()).toList();
     return ApiResult<List<String>>(data: methods);
   } on DioError catch (e) {
     debugPrint(e.message);

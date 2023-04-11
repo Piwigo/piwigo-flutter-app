@@ -9,8 +9,10 @@ import 'package:image_picker/image_picker.dart';
 import 'package:piwigo_ng/api/api_client.dart';
 import 'package:piwigo_ng/api/api_error.dart';
 import 'package:piwigo_ng/api/authentication.dart';
+import 'package:piwigo_ng/api/images.dart';
 import 'package:piwigo_ng/api/upload.dart';
 import 'package:piwigo_ng/models/album_model.dart';
+import 'package:piwigo_ng/services/chunked_uploader.dart';
 import 'package:piwigo_ng/services/notification_service.dart';
 import 'package:piwigo_ng/services/preferences_service.dart';
 import 'package:piwigo_ng/utils/settings.dart';
@@ -32,15 +34,18 @@ class AutoUploadManager {
     await _manager.cancelByUniqueName(taskKey);
   }
 
-  Future<void> startAutoUpload() async {
+  Future<bool> startAutoUpload() async {
+    if (!await askMediaPermission()) return false;
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    int hours = prefs.getInt(AutoUploadPrefs.autoUploadFrequencyKey) ?? Settings.defaultAutoUploadFrequency;
+    int hours = prefs.getInt(AutoUploadPrefs.autoUploadFrequencyKey) ??
+        Settings.defaultAutoUploadFrequency;
     prefs.setBool(AutoUploadPrefs.autoUploadKey, true);
     await _manager.registerPeriodicTask(
       taskKey,
       taskKey,
       frequency: Duration(hours: hours),
     );
+    return true;
   }
 
   Future<bool> autoUpload() async {
@@ -50,14 +55,17 @@ class AutoUploadManager {
       var connectivity = await Connectivity().checkConnectivity();
       if (connectivity != ConnectivityResult.wifi) {
         print('No wifi');
-        return Future.value(false);
+        return false;
       }
       print('Has wifi');
     }
     final Directory? appDocDir = await getUploadDirectory();
     if (appDocDir == null) return false;
     List<FileSystemEntity> dirFiles = appDocDir.listSync();
-    List<File> files = dirFiles.where((file) => file is File).map<File>((e) => e as File).toList();
+    List<File> files = dirFiles
+        .where((file) => file is File)
+        .map<File>((e) => e as File)
+        .toList();
     debugPrint("List files: ${files.toString()}");
     await autoUploadPhotos(files);
     return true;
@@ -80,12 +88,12 @@ class AutoUploadManager {
     String? username = await storage.read(key: 'SERVER_USERNAME');
     String? password = await storage.read(key: 'SERVER_PASSWORD');
     int nbError = 0;
-    String? albumJson = prefs.getString(AutoUploadPrefs.autoUploadDestinationKey);
+    String? albumJson =
+        prefs.getString(AutoUploadPrefs.autoUploadDestinationKey);
     if (albumJson == null) return null;
     AlbumModel destination = AlbumModel.fromJson(json.decode(albumJson));
 
     print('Try login');
-    // todo: login
     // login
     ApiResult<bool> success = await loginUser(
       url,
@@ -99,10 +107,21 @@ class AutoUploadManager {
     }
     print('Login success');
 
+    List<File> newPhotos = await checkImagesNotExist(photos);
+
+    if (newPhotos.isEmpty) {
+      debugPrint('All photos already exist');
+      return;
+    }
+
     // upload
-    for (File file in photos) {
+    for (File file in newPhotos) {
       print("Try upload ${file.path}");
-      if (prefs.getBool(Preferences.removeMetadataKey) ?? Settings.defaultRemoveMetadata) {
+      String originalSum =
+          await ChunkedUploader.generateMd5(File(file.path).openRead());
+      debugPrint("Md5sum $originalSum");
+      if (prefs.getBool(Preferences.removeMetadataKey) ??
+          Settings.defaultRemoveMetadata) {
         file = await compressFile(XFile(file.path));
       }
       try {
@@ -114,6 +133,8 @@ class AutoUploadManager {
           username: username,
           password: password,
         );
+
+        print(response?.statusCode);
 
         // Handle result
         if (response == null || json.decode(response.data)['stat'] == 'fail') {
@@ -127,14 +148,14 @@ class AutoUploadManager {
           }
         }
       } on DioError catch (e) {
-        debugPrint("${e.type}");
+        debugPrint("Dio Error ${e.type}");
         nbError++;
       } on Error catch (e) {
-        debugPrint("$e");
+        debugPrint("Error $e");
         debugPrint("${e.stackTrace}");
         nbError++;
       } catch (e) {
-        debugPrint("$e");
+        debugPrint("Unknown $e");
         nbError++;
       }
     }
@@ -145,7 +166,8 @@ class AutoUploadManager {
     print('Empty lunge');
     // empty lunge
     try {
-      bool uploadCompletedSuccess = await uploadCompleted(result, destination.id);
+      bool uploadCompletedSuccess =
+          await uploadCompleted(result, destination.id);
       print(uploadCompletedSuccess);
       if (await methodExist('community.images.uploadCompleted')) {
         await communityUploadCompleted(result, destination.id);
@@ -234,6 +256,7 @@ void callbackDispatcher() {
 void initializeWorkManager() {
   Workmanager().initialize(
     callbackDispatcher, // The top level function, aka callbackDispatcher
-    isInDebugMode: true, // If enabled it will post a notification whenever the task is running. Handy for debugging tasks
+    isInDebugMode:
+        true, // If enabled it will post a notification whenever the task is running. Handy for debugging tasks
   );
 }

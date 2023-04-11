@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -9,6 +10,7 @@ import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:piwigo_ng/api/api_client.dart';
 import 'package:piwigo_ng/api/authentication.dart';
 import 'package:piwigo_ng/app.dart';
@@ -22,6 +24,36 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../services/chunked_uploader.dart';
 import '../services/notification_service.dart';
+
+Future<bool> askMediaPermission() async {
+  bool storage = true;
+  bool videos = true;
+  bool photos = true;
+
+  // Only check for storage < Android 13
+  AndroidDeviceInfo androidInfo = await DeviceInfoPlugin().androidInfo;
+  if (androidInfo.version.sdkInt >= 33) {
+    videos = await Permission.videos.status.isGranted;
+    photos = await Permission.photos.status.isGranted;
+
+    if (!videos) {
+      videos = await Permission.videos.request().isGranted;
+    }
+    if (!photos) {
+      photos = await Permission.photos.request().isGranted;
+    }
+  } else {
+    storage = await Permission.storage.status.isGranted;
+    if (!storage) {
+      storage = await Permission.storage.request().isGranted;
+    }
+  }
+
+  if (storage && (videos || photos)) {
+    return true;
+  }
+  return false;
+}
 
 Future<List<int>> uploadPhotos(
   List<XFile> photos,
@@ -50,7 +82,8 @@ Future<List<int>> uploadPhotos(
   if (url == null) return [];
   String? username = await storage.read(key: 'SERVER_USERNAME');
   String? password = await storage.read(key: 'SERVER_PASSWORD');
-  UploadNotifier uploadNotifier = App.appKey.currentContext!.read<UploadNotifier>();
+  UploadNotifier uploadNotifier =
+      App.appKey.currentContext!.read<UploadNotifier>();
   int nbError = 0;
 
   // Creates Upload Item list for the upload notifier
@@ -157,8 +190,10 @@ Future<Response?> uploadChunk({
   };
 
   if (info['name'] != '' && info['name'] != null) fields['name'] = info['name'];
-  if (info['comment'] != '' && info['comment'] != null) fields['comment'] = info['comment'];
-  if (info['tag_ids']?.isNotEmpty ?? false) fields['tag_ids'] = info['tag_ids'].join(',');
+  if (info['comment'] != '' && info['comment'] != null)
+    fields['comment'] = info['comment'];
+  if (info['tag_ids']?.isNotEmpty ?? false)
+    fields['tag_ids'] = info['tag_ids'].join(',');
   if (info['level'] != -1) fields['level'] = info['level'];
 
   ChunkedUploader chunkedUploader = ChunkedUploader(Dio(
@@ -216,7 +251,8 @@ Future<bool> uploadCompleted(List<int> imageId, int categoryId) async {
   });
 
   try {
-    Response response = await ApiClient.post(data: formData, queryParameters: queries);
+    Response response =
+        await ApiClient.post(data: formData, queryParameters: queries);
     if (response.statusCode == 200) {
       return true;
     }
@@ -238,7 +274,8 @@ Future<bool> communityUploadCompleted(List<int> imageId, int categoryId) async {
     'category_id': categoryId,
   });
   try {
-    Response response = await ApiClient.post(data: formData, queryParameters: queries);
+    Response response =
+        await ApiClient.post(data: formData, queryParameters: queries);
     if (response.statusCode == 200) {
       return true;
     }

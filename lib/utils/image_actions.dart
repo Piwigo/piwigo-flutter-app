@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:piwigo_ng/api/albums.dart';
 import 'package:piwigo_ng/api/images.dart';
+import 'package:piwigo_ng/api/upload.dart';
 import 'package:piwigo_ng/api/users.dart';
 import 'package:piwigo_ng/components/dialogs/confirm_dialog.dart';
 import 'package:piwigo_ng/components/modals/choose_camera_picker_modal.dart';
@@ -20,17 +21,15 @@ final ImagePicker _picker = ImagePicker();
 
 Future<List<XFile>?> onPickImages() async {
   try {
-    // List<XFile> images = await _picker.pickMultiImage(
-    //   imageQuality: (Preferences.getUploadQuality * 100).round(),
-    //   requestFullMetadata: Preferences.getRemoveMetadata,
-    // );
-    // if (images.isNotEmpty) return images;
+    if (!await askMediaPermission()) return null;
     final FilePickerResult? result = await FilePicker.platform.pickFiles(
       allowMultiple: true,
       type: FileType.media,
     );
     if (result == null) return null;
-    return result.files.map<XFile>((e) => XFile(e.path!, name: e.name, bytes: e.bytes)).toList();
+    return result.files
+        .map<XFile>((e) => XFile(e.path!, name: e.name, bytes: e.bytes))
+        .toList();
   } catch (e) {
     debugPrint('${e.toString()}');
   }
@@ -64,13 +63,16 @@ Future<XFile?> onTakePhoto(BuildContext context) async {
   return null;
 }
 
-Future<bool?> onEditPhotos(BuildContext context, List<ImageModel> images) async {
-  return await Navigator.of(context).pushNamed(EditImagePage.routeName, arguments: {
+Future<bool?> onEditPhotos(
+    BuildContext context, List<ImageModel> images) async {
+  return await Navigator.of(context)
+      .pushNamed(EditImagePage.routeName, arguments: {
     'images': images,
   });
 }
 
-Future<dynamic> onMovePhotos(BuildContext context, List<ImageModel> images, [AlbumModel? album]) async {
+Future<dynamic> onMovePhotos(BuildContext context, List<ImageModel> images,
+    [AlbumModel? album]) async {
   late AlbumModel origin;
   if (album == null || images.length == 1) {
     origin = AlbumModel(
@@ -87,7 +89,8 @@ Future<dynamic> onMovePhotos(BuildContext context, List<ImageModel> images, [Alb
       padding: MediaQuery.of(context).padding,
       child: MoveOrCopyModal(
         title: appStrings.moveImage_title,
-        subtitle: appStrings.moveImage_selectAlbum(images.length, images.first.name),
+        subtitle:
+            appStrings.moveImage_selectAlbum(images.length, images.first.name),
         isImage: true,
         album: origin,
         onSelected: (selectedAlbum) async {
@@ -99,7 +102,8 @@ Future<dynamic> onMovePhotos(BuildContext context, List<ImageModel> images, [Alb
               !await showConfirmDialog(
                 context,
                 title: appStrings.moveImage_title,
-                message: appStrings.moveImage_message(images.length, images.first, selectedAlbum.name),
+                message: appStrings.moveImage_message(
+                    images.length, images.first, selectedAlbum.name),
               )) return false;
           int results = 0;
           switch (choice) {
@@ -120,7 +124,8 @@ Future<dynamic> onMovePhotos(BuildContext context, List<ImageModel> images, [Alb
   );
 }
 
-Future<bool> onDeletePhotos(BuildContext context, List<ImageModel> images, [AlbumModel? album]) async {
+Future<bool> onDeletePhotos(BuildContext context, List<ImageModel> images,
+    [AlbumModel? album]) async {
   final DeleteAlbumModes? mode = await showModalBottomSheet<DeleteAlbumModes>(
     context: context,
     isScrollControlled: true,
@@ -157,9 +162,11 @@ Future<bool> onDeletePhotos(BuildContext context, List<ImageModel> images, [Albu
   return false;
 }
 
-Future<bool?> onLikePhotos(List<ImageModel> images, bool hasNonFavorites) async {
+Future<bool?> onLikePhotos(
+    List<ImageModel> images, bool hasNonFavorites) async {
   if (hasNonFavorites) {
-    int success = await addFavorites(images.where((image) => !image.favorite).toList());
+    int success =
+        await addFavorites(images.where((image) => !image.favorite).toList());
     if (success > 0) {
       return true;
     }
