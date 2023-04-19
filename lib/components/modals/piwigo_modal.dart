@@ -15,7 +15,7 @@ class PiwigoModal extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BottomSheet(
-      backgroundColor: Theme.of(context).backgroundColor,
+      backgroundColor: Theme.of(context).colorScheme.background,
       enableDrag: false,
       onClosing: () {},
       shape: const RoundedRectangleBorder(

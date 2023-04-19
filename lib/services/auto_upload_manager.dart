@@ -36,6 +36,7 @@ class AutoUploadManager {
 
   Future<bool> startAutoUpload() async {
     if (!await askMediaPermission()) return false;
+    await endAutoUpload();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     int hours = prefs.getInt(AutoUploadPrefs.autoUploadFrequencyKey) ??
         Settings.defaultAutoUploadFrequency;

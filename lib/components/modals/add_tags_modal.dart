@@ -55,9 +55,10 @@ class _AddTagsModalState extends State<AddTagsModal> {
     await _onRefresh();
     try {
       setState(() {
-        _selectedTagList.add(_tagList.where((tag) => tag.id == addedTag.id).first);
+        _selectedTagList
+            .add(_tagList.where((tag) => tag.id == addedTag.id).first);
       });
-    } on StateError catch (e) {
+    } on StateError catch (_) {
       debugPrint('Can\'t fetch new tag');
     }
   }
@@ -77,7 +78,7 @@ class _AddTagsModalState extends State<AddTagsModal> {
   @override
   Widget build(BuildContext context) {
     return BottomSheet(
-      backgroundColor: Theme.of(context).backgroundColor,
+      backgroundColor: Theme.of(context).colorScheme.background,
       enableDrag: false,
       onClosing: () {},
       shape: const RoundedRectangleBorder(
@@ -132,7 +133,8 @@ class _AddTagsModalState extends State<AddTagsModal> {
                   }),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+              padding:
+                  const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
               child: PiwigoButton(
                 color: Theme.of(context).primaryColor,
                 onPressed: () => Navigator.of(context).pop(),
@@ -146,7 +148,8 @@ class _AddTagsModalState extends State<AddTagsModal> {
   }
 
   Widget get _tagLists {
-    List<TagModel> unselectedTags = _tagList.where((tag) => !_selectedTagList.contains(tag)).toList();
+    List<TagModel> unselectedTags =
+        _tagList.where((tag) => !_selectedTagList.contains(tag)).toList();
     return RefreshIndicator(
       onRefresh: _onRefresh,
       child: Theme(
@@ -192,7 +195,9 @@ class _AddTagsModalState extends State<AddTagsModal> {
 }
 
 class TagWrap extends StatelessWidget {
-  const TagWrap({Key? key, this.tags = const [], this.removeAction = true, this.onTap}) : super(key: key);
+  const TagWrap(
+      {Key? key, this.tags = const [], this.removeAction = true, this.onTap})
+      : super(key: key);
 
   final List<TagModel> tags;
   final bool removeAction;

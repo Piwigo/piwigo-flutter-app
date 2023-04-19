@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:piwigo_ng/api/images.dart';
-import 'package:piwigo_ng/components/buttons/piwigo_button.dart';
 import 'package:piwigo_ng/components/modals/move_or_copy_modal.dart';
 import 'package:piwigo_ng/components/sections/settings_section.dart';
 import 'package:piwigo_ng/models/album_model.dart';
@@ -48,20 +47,29 @@ class _AutoUploadPageState extends State<AutoUploadPage> {
               SettingsSectionItemSwitch(
                 title: appStrings.settings_autoUpload,
                 value: _autoUploadEnabled,
-                onChanged: (value) => setState(() {
-                  _autoUploadEnabled = value;
-                  if (value) {
-                    if (AutoUploadPrefs.getAutoUploadDestination == null || AutoUploadPrefs.getAutoUploadSource == null) {
-                      _autoUploadEnabled = false;
-                      return;
-                    }
-                    _manager.startAutoUpload();
-                  } else {
-                    _manager.endAutoUpload();
+                onChanged: (value) {
+                  if (AutoUploadPrefs.getAutoUploadDestination == null ||
+                      AutoUploadPrefs.getAutoUploadSource == null) {
+                    return;
                   }
-                }),
+                  setState(() {
+                    _autoUploadEnabled = value;
+                    if (value) {
+                      _manager.startAutoUpload();
+                    } else {
+                      _manager.endAutoUpload();
+                    }
+                  });
+                },
               ),
             ],
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
+              appStrings.settings_autoUploadDuplicateInfo,
+              textAlign: TextAlign.center,
+            ),
           ),
           SettingsSection(
             children: [
@@ -86,23 +94,23 @@ class _AutoUploadPageState extends State<AutoUploadPage> {
                   await showModalBottomSheet(
                     context: context,
                     isScrollControlled: true,
-                    builder: (_) => Padding(
-                      padding: MediaQuery.of(context).padding,
-                      child: MoveOrCopyModal(
-                        title: appStrings.settings_autoUploadDestination,
-                        subtitle: appStrings.settings_autoUploadDestinationInfo,
-                        isImage: true,
-                        onSelected: (selectedAlbum) async {
-                          if (_album == selectedAlbum) return true;
-                          bool success = await AutoUploadPrefs.setAutoUploadDestination(selectedAlbum);
-                          if (!success) return false;
-                          setState(() {
-                            _album = selectedAlbum;
-                          });
-                          _manager.endAutoUpload();
-                          return true;
-                        },
-                      ),
+                    useSafeArea: true,
+                    builder: (_) => MoveOrCopyModal(
+                      title: appStrings.settings_autoUploadDestination,
+                      subtitle: appStrings.settings_autoUploadDestinationInfo,
+                      isImage: true,
+                      onSelected: (selectedAlbum) async {
+                        if (_album == selectedAlbum) return true;
+                        bool success =
+                            await AutoUploadPrefs.setAutoUploadDestination(
+                                selectedAlbum);
+                        if (!success) return false;
+                        setState(() {
+                          _album = selectedAlbum;
+                        });
+                        _manager.endAutoUpload();
+                        return true;
+                      },
                     ),
                   );
                 },
@@ -112,14 +120,17 @@ class _AutoUploadPageState extends State<AutoUploadPage> {
                 value: _selectedFrequency,
                 onChanged: (value) async {
                   if (value == null || _selectedFrequency == value) return;
-                  bool success = await AutoUploadPrefs.setAutoUploadFrequency(value);
+                  bool success =
+                      await AutoUploadPrefs.setAutoUploadFrequency(value);
                   if (!success) return;
                   setState(() {
+                    _autoUploadEnabled = false;
                     _selectedFrequency = value;
                   });
                   _manager.endAutoUpload();
                 },
-                items: List.generate(Settings.autoUploadFrequencies.length, (index) {
+                items: List.generate(Settings.autoUploadFrequencies.length,
+                    (index) {
                   Duration frequency = Settings.autoUploadFrequencies[index];
                   return DropdownMenuItem<Duration>(
                     value: frequency,
@@ -131,13 +142,38 @@ class _AutoUploadPageState extends State<AutoUploadPage> {
               ),
             ],
           ),
-          // todo: remove
-          PiwigoButton(
-            margin: const EdgeInsets.symmetric(vertical: 16.0),
-            color: Theme.of(context).colorScheme.secondary,
-            text: 'Debug auto upload',
-            onPressed: () => AutoUploadManager().autoUpload(),
-          ),
+          if (AutoUploadPrefs.getAutoUploadDestination == null)
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                children: [
+                  Icon(Icons.warning),
+                  SizedBox(width: 8.0),
+                  Flexible(
+                    child: Text(
+                      appStrings.settings_autoUploadDestinationInfo,
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          if (AutoUploadPrefs.getAutoUploadSource == null)
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                children: [
+                  Icon(Icons.warning),
+                  SizedBox(width: 8.0),
+                  Flexible(
+                    child: Text(
+                      appStrings.settings_autoUploadSourceInfo,
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ],
+              ),
+            ),
         ],
       ),
     );
@@ -145,7 +181,8 @@ class _AutoUploadPageState extends State<AutoUploadPage> {
 
   String _getFrequencyText(Duration frequency) {
     if (frequency.inHours == 0) {
-      return appStrings.settings_autoUploadFrequencyMinutes(frequency.inMinutes);
+      return appStrings
+          .settings_autoUploadFrequencyMinutes(frequency.inMinutes);
     } else if (frequency.inDays == 0) {
       return appStrings.settings_autoUploadFrequencyHours(frequency.inHours);
     }

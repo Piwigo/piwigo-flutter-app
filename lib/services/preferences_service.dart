@@ -41,27 +41,32 @@ class Preferences {
 
   static const String imageRowCountKey = 'IMAGE_ROW_COUNT';
   static int get getImageRowCount {
-    return appPreferences.getInt(imageRowCountKey) ?? Settings.defaultImageRowCount;
+    return appPreferences.getInt(imageRowCountKey) ??
+        Settings.defaultImageRowCount;
   }
 
   static const String showThumbnailTitleKey = 'SHOW_THUMBNAIL_TITLE';
   static bool get getShowThumbnailTitle {
-    return appPreferences.getBool(showThumbnailTitleKey) ?? Settings.defaultShowThumbnailTitle;
+    return appPreferences.getBool(showThumbnailTitleKey) ??
+        Settings.defaultShowThumbnailTitle;
   }
 
   static const String removeMetadataKey = 'REMOVE_METADATA';
   static bool get getRemoveMetadata {
-    return appPreferences.getBool(removeMetadataKey) ?? Settings.defaultRemoveMetadata;
+    return appPreferences.getBool(removeMetadataKey) ??
+        Settings.defaultRemoveMetadata;
   }
 
   static const String imageFullScreenSizeKey = 'IMAGE_FULL_SCREEN_SIZE';
   static String get getImageFullScreenSize {
-    return appPreferences.getString(imageFullScreenSizeKey) ?? Settings.defaultImageFullScreenSize;
+    return appPreferences.getString(imageFullScreenSizeKey) ??
+        Settings.defaultImageFullScreenSize;
   }
 
   static const String imageThumbnailSizeKey = 'IMAGE_THUMBNAIL_SIZE';
   static String get getImageThumbnailSize {
-    return appPreferences.getString(imageThumbnailSizeKey) ?? Settings.defaultImageThumbnailSize;
+    return appPreferences.getString(imageThumbnailSizeKey) ??
+        Settings.defaultImageThumbnailSize;
   }
 
   static const String imageSortKey = 'IMAGE_SORT';
@@ -75,7 +80,8 @@ class Preferences {
 
   static const String albumThumbnailSizeKey = 'ALBUM_THUMBNAIL_SIZE';
   static String get getAlbumThumbnailSize {
-    return appPreferences.getString(albumThumbnailSizeKey) ?? Settings.defaultAlbumThumbnailSize;
+    return appPreferences.getString(albumThumbnailSizeKey) ??
+        Settings.defaultAlbumThumbnailSize;
   }
 
   static const String uploadAuthorKey = 'UPLOAD_AUTHOR_NAME';
@@ -87,12 +93,14 @@ class Preferences {
 
   static const String compressUploadKey = 'COMPRESS_BEFORE_UPLOAD';
   static bool get getCompressUpload {
-    return appPreferences.getBool(compressUploadKey) ?? Settings.defaultCompress;
+    return appPreferences.getBool(compressUploadKey) ??
+        Settings.defaultCompress;
   }
 
   static const String deleteAfterUploadKey = 'DELETE_AFTER_UPLOAD';
   static bool get getDeleteAfterUpload {
-    return appPreferences.getBool(deleteAfterUploadKey) ?? Settings.defaultDeleteAfterUpload;
+    return appPreferences.getBool(deleteAfterUploadKey) ??
+        Settings.defaultDeleteAfterUpload;
   }
 
   static const String wifiUploadKey = 'UPLOAD_WIFI_ONLY';
@@ -102,7 +110,8 @@ class Preferences {
 
   static const String uploadQualityKey = 'UPLOAD_QUALITY';
   static double get getUploadQuality {
-    return appPreferences.getDouble(uploadQualityKey) ?? Settings.defaultUploadQuality;
+    return appPreferences.getDouble(uploadQualityKey) ??
+        Settings.defaultUploadQuality;
   }
 
   static const String downloadDestinationKey = 'DOWNLOAD_DESTINATION';
@@ -124,7 +133,8 @@ class Preferences {
 
   /// Save account login (username and password)
   /// Then call saveStatus if status is not null
-  static void saveId(StatusModel? status, {String? username, String? password}) async {
+  static void saveId(StatusModel? status,
+      {String? username, String? password}) async {
     FlutterSecureStorage storage = const FlutterSecureStorage();
     storage.write(key: usernameKey, value: username);
     storage.write(key: passwordKey, value: password);
@@ -175,18 +185,19 @@ class AutoUploadPrefs {
   static AlbumModel? get getAutoUploadDestination {
     String? albumJson = appPreferences.getString(autoUploadDestinationKey);
     if (albumJson == null) return null;
-    //return null;
     return AlbumModel.fromJson(json.decode(albumJson));
   }
 
   static Future<bool> setAutoUploadDestination(AlbumModel album) async {
     print(json.encode(album.toJson()));
-    return appPreferences.setString(autoUploadDestinationKey, json.encode(album.toJson()));
+    return appPreferences.setString(
+        autoUploadDestinationKey, json.encode(album.toJson()));
   }
 
   static const String autoUploadFrequencyKey = 'AUTO_UPLOAD_FREQUENCY';
   static Duration get getAutoUploadFrequency {
-    int hours = appPreferences.getInt(autoUploadFrequencyKey) ?? Settings.defaultAutoUploadFrequency;
+    int hours = appPreferences.getInt(autoUploadFrequencyKey) ??
+        Settings.defaultAutoUploadFrequency;
     return Duration(hours: hours);
   }
 

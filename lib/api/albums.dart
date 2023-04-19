@@ -12,7 +12,7 @@ import 'authentication.dart';
 Map<String, dynamic> tryParseJson(String data) {
   try {
     return json.decode(data);
-  } on FormatException catch (e) {
+  } on FormatException catch (_) {
     debugPrint('Invalid json data');
     debugPrint(data);
     int start = data.indexOf('{');
@@ -49,7 +49,8 @@ Future<ApiResult<List<AlbumModel>>> fetchAlbums(int albumID) async {
     );
 
     if (response.statusCode == 200) {
-      List<dynamic> jsonAlbums = tryParseJson(response.data)['result']['categories'];
+      List<dynamic> jsonAlbums =
+          tryParseJson(response.data)['result']['categories'];
       List<AlbumModel> albums = List<AlbumModel>.from(jsonAlbums.map(
         (album) {
           bool canUpload = false;
@@ -86,7 +87,8 @@ Future<ApiResult<List<AlbumModel>>> fetchCommunityAlbums(int albumID) async {
     );
 
     if (response.statusCode == 200) {
-      List<dynamic> jsonAlbums = json.decode(response.data)['result']['categories'];
+      List<dynamic> jsonAlbums =
+          json.decode(response.data)['result']['categories'];
       List<AlbumModel> albums = List<AlbumModel>.from(jsonAlbums.map(
         (album) => AlbumModel.fromJson(album),
       ));
@@ -204,7 +206,10 @@ Future<ApiResult<bool>> moveAlbum(int catId, int parentCatId) async {
   return ApiResult(error: ApiErrors.moveAlbumError);
 }
 
-Future<ApiResult<bool>> editAlbum({required String name, required int albumId, String description = ''}) async {
+Future<ApiResult<bool>> editAlbum(
+    {required String name,
+    required int albumId,
+    String description = ''}) async {
   Map<String, String> queries = {
     'format': 'json',
     'method': 'pwg.categories.setInfo',

@@ -27,74 +27,81 @@ class ImageCard extends StatelessWidget {
     return GestureDetector(
       onTap: onPressed,
       onLongPress: onLongPress,
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          _buildThumbnail(context),
-          Positioned(
-            bottom: 0,
-            right: 0,
-            left: 0,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    if (image.isVideo)
-                      Padding(
-                        padding: const EdgeInsets.all(2.0),
-                        child: Icon(
-                          Icons.local_movies,
-                          color: Color(0xFFFFFFFF),
-                          size: 12,
-                          shadows: AppShadows.icon,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(5.0),
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            _buildThumbnail(context),
+            Positioned(
+              bottom: 0,
+              right: 0,
+              left: 0,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      if (image.isVideo)
+                        Padding(
+                          padding: const EdgeInsets.all(2.0),
+                          child: Icon(
+                            Icons.local_movies,
+                            color: Color(0xFFFFFFFF),
+                            size: 12,
+                            shadows: AppShadows.icon,
+                          ),
                         ),
-                      ),
-                    if (image.favorite)
-                      Padding(
-                        padding: const EdgeInsets.all(2.0),
-                        child: Icon(
-                          Icons.favorite,
-                          color: Color(0xFFFFFFFF),
-                          size: 12,
-                          shadows: AppShadows.icon,
+                      if (image.favorite)
+                        Padding(
+                          padding: const EdgeInsets.all(2.0),
+                          child: Icon(
+                            Icons.favorite,
+                            color: Color(0xFFFFFFFF),
+                            size: 12,
+                            shadows: AppShadows.icon,
+                          ),
                         ),
-                      ),
-                  ],
-                ),
-                if (Preferences.getShowThumbnailTitle)
-                  Container(
-                    padding: const EdgeInsets.all(2.0),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(colors: [
-                        Colors.black,
-                        Colors.black.withOpacity(0),
-                      ], begin: Alignment.bottomCenter, end: Alignment.topCenter),
-                    ),
-                    child: AutoSizeText(
-                      image.name,
-                      maxLines: 1,
-                      maxFontSize: 14,
-                      minFontSize: 8,
-                      textAlign: TextAlign.center,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(color: Colors.white, fontSize: 14),
-                    ),
+                    ],
                   ),
-              ],
+                  if (Preferences.getShowThumbnailTitle)
+                    Container(
+                      padding: const EdgeInsets.all(2.0),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                            colors: [
+                              Colors.black,
+                              Colors.black.withOpacity(0),
+                            ],
+                            begin: Alignment.bottomCenter,
+                            end: Alignment.topCenter),
+                      ),
+                      child: AutoSizeText(
+                        image.name,
+                        maxLines: 1,
+                        maxFontSize: 14,
+                        minFontSize: 8,
+                        textAlign: TextAlign.center,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(color: Colors.white, fontSize: 14),
+                      ),
+                    ),
+                ],
+              ),
             ),
-          ),
-          ..._buildSelectOverlay(context),
-        ],
+            ..._buildSelectOverlay(context),
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildThumbnail(context) {
-    final String? imageUrl = image.getDerivativeFromString(Preferences.getImageThumbnailSize)?.url;
+    final String? imageUrl =
+        image.getDerivativeFromString(Preferences.getImageThumbnailSize)?.url;
     return CachedNetworkImage(
       imageUrl: imageUrl ?? '',
       fadeInDuration: const Duration(milliseconds: 300),

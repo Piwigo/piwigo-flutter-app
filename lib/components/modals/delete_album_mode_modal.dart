@@ -16,24 +16,28 @@ class DeleteAlbumModeModal extends StatelessWidget {
   Widget build(BuildContext context) {
     return PiwigoModal(
       title: appStrings.deleteCategory_title,
-      subtitle: appStrings.deleteCategory_message(albumModel.nbTotalImages, albumModel.name),
+      subtitle: appStrings.deleteCategory_message(
+          albumModel.nbTotalImages, albumModel.name),
       content: Padding(
         padding: const EdgeInsets.symmetric(vertical: 8.0),
         child: Column(
           children: [
             ListTile(
               minLeadingWidth: 24,
-              leading: Icon(Icons.photo_library, color: Theme.of(context).primaryColor),
+              leading: Icon(Icons.photo_library,
+                  color: Theme.of(context).primaryColor),
               title: Text(appStrings.deleteCategory_noImages),
               subtitle: Text(appStrings.deleteCategory_noImages_subtitle),
               onTap: () => Navigator.of(context).pop(DeleteAlbumModes.noDelete),
             ),
             ListTile(
               minLeadingWidth: 24,
-              leading: Icon(Icons.delete, color: Theme.of(context).errorColor),
+              leading: Icon(Icons.delete,
+                  color: Theme.of(context).colorScheme.error),
               title: Text(appStrings.deleteCategory_orphanedImages),
               subtitle: Text(appStrings.deleteCategory_orphanedImages_subtitle),
-              onTap: () => Navigator.of(context).pop(DeleteAlbumModes.deleteOrphans),
+              onTap: () =>
+                  Navigator.of(context).pop(DeleteAlbumModes.deleteOrphans),
             ),
             ListTile(
               minLeadingWidth: 24,
@@ -60,7 +64,7 @@ class DeleteAlbumModeModal extends StatelessWidget {
                           ),
                           Icon(
                             Icons.delete,
-                            color: Theme.of(context).errorColor,
+                            color: Theme.of(context).colorScheme.error,
                             size: 18,
                           ),
                         ],
@@ -69,9 +73,11 @@ class DeleteAlbumModeModal extends StatelessWidget {
                   ],
                 ),
               ),
-              title: Text(appStrings.deleteCategory_allImages(albumModel.nbTotalImages)),
+              title: Text(appStrings
+                  .deleteCategory_allImages(albumModel.nbTotalImages)),
               subtitle: Text(appStrings.deleteCategory_allImages_subtitle),
-              onTap: () => Navigator.of(context).pop(DeleteAlbumModes.forceDelete),
+              onTap: () =>
+                  Navigator.of(context).pop(DeleteAlbumModes.forceDelete),
             ),
           ],
         ),

@@ -47,26 +47,42 @@ class _ImageGridViewState extends State<ImageGridView> {
 
   @override
   Widget build(BuildContext context) {
-    return GridView.builder(
-      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: Settings.getImageCrossAxisCount(context),
-        mainAxisSpacing: 4.0,
-        crossAxisSpacing: 4.0,
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(10.0),
+        child: GridView.builder(
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: Settings.getImageCrossAxisCount(context),
+            mainAxisSpacing: 4.0,
+            crossAxisSpacing: 4.0,
+          ),
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: widget.imageList.length,
+          itemBuilder: (context, index) {
+            final ImageModel image = widget.imageList[index];
+            final bool selected = widget.selectedList.contains(image);
+            return ClipRRect(
+              borderRadius: index == widget.imageList.length - 1
+                  ? BorderRadius.only(
+                      topRight: widget.imageList.length <
+                              Settings.getImageCrossAxisCount(context)
+                          ? Radius.circular(10.0)
+                          : Radius.zero,
+                      bottomRight: Radius.circular(10.0),
+                    )
+                  : BorderRadius.zero,
+              child: ImageCard(
+                image: image,
+                selected: widget.selectedList.isNotEmpty ? selected : null,
+                onPressed: () => _onTapImage(image),
+                onLongPress: () => _onLongPressImage(image),
+              ),
+            );
+          },
+        ),
       ),
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: widget.imageList.length,
-      itemBuilder: (context, index) {
-        final ImageModel image = widget.imageList[index];
-        final bool selected = widget.selectedList.contains(image);
-        return ImageCard(
-          image: image,
-          selected: widget.selectedList.isNotEmpty ? selected : null,
-          onPressed: () => _onTapImage(image),
-          onLongPress: () => _onLongPressImage(image),
-        );
-      },
     );
   }
 }

@@ -67,14 +67,15 @@ class AlbumCard extends StatelessWidget {
           icon: Icons.edit,
         ),
         AlbumCardAction(
-          backgroundColor: const Color(0xFF4B4B4B), // Todo: Theme grey action color
+          backgroundColor:
+              const Color(0xFF4B4B4B), // Todo: Theme grey action color
           foregroundColor: Colors.white,
           autoClose: true,
           onPressed: onMove,
           icon: Icons.drive_file_move,
         ),
         AlbumCardAction(
-          backgroundColor: Theme.of(context).errorColor,
+          backgroundColor: Theme.of(context).colorScheme.error,
           foregroundColor: Colors.white,
           autoClose: true,
           onPressed: onDelete,
@@ -100,7 +101,8 @@ class AlbumCard extends StatelessWidget {
                 width: kAlbumAnchorRadius * 2.0 + 1.0,
                 decoration: BoxDecoration(
                   color: Theme.of(context).primaryColor,
-                  border: Border.all(color: Theme.of(context).primaryColor, width: 1.0),
+                  border: Border.all(
+                      color: Theme.of(context).primaryColor, width: 1.0),
                 ),
               ),
             ),
@@ -120,7 +122,8 @@ class AlbumCard extends StatelessWidget {
               padding: const EdgeInsets.all(8.0).copyWith(right: 0.0),
               decoration: BoxDecoration(
                 color: Theme.of(context).cardColor,
-                border: Border.all(color: Theme.of(context).cardColor, width: 1.0),
+                border:
+                    Border.all(color: Theme.of(context).cardColor, width: 1.0),
               ),
               child: AlbumCardContent(
                 album: album,

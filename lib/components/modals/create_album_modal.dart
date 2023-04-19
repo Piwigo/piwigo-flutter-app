@@ -18,7 +18,8 @@ class CreateAlbumModal extends StatefulWidget {
 }
 
 class _CreateAlbumModalState extends State<CreateAlbumModal> {
-  final RoundedLoadingButtonController _btnController = RoundedLoadingButtonController();
+  final RoundedLoadingButtonController _btnController =
+      RoundedLoadingButtonController();
   final TextEditingController _descriptionController = TextEditingController();
 
   String _name = '';
@@ -101,9 +102,7 @@ Future<void> showCreateAlbumModal(BuildContext context, int parentId) async {
   await showModalBottomSheet(
     context: context,
     isScrollControlled: true,
-    builder: (_) => Padding(
-      padding: MediaQuery.of(context).padding,
-      child: CreateAlbumModal(albumId: parentId),
-    ),
+    useSafeArea: true,
+    builder: (_) => CreateAlbumModal(albumId: parentId),
   );
 }

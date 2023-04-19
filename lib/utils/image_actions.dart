@@ -39,6 +39,8 @@ Future<List<XFile>?> onPickImages() async {
 Future<XFile?> onTakePhoto(BuildContext context) async {
   final int? choice = await showModalBottomSheet<int>(
     context: context,
+    isScrollControlled: true,
+    useSafeArea: true,
     builder: (context) => ChooseCameraPickerModal(),
   );
   if (choice == null) return null;
@@ -85,41 +87,41 @@ Future<dynamic> onMovePhotos(BuildContext context, List<ImageModel> images,
   return showModalBottomSheet<dynamic>(
     context: context,
     isScrollControlled: true,
-    builder: (_) => Padding(
-      padding: MediaQuery.of(context).padding,
-      child: MoveOrCopyModal(
-        title: appStrings.moveImage_title,
-        subtitle:
-            appStrings.moveImage_selectAlbum(images.length, images.first.name),
-        isImage: true,
-        album: origin,
-        onSelected: (selectedAlbum) async {
-          final int? choice = await showModalBottomSheet<int>(
-            context: context,
-            builder: (context) => ChooseMoveOptionModal(),
-          );
-          if (choice == null ||
-              !await showConfirmDialog(
-                context,
-                title: appStrings.moveImage_title,
-                message: appStrings.moveImage_message(
-                    images.length, images.first, selectedAlbum.name),
-              )) return false;
-          int results = 0;
-          switch (choice) {
-            case 0:
-              results = await moveImages(images, origin.id, selectedAlbum.id);
-              break;
-            case 1:
-              results = await assignImages(images, selectedAlbum.id);
-              break;
-          }
-          if (results > 0) {
-            return true;
-          }
-          return false;
-        },
-      ),
+    useSafeArea: true,
+    builder: (_) => MoveOrCopyModal(
+      title: appStrings.moveImage_title,
+      subtitle:
+          appStrings.moveImage_selectAlbum(images.length, images.first.name),
+      isImage: true,
+      album: origin,
+      onSelected: (selectedAlbum) async {
+        final int? choice = await showModalBottomSheet<int>(
+          context: context,
+          isScrollControlled: true,
+          useSafeArea: true,
+          builder: (context) => ChooseMoveOptionModal(),
+        );
+        if (choice == null ||
+            !await showConfirmDialog(
+              context,
+              title: appStrings.moveImage_title,
+              message: appStrings.moveImage_message(
+                  images.length, images.first, selectedAlbum.name),
+            )) return false;
+        int results = 0;
+        switch (choice) {
+          case 0:
+            results = await moveImages(images, origin.id, selectedAlbum.id);
+            break;
+          case 1:
+            results = await assignImages(images, selectedAlbum.id);
+            break;
+        }
+        if (results > 0) {
+          return true;
+        }
+        return false;
+      },
     ),
   );
 }
@@ -129,6 +131,7 @@ Future<bool> onDeletePhotos(BuildContext context, List<ImageModel> images,
   final DeleteAlbumModes? mode = await showModalBottomSheet<DeleteAlbumModes>(
     context: context,
     isScrollControlled: true,
+    useSafeArea: true,
     isDismissible: true,
     builder: (context) => DeleteImagesModal(
       imageList: images,

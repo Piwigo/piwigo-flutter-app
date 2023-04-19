@@ -479,8 +479,6 @@ Future<bool> editImage(ImageModel image,
   return false;
 }
 
-Future<int?> checkImageExist(File file) async {}
-
 /// Return a list of files that are not in the server
 Future<List<File>> checkImagesNotExist(List<File> files) async {
   Map<String, File> md5sumList = {};

@@ -100,14 +100,14 @@ class AppField extends StatelessWidget {
           errorBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10.0),
             borderSide: BorderSide(
-              color: Theme.of(context).errorColor,
+              color: Theme.of(context).colorScheme.error,
               width: 1.0,
             ),
           ),
           focusedErrorBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10.0),
             borderSide: BorderSide(
-              color: Theme.of(context).errorColor,
+              color: Theme.of(context).colorScheme.error,
               width: 2.0,
             ),
           ),

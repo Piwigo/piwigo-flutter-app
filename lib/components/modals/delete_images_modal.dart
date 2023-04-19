@@ -48,10 +48,14 @@ class DeleteImagesModal extends StatelessWidget {
           children: [
             ListTile(
               minLeadingWidth: 24,
-              leading: Icon(Icons.delete, color: Theme.of(context).errorColor),
+              leading: Icon(Icons.delete,
+                  color: Theme.of(context).colorScheme.error),
               title: Text(appStrings.deleteImageCount_title(imageList.length)),
-              subtitle: _canMakeOrphans && _safeDelete ? Text(appStrings.deleteCategory_allImages_subtitle) : null,
-              onTap: () => Navigator.of(context).pop(DeleteAlbumModes.forceDelete),
+              subtitle: _canMakeOrphans && _safeDelete
+                  ? Text(appStrings.deleteCategory_allImages_subtitle)
+                  : null,
+              onTap: () =>
+                  Navigator.of(context).pop(DeleteAlbumModes.forceDelete),
             ),
             if (_safeDelete)
               Builder(
@@ -59,20 +63,27 @@ class DeleteImagesModal extends StatelessWidget {
                   if (_canMakeOrphans) {
                     return ListTile(
                       minLeadingWidth: 24,
-                      leading: Icon(Icons.remove_circle, color: Theme.of(context).primaryColor),
+                      leading: Icon(Icons.remove_circle,
+                          color: Theme.of(context).primaryColor),
                       title: Text(appStrings.deleteCategory_orphanedImages),
-                      subtitle: Text(appStrings.deleteCategory_orphanedImages_subtitle),
-                      onTap: () => Navigator.of(context).pop(DeleteAlbumModes.noDelete),
+                      subtitle: Text(
+                          appStrings.deleteCategory_orphanedImages_subtitle),
+                      onTap: () =>
+                          Navigator.of(context).pop(DeleteAlbumModes.noDelete),
                     );
                   }
                   return ListTile(
                     minLeadingWidth: 24,
-                    leading: Icon(Icons.remove_circle, color: Theme.of(context).primaryColor),
-                    title: Text(_canMakeOrphans ? appStrings.deleteCategory_orphanedImages : appStrings.removeSingleImage_title),
+                    leading: Icon(Icons.remove_circle,
+                        color: Theme.of(context).primaryColor),
+                    title: Text(_canMakeOrphans
+                        ? appStrings.deleteCategory_orphanedImages
+                        : appStrings.removeSingleImage_title),
                     subtitle: Text(_canMakeOrphans
                         ? appStrings.deleteCategory_orphanedImages_subtitle
                         : appStrings.deleteCategory_noImages_subtitle),
-                    onTap: () => Navigator.of(context).pop(DeleteAlbumModes.noDelete),
+                    onTap: () =>
+                        Navigator.of(context).pop(DeleteAlbumModes.noDelete),
                   );
                 },
               ),

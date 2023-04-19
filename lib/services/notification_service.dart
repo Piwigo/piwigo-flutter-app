@@ -1,18 +1,25 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:open_filex/open_filex.dart';
+import 'package:piwigo_ng/services/locale_provider.dart';
 import 'package:piwigo_ng/services/preferences_service.dart';
 import 'package:piwigo_ng/utils/localizations.dart';
 import 'package:piwigo_ng/utils/settings.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-final FlutterLocalNotificationsPlugin localNotification = FlutterLocalNotificationsPlugin();
+final FlutterLocalNotificationsPlugin localNotification =
+    FlutterLocalNotificationsPlugin();
 
 void initLocalNotifications() {
-  const AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings(
+  const AndroidInitializationSettings initializationSettingsAndroid =
+      AndroidInitializationSettings(
     '@mipmap/ic_launcher',
   );
-  final initSettings = InitializationSettings(android: initializationSettingsAndroid);
+  final initSettings =
+      InitializationSettings(android: initializationSettingsAndroid);
   localNotification.initialize(
     initSettings,
     onDidReceiveNotificationResponse: onSelectNotification,
@@ -27,7 +34,10 @@ Future<void> onSelectNotification(NotificationResponse response) async {
 }
 
 Future<bool?> requestPermissions() async {
-  return localNotification.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()?.requestPermission();
+  return localNotification
+      .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin>()
+      ?.requestPermission();
 }
 
 Future<void> showLocalNotification({
@@ -78,7 +88,9 @@ Future<void> showUploadNotification([int nbError = 0, int nbImage = 0]) async {
   } else if (nbError == 0 && nbImage > 0) {
     // Upload completed
     title = appStrings.imageUploadCompleted_title;
-    message = nbImage == 1 ? appStrings.imageUploadCompleted_message : appStrings.imageUploadCompleted_message1;
+    message = nbImage == 1
+        ? appStrings.imageUploadCompleted_message
+        : appStrings.imageUploadCompleted_message1;
   } else if (nbError > 0 && nbImage != nbError) {
     // Upload partially completed
     title = appStrings.coreDataStore_WarningTitle;
@@ -88,12 +100,21 @@ Future<void> showUploadNotification([int nbError = 0, int nbImage = 0]) async {
     title = appStrings.uploadError_title;
     message = appStrings.uploadError_message;
   }
-  await localNotification.show(Settings.uploadNotificationId, title, message, platform);
+  await localNotification.show(
+      Settings.uploadNotificationId, title, message, platform);
 }
 
-Future<void> showAutoUploadNotification([int nbError = 0, int nbImage = 0]) async {
+Future<void> showAutoUploadNotification(
+    [int nbError = 0, int nbImage = 0]) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   if (!(prefs.getBool(Preferences.uploadNotificationKey) ?? false)) return;
+
+  Locale locale = Locale(prefs.getString(LocaleNotifier.key) ??
+      Platform.localeName.split('_').first);
+
+  AppLocalizations backgroundStrings =
+      await AppLocalizations.delegate.load(locale);
+
   final android = AndroidNotificationDetails(
     'piwigo-ng-auto-upload',
     'Piwigo NG Auto Upload',
@@ -106,16 +127,19 @@ Future<void> showAutoUploadNotification([int nbError = 0, int nbImage = 0]) asyn
   String? message;
   if (nbError == 0 && nbImage > 0) {
     // Upload completed
-    title = appStrings.imageUploadCompleted_title;
-    message = nbImage == 1 ? appStrings.imageUploadCompleted_message : appStrings.imageUploadCompleted_message1;
+    title = backgroundStrings.imageUploadCompleted_title;
+    message = nbImage == 1
+        ? backgroundStrings.imageUploadCompleted_message
+        : backgroundStrings.imageUploadCompleted_message1;
   } else if (nbError > 0 && nbImage != nbError) {
     // Upload partially completed
-    title = appStrings.coreDataStore_WarningTitle;
-    message = appStrings.imageUploadCompleted_warning;
+    title = backgroundStrings.coreDataStore_WarningTitle;
+    message = backgroundStrings.imageUploadCompleted_warning;
   } else {
     // Upload failed
-    title = appStrings.uploadError_title;
-    message = appStrings.uploadError_message;
+    title = backgroundStrings.uploadError_title;
+    message = backgroundStrings.uploadError_message;
   }
-  await localNotification.show(Settings.autoUploadNotificationId, title, message, platform);
+  await localNotification.show(
+      Settings.autoUploadNotificationId, title, message, platform);
 }

@@ -34,7 +34,8 @@ class _EditImagePageState extends State<EditImagePage> {
   late final TextEditingController _authorController;
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
-  final RoundedLoadingButtonController _btnController = RoundedLoadingButtonController();
+  final RoundedLoadingButtonController _btnController =
+      RoundedLoadingButtonController();
 
   final List<DropdownMenuItem<int?>> _levelItems = [];
   final List<TagModel> _tags = [];
@@ -44,7 +45,8 @@ class _EditImagePageState extends State<EditImagePage> {
   @override
   void initState() {
     _imageList = widget.images;
-    _authorController = TextEditingController(text: Preferences.getUploadAuthor);
+    _authorController =
+        TextEditingController(text: Preferences.getUploadAuthor);
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       PrivacyLevel.values.forEach((privacy) {
@@ -66,7 +68,7 @@ class _EditImagePageState extends State<EditImagePage> {
       title: appStrings.removeSelectedImage_title,
       message: appStrings.removeSelectedImage_message,
       confirm: appStrings.alertRemoveButton,
-      confirmColor: Theme.of(context).errorColor,
+      confirmColor: Theme.of(context).colorScheme.error,
     )) return;
     setState(() {
       _imageList.remove(image);
@@ -88,7 +90,9 @@ class _EditImagePageState extends State<EditImagePage> {
     int result = await editImages(_imageList, {
       'title': _titleController.text.isEmpty ? null : _titleController.text,
       'author': _authorController.text.isEmpty ? null : _authorController.text,
-      'description': _descriptionController.text.isEmpty ? null : _descriptionController.text,
+      'description': _descriptionController.text.isEmpty
+          ? null
+          : _descriptionController.text,
       'level': _privacyLevel,
       'tags': tagIds.isEmpty ? null : tagIds,
     });
@@ -198,7 +202,8 @@ class _EditImagePageState extends State<EditImagePage> {
             ),
           ), // tags
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+            padding:
+                const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
             child: AnimatedPiwigoButton(
               controller: _btnController,
               color: Theme.of(context).primaryColor,

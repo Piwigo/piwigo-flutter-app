@@ -17,7 +17,8 @@ class CreateTagModal extends StatefulWidget {
 }
 
 class _CreateTagModalState extends State<CreateTagModal> {
-  final RoundedLoadingButtonController _btnController = RoundedLoadingButtonController();
+  final RoundedLoadingButtonController _btnController =
+      RoundedLoadingButtonController();
 
   String _name = '';
 
@@ -88,9 +89,7 @@ Future<TagModel?> showCreateTagModal(BuildContext context) async {
   return await showModalBottomSheet<TagModel?>(
     context: context,
     isScrollControlled: true,
-    builder: (_) => Padding(
-      padding: MediaQuery.of(context).padding,
-      child: CreateTagModal(),
-    ),
+    useSafeArea: true,
+    builder: (_) => CreateTagModal(),
   );
 }
