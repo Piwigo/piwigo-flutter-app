@@ -31,6 +31,7 @@ final ThemeData lightTheme = ThemeData.light(useMaterial3: true).copyWith(
     shadowColor: Colors.black54,
     elevation: 0.0,
     scrolledUnderElevation: 5.0,
+    shadowColor: Colors.black54,
     iconTheme: IconThemeData(
       color: AppColors.accent,
     ),
@@ -202,6 +203,7 @@ final ThemeData darkTheme = ThemeData.dark(useMaterial3: true).copyWith(
     shadowColor: Colors.black54,
     elevation: 0.0,
     scrolledUnderElevation: 5.0,
+    shadowColor: Colors.black54,
     iconTheme: IconThemeData(
       color: AppColors.accent,
     ),
