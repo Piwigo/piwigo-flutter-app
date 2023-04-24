@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
@@ -7,10 +8,10 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:piwigo_ng/api/api_error.dart';
 import 'package:piwigo_ng/models/album_model.dart';
 import 'package:piwigo_ng/models/image_model.dart';
+import 'package:piwigo_ng/services/chunked_uploader.dart';
 import 'package:piwigo_ng/services/notification_service.dart';
 import 'package:piwigo_ng/services/preferences_service.dart';
 import 'package:piwigo_ng/utils/localizations.dart';
@@ -47,7 +48,8 @@ Future<ApiResult<ImageModel>> getImage(int imageId) async {
   return ApiResult(error: ApiErrors.error);
 }
 
-Future<ApiResult<List<ImageModel>>> fetchImages(int albumID, int page) async {
+Future<ApiResult<List<ImageModel>>> fetchImages(int albumID,
+    [int page = 0]) async {
   Map<String, dynamic> queries = {
     'format': 'json',
     'method': 'pwg.categories.getImages',
@@ -61,7 +63,7 @@ Future<ApiResult<List<ImageModel>>> fetchImages(int albumID, int page) async {
     Response response = await ApiClient.get(queryParameters: queries);
 
     if (response.statusCode == 200) {
-      var jsonImages = json.decode(response.data)["result"]["images"];
+      var jsonImages = json.decode(response.data)['result']['images'];
       List<ImageModel> images = List<ImageModel>.from(
         jsonImages.map((image) => ImageModel.fromJson(image)),
       );
@@ -78,10 +80,12 @@ Future<ApiResult<List<ImageModel>>> fetchImages(int albumID, int page) async {
 
 Future<ApiResult<Map>> searchImages(String searchQuery, [int page = 0]) async {
   Map<String, dynamic> query = {
-    "format": "json",
-    "method": "pwg.images.search",
-    "query": searchQuery,
-    "page": page,
+    'format': 'json',
+    'method': 'pwg.images.search',
+    'query': searchQuery,
+    'order': Preferences.getImageSort.value,
+    'per_page': Settings.defaultElementPerPage,
+    'page': page,
   };
 
   try {
@@ -91,17 +95,17 @@ Future<ApiResult<Map>> searchImages(String searchQuery, [int page = 0]) async {
       final Map<String, dynamic> result = json.decode(response.data);
       if (result['err'] == 1002) {
         return ApiResult<Map>(data: {
-          "total_count": 0,
-          "images": [],
+          'total_count': 0,
+          'images': [],
         });
       }
-      final jsonImages = result["result"]["images"];
+      final jsonImages = result['result']['images'];
       List<ImageModel> images = List<ImageModel>.from(
         jsonImages.map((image) => ImageModel.fromJson(image)),
       );
       return ApiResult<Map>(data: {
-        "total_count": result["result"]["paging"]["total_count"],
-        "images": images,
+        'total_count': result['result']['paging']['total_count'],
+        'images': images,
       });
     }
   } on DioError catch (e) {
@@ -112,21 +116,52 @@ Future<ApiResult<Map>> searchImages(String searchQuery, [int page = 0]) async {
   return ApiResult(error: ApiErrors.searchImagesError);
 }
 
-Future<bool> _requestPermissions() async {
-  var permission = await Permission.storage.status;
-  if (permission != PermissionStatus.granted) {
-    await Permission.storage.request();
-    permission = await Permission.storage.status;
-  }
+Future<ApiResult<Map>> fetchFavorites([int page = 0]) async {
+  Map<String, dynamic> query = {
+    'format': 'json',
+    'method': 'pwg.users.favorites.getList',
+    'order': Preferences.getImageSort.value,
+    'per_page': Settings.defaultElementPerPage,
+    'page': page,
+  };
 
-  return permission == PermissionStatus.granted;
+  try {
+    Response response = await ApiClient.get(queryParameters: query);
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> result = json.decode(response.data);
+      if (result['stat'] == 'fail') {
+        return ApiResult<Map>(data: {
+          'total_count': 0,
+          'images': [],
+        });
+      }
+      final jsonImages = result['result']['images'];
+      List<ImageModel> images = List<ImageModel>.from(
+        jsonImages.map((image) {
+          image['is_favorite'] = true;
+          return ImageModel.fromJson(image);
+        }),
+      );
+      return ApiResult<Map>(data: {
+        'total_count': result['result']['paging']['count'],
+        'images': images,
+      });
+    }
+  } on DioError catch (e) {
+    debugPrint('Fetch favorites: ${e.message}');
+  } on Error catch (e) {
+    debugPrint('Fetch favorites: ${e.stackTrace}');
+  }
+  return ApiResult(error: ApiErrors.error);
 }
 
 Future<String?> pickDirectoryPath() async {
   return await FilePicker.platform.getDirectoryPath();
 }
 
-Future<void> _showDownloadNotification({bool success = true, String? payload}) async {
+Future<void> _showDownloadNotification(
+    {bool success = true, String? payload}) async {
   if (!Preferences.getDownloadNotification) return;
   final android = AndroidNotificationDetails(
     'piwigo-ng-download',
@@ -137,8 +172,12 @@ Future<void> _showDownloadNotification({bool success = true, String? payload}) a
   );
   await showLocalNotification(
     id: 0,
-    title: success ? appStrings.downloadImageSuccess_title : appStrings.downloadImageFail_title,
-    body: success ? appStrings.downloadImageSuccess_message : appStrings.deleteImageFail_message,
+    title: success
+        ? appStrings.downloadImageSuccess_title
+        : appStrings.downloadImageFail_title,
+    body: success
+        ? appStrings.downloadImageSuccess_message
+        : appStrings.deleteImageFail_message,
     details: android,
     payload: payload,
   );
@@ -168,7 +207,7 @@ Future<List<XFile>?> downloadImages(
 }) async {
   String? dirPath = (await getTemporaryDirectory()).path;
   if (!cached) {
-    dirPath = await Preferences.getDownloadDestination;
+    dirPath = Preferences.getDownloadDestination ?? await pickDirectoryPath();
   }
 
   if (dirPath == null) return null;
@@ -198,14 +237,14 @@ Future<XFile?> downloadImage(String dirPath, ImageModel image) async {
   String localPath = path.join(dirPath, image.file);
   try {
     await ApiClient.download(
-      path: image.derivatives.medium.url,
+      path: image.elementUrl,
       outputPath: localPath,
     );
     return XFile(localPath);
   } on DioError catch (e) {
-    debugPrint('Download images: ${e.message}');
+    debugPrint("Download images: ${e.message}");
   } on Error catch (e) {
-    debugPrint('Download images: ${e.stackTrace}');
+    debugPrint("Download images: ${e.stackTrace}");
   }
   return null;
 }
@@ -275,7 +314,8 @@ Future<int> removeImages(List<ImageModel> images, int albumId) async {
 }
 
 Future<bool> removeImage(ImageModel image, int albumId) async {
-  final List<int> albums = image.categories.map<int>((album) => album['id']).toList();
+  final List<int> albums =
+      image.categories.map<int>((album) => album['id']).toList();
   albums.removeWhere((album) => album == albumId);
 
   if (albums.isEmpty) {
@@ -293,7 +333,8 @@ Future<bool> removeImage(ImageModel image, int albumId) async {
   });
 
   try {
-    Response response = await ApiClient.post(data: formData, queryParameters: queries);
+    Response response =
+        await ApiClient.post(data: formData, queryParameters: queries);
 
     if (response.statusCode == 200) {
       return true;
@@ -306,7 +347,8 @@ Future<bool> removeImage(ImageModel image, int albumId) async {
   return false;
 }
 
-Future<int> moveImages(List<ImageModel> images, int oldAlbumId, int newAlbumId) async {
+Future<int> moveImages(
+    List<ImageModel> images, int oldAlbumId, int newAlbumId) async {
   int nbMoved = 0;
   for (var image in images) {
     bool response = await moveImage(image, oldAlbumId, newAlbumId);
@@ -318,7 +360,8 @@ Future<int> moveImages(List<ImageModel> images, int oldAlbumId, int newAlbumId) 
 }
 
 Future<bool> moveImage(ImageModel image, int oldAlbumId, int newAlbumId) async {
-  final List<int> albums = image.categories.map<int>((album) => album['id']).toList();
+  final List<int> albums =
+      image.categories.map<int>((album) => album['id']).toList();
   albums.removeWhere((id) => id == oldAlbumId);
   albums.add(newAlbumId);
   Map<String, String> queries = {
@@ -333,7 +376,8 @@ Future<bool> moveImage(ImageModel image, int oldAlbumId, int newAlbumId) async {
   });
 
   try {
-    Response response = await ApiClient.post(data: formData, queryParameters: queries);
+    Response response =
+        await ApiClient.post(data: formData, queryParameters: queries);
 
     if (response.statusCode == 200) {
       return true;
@@ -349,7 +393,8 @@ Future<bool> moveImage(ImageModel image, int oldAlbumId, int newAlbumId) async {
 Future<int> assignImages(List<ImageModel> images, int albumId) async {
   int nbAssigned = 0;
   for (ImageModel image in images) {
-    final List<int> categories = image.categories.map<int>((album) => album['id']).toList();
+    final List<int> categories =
+        image.categories.map<int>((album) => album['id']).toList();
     categories.add(albumId);
     bool response = await assignImage(image.id, categories);
     if (response == true) {
@@ -372,7 +417,8 @@ Future<bool> assignImage(int imageId, List<int> categories) async {
   });
 
   try {
-    Response response = await ApiClient.post(data: formData, queryParameters: queries);
+    Response response =
+        await ApiClient.post(data: formData, queryParameters: queries);
 
     if (response.statusCode == 200) {
       return true;
@@ -385,7 +431,8 @@ Future<bool> assignImage(int imageId, List<int> categories) async {
   return false;
 }
 
-Future<int> editImages(List<ImageModel> images, [Map<String, dynamic> info = const {}]) async {
+Future<int> editImages(List<ImageModel> images,
+    [Map<String, dynamic> info = const {}]) async {
   int nbEdited = 0;
   for (ImageModel image in images) {
     bool response = await editImage(image, info);
@@ -396,7 +443,8 @@ Future<int> editImages(List<ImageModel> images, [Map<String, dynamic> info = con
   return nbEdited;
 }
 
-Future<bool> editImage(ImageModel image, [Map<String, dynamic> info = const {}]) async {
+Future<bool> editImage(ImageModel image,
+    [Map<String, dynamic> info = const {}]) async {
   final Map<String, String> queries = {
     'format': 'json',
     'method': 'pwg.images.setInfo',
@@ -415,7 +463,10 @@ Future<bool> editImage(ImageModel image, [Map<String, dynamic> info = const {}])
   final FormData formData = FormData.fromMap(form);
 
   try {
-    Response response = await ApiClient.post(data: formData, queryParameters: queries);
+    Response response = await ApiClient.post(
+      data: formData,
+      queryParameters: queries,
+    );
 
     if (response.statusCode == 200) {
       return true;
@@ -426,4 +477,43 @@ Future<bool> editImage(ImageModel image, [Map<String, dynamic> info = const {}])
     debugPrint('Edit images: ${e.stackTrace}');
   }
   return false;
+}
+
+/// Return a list of files that are not in the server
+Future<List<File>> checkImagesNotExist(List<File> files,
+    {bool returnExistFiles = false}) async {
+  Map<String, File> md5sumList = {};
+
+  for (File file in files) {
+    String md5sum = await ChunkedUploader.generateMd5(file.openRead());
+    md5sumList[md5sum] = file;
+  }
+
+  final Map<String, String> queries = {
+    'format': 'json',
+    'method': 'pwg.images.exist',
+    'md5sum_list': md5sumList.keys.join(','),
+  };
+
+  try {
+    Response response = await ApiClient.get(
+      queryParameters: queries,
+    );
+
+    Map<String, dynamic> data = json.decode(response.data);
+    if (data['stat'] == 'fail') return [];
+    print(data['result']);
+    Map<String, dynamic> existResult = data['result'];
+    if (returnExistFiles) {
+      existResult.removeWhere((key, value) => value == null);
+    } else {
+      existResult.removeWhere((key, value) => value != null);
+    }
+    return existResult.keys.map((md5sum) => md5sumList[md5sum]!).toList();
+  } on DioError catch (e) {
+    debugPrint('Edit images: ${e.message}');
+  } on Error catch (e) {
+    debugPrint('Edit images: ${e.stackTrace}');
+  }
+  return [];
 }

@@ -35,6 +35,9 @@ class _EditAlbumModalState extends State<EditAlbumModal> {
 
   Future<void> _onEditAlbum() async {
     if (_name.isEmpty) return;
+    if (_name == widget.album.name && _descriptionController.text == widget.album.comment) {
+      Navigator.of(context).pop();
+    }
     _btnController.start();
     ApiResult result = await editAlbum(
       albumId: widget.album.id,
@@ -76,6 +79,9 @@ class _EditAlbumModalState extends State<EditAlbumModal> {
               padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: AppField(
                 controller: _nameController,
+                onChanged: (value) => setState(() {
+                  _name = value;
+                }),
                 hint: appStrings.createNewAlbum_placeholder,
               ),
             ),

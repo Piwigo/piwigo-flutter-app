@@ -83,6 +83,12 @@ extension SortMethodsExtension on SortMethods {
 }
 
 class Settings {
+  static const String privacyPolicyUrl = 'https://piwigo.org/mobile-apps-privacy-policy&webview';
+  static const String twitterUrl = 'https://twitter.com/piwigo';
+  static const String forumUrl = 'https://piwigo.org/forum';
+  static const String playStorePrefixUrl = 'market://details?id=';
+  static const String crowdinUrl = 'https://crowdin.com/project/piwigo-ng';
+
   static const String defaultAlbumThumbnailSize = 'medium';
   static const String defaultImageThumbnailSize = 'medium';
   static const String defaultImageFullScreenSize = 'medium';
@@ -98,6 +104,18 @@ class Settings {
   static const int defaultElementPerPage = 100; // API requests
   static const double defaultAlbumGridSize = 448.0;
   static const double defaultUploadQuality = 1.0;
+  static const int uploadNotificationId = 1;
+  static const int autoUploadNotificationId = 2;
+  static const List<Duration> autoUploadFrequencies = [
+    Duration(hours: 1),
+    Duration(hours: 6),
+    Duration(hours: 12),
+    Duration(days: 1),
+    Duration(days: 7),
+  ];
+
+  /// Default autoUploadInterval in hours
+  static const int defaultAutoUploadFrequency = 1;
 
   /// Get image row count based on device orientation
   static int getImageCrossAxisCount(BuildContext context, [int? nbImageRow]) {

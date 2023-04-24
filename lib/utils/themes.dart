@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:piwigo_ng/utils/resources.dart';
 
-final ThemeData lightTheme = ThemeData.light().copyWith(
+final ThemeData lightTheme = ThemeData.light(useMaterial3: true).copyWith(
   primaryColor: AppColors.accent,
   primaryColorLight: AppColors.white,
   primaryColorDark: AppColors.black,
-  errorColor: AppColors.error,
   disabledColor: AppColors.disabled,
-  backgroundColor: AppColors.backgroundLight,
   scaffoldBackgroundColor: AppColors.backgroundLight,
   dialogBackgroundColor: AppColors.backgroundLight,
   focusColor: AppColors.accent,
@@ -17,8 +15,11 @@ final ThemeData lightTheme = ThemeData.light().copyWith(
     backgroundColor: AppColors.fieldLight,
   ),
   colorScheme: const ColorScheme.highContrastLight(
-    primary: AppColors.accent,
+    primary: AppColors.white,
     secondary: AppColors.accent,
+    error: AppColors.error,
+    background: AppColors.backgroundLight,
+    outline: AppColors.fieldLight,
   ),
   progressIndicatorTheme: const ProgressIndicatorThemeData(
     color: AppColors.accent,
@@ -27,6 +28,7 @@ final ThemeData lightTheme = ThemeData.light().copyWith(
     backgroundColor: AppColors.backgroundLight,
     elevation: 0.0,
     scrolledUnderElevation: 5.0,
+    shadowColor: Colors.black54,
     iconTheme: IconThemeData(
       color: AppColors.accent,
     ),
@@ -35,6 +37,28 @@ final ThemeData lightTheme = ThemeData.light().copyWith(
     ),
     foregroundColor: AppColors.accent,
     titleTextStyle: TextStyle(fontSize: 20.0, color: AppColors.black),
+  ),
+  tabBarTheme: TabBarTheme(
+    dividerColor: Colors.transparent,
+    labelStyle: TextStyle(
+      fontSize: 16,
+      color: AppColors.white,
+      fontWeight: FontWeight.bold,
+    ),
+  ),
+  bottomNavigationBarTheme: BottomNavigationBarThemeData(
+    selectedItemColor: AppColors.accent,
+    selectedLabelStyle: TextStyle(
+      fontSize: 14,
+      color: AppColors.accent,
+      fontWeight: FontWeight.w500,
+    ),
+    unselectedItemColor: AppColors.black,
+    unselectedLabelStyle: TextStyle(
+      fontSize: 14,
+      color: AppColors.black,
+      fontWeight: FontWeight.normal,
+    ),
   ),
   iconTheme: const IconThemeData(
     color: AppColors.accent,
@@ -80,6 +104,7 @@ final ThemeData lightTheme = ThemeData.light().copyWith(
   ),
   switchTheme: SwitchThemeData(
     thumbColor: MaterialStateProperty.all(AppColors.backgroundLight),
+    overlayColor: MaterialStateProperty.all(AppColors.backgroundLight),
     trackColor: MaterialStateProperty.resolveWith((states) {
       if (states.contains(MaterialState.selected)) {
         return AppColors.accent;
@@ -96,6 +121,9 @@ final ThemeData lightTheme = ThemeData.light().copyWith(
     activeTickMarkColor: AppColors.transparent,
     inactiveTickMarkColor: AppColors.transparent,
     overlayColor: Colors.transparent,
+  ),
+  dividerTheme: DividerThemeData(
+    color: AppColors.backgroundLight,
   ),
   splashFactory: NoSplash.splashFactory,
   textTheme: TextTheme(
@@ -146,23 +174,25 @@ final ThemeData lightTheme = ThemeData.light().copyWith(
   ),
 );
 
-final ThemeData darkTheme = ThemeData.dark().copyWith(
+final ThemeData darkTheme = ThemeData.dark(useMaterial3: true).copyWith(
   primaryColor: AppColors.accent,
   primaryColorLight: AppColors.white,
   primaryColorDark: AppColors.black,
-  errorColor: AppColors.error,
   disabledColor: AppColors.disabled,
-  backgroundColor: AppColors.backgroundDark,
   scaffoldBackgroundColor: AppColors.backgroundDark,
   dialogBackgroundColor: AppColors.backgroundDark,
   focusColor: AppColors.accent,
+  splashColor: AppColors.accent.withOpacity(0.3),
   cardColor: AppColors.cardDark,
   chipTheme: ChipThemeData(
     backgroundColor: AppColors.fieldDark,
   ),
   colorScheme: const ColorScheme.highContrastDark(
-    primary: AppColors.accent,
+    primary: AppColors.white,
     secondary: AppColors.accent,
+    error: AppColors.error,
+    background: AppColors.backgroundDark,
+    outline: AppColors.fieldDark,
   ),
   progressIndicatorTheme: const ProgressIndicatorThemeData(
     color: AppColors.accent,
@@ -171,10 +201,37 @@ final ThemeData darkTheme = ThemeData.dark().copyWith(
     backgroundColor: AppColors.backgroundDark,
     elevation: 0.0,
     scrolledUnderElevation: 5.0,
+    shadowColor: Colors.black54,
     iconTheme: IconThemeData(
       color: AppColors.accent,
     ),
+    actionsIconTheme: IconThemeData(
+      color: AppColors.accent,
+    ),
+    foregroundColor: AppColors.accent,
     titleTextStyle: TextStyle(fontSize: 20.0, color: AppColors.white),
+  ),
+  tabBarTheme: TabBarTheme(
+    dividerColor: Colors.transparent,
+    labelStyle: TextStyle(
+      fontSize: 16,
+      color: AppColors.white,
+      fontWeight: FontWeight.bold,
+    ),
+  ),
+  bottomNavigationBarTheme: BottomNavigationBarThemeData(
+    selectedItemColor: AppColors.accent,
+    selectedLabelStyle: TextStyle(
+      fontSize: 14,
+      color: AppColors.accent,
+      fontWeight: FontWeight.w500,
+    ),
+    unselectedItemColor: AppColors.white,
+    unselectedLabelStyle: TextStyle(
+      fontSize: 14,
+      color: AppColors.white,
+      fontWeight: FontWeight.normal,
+    ),
   ),
   iconTheme: const IconThemeData(
     color: AppColors.accent,
@@ -236,6 +293,9 @@ final ThemeData darkTheme = ThemeData.dark().copyWith(
     activeTickMarkColor: Color(0x00000000),
     inactiveTickMarkColor: Color(0x00000000),
     overlayColor: Colors.transparent,
+  ),
+  dividerTheme: DividerThemeData(
+    color: AppColors.backgroundDark,
   ),
   splashFactory: NoSplash.splashFactory,
   textTheme: TextTheme(

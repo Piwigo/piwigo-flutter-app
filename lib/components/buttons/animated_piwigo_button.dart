@@ -37,7 +37,10 @@ class AnimatedPiwigoButton extends StatelessWidget {
             borderRadius: 10.0,
             height: 56.0,
             width: constraints.maxWidth,
-            onPressed: disabled ? () {} : onPressed,
+            onPressed:
+                controller.currentState == ButtonState.loading || disabled
+                    ? () {}
+                    : onPressed,
             child: child ?? const SizedBox(),
           );
         }),

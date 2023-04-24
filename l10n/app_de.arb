@@ -770,5 +770,5 @@
     "settings_acknowledgements": "Danksagungen",
     "settings_privacy": "Datenschutzerklärung",
     "settings_unknownVersion": "Unbekannte Version",
-    "settings_privacyUrl": "&lang=de_DE"
+    "settings_privacyLocale": "&lang=de_DE"
 }

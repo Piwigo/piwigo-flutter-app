@@ -1,5 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:piwigo_ng/components/notification_dot.dart';
+import 'package:piwigo_ng/components/popup_list_item.dart';
+import 'package:piwigo_ng/services/preferences_service.dart';
+import 'package:piwigo_ng/services/upload_notifier.dart';
 import 'package:piwigo_ng/utils/localizations.dart';
+import 'package:piwigo_ng/views/image/image_favorites_page.dart';
+import 'package:piwigo_ng/views/upload/upload_status_page.dart';
+import 'package:provider/provider.dart';
 
 import '../../views/settings/settings_view_page.dart';
 import '../fields/app_field.dart';
@@ -72,7 +79,7 @@ class _RootSearchAppBarState extends State<RootSearchAppBar> {
         child: GestureDetector(
           onTap: widget.onSearch,
           child: const Hero(
-            tag: 'search-bar',
+            tag: '<search-bar>',
             child: Material(
               color: Colors.transparent,
               child: IgnorePointer(
@@ -87,11 +94,7 @@ class _RootSearchAppBarState extends State<RootSearchAppBar> {
         ),
       ),
       actions: [
-        SizedBox(width: 16.0),
-        // IconButton(
-        //   onPressed: () {},
-        //   icon: const Icon(Icons.more_vert),
-        // ),
+        _popupMenu,
       ],
       expandedHeight: _expandedHeight,
       flexibleSpace: FlexibleSpaceBar(
@@ -105,6 +108,62 @@ class _RootSearchAppBarState extends State<RootSearchAppBar> {
           style: Theme.of(context).appBarTheme.titleTextStyle,
         ),
       ),
+    );
+  }
+
+  Widget get _popupMenu {
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        PopupMenuButton(
+          position: PopupMenuPosition.under,
+          itemBuilder: (context) => [
+            PopupMenuItem(
+              onTap: () => Future.delayed(
+                const Duration(seconds: 0),
+                () => Navigator.of(context).pushNamed(UploadStatusPage.routeName),
+              ),
+              child: Stack(
+                children: [
+                  PopupListItem(
+                    icon: Icons.upload,
+                    text: appStrings.uploadSection_queue,
+                  ),
+                  Positioned(
+                    top: 14.0,
+                    left: 0.0,
+                    child: Consumer<UploadNotifier>(builder: (context, uploadNotifier, child) {
+                      return NotificationDot(
+                        isShown: uploadNotifier.uploadList.isNotEmpty,
+                      );
+                    }),
+                  ),
+                ],
+              ),
+            ),
+            if (Preferences.getUserStatus != 'guest')
+              PopupMenuItem(
+                onTap: () => Future.delayed(
+                  const Duration(seconds: 0),
+                  () => Navigator.of(context).pushNamed(ImageFavoritesPage.routeName),
+                ),
+                child: PopupListItem(
+                  icon: Icons.favorite,
+                  text: appStrings.categoryDiscoverFavorites_title,
+                ),
+              ),
+          ],
+        ),
+        Positioned(
+          top: 12.0,
+          left: 12.0,
+          child: Consumer<UploadNotifier>(builder: (context, uploadNotifier, child) {
+            return NotificationDot(
+              isShown: uploadNotifier.uploadList.isNotEmpty,
+            );
+          }),
+        ),
+      ],
     );
   }
 }

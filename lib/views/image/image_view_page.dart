@@ -1,8 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:mime_type/mime_type.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:html_unescape/html_unescape.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
+import 'package:piwigo_ng/api/api_client.dart';
 import 'package:piwigo_ng/api/api_error.dart';
 import 'package:piwigo_ng/api/images.dart';
 import 'package:piwigo_ng/components/popup_list_item.dart';
@@ -61,12 +65,16 @@ class _ImageViewPageState extends State<ImageViewPage> {
   /// API Image Pagination
   int _imagePage = 0;
 
+  /// Server Cookie String
+  String _serverCookie = '';
+
   /// Initialize [PageView]
   @override
   void initState() {
     _imageList = widget.images.sublist(0);
     _album = widget.album;
-    final ImageModel? startImage = _imageList.firstWhere((image) => image.id == widget.startId);
+    final ImageModel? startImage =
+        _imageList.firstWhere((image) => image.id == widget.startId);
     if (startImage != null) {
       _page = _imageList.indexOf(startImage);
       if (_imageList.last == startImage) {
@@ -74,6 +82,9 @@ class _ImageViewPageState extends State<ImageViewPage> {
       }
     }
     _pageController = PageController(initialPage: _page);
+
+    _loadCookies();
+
     super.initState();
   }
 
@@ -88,11 +99,25 @@ class _ImageViewPageState extends State<ImageViewPage> {
   Future<void> _loadMoreImages() async {
     if (_album.id == -1) return;
     if (_album.nbImages <= _imageList.length) return;
-    ApiResult<List<ImageModel>> result = await fetchImages(_album.id, _imagePage + 1);
+    ApiResult<List<ImageModel>> result =
+        await fetchImages(_album.id, _imagePage + 1);
     if (result.hasError || !result.hasData) return;
     setState(() {
       _imagePage += 1;
       _imageList.addAll(result.data!);
+    });
+  }
+
+  Future<void> _loadCookies() async {
+    FlutterSecureStorage secureStorage = const FlutterSecureStorage();
+    String? serverUrl = await secureStorage.read(key: 'SERVER_URL');
+    List<Cookie> cookies =
+        await ApiClient.cookieJar.loadForRequest(Uri.parse(serverUrl!));
+
+    String cookiesStr =
+        cookies.map((cookie) => '${cookie.name}=${cookie.value}').join('; ');
+    setState(() {
+      _serverCookie = cookiesStr;
     });
   }
 
@@ -113,7 +138,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
   }
 
   /// Toggle overlay action (orientation was necessary, *see comments*).
-  void _onToggleOverlay(Orientation orientation) {
+  void _onToggleOverlay(Orientation orientation, [bool? value]) {
     // if (_showOverlay) {
     //   SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
     // } else {
@@ -122,7 +147,11 @@ class _ImageViewPageState extends State<ImageViewPage> {
     //   ]);
     // }
     setState(() {
-      _showOverlay = !_showOverlay;
+      if (value != null) {
+        _showOverlay = value;
+      } else {
+        _showOverlay = !_showOverlay;
+      }
     });
   }
 
@@ -257,7 +286,8 @@ class _ImageViewPageState extends State<ImageViewPage> {
                     style: TextStyle(fontSize: 16, color: Colors.white),
                   ),
                 ),
-                if (MediaQuery.of(context).orientation == Orientation.landscape) ...[
+                if (MediaQuery.of(context).orientation ==
+                    Orientation.landscape) ...[
                   IconButton(
                     onPressed: _onEdit,
                     icon: Icon(Icons.edit),
@@ -269,7 +299,8 @@ class _ImageViewPageState extends State<ImageViewPage> {
                     ),
                   IconButton(
                     onPressed: _onDelete,
-                    icon: Icon(Icons.delete, color: Theme.of(context).errorColor),
+                    icon: Icon(Icons.delete,
+                        color: Theme.of(context).colorScheme.error),
                   ),
                 ],
                 if (widget.isAdmin)
@@ -293,7 +324,9 @@ class _ImageViewPageState extends State<ImageViewPage> {
                             _onLike,
                           ),
                           child: PopupListItem(
-                            icon: !_currentImage.favorite ? Icons.favorite_border : Icons.favorite,
+                            icon: !_currentImage.favorite
+                                ? Icons.favorite_border
+                                : Icons.favorite,
                             text: !_currentImage.favorite
                                 ? appStrings.imageOptions_addFavorites
                                 : appStrings.imageOptions_removeFavorites,
@@ -327,49 +360,70 @@ class _ImageViewPageState extends State<ImageViewPage> {
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: () => _onToggleOverlay(MediaQuery.of(context).orientation),
-        child: PhotoViewGallery.builder(
-          /// Compatibility with PageView and PhotoView
-          pageController: _pageController,
-          onPageChanged: (page) => setState(() {
-            _page = page;
-            if (page == _imageList.length - 1) {
-              _loadMoreImages();
-            }
-          }),
-          itemCount: _imageList.length,
-          builder: (context, index) {
-            final ImageModel image = _imageList[index];
+        child: _serverCookie == ''
+            ? null
+            : PhotoViewGallery.builder(
+                /// Compatibility with PageView and PhotoView
+                pageController: _pageController,
+                onPageChanged: (page) => setState(() {
+                  _page = page;
+                  if (page == _imageList.length - 1) {
+                    _loadMoreImages();
+                  }
+                }),
+                itemCount: _imageList.length,
+                builder: (context, index) {
+                  final ImageModel image = _imageList[index];
 
-            /// Check mime type of file (multiple test to ensure it is not null)
-            String? mimeType = mime(image.file) ?? mime(image.elementUrl) ?? mime(image.derivatives.medium.url);
-            if (mimeType != null && mimeType.startsWith('video')) {
-              /// Returns video player
-              return PhotoViewGalleryPageOptions.customChild(
-                disableGestures: true,
-                child: VideoView(
-                  videoUrl: image.elementUrl,
-                  thumbnailUrl: image.derivatives.medium.url,
-                  showOverlay: _showOverlay,
-                  screenPadding: const EdgeInsets.only(bottom: 56.0),
-                  onToggleOverlay: () => _onToggleOverlay(MediaQuery.of(context).orientation),
-                ),
-              );
-            }
+                  // Check mime type of file (multiple test to ensure it is not null)
+                  if (image.isVideo) {
+                    // Returns video player
+                    return PhotoViewGalleryPageOptions.customChild(
+                      disableGestures: true,
+                      child: VideoPlayerView(
+                        videoUrl: image.elementUrl,
+                        thumbnailUrl: image.derivatives.medium.url,
+                        showOverlay: _showOverlay,
+                        screenPadding: const EdgeInsets.only(bottom: 56.0),
+                        onToggleOverlay: (value) => _onToggleOverlay(
+                            MediaQuery.of(context).orientation, value),
+                      ),
+                    );
+                  }
 
-            /// Default behavior: Zoomable image
-            return PhotoViewGalleryPageOptions(
-              imageProvider: NetworkImage(
-                image.getDerivativeFromString(Preferences.getImageFullScreenSize)?.url ?? '',
+                  String imageUrl = '';
+                  if (Preferences.getImageFullScreenSize == 'full') {
+                    imageUrl = image.elementUrl;
+                    imageUrl = HtmlUnescape().convert(imageUrl);
+                  } else {
+                    imageUrl = image
+                            .getDerivativeFromString(
+                                Preferences.getImageFullScreenSize)
+                            ?.url ??
+                        '';
+                  }
+
+                  ApiClient.cookieJar.loadForRequest(Uri.parse(imageUrl));
+
+                  // Default behavior: Zoomable image
+
+                  return PhotoViewGalleryPageOptions(
+                    heroAttributes: PhotoViewHeroAttributes(
+                      tag: "<hero image ${image.id}>",
+                    ),
+                    imageProvider: NetworkImage(
+                      imageUrl,
+                      headers: {HttpHeaders.cookieHeader: _serverCookie},
+                    ),
+                    maxScale: 2.0,
+                    minScale: PhotoViewComputedScale.contained,
+                    errorBuilder: (context, o, s) {
+                      debugPrint("$o");
+                      return SizedBox();
+                    },
+                  );
+                },
               ),
-              maxScale: 2.0,
-              minScale: PhotoViewComputedScale.contained,
-              errorBuilder: (context, o, s) {
-                debugPrint("$o");
-                return Center();
-              },
-            );
-          },
-        ),
       ),
     );
   }
@@ -415,7 +469,8 @@ class _ImageViewPageState extends State<ImageViewPage> {
                       Expanded(
                         child: IconButton(
                           onPressed: _onDelete,
-                          icon: Icon(Icons.delete, color: Theme.of(context).errorColor),
+                          icon: Icon(Icons.delete,
+                              color: Theme.of(context).colorScheme.error),
                         ),
                       ),
                     ]

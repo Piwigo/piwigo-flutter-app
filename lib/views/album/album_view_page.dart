@@ -5,6 +5,7 @@ import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:piwigo_ng/api/albums.dart';
 import 'package:piwigo_ng/api/api_error.dart';
+import 'package:piwigo_ng/components/loading_overlay.dart';
 import 'package:piwigo_ng/components/popup_list_item.dart';
 import 'package:piwigo_ng/components/scroll_widgets/album_grid_view.dart';
 import 'package:piwigo_ng/components/scroll_widgets/image_grid_view.dart';
@@ -16,6 +17,7 @@ import 'package:piwigo_ng/utils/album_actions.dart';
 import 'package:piwigo_ng/utils/image_actions.dart';
 import 'package:piwigo_ng/utils/localizations.dart';
 import 'package:piwigo_ng/views/image/image_view_page.dart';
+import 'package:piwigo_ng/views/upload/upload_status_page.dart';
 import 'package:piwigo_ng/views/upload/upload_view_page.dart';
 import 'package:provider/provider.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
@@ -38,14 +40,15 @@ class AlbumViewPage extends StatefulWidget {
 }
 
 class _AlbumViewPageState extends State<AlbumViewPage> {
-  final RefreshController _refreshController = RefreshController(initialRefresh: false);
+  final RefreshController _refreshController =
+      RefreshController(initialRefresh: false);
   final ScrollController _scrollController = ScrollController();
 
   late AlbumModel _currentAlbum;
 
   late final Future<List<ApiResult>> _data;
-  List<ImageModel> _imageList = [];
-  List<AlbumModel> _albumList = [];
+  List<ImageModel>? _imageList;
+  List<AlbumModel>? _albumList;
   List<ImageModel> _selectedList = [];
 
   int _page = 0;
@@ -60,7 +63,13 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
     super.initState();
   }
 
-  bool get _hasNonFavorites => _selectedList.where((image) => !image.favorite).isNotEmpty;
+  bool get _hasNonFavorites =>
+      _selectedList.where((image) => !image.favorite).isNotEmpty;
+
+  bool get _enableLoad {
+    if (_imageList == null || _imageList!.isEmpty) return false;
+    return _currentAlbum.nbImages > _imageList!.length;
+  }
 
   List<AlbumModel> _parseAlbums(List<AlbumModel> albums) {
     albums.removeWhere((album) {
@@ -74,8 +83,10 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
   }
 
   Future<void> _loadMoreImages() async {
-    if (_currentAlbum.nbImages <= _imageList.length) return;
-    ApiResult<List<ImageModel>> result = await fetchImages(widget.album.id, _page + 1);
+    if (_imageList == null) return;
+    if (_currentAlbum.nbImages <= _imageList!.length) return;
+    ApiResult<List<ImageModel>> result =
+        await fetchImages(widget.album.id, _page + 1);
     if (result.hasError || !result.hasData) {
       _refreshController.loadFailed();
       await Future.delayed(const Duration(milliseconds: 500));
@@ -83,15 +94,18 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
     }
     setState(() {
       _page += 1;
-      _imageList.addAll(result.data!);
+      _imageList!.addAll(result.data!);
     });
     _refreshController.loadComplete();
   }
 
   Future<void> _onRefresh() async {
-    final result = await Future.wait([fetchAlbums(widget.album.id), fetchImages(widget.album.id, 0)]);
-    final ApiResult<List<AlbumModel>> albumsResult = result.first as ApiResult<List<AlbumModel>>;
-    final ApiResult<List<ImageModel>> imagesResult = result.last as ApiResult<List<ImageModel>>;
+    final result = await Future.wait(
+        [fetchAlbums(widget.album.id), fetchImages(widget.album.id, 0)]);
+    final ApiResult<List<AlbumModel>> albumsResult =
+        result.first as ApiResult<List<AlbumModel>>;
+    final ApiResult<List<ImageModel>> imagesResult =
+        result.last as ApiResult<List<ImageModel>>;
     if (!albumsResult.hasData || !imagesResult.hasData) {
       _refreshController.refreshFailed();
       await Future.delayed(const Duration(milliseconds: 500));
@@ -101,16 +115,21 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
       _page = 0;
       _albumList = _parseAlbums(albumsResult.data!);
       _imageList = imagesResult.data!;
-      _selectedList.removeWhere((image) => !_imageList.contains(image));
+      _selectedList.removeWhere((image) => !(_imageList ?? []).contains(image));
     });
     _refreshController.refreshCompleted();
   }
 
-  void _onAddAlbum() => onAddAlbum(context, widget.album.id).whenComplete(() => _onRefresh());
-  void _onTapAlbum(AlbumModel album) => onOpenAlbum(context, album).whenComplete(() => _onRefresh());
-  void _onEditAlbum(AlbumModel album) => onEditAlbum(context, album).whenComplete(() => _onRefresh());
-  void _onMoveAlbum(AlbumModel album) => onMoveAlbum(context, album).whenComplete(() => _onRefresh());
-  Future<bool> _onDeleteAlbum(AlbumModel album) => onDeleteAlbum(context, album).then((success) {
+  void _onAddAlbum() =>
+      onAddAlbum(context, widget.album.id).whenComplete(() => _onRefresh());
+  void _onTapAlbum(AlbumModel album) =>
+      onOpenAlbum(context, album).whenComplete(() => _onRefresh());
+  void _onEditAlbum(AlbumModel album) =>
+      onEditAlbum(context, album).whenComplete(() => _onRefresh());
+  void _onMoveAlbum(AlbumModel album) =>
+      onMoveAlbum(context, album).whenComplete(() => _onRefresh());
+  Future<bool> _onDeleteAlbum(AlbumModel album) =>
+      onDeleteAlbum(context, album).then((success) {
         if (success) _onRefresh();
         return success;
       });
@@ -129,14 +148,22 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
           _onRefresh();
         }
       });
-  Future<void> _onMovePhotos() async => onMovePhotos(context, _selectedList, _currentAlbum).whenComplete(() => _onRefresh());
-  void _onLikePhotos() => onLikePhotos(_selectedList, _hasNonFavorites).whenComplete(() => _onRefresh());
-  _onDeletePhotos() => onDeletePhotos(context, _selectedList, _currentAlbum).then((success) {
+  Future<void> _onMovePhotos() async =>
+      onMovePhotos(context, _selectedList, _currentAlbum)
+          .whenComplete(() => _onRefresh());
+  void _onLikePhotos() => onLikePhotos(_selectedList, _hasNonFavorites)
+      .whenComplete(() => _onRefresh());
+  _onDeletePhotos() =>
+      onDeletePhotos(context, _selectedList, _currentAlbum).then((success) {
         if (success) _onRefresh();
       });
 
   Future<void> _onPickImages() async {
+    OverlayEntry overlayEntry =
+        OverlayEntry(builder: (context) => LoadingOverlay());
+    Overlay.of(context).insert(overlayEntry);
     List<XFile>? images = await onPickImages();
+    overlayEntry.remove();
     if (images == null || images.isEmpty) return;
     Navigator.of(context).pushNamed(UploadViewPage.routeName, arguments: {
       'images': images,
@@ -160,12 +187,12 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
         child: SmartRefresher(
           controller: _refreshController,
           scrollController: _scrollController,
-          enablePullUp: _imageList.isNotEmpty && _currentAlbum.nbImages > _imageList.length,
+          enablePullUp: _enableLoad,
           onLoading: _loadMoreImages,
           onRefresh: _onRefresh,
           header: MaterialClassicHeader(
             backgroundColor: Theme.of(context).cardColor,
-            color: Theme.of(context).colorScheme.primary,
+            color: Theme.of(context).colorScheme.secondary,
           ),
           child: CustomScrollView(
             controller: _scrollController,
@@ -176,17 +203,29 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
                   future: _data,
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
+                      if (snapshot.data!.first.hasError &&
+                          snapshot.data!.last.hasError) {
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16.0, vertical: 8.0),
+                          child: Text(
+                            appStrings.categoryImageList_noDataError,
+                            textAlign: TextAlign.center,
+                          ),
+                        );
+                      }
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           _albumGrid(snapshot),
                           _imageGrid(snapshot),
                           SizedBox(
-                            height: 72,
+                            height: 72.0,
                             child: Padding(
-                              padding: const EdgeInsets.all(8),
+                              padding: const EdgeInsets.all(8.0),
                               child: Text(
-                                appStrings.imageCount(_currentAlbum.nbTotalImages),
+                                appStrings
+                                    .imageCount(_currentAlbum.nbTotalImages),
                                 style: Theme.of(context).textTheme.titleSmall,
                               ),
                             ),
@@ -219,11 +258,14 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
 
   Widget get _appBar {
     return SliverAppBar(
+      backgroundColor: Theme.of(context).colorScheme.background,
       pinned: true,
       titleSpacing: 0,
       centerTitle: _selectedList.isNotEmpty,
       title: Text(
-        _selectedList.isEmpty ? _currentAlbum.name : _selectedList.length.toString(),
+        _selectedList.isEmpty
+            ? _currentAlbum.name
+            : _selectedList.length.toString(),
         style: Theme.of(context).appBarTheme.titleTextStyle,
       ),
       actions: [
@@ -258,15 +300,20 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
                     text: appStrings.imageOptions_share,
                   ),
                 ),
-              if (_selectedList.isNotEmpty && Preferences.getUserStatus != 'guest')
+              if (_selectedList.isNotEmpty &&
+                  Preferences.getUserStatus != 'guest')
                 PopupMenuItem(
                   onTap: () => Future.delayed(
                     const Duration(seconds: 0),
                     _onLikePhotos,
                   ),
                   child: PopupListItem(
-                    icon: _hasNonFavorites ? Icons.favorite_border : Icons.favorite,
-                    text: _hasNonFavorites ? appStrings.imageOptions_addFavorites : appStrings.imageOptions_removeFavorites,
+                    icon: _hasNonFavorites
+                        ? Icons.favorite_border
+                        : Icons.favorite,
+                    text: _hasNonFavorites
+                        ? appStrings.imageOptions_addFavorites
+                        : appStrings.imageOptions_removeFavorites,
                   ),
                 ),
               if (_selectedList.isNotEmpty)
@@ -300,7 +347,7 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
                   },
                 ),
                 child: PopupListItem(
-                  color: Theme.of(context).errorColor,
+                  color: Theme.of(context).colorScheme.error,
                   icon: Icons.delete,
                   text: appStrings.deleteCategory_title,
                 ),
@@ -317,18 +364,27 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        FloatingActionButton(
-          backgroundColor: Colors.grey.withOpacity(0.8),
-          onPressed: () => Navigator.of(context).popUntil((route) => route.isFirst),
-          child: Consumer<UploadNotifier>(
-            builder: (context, uploadNotifier, child) {
-              if (uploadNotifier.uploadList.isNotEmpty) {
-                UploadItem item = uploadNotifier.uploadList.first;
-                return Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    SizedBox.expand(
-                      child: StreamBuilder<double>(
+        Consumer<UploadNotifier>(
+          builder: (context, uploadNotifier, child) {
+            bool uploading = uploadNotifier.uploadList.isNotEmpty;
+            return FloatingActionButton(
+              shape: uploading ? CircleBorder() : null,
+              backgroundColor: Colors.grey.withOpacity(0.8),
+              onPressed: () {
+                if (uploading) {
+                  Navigator.of(context).pushNamed(UploadStatusPage.routeName);
+                } else {
+                  Navigator.of(context).popUntil((route) => route.isFirst);
+                }
+              },
+              child: Builder(builder: (context) {
+                if (uploading) {
+                  UploadItem item = uploadNotifier.uploadList.first;
+                  return Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      SizedBox.expand(
+                        child: StreamBuilder<double>(
                           stream: item.progress.stream,
                           initialData: 0.0,
                           builder: (context, snapshot) {
@@ -339,22 +395,24 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
                               );
                             }
                             return CircularProgressIndicator(strokeWidth: 5.0);
-                          }),
-                    ),
-                    FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: Text(
-                        "${uploadNotifier.uploadList.length}", // todo: upload files remaining
-                        style: TextStyle(fontSize: 20),
+                          },
+                        ),
                       ),
-                    ),
-                  ],
-                );
-              }
-              return child!;
-            },
-            child: Icon(Icons.home, color: Colors.white),
-          ),
+                      FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          "${uploadNotifier.uploadList.length}",
+                          style: TextStyle(fontSize: 20),
+                        ),
+                      ),
+                    ],
+                  );
+                }
+                return child!;
+              }),
+            );
+          },
+          child: Icon(Icons.home, color: Colors.white),
         ),
         if (widget.isAdmin || widget.album.canUpload) ...[
           SizedBox(width: 16.0),
@@ -366,18 +424,21 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
             animatedIcon: AnimatedIcons.menu_close,
             children: [
               SpeedDialChild(
+                shape: CircleBorder(),
                 backgroundColor: childBackgroundColor,
                 foregroundColor: childIconColor,
                 onTap: _onAddAlbum,
                 child: Icon(Icons.create_new_folder),
               ),
               SpeedDialChild(
+                shape: CircleBorder(),
                 backgroundColor: childBackgroundColor,
                 foregroundColor: childIconColor,
                 onTap: _onPickImages,
                 child: Icon(Icons.add_photo_alternate),
               ),
               SpeedDialChild(
+                shape: CircleBorder(),
                 backgroundColor: childBackgroundColor,
                 foregroundColor: childIconColor,
                 onTap: _onTakePhoto,
@@ -391,15 +452,22 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
   }
 
   Widget _albumGrid(AsyncSnapshot snapshot) {
-    if (_albumList.isEmpty) {
-      final ApiResult<List<AlbumModel>> result = snapshot.data!.first as ApiResult<List<AlbumModel>>;
-      List<AlbumModel> albums = _parseAlbums(result.data!);
-      if (albums.isEmpty) return const SizedBox();
+    // initialize album list
+    if (_albumList == null) {
+      final ApiResult<List<AlbumModel>> result =
+          snapshot.data!.first as ApiResult<List<AlbumModel>>;
+      // if only albums has error
+      if (!result.hasData) {
+        return Center(
+          child: Text(appStrings.categoryImageList_noDataError),
+        );
+      }
       _albumList = _parseAlbums(result.data!);
     }
+    if (_albumList!.isEmpty) return const SizedBox();
     return AlbumGridView(
       isAdmin: widget.isAdmin,
-      albumList: _albumList,
+      albumList: _albumList!,
       onTap: _onTapAlbum,
       onEdit: _onEditAlbum,
       onDelete: _onDeleteAlbum,
@@ -408,19 +476,27 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
   }
 
   Widget _imageGrid(AsyncSnapshot snapshot) {
-    if (_imageList.isEmpty && _page == 0) {
-      final ApiResult<List<ImageModel>> result = snapshot.data!.last as ApiResult<List<ImageModel>>;
-      if (result.hasError || !result.hasData) {
+    // Initialize image list
+    if (_imageList == null) {
+      final ApiResult<List<ImageModel>> result =
+          snapshot.data!.last as ApiResult<List<ImageModel>>;
+      // if only images has error
+      if (!result.hasData) {
         return Center(
           child: Text(appStrings.categoryImageList_noDataError),
         );
       }
       _imageList = result.data!;
-      WidgetsBinding.instance.addPostFrameCallback((timeStamp) => setState(() {}));
+      // Refresh after build (for _enableLoad)
+      WidgetsBinding.instance
+          .addPostFrameCallback((timeStamp) => setState(() {}));
     }
-    _selectedList = _imageList.where((image) => _selectedList.contains(image)).toList();
+    if (_imageList!.isEmpty) return const SizedBox();
+    // rebuild current selection with new images
+    _selectedList =
+        _imageList!.where((image) => _selectedList.contains(image)).toList();
     return ImageGridView(
-      imageList: _imageList,
+      imageList: _imageList!,
       selectedList: _selectedList,
       onTapImage: _onTapPhoto,
       onSelectImage: (image) => setState(() {
@@ -433,11 +509,12 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
   }
 
   Widget get _bottomBar {
-    return BottomAppBar(
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
-        height: _selectedList.isEmpty ? 0 : 56.0,
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+      height: _selectedList.isEmpty ? 0 : 56.0,
+      child: BottomAppBar(
+        height: 56.0,
         child: Row(
           children: widget.isAdmin
               ? [

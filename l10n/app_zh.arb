@@ -770,5 +770,5 @@
     "settings_acknowledgements": "鸣谢",
     "settings_privacy": "隐私政策",
     "settings_unknownVersion": "未知版本",
-    "settings_privacyUrl": "&lang=en_EN"
+    "settings_privacyLocale": "&lang=en_EN"
 }

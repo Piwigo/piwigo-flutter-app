@@ -29,10 +29,13 @@ class EditImagePage extends StatefulWidget {
 }
 
 class _EditImagePageState extends State<EditImagePage> {
+  static const double maxCarouselElementWidth = 300.0;
+  static const double carouselHeight = 128.0;
   late final TextEditingController _authorController;
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
-  final RoundedLoadingButtonController _btnController = RoundedLoadingButtonController();
+  final RoundedLoadingButtonController _btnController =
+      RoundedLoadingButtonController();
 
   final List<DropdownMenuItem<int?>> _levelItems = [];
   final List<TagModel> _tags = [];
@@ -42,7 +45,8 @@ class _EditImagePageState extends State<EditImagePage> {
   @override
   void initState() {
     _imageList = widget.images;
-    _authorController = TextEditingController(text: Preferences.getUploadAuthor);
+    _authorController =
+        TextEditingController(text: Preferences.getUploadAuthor);
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       PrivacyLevel.values.forEach((privacy) {
@@ -64,7 +68,7 @@ class _EditImagePageState extends State<EditImagePage> {
       title: appStrings.removeSelectedImage_title,
       message: appStrings.removeSelectedImage_message,
       confirm: appStrings.alertRemoveButton,
-      confirmColor: Theme.of(context).errorColor,
+      confirmColor: Theme.of(context).colorScheme.error,
     )) return;
     setState(() {
       _imageList.remove(image);
@@ -86,7 +90,9 @@ class _EditImagePageState extends State<EditImagePage> {
     int result = await editImages(_imageList, {
       'title': _titleController.text.isEmpty ? null : _titleController.text,
       'author': _authorController.text.isEmpty ? null : _authorController.text,
-      'description': _descriptionController.text.isEmpty ? null : _descriptionController.text,
+      'description': _descriptionController.text.isEmpty
+          ? null
+          : _descriptionController.text,
       'level': _privacyLevel,
       'tags': tagIds.isEmpty ? null : tagIds,
     });
@@ -113,25 +119,7 @@ class _EditImagePageState extends State<EditImagePage> {
       body: ListView(
         padding: const EdgeInsets.symmetric(vertical: 8.0),
         children: [
-          SizedBox(
-            height: 128.0,
-            child: OrientationBuilder(builder: (context, orientation) {
-              return PageView.builder(
-                controller: PageController(
-                  viewportFraction: min(300.0 / MediaQuery.of(context).size.width, 0.9),
-                ),
-                padEnds: false,
-                itemCount: _imageList.length,
-                itemBuilder: (context, index) {
-                  ImageModel image = _imageList[index];
-                  return ImageDetailsCard(
-                    image: image,
-                    onRemove: () => _onRemoveImage(image),
-                  );
-                },
-              );
-            }),
-          ),
+          _carousel,
           FormSection(
             margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
             title: appStrings.editImageDetails_title,
@@ -214,7 +202,8 @@ class _EditImagePageState extends State<EditImagePage> {
             ),
           ), // tags
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+            padding:
+                const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
             child: AnimatedPiwigoButton(
               controller: _btnController,
               color: Theme.of(context).primaryColor,
@@ -227,6 +216,37 @@ class _EditImagePageState extends State<EditImagePage> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget get _carousel {
+    return SizedBox(
+      height: carouselHeight,
+      child: OrientationBuilder(builder: (context, orientation) {
+        return PageView.builder(
+          controller: PageController(
+            viewportFraction: min(
+              maxCarouselElementWidth / MediaQuery.of(context).size.width,
+              0.9,
+            ),
+          ),
+          padEnds: false,
+          itemCount: _imageList.length,
+          itemBuilder: (context, index) {
+            ImageModel image = _imageList[index];
+            return Padding(
+              padding: EdgeInsets.only(
+                left: index == 0 ? 8.0 : 0.0,
+                right: index == _imageList.length - 1 ? 8.0 : 0.0,
+              ),
+              child: ImageDetailsCard(
+                image: image,
+                onRemove: () => _onRemoveImage(image),
+              ),
+            );
+          },
+        );
+      }),
     );
   }
 }

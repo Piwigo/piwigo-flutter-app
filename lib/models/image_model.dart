@@ -1,3 +1,5 @@
+import 'package:mime_type/mime_type.dart';
+
 class ImageModel {
   int id;
   int width;
@@ -10,7 +12,7 @@ class ImageModel {
   String? dateCreation;
   String? dateAvailable;
   String? pageUrl;
-  String? elementUrl;
+  String elementUrl;
   Derivatives derivatives;
   List<dynamic> categories;
 
@@ -26,7 +28,7 @@ class ImageModel {
     this.dateCreation,
     this.dateAvailable,
     this.pageUrl,
-    this.elementUrl,
+    required this.elementUrl,
     required this.derivatives,
     this.categories = const [],
   });
@@ -72,6 +74,11 @@ class ImageModel {
       default:
         return null;
     }
+  }
+
+  bool get isVideo {
+    String? mimeType = mime(file) ?? mime(elementUrl) ?? mime(derivatives.medium.url);
+    return mimeType != null && mimeType.startsWith('video');
   }
 
   @override

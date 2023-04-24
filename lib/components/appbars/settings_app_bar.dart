@@ -33,7 +33,8 @@ class _SettingsAppBarState extends State<SettingsAppBar> {
       }
 
       // In case 0%-100% of the expanded height is viewed
-      double scrollDelta = (_expandedHeight - widget.scrollController.offset) / _expandedHeight;
+      double scrollDelta =
+          (_expandedHeight - widget.scrollController.offset) / _expandedHeight;
       double scrollPercent = (scrollDelta * 2 - 1);
       return (1 - scrollPercent) * delta * basePadding + basePadding;
     }
@@ -49,6 +50,8 @@ class _SettingsAppBarState extends State<SettingsAppBar> {
       ),
       pinned: true,
       expandedHeight: _expandedHeight,
+      elevation: 5.0,
+      scrolledUnderElevation: 5.0,
       flexibleSpace: FlexibleSpaceBar(
         titlePadding: EdgeInsets.symmetric(
           horizontal: _horizontalTitlePadding,

@@ -1,3 +1,4 @@
+import 'package:extended_text/extended_text.dart';
 import 'package:flutter/material.dart';
 
 import '../fields/settings_field.dart';
@@ -175,13 +176,23 @@ class SettingsSectionItemButton extends StatelessWidget {
       child: SettingsSectionItem(
         title: title,
         disabled: disabled,
+        expandedChild: true,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            Text(
-              text ?? "",
-              textAlign: TextAlign.end,
-              style: Theme.of(context).textTheme.bodySmall,
+            Flexible(
+              child: ExtendedText(
+                text ?? '',
+                maxLines: 1,
+                overflowWidget: TextOverflowWidget(
+                  position: TextOverflowPosition.start,
+                  child: Text(
+                    "...",
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                ),
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
             ),
             Padding(
               padding: const EdgeInsets.only(left: 8.0),
@@ -231,7 +242,8 @@ class SettingsSectionItemSlider extends StatefulWidget {
   final Function(double) onChanged;
 
   @override
-  State<SettingsSectionItemSlider> createState() => _SettingsSectionItemSliderState();
+  State<SettingsSectionItemSlider> createState() =>
+      _SettingsSectionItemSliderState();
 }
 
 class _SettingsSectionItemSliderState extends State<SettingsSectionItemSlider> {
@@ -319,7 +331,8 @@ class _SettingsSectionItemSliderState extends State<SettingsSectionItemSlider> {
                   max: widget.max,
                   value: widget.value,
                   onChanged: widget.onChanged,
-                  divisions: widget.divisions ?? (widget.max - widget.min).round(),
+                  divisions:
+                      widget.divisions ?? (widget.max - widget.min).round(),
                 ),
               ),
               if (widget.text != null)
@@ -328,7 +341,8 @@ class _SettingsSectionItemSliderState extends State<SettingsSectionItemSlider> {
                   child: Padding(
                     padding: const EdgeInsets.only(right: 8.0),
                     child: SizedBox(
-                      width: widget.textWidth ?? widget.max.toString().length * 2 * 6,
+                      width: widget.textWidth ??
+                          widget.max.toString().length * 2 * 6,
                       child: Text(
                         widget.text!,
                         textAlign: TextAlign.end,
@@ -398,7 +412,8 @@ class SettingsSectionItemField extends StatefulWidget {
   final Function(String) onChanged;
 
   @override
-  State<SettingsSectionItemField> createState() => _SettingsSectionItemFieldState();
+  State<SettingsSectionItemField> createState() =>
+      _SettingsSectionItemFieldState();
 }
 
 class _SettingsSectionItemFieldState extends State<SettingsSectionItemField> {

@@ -759,5 +759,5 @@
   "settings_translateWithCrowdin": "Translate Piwigo NG",
   "settings_acknowledgements": "Acknowledgements",
   "settings_privacy": "Privacy Policy",
-  "settings_privacyUrl": "&lang=es_ES"
+  "settings_privacyLocale": "&lang=es_ES"
 }

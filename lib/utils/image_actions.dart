@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:piwigo_ng/api/albums.dart';
 import 'package:piwigo_ng/api/images.dart';
+import 'package:piwigo_ng/api/upload.dart';
 import 'package:piwigo_ng/api/users.dart';
 import 'package:piwigo_ng/components/dialogs/confirm_dialog.dart';
 import 'package:piwigo_ng/components/modals/choose_camera_picker_modal.dart';
@@ -20,17 +21,16 @@ final ImagePicker _picker = ImagePicker();
 
 Future<List<XFile>?> onPickImages() async {
   try {
-    // List<XFile> images = await _picker.pickMultiImage(
-    //   imageQuality: (Preferences.getUploadQuality * 100).round(),
-    //   requestFullMetadata: Preferences.getRemoveMetadata,
-    // );
-    // if (images.isNotEmpty) return images;
+    if (!await askMediaPermission()) return null;
     final FilePickerResult? result = await FilePicker.platform.pickFiles(
+      allowedExtensions: appPreferences.getString('FILE_TYPES')?.split(','),
       allowMultiple: true,
-      type: FileType.media,
+      type: FileType.custom,
     );
     if (result == null) return null;
-    return result.files.map<XFile>((e) => XFile(e.path!, name: e.name, bytes: e.bytes)).toList();
+    return result.files
+        .map<XFile>((e) => XFile(e.path!, name: e.name, bytes: e.bytes))
+        .toList();
   } catch (e) {
     debugPrint('${e.toString()}');
   }
@@ -40,6 +40,8 @@ Future<List<XFile>?> onPickImages() async {
 Future<XFile?> onTakePhoto(BuildContext context) async {
   final int? choice = await showModalBottomSheet<int>(
     context: context,
+    isScrollControlled: true,
+    useSafeArea: true,
     builder: (context) => ChooseCameraPickerModal(),
   );
   if (choice == null) return null;
@@ -50,7 +52,7 @@ Future<XFile?> onTakePhoto(BuildContext context) async {
         image = await _picker.pickImage(
           source: ImageSource.camera,
           imageQuality: (Preferences.getUploadQuality * 100).round(),
-          requestFullMetadata: Preferences.getRemoveMetadata,
+          requestFullMetadata: !Preferences.getRemoveMetadata,
         );
         break;
       case 1:
@@ -64,13 +66,16 @@ Future<XFile?> onTakePhoto(BuildContext context) async {
   return null;
 }
 
-Future<bool?> onEditPhotos(BuildContext context, List<ImageModel> images) async {
-  return await Navigator.of(context).pushNamed(EditImagePage.routeName, arguments: {
+Future<bool?> onEditPhotos(
+    BuildContext context, List<ImageModel> images) async {
+  return await Navigator.of(context)
+      .pushNamed(EditImagePage.routeName, arguments: {
     'images': images,
   });
 }
 
-Future<dynamic> onMovePhotos(BuildContext context, List<ImageModel> images, [AlbumModel? album]) async {
+Future<dynamic> onMovePhotos(BuildContext context, List<ImageModel> images,
+    [AlbumModel? album]) async {
   late AlbumModel origin;
   if (album == null || images.length == 1) {
     origin = AlbumModel(
@@ -83,47 +88,51 @@ Future<dynamic> onMovePhotos(BuildContext context, List<ImageModel> images, [Alb
   return showModalBottomSheet<dynamic>(
     context: context,
     isScrollControlled: true,
-    builder: (_) => Padding(
-      padding: MediaQuery.of(context).padding,
-      child: MoveOrCopyModal(
-        title: appStrings.moveImage_title,
-        subtitle: appStrings.moveImage_selectAlbum(images.length, images.first.name),
-        isImage: true,
-        album: origin,
-        onSelected: (selectedAlbum) async {
-          final int? choice = await showModalBottomSheet<int>(
-            context: context,
-            builder: (context) => ChooseMoveOptionModal(),
-          );
-          if (choice == null ||
-              !await showConfirmDialog(
-                context,
-                title: appStrings.moveImage_title,
-                message: appStrings.moveImage_message(images.length, images.first, selectedAlbum.name),
-              )) return false;
-          int results = 0;
-          switch (choice) {
-            case 0:
-              results = await moveImages(images, origin.id, selectedAlbum.id);
-              break;
-            case 1:
-              results = await assignImages(images, selectedAlbum.id);
-              break;
-          }
-          if (results > 0) {
-            return choice;
-          }
-          return -1;
-        },
-      ),
+    useSafeArea: true,
+    builder: (_) => MoveOrCopyModal(
+      title: appStrings.moveImage_title,
+      subtitle:
+          appStrings.moveImage_selectAlbum(images.length, images.first.name),
+      isImage: true,
+      album: origin,
+      onSelected: (selectedAlbum) async {
+        final int? choice = await showModalBottomSheet<int>(
+          context: context,
+          isScrollControlled: true,
+          useSafeArea: true,
+          builder: (context) => ChooseMoveOptionModal(),
+        );
+        if (choice == null ||
+            !await showConfirmDialog(
+              context,
+              title: appStrings.moveImage_title,
+              message: appStrings.moveImage_message(
+                  images.length, images.first, selectedAlbum.name),
+            )) return false;
+        int results = 0;
+        switch (choice) {
+          case 0:
+            results = await moveImages(images, origin.id, selectedAlbum.id);
+            break;
+          case 1:
+            results = await assignImages(images, selectedAlbum.id);
+            break;
+        }
+        if (results > 0) {
+          return true;
+        }
+        return false;
+      },
     ),
   );
 }
 
-Future<bool> onDeletePhotos(BuildContext context, List<ImageModel> images, [AlbumModel? album]) async {
+Future<bool> onDeletePhotos(BuildContext context, List<ImageModel> images,
+    [AlbumModel? album]) async {
   final DeleteAlbumModes? mode = await showModalBottomSheet<DeleteAlbumModes>(
     context: context,
     isScrollControlled: true,
+    useSafeArea: true,
     isDismissible: true,
     builder: (context) => DeleteImagesModal(
       imageList: images,
@@ -157,9 +166,11 @@ Future<bool> onDeletePhotos(BuildContext context, List<ImageModel> images, [Albu
   return false;
 }
 
-Future<bool?> onLikePhotos(List<ImageModel> images, bool hasNonFavorites) async {
+Future<bool?> onLikePhotos(
+    List<ImageModel> images, bool hasNonFavorites) async {
   if (hasNonFavorites) {
-    int success = await addFavorites(images.where((image) => !image.favorite).toList());
+    int success =
+        await addFavorites(images.where((image) => !image.favorite).toList());
     if (success > 0) {
       return true;
     }

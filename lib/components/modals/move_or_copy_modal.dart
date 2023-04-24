@@ -7,14 +7,14 @@ import 'package:piwigo_ng/utils/localizations.dart';
 class MoveOrCopyModal extends StatefulWidget {
   const MoveOrCopyModal({
     Key? key,
-    required this.album,
+    this.album,
     this.isImage = false,
     this.onSelected,
     this.title,
     this.subtitle,
   }) : super(key: key);
 
-  final AlbumModel album;
+  final AlbumModel? album;
   final bool isImage;
   final String? title;
   final String? subtitle;
@@ -34,9 +34,9 @@ class _MoveOrCopyModalState extends State<MoveOrCopyModal> {
   @override
   void initState() {
     _albumFuture = getAlbumTree();
-    List<String> parentAlbums = widget.album.upperCategories.split(',');
+    List<String> parentAlbums = widget.album?.upperCategories.split(',') ?? [];
     _disabledAlbums = [
-      widget.album.id,
+      if (widget.album != null) widget.album!.id,
       if (parentAlbums.length == 1 || widget.isImage) 0,
       if (!widget.isImage && parentAlbums.length > 1) int.parse(parentAlbums[parentAlbums.length - 2]),
     ];
@@ -52,7 +52,7 @@ class _MoveOrCopyModalState extends State<MoveOrCopyModal> {
   @override
   Widget build(BuildContext context) {
     return BottomSheet(
-      backgroundColor: Theme.of(context).backgroundColor,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       enableDrag: false,
       onClosing: () {},
       shape: const RoundedRectangleBorder(

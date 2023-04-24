@@ -71,6 +71,7 @@ class _RootAlbumViewPageState extends State<RootAlbumViewPage> {
         child: SafeArea(
           child: CustomScrollView(
             controller: _scrollController,
+            physics: const AlwaysScrollableScrollPhysics(),
             slivers: [
               RootSearchAppBar(
                 scrollController: _scrollController,
@@ -96,14 +97,22 @@ class _RootAlbumViewPageState extends State<RootAlbumViewPage> {
         if (snapshot.hasData) {
           ApiResult<List<AlbumModel>> result = snapshot.data!;
           if (!result.hasData) {
-            return Center(
-              child: Text(appStrings.categoryImageList_noDataError),
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+              child: Text(
+                appStrings.categoryImageList_noDataError,
+                textAlign: TextAlign.center,
+              ),
             );
           }
           if (_albumList.isEmpty) {
             if (result.data!.isEmpty) {
-              return Center(
-                child: Text(appStrings.categoryMainEmpty),
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                child: Text(
+                  appStrings.categoryMainEmpty,
+                  textAlign: TextAlign.center,
+                ),
               );
             }
             _albumList = result.data!;

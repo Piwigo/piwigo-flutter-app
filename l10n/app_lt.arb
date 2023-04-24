@@ -762,5 +762,5 @@
   "settings_pwgForumURL": "https://piwigo.org/forum",
   "settings_acknowledgements": "Padėkos",
   "settings_privacy": "Privatumo politika",
-  "settings_privacyUrl": "&lang=lt_LT"
+  "settings_privacyLocale": "&lang=lt_LT"
 }

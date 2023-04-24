@@ -31,10 +31,8 @@ Future<void> onEditAlbum(BuildContext context, AlbumModel album) async {
   await showModalBottomSheet(
     context: context,
     isScrollControlled: true,
-    builder: (_) => Padding(
-      padding: MediaQuery.of(context).padding,
-      child: EditAlbumModal(album: album),
-    ),
+    useSafeArea: true,
+    builder: (_) => EditAlbumModal(album: album),
   );
 }
 
@@ -42,29 +40,27 @@ Future<void> onMoveAlbum(BuildContext context, AlbumModel album) async {
   await showModalBottomSheet(
     context: context,
     isScrollControlled: true,
-    builder: (_) => Padding(
-      padding: MediaQuery.of(context).padding,
-      child: MoveOrCopyModal(
-        title: appStrings.moveCategory,
-        subtitle: appStrings.moveCategory_select(album.name),
-        album: album,
-        onSelected: (selectedAlbum) async {
-          if (!await showConfirmDialog(
-            context,
-            title: appStrings.moveCategory,
-            message: appStrings.moveCategory_message(
-              album.name,
-              selectedAlbum.name,
-            ),
-          )) return false;
-          ApiResult<bool> result = await moveAlbum(
-            album.id,
-            selectedAlbum.id,
-          );
+    useSafeArea: true,
+    builder: (_) => MoveOrCopyModal(
+      title: appStrings.moveCategory,
+      subtitle: appStrings.moveCategory_select(album.name),
+      album: album,
+      onSelected: (selectedAlbum) async {
+        if (!await showConfirmDialog(
+          context,
+          title: appStrings.moveCategory,
+          message: appStrings.moveCategory_message(
+            album.name,
+            selectedAlbum.name,
+          ),
+        )) return false;
+        ApiResult<bool> result = await moveAlbum(
+          album.id,
+          selectedAlbum.id,
+        );
 
-          return result.hasData && result.data == true;
-        },
-      ),
+        return result.hasData && result.data == true;
+      },
     ),
   );
 }
@@ -76,6 +72,7 @@ Future<bool> onDeleteAlbum(BuildContext context, AlbumModel album) async {
       context: context,
       isScrollControlled: true,
       isDismissible: true,
+      useSafeArea: true,
       builder: (context) => DeleteAlbumModeModal(
         albumModel: album,
       ),
@@ -87,7 +84,7 @@ Future<bool> onDeleteAlbum(BuildContext context, AlbumModel album) async {
     title: appStrings.deleteCategoryConfirm_title,
     message: appStrings.deleteCategory_message(album.nbTotalImages, album.name),
     confirm: appStrings.deleteCategoryConfirm_deleteButton,
-    confirmColor: Theme.of(context).errorColor,
+    confirmColor: Theme.of(context).colorScheme.error,
   )) return false;
   final ApiResult result = await deleteAlbum(
     album.id,

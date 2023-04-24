@@ -73,7 +73,7 @@ class _LoginFormViewState extends State<LoginFormView> {
 
   bool _urlValidator(String? value) {
     RegExp urlCheck = RegExp(
-      r"[(www\.)?a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)",
+      r"[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,256}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)",
     );
     if (value == null || value.isEmpty || !urlCheck.hasMatch(value)) {
       return false;
@@ -173,16 +173,7 @@ class _LoginFormViewState extends State<LoginFormView> {
               });
             },
             textInputAction: TextInputAction.next,
-            prefix: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                  child: const Icon(Icons.public),
-                ),
-                _securedPrefix,
-              ],
-            ),
+            prefix: _securedPrefix,
             hint: 'example.piwigo.com',
             error: _urlError,
           ),
@@ -211,7 +202,10 @@ class _LoginFormViewState extends State<LoginFormView> {
                     }),
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: Icon(Icons.clear),
+                      child: Icon(
+                        Icons.clear,
+                        color: Theme.of(context).colorScheme.secondary,
+                      ),
                     ),
                   )
                 : null,
@@ -251,7 +245,10 @@ class _LoginFormViewState extends State<LoginFormView> {
                     }),
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: Icon(Icons.clear),
+                      child: Icon(
+                        Icons.clear,
+                        color: Theme.of(context).colorScheme.secondary,
+                      ),
                     ),
                   )
                 : null,
@@ -279,19 +276,28 @@ class _LoginFormViewState extends State<LoginFormView> {
       onTap: () => setState(() {
         _isSecured = !_isSecured;
       }),
-      child: Stack(
-        clipBehavior: Clip.none,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Text(
-            '${_isSecured ? 'https' : 'http'}://',
-            style: Theme.of(context).textTheme.bodyMedium,
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: const Icon(Icons.public),
           ),
-          Positioned(
-            top: Theme.of(context).textTheme.bodyMedium?.fontSize,
-            child: Text(
-              !_isSecured ? 'https' : 'http',
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: 11),
-            ),
+          Stack(
+            clipBehavior: Clip.none,
+            children: [
+              Text(
+                '${_isSecured ? 'https' : 'http'}://',
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+              Positioned(
+                top: Theme.of(context).textTheme.bodyMedium?.fontSize,
+                child: Text(
+                  !_isSecured ? 'https' : 'http',
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: 11),
+                ),
+              ),
+            ],
           ),
         ],
       ),

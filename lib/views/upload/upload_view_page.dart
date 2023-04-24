@@ -4,12 +4,14 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mime_type/mime_type.dart';
+import 'package:piwigo_ng/api/images.dart';
 import 'package:piwigo_ng/components/buttons/animated_piwigo_button.dart';
 import 'package:piwigo_ng/components/fields/app_field.dart';
 import 'package:piwigo_ng/components/modals/add_tags_modal.dart';
 import 'package:piwigo_ng/components/sections/form_section.dart';
 import 'package:piwigo_ng/services/preferences_service.dart';
 import 'package:piwigo_ng/utils/resources.dart';
+import 'package:piwigo_ng/utils/settings.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 import 'package:video_player/video_player.dart';
 
@@ -18,7 +20,9 @@ import '../../models/tag_model.dart';
 import '../../utils/localizations.dart';
 
 class UploadViewPage extends StatefulWidget {
-  const UploadViewPage({Key? key, required this.imageList, required this.albumId}) : super(key: key);
+  const UploadViewPage(
+      {Key? key, required this.imageList, required this.albumId})
+      : super(key: key);
 
   static const String routeName = '/upload';
   final List<XFile> imageList;
@@ -28,35 +32,59 @@ class UploadViewPage extends StatefulWidget {
   State<UploadViewPage> createState() => _UploadGalleryViewPage();
 }
 
-class _UploadGalleryViewPage extends State<UploadViewPage> {
+class _UploadGalleryViewPage extends State<UploadViewPage>
+    with SingleTickerProviderStateMixin {
   final ImagePicker _picker = ImagePicker();
+  late final TabController _tabController;
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   late final TextEditingController _authorController;
-  final RoundedLoadingButtonController _btnController = RoundedLoadingButtonController();
+  final RoundedLoadingButtonController _btnController =
+      RoundedLoadingButtonController();
 
   final List<DropdownMenuItem<int?>> _levelItems = [];
   final List<TagModel> _tags = [];
   List<XFile> _imageList = [];
+  List<String> _imageExistList = [];
   int? _privacyLevel;
-  bool _showFiles = false;
 
   @override
   void initState() {
-    _imageList = widget.imageList;
-    _authorController = TextEditingController(text: Preferences.getUploadAuthor);
+    _imageList = List.from(widget.imageList);
+    _authorController =
+        TextEditingController(text: Preferences.getUploadAuthor);
+    _tabController = TabController(length: 2, vsync: this);
+    _tabController.addListener(_handleTabSelection);
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      PrivacyLevel.values.forEach((privacy) {
-        _levelItems.add(DropdownMenuItem<int?>(
-          value: privacy.value,
-          child: Tooltip(
-            message: privacy.localization,
-            child: Text(privacy.localization, overflow: TextOverflow.fade),
-          ),
-        ));
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      setState(() {
+        PrivacyLevel.values.forEach((privacy) {
+          _levelItems.add(DropdownMenuItem<int?>(
+            value: privacy.value,
+            child: Tooltip(
+              message: privacy.localization,
+              child: Text(privacy.localization, overflow: TextOverflow.fade),
+            ),
+          ));
+        });
       });
+      checkImageExist();
+    });
+  }
+
+  _handleTabSelection() {
+    if (_tabController.indexIsChanging) {
       setState(() {});
+    }
+  }
+
+  Future<void> checkImageExist() async {
+    List<File> files = await checkImagesNotExist(
+      _imageList.map((e) => File(e.path)).toList(),
+      returnExistFiles: true,
+    );
+    setState(() {
+      _imageExistList = files.map((e) => e.path).toList();
     });
   }
 
@@ -65,7 +93,34 @@ class _UploadGalleryViewPage extends State<UploadViewPage> {
     _titleController.dispose();
     _descriptionController.dispose();
     _authorController.dispose();
+    _tabController.dispose();
     super.dispose();
+  }
+
+  BorderRadiusGeometry _imageGridBorder(int index) {
+    Radius topLeft = Radius.circular(index == 0 ? 10.0 : 5.0);
+    Radius topRight = Radius.circular(
+        _imageList.length < Settings.getImageCrossAxisCount(context)
+            ? 10.0
+            : 5.0);
+    Radius bottomRight =
+        Radius.circular(index == _imageList.length - 1 ? 10.0 : 5.0);
+    Radius bottomLeft = Radius.circular(index ==
+            _imageList.length -
+                (_imageList.length % Settings.getImageCrossAxisCount(context) ==
+                        0
+                    ? Settings.getImageCrossAxisCount(context)
+                    : _imageList.length %
+                        Settings.getImageCrossAxisCount(context))
+        ? 10.0
+        : 5.0);
+
+    return BorderRadius.circular(5.0).copyWith(
+      topLeft: topLeft,
+      topRight: topRight,
+      bottomRight: bottomRight,
+      bottomLeft: bottomLeft,
+    );
   }
 
   Future<void> _addFiles() async {
@@ -80,8 +135,9 @@ class _UploadGalleryViewPage extends State<UploadViewPage> {
       }).toList();
       if (images.isNotEmpty) {
         setState(() {
-          widget.imageList.addAll(images);
+          _imageList.addAll(images);
         });
+        checkImageExist();
       }
     } catch (e) {
       debugPrint(e.toString());
@@ -93,7 +149,7 @@ class _UploadGalleryViewPage extends State<UploadViewPage> {
       final XFile? image = await _picker.pickImage(source: ImageSource.camera);
       if (image == null) return;
       setState(() {
-        widget.imageList.add(image);
+        _imageList.add(image);
       });
     } catch (e) {
       debugPrint('Pick image error ${e.toString()}');
@@ -105,7 +161,7 @@ class _UploadGalleryViewPage extends State<UploadViewPage> {
       final XFile? image = await _picker.pickVideo(source: ImageSource.camera);
       if (image == null) return;
       setState(() {
-        widget.imageList.add(image);
+        _imageList.add(image);
       });
     } catch (e) {
       debugPrint('Pick image error ${e.toString()}');
@@ -113,8 +169,10 @@ class _UploadGalleryViewPage extends State<UploadViewPage> {
   }
 
   Future<void> _onRemoveFile(int index) async {
+    String path = _imageList[index].path;
     setState(() {
-      widget.imageList.removeAt(index);
+      _imageExistList.remove(path);
+      _imageList.removeAt(index);
     });
   }
 
@@ -127,7 +185,9 @@ class _UploadGalleryViewPage extends State<UploadViewPage> {
   Future<void> _onUpload() async {
     _btnController.start();
     List<int> tagIds = _tags.map<int>((tag) => tag.id).toList();
-    var result = await uploadPhotos(_imageList, widget.albumId, info: {
+    List<XFile> filesToUpload =
+        _imageList.where((e) => !_imageExistList.contains(e.path)).toList();
+    var result = await uploadPhotos(filesToUpload, widget.albumId, info: {
       'name': _titleController.text,
       'comment': _descriptionController.text,
       'author': _authorController.text,
@@ -151,215 +211,291 @@ class _UploadGalleryViewPage extends State<UploadViewPage> {
     return Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
-        elevation: 0.0,
-        scrolledUnderElevation: 5.0,
-        centerTitle: true,
         title: Text(appStrings.categoryUpload_images),
-        actions: [
-          IconButton(
-            onPressed: _onUpload,
-            icon: const Icon(Icons.upload_file),
-          ),
-        ],
       ),
       body: SafeArea(
-        child: Scrollbar(
-          thickness: 8.0,
-          thumbVisibility: true,
-          radius: Radius.circular(8.0),
-          child: ListView(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 16.0,
-              vertical: 8.0,
+        child: ListView(
+          children: [
+            AnimatedSize(
+              duration: const Duration(milliseconds: 300),
+              child: Builder(builder: (context) {
+                if (_imageExistList.length != _imageList.length) {
+                  return Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      children: [
+                        Icon(Icons.file_copy),
+                        SizedBox(width: 8.0),
+                        Flexible(
+                          child: Text(
+                            appStrings.settings_autoUploadDuplicateInfo,
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+                return SizedBox(width: double.infinity);
+              }),
             ),
-            children: [
-              FormSection(
-                expanded: _showFiles,
-                onTapTitle: () => setState(() {
-                  _showFiles = !_showFiles;
-                }),
-                title: appStrings.imageCount(widget.imageList.length),
-                actions: [
-                  GestureDetector(
-                    behavior: HitTestBehavior.opaque,
-                    onTap: _addFiles,
-                    child: Padding(
-                      padding: const EdgeInsets.all(8),
-                      child: Icon(Icons.add_photo_alternate),
-                    ),
-                  ),
-                  GestureDetector(
-                    behavior: HitTestBehavior.opaque,
-                    onTap: _takePhoto,
-                    child: Padding(
-                      padding: const EdgeInsets.all(8),
-                      child: Icon(Icons.photo_camera_rounded),
-                    ),
-                  ),
-                  GestureDetector(
-                    behavior: HitTestBehavior.opaque,
-                    onTap: _takeVideo,
-                    child: Padding(
-                      padding: const EdgeInsets.all(8),
-                      child: Icon(Icons.video_camera_back),
-                    ),
-                  ),
-                ],
-                child: Builder(builder: (context) {
-                  if (_showFiles) {
-                    return GridView.builder(
-                      padding: EdgeInsets.zero,
-                      gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                        maxCrossAxisExtent: 96.0,
-                      ),
-                      physics: const NeverScrollableScrollPhysics(),
-                      shrinkWrap: true,
-                      itemCount: widget.imageList.length,
-                      itemBuilder: (context, index) {
-                        final File file = File(widget.imageList[index].path);
-                        return Stack(
-                          children: [
-                            Positioned(
-                              top: 4.0,
-                              right: 4.0,
-                              left: 4.0,
-                              bottom: 4.0,
-                              child: Builder(builder: (context) {
-                                List<String>? mimeType = mime(file.path.split('/').last)?.split('/');
-                                if (mimeType?.first == 'image') {
-                                  return Image.file(
-                                    file,
-                                    fit: BoxFit.cover,
-                                    scale: 0.7,
-                                    errorBuilder: (context, object, stacktrace) => Center(
-                                      child: Icon(Icons.image_not_supported),
-                                    ),
-                                  );
-                                }
-                                if (mimeType?.first == 'video') {
-                                  return VideoUploadItem(
-                                    path: file.path,
-                                  );
-                                }
-                                return const Center(
-                                  child: Icon(Icons.image_not_supported),
-                                );
-                              }),
-                            ),
-                            Positioned(
-                              top: 0,
-                              right: 0,
-                              child: GestureDetector(
-                                behavior: HitTestBehavior.opaque,
-                                onTap: () => _onRemoveFile(index),
-                                child: CircleAvatar(
-                                  backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-                                  radius: 12,
-                                  child: Icon(Icons.remove_circle_outline, size: 20, color: Theme.of(context).errorColor),
-                                ),
-                              ),
-                            ),
-                          ],
-                        );
-                      },
-                    );
-                  }
-                  return const SizedBox(width: double.infinity);
-                }),
+            Container(
+              margin: const EdgeInsets.symmetric(
+                horizontal: 24.0,
+                vertical: 8.0,
               ),
-              FormSection(
-                title: appStrings.editImageDetails_title,
-                child: AppField(
-                  controller: _titleController,
-                  hint: appStrings.editImageDetails_titlePlaceholder,
+              decoration: ShapeDecoration(
+                shape: StadiumBorder(),
+                color: Theme.of(context).inputDecorationTheme.fillColor,
+              ),
+              child: TabBar(
+                controller: _tabController,
+                indicatorSize: TabBarIndicatorSize.tab,
+                indicatorWeight: 0.0,
+                indicator: ShapeDecoration(
+                  shape: StadiumBorder(),
+                  color: Theme.of(context).colorScheme.secondary,
                 ),
-              ), // title
-              FormSection(
-                title: appStrings.editImageDetails_author,
-                child: AppField(
-                  controller: _authorController,
-                  hint: appStrings.settings_defaultAuthorPlaceholder,
-                ),
-              ), // author
-              FormSection(
-                title: appStrings.editImageDetails_description,
-                child: AppField(
-                  controller: _descriptionController,
-                  hint: appStrings.editImageDetails_descriptionPlaceholder,
-                  minLines: 5,
-                  maxLines: 10,
-                ),
-              ), // description
-              FormSection(
-                title: appStrings.editImageDetails_privacyLevel,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    color: Theme.of(context).inputDecorationTheme.fillColor,
-                  ),
-                  child: DropdownButton<int?>(
-                    onTap: () {
-                      final FocusScopeNode currentFocus = FocusScope.of(context);
-                      if (!currentFocus.hasPrimaryFocus) {
-                        currentFocus.unfocus();
-                      }
-                    },
-                    isExpanded: true,
-                    underline: const SizedBox(),
-                    value: _privacyLevel,
-                    onChanged: (level) {
-                      setState(() {
-                        _privacyLevel = level;
-                      });
-                    },
-                    style: Theme.of(context).textTheme.bodyMedium,
-                    items: _levelItems,
-                  ),
-                ),
-              ), // privacy
-              FormSection(
-                title: appStrings.tagsAdd_title,
-                onTapTitle: () {
-                  showModalBottomSheet(
-                    context: context,
-                    isScrollControlled: true,
-                    builder: (_) => Padding(
-                      padding: MediaQuery.of(context).padding,
-                      child: AddTagsModal(
-                        selectedTags: _tags,
-                      ),
-                    ),
-                  ).whenComplete(() => setState(() {}));
-                },
-                actions: [
-                  const Icon(Icons.add_circle_outline),
+                dividerColor: Colors.transparent,
+                tabs: [
+                  Tab(text: appStrings.imageUploadDetailsButton_title),
+                  Tab(text: appStrings.imageUploadDetailsView_title),
                 ],
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
-                  child: TagWrap(
-                    tags: _tags,
-                    onTap: _onDeselectTag,
-                  ),
-                ),
-              ), // tags
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 16.0),
-                child: AnimatedPiwigoButton(
-                  controller: _btnController,
-                  color: Theme.of(context).primaryColor,
-                  disabled: widget.imageList.isEmpty,
-                  onPressed: _onUpload,
-                  child: Text(
-                    widget.imageList.isEmpty ? appStrings.noImages : appStrings.imageUploadDetailsButton_title,
-                    style: Theme.of(context).textTheme.displaySmall,
-                  ),
+              ),
+            ),
+            [_form, _imageGrid][_tabController.index],
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16.0,
+                vertical: 8.0,
+              ),
+              child: AnimatedPiwigoButton(
+                controller: _btnController,
+                color: Theme.of(context).primaryColor,
+                disabled: _imageList.isEmpty,
+                onPressed: _onUpload,
+                child: Text(
+                  _imageList.isEmpty
+                      ? appStrings.noImages
+                      : appStrings.imageUploadDetailsButton_title,
+                  style: Theme.of(context).textTheme.displaySmall,
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
+    );
+  }
+
+  Widget get _form {
+    return ListView(
+      padding: const EdgeInsets.symmetric(
+        horizontal: 16.0,
+        vertical: 8.0,
+      ),
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      children: [
+        FormSection(
+          title: appStrings.editImageDetails_title,
+          child: AppField(
+            controller: _titleController,
+            hint: appStrings.editImageDetails_titlePlaceholder,
+          ),
+        ), // title
+        FormSection(
+          title: appStrings.editImageDetails_author,
+          child: AppField(
+            controller: _authorController,
+            hint: appStrings.settings_defaultAuthorPlaceholder,
+          ),
+        ), // author
+        FormSection(
+          title: appStrings.editImageDetails_description,
+          child: AppField(
+            controller: _descriptionController,
+            hint: appStrings.editImageDetails_descriptionPlaceholder,
+            minLines: 5,
+            maxLines: 10,
+          ),
+        ), // description
+        FormSection(
+          title: appStrings.editImageDetails_privacyLevel,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              color: Theme.of(context).inputDecorationTheme.fillColor,
+            ),
+            child: DropdownButton<int?>(
+              onTap: () {
+                final FocusScopeNode currentFocus = FocusScope.of(context);
+                if (!currentFocus.hasPrimaryFocus) {
+                  currentFocus.unfocus();
+                }
+              },
+              isExpanded: true,
+              underline: const SizedBox(),
+              value: _privacyLevel,
+              onChanged: (level) {
+                setState(() {
+                  _privacyLevel = level;
+                });
+              },
+              style: Theme.of(context).textTheme.bodyMedium,
+              items: _levelItems,
+            ),
+          ),
+        ), // privacy
+        FormSection(
+          title: appStrings.tagsAdd_title,
+          onTapTitle: () {
+            showModalBottomSheet(
+              context: context,
+              isScrollControlled: true,
+              builder: (_) => Padding(
+                padding: MediaQuery.of(context).padding,
+                child: AddTagsModal(
+                  selectedTags: _tags,
+                ),
+              ),
+            ).whenComplete(() => setState(() {}));
+          },
+          actions: [
+            const Icon(Icons.add_circle_outline),
+          ],
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(10),
+            child: TagWrap(
+              tags: _tags,
+              onTap: _onDeselectTag,
+            ),
+          ),
+        ), // tags
+      ],
+    );
+  }
+
+  Widget get _imageGrid {
+    return ListView(
+      padding: const EdgeInsets.symmetric(
+        horizontal: 16.0,
+        vertical: 8.0,
+      ),
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      children: [
+        FormSection(
+          title: appStrings.imageCount(_imageList.length),
+          actions: [
+            GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: _addFiles,
+              child: Padding(
+                padding: const EdgeInsets.all(8),
+                child: Icon(Icons.add_photo_alternate),
+              ),
+            ),
+            GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: _takePhoto,
+              child: Padding(
+                padding: const EdgeInsets.all(8),
+                child: Icon(Icons.photo_camera_rounded),
+              ),
+            ),
+            GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: _takeVideo,
+              child: Padding(
+                padding: const EdgeInsets.all(8),
+                child: Icon(Icons.video_camera_back),
+              ),
+            ),
+          ],
+          child: GridView.builder(
+            padding: EdgeInsets.zero,
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: Settings.getImageCrossAxisCount(context),
+            ),
+            physics: const NeverScrollableScrollPhysics(),
+            shrinkWrap: true,
+            addAutomaticKeepAlives: false,
+            cacheExtent: 0,
+            itemCount: _imageList.length,
+            itemBuilder: (context, index) {
+              File file = File(_imageList[index].path);
+              return Stack(
+                children: [
+                  Positioned(
+                    top: 4.0,
+                    right: 4.0,
+                    left: 4.0,
+                    bottom: 4.0,
+                    child: ClipRRect(
+                      borderRadius: _imageGridBorder(index),
+                      child: Stack(
+                        fit: StackFit.expand,
+                        children: [
+                          Builder(builder: (context) {
+                            List<String>? mimeType =
+                                mime(file.path.split('/').last)?.split('/');
+                            if (mimeType?.first == 'image') {
+                              return Image.file(
+                                file,
+                                fit: BoxFit.cover,
+                                scale: 7,
+                                gaplessPlayback: true,
+                                filterQuality: FilterQuality.low,
+                                errorBuilder: (context, object, stacktrace) =>
+                                    Center(
+                                  child: Icon(Icons.image_not_supported),
+                                ),
+                              );
+                            }
+                            if (mimeType?.first == 'video') {
+                              return VideoUploadItem(
+                                path: file.path,
+                              );
+                            }
+                            return const Center(
+                              child: Icon(Icons.image_not_supported),
+                            );
+                          }),
+                          if (_imageExistList.contains(file.path))
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Colors.black45,
+                              ),
+                              child: Icon(Icons.file_copy),
+                            ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    top: 0,
+                    right: 0,
+                    child: GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: () => _onRemoveFile(index),
+                      child: CircleAvatar(
+                        backgroundColor:
+                            Theme.of(context).scaffoldBackgroundColor,
+                        radius: 12,
+                        child: Icon(Icons.remove_circle_outline,
+                            size: 20,
+                            color: Theme.of(context).colorScheme.error),
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 }
@@ -395,7 +531,9 @@ class _VideoUploadItemState extends State<VideoUploadItem> {
     final Duration duration = _controller.value.duration;
     int hours = duration.inHours;
     int minutes = (duration - Duration(hours: hours)).inMinutes;
-    int seconds = (duration - Duration(hours: hours) - Duration(minutes: minutes)).inSeconds;
+    int seconds =
+        (duration - Duration(hours: hours) - Duration(minutes: minutes))
+            .inSeconds;
     return '${hours > 0 ? '$hours:' : ''}${minutes < 10 ? '0$minutes' : '$minutes'}:${seconds < 10 ? '0$seconds' : '$seconds'}';
   }
 
@@ -434,10 +572,15 @@ class _VideoUploadItemState extends State<VideoUploadItem> {
             left: 2,
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-              decoration: BoxDecoration(borderRadius: BorderRadius.circular(5), color: AppColors.black.withOpacity(0.7)),
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(5),
+                  color: AppColors.black.withOpacity(0.7)),
               child: Text(
                 _duration,
-                style: TextStyle(color: AppColors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                    color: AppColors.white,
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold),
               ),
             ),
           ),

@@ -14,13 +14,11 @@ class AlbumCard extends StatelessWidget {
     required this.album,
     this.onTap,
     this.showActions = true,
-    this.example = false,
     this.onDelete,
     this.onEdit,
     this.onMove,
   }) : super(key: key);
 
-  final bool example;
   final AlbumModel album;
   final Function()? onTap;
   final Function()? onDelete;
@@ -69,14 +67,15 @@ class AlbumCard extends StatelessWidget {
           icon: Icons.edit,
         ),
         AlbumCardAction(
-          backgroundColor: const Color(0xFF4B4B4B), // Todo: Theme grey action color
+          backgroundColor:
+              const Color(0xFF4B4B4B), // Todo: Theme grey action color
           foregroundColor: Colors.white,
           autoClose: true,
           onPressed: onMove,
           icon: Icons.drive_file_move,
         ),
         AlbumCardAction(
-          backgroundColor: Theme.of(context).errorColor,
+          backgroundColor: Theme.of(context).colorScheme.error,
           foregroundColor: Colors.white,
           autoClose: true,
           onPressed: onDelete,
@@ -102,7 +101,8 @@ class AlbumCard extends StatelessWidget {
                 width: kAlbumAnchorRadius * 2.0 + 1.0,
                 decoration: BoxDecoration(
                   color: Theme.of(context).primaryColor,
-                  border: Border.all(color: Theme.of(context).primaryColor, width: 1.0),
+                  border: Border.all(
+                      color: Theme.of(context).primaryColor, width: 1.0),
                 ),
               ),
             ),
@@ -122,11 +122,11 @@ class AlbumCard extends StatelessWidget {
               padding: const EdgeInsets.all(8.0).copyWith(right: 0.0),
               decoration: BoxDecoration(
                 color: Theme.of(context).cardColor,
-                border: Border.all(color: Theme.of(context).cardColor, width: 1.0),
+                border:
+                    Border.all(color: Theme.of(context).cardColor, width: 1.0),
               ),
               child: AlbumCardContent(
                 album: album,
-                example: example,
               ),
             ),
           ),
@@ -151,7 +151,6 @@ class AlbumCard extends StatelessWidget {
           ),
           child: AlbumCardContent(
             album: album,
-            example: example,
           ),
         ),
       );
@@ -163,11 +162,9 @@ class AlbumCardContent extends StatelessWidget {
   const AlbumCardContent({
     Key? key,
     required this.album,
-    this.example = false,
   }) : super(key: key);
 
   final AlbumModel album;
-  final bool example;
 
   @override
   Widget build(BuildContext context) {
@@ -201,30 +198,26 @@ class AlbumCardContent extends StatelessWidget {
                 ),
               );
             }
-            if (example) {
-              return Image.asset(
-                album.urlRepresentative!,
-                fit: BoxFit.cover,
-                errorBuilder: (context, o, s) {
-                  debugPrint("$o");
-                  return Center(child: Icon(Icons.image_not_supported));
-                },
-              );
-            }
             return CachedNetworkImage(
               imageUrl: album.urlRepresentative!,
               fit: BoxFit.cover,
-              progressIndicatorBuilder: (context, url, download) => Center(
-                child: CircularProgressIndicator(
-                  value: download.progress,
-                ),
-              ),
+              fadeInDuration: const Duration(milliseconds: 300),
+              progressIndicatorBuilder: (context, url, download) {
+                if (download.downloaded >= (download.totalSize ?? 0)) {
+                  return const SizedBox();
+                }
+                return Center(
+                  child: CircularProgressIndicator(
+                    value: download.progress,
+                  ),
+                );
+              },
               errorWidget: (context, url, error) {
                 debugPrint("[$url] $error");
                 return FittedBox(
                   fit: BoxFit.cover,
                   child: Container(
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(16.0),
                     decoration: BoxDecoration(
                       color: Theme.of(context).scaffoldBackgroundColor,
                     ),

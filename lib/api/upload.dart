@@ -2,14 +2,15 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:piwigo_ng/api/api_client.dart';
 import 'package:piwigo_ng/api/authentication.dart';
 import 'package:piwigo_ng/app.dart';
@@ -17,35 +18,49 @@ import 'package:piwigo_ng/components/dialogs/confirm_dialog.dart';
 import 'package:piwigo_ng/services/preferences_service.dart';
 import 'package:piwigo_ng/services/upload_notifier.dart';
 import 'package:piwigo_ng/utils/localizations.dart';
+import 'package:piwigo_ng/views/upload/upload_status_page.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../services/chunked_uploader.dart';
 import '../services/notification_service.dart';
 
-Future<void> _showUploadNotification({bool success = true}) async {
-  if (!Preferences.getUploadNotification) return;
-  final android = AndroidNotificationDetails(
-    'piwigo-ng-upload',
-    'Piwigo NG Upload',
-    channelDescription: 'piwigo-ng',
-    priority: Priority.high,
-    importance: Importance.high,
-  );
-  final platform = NotificationDetails(android: android);
-  await localNotification.show(
-    1,
-    success ? 'Success' : 'Failure',
-    success ? appStrings.imageUploadCompleted_message : appStrings.uploadError_message,
-    platform,
-  );
+Future<bool> askMediaPermission() async {
+  bool storage = true;
+  bool videos = true;
+  bool photos = true;
+
+  // Only check for storage < Android 13
+  AndroidDeviceInfo androidInfo = await DeviceInfoPlugin().androidInfo;
+  if (androidInfo.version.sdkInt >= 33) {
+    videos = await Permission.videos.status.isGranted;
+    photos = await Permission.photos.status.isGranted;
+
+    if (!videos) {
+      videos = await Permission.videos.request().isGranted;
+    }
+    if (!photos) {
+      photos = await Permission.photos.request().isGranted;
+    }
+  } else {
+    storage = await Permission.storage.status.isGranted;
+    if (!storage) {
+      storage = await Permission.storage.request().isGranted;
+    }
+  }
+
+  if (storage && (videos || photos)) {
+    return true;
+  }
+  return false;
 }
 
-Future<List<Map<String, dynamic>>> uploadPhotos(
+Future<List<int>> uploadPhotos(
   List<XFile> photos,
   int albumId, {
   Map<String, dynamic> info = const {},
 }) async {
-  /// Check if Wifi is enabled and working
+  // Check if Wifi is enabled and working
   if (Preferences.getWifiUpload) {
     var connectivity = await Connectivity().checkConnectivity();
     if (connectivity != ConnectivityResult.wifi) {
@@ -60,17 +75,18 @@ Future<List<Map<String, dynamic>>> uploadPhotos(
     }
   }
 
-  List<Map<String, dynamic>> result = [];
-  List<int> uploadCompletedList = [];
+  List<int> result = [];
   List<UploadItem> items = [];
   FlutterSecureStorage storage = const FlutterSecureStorage();
   String? url = await storage.read(key: 'SERVER_URL');
   if (url == null) return [];
   String? username = await storage.read(key: 'SERVER_USERNAME');
   String? password = await storage.read(key: 'SERVER_PASSWORD');
-  UploadNotifier uploadNotifier = App.appKey.currentContext!.read<UploadNotifier>();
+  UploadNotifier uploadNotifier =
+      App.appKey.currentContext!.read<UploadNotifier>();
+  int nbError = 0;
 
-  /// Creates Upload Item list for the upload notifier
+  // Creates Upload Item list for the upload notifier
   for (var photo in photos) {
     File? compressedFile;
     if (Preferences.getRemoveMetadata) {
@@ -86,10 +102,12 @@ Future<List<Map<String, dynamic>>> uploadPhotos(
 
   uploadNotifier.addItems(items);
 
-  /// Upload loop
-  for (var item in items) {
+  App.navigatorKey.currentState?.popAndPushNamed(UploadStatusPage.routeName);
+
+  await Future.wait(List<Future<void>>.generate(items.length, (index) async {
+    UploadItem item = items[index];
     try {
-      /// Make Request
+      // Make Request
       Response? response = await uploadChunk(
         photo: item.file,
         category: albumId,
@@ -97,41 +115,50 @@ Future<List<Map<String, dynamic>>> uploadPhotos(
         username: username,
         password: password,
         info: info,
+        cancelToken: item.cancelToken,
         onProgress: (progress) {
-          debugPrint("$progress");
           item.progress.sink.add(progress);
         },
       );
-      if (response != null) {
-        var data = json.decode(response.data);
-        if (data['stat'] != 'fail') {
-          result.add({
-            'id': data['result']['id'],
-            'url': data['result']['element_url'],
-          });
 
-          /// Notify provider upload completed
-          uploadNotifier.itemUploadCompleted(item);
-          if (Preferences.getDeleteAfterUpload) {
-            // todo: delete real file path, not the cached one.
-          }
-        } else {
+      // Handle result
+      if (response == null || json.decode(response.data)['stat'] == 'fail') {
+        if (!item.cancelToken.isCancelled) {
           uploadNotifier.itemUploadCompleted(item, error: true);
+          nbError++;
         }
       } else {
-        uploadNotifier.itemUploadCompleted(item, error: true);
+        var data = json.decode(response.data);
+        result.add(data['result']['id']);
+
+        // Notify provider upload completed
+        uploadNotifier.itemUploadCompleted(item);
+        if (Preferences.getDeleteAfterUpload) {
+          // todo: delete real file path, not the cached one.
+        }
       }
+    } on DioError catch (e) {
+      debugPrint("${e.message}");
+      debugPrint("${e.stackTrace}");
+      uploadNotifier.itemUploadCompleted(item, error: true);
+      nbError++;
     } catch (e) {
+      if (e is Error) {
+        debugPrint("$e");
+        debugPrint("${e.stackTrace}");
+      }
       debugPrint("$e");
+      uploadNotifier.itemUploadCompleted(item, error: true);
+      nbError++;
     }
-  }
-  _showUploadNotification(success: result.isNotEmpty);
+  }));
+
+  showUploadNotification(nbError, result.length);
   if (result.isEmpty) return [];
-  uploadCompletedList = result.map<int>((e) => e['id']).toList();
   try {
-    await uploadCompleted(uploadCompletedList, albumId);
+    await uploadCompleted(result, albumId);
     if (await methodExist('community.images.uploadCompleted')) {
-      await communityUploadCompleted(uploadCompletedList, albumId);
+      await communityUploadCompleted(result, albumId);
     }
   } on DioError catch (e) {
     debugPrint(e.message);
@@ -148,7 +175,9 @@ Future<Response?> uploadChunk({
   Function(double)? onProgress,
   String? username,
   String? password,
+  CancelToken? cancelToken,
 }) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
   Map<String, String> queries = {
     'format': 'json',
     'method': 'pwg.images.uploadAsync',
@@ -161,8 +190,10 @@ Future<Response?> uploadChunk({
   };
 
   if (info['name'] != '' && info['name'] != null) fields['name'] = info['name'];
-  if (info['comment'] != '' && info['comment'] != null) fields['comment'] = info['comment'];
-  if (info['tag_ids'].isNotEmpty) fields['tag_ids'] = info['tag_ids'];
+  if (info['comment'] != '' && info['comment'] != null)
+    fields['comment'] = info['comment'];
+  if (info['tag_ids']?.isNotEmpty ?? false)
+    fields['tag_ids'] = info['tag_ids'].join(',');
   if (info['level'] != -1) fields['level'] = info['level'];
 
   ChunkedUploader chunkedUploader = ChunkedUploader(Dio(
@@ -174,10 +205,11 @@ Future<Response?> uploadChunk({
   return await chunkedUploader.upload(
     path: '/ws.php',
     filePath: photo.absolute.path,
-    maxChunkSize: 100000,
+    maxChunkSize: (prefs.getInt(Preferences.uploadChunkSizeKey) ?? 100) * 1000,
     params: queries,
     method: 'POST',
     data: fields,
+    cancelToken: cancelToken,
     contentType: Headers.formUrlEncodedContentType,
     onUploadProgress: (value) {
       if (onProgress != null) onProgress(value);
@@ -207,18 +239,20 @@ Future<File> compressFile(XFile file) async {
 }
 
 Future<bool> uploadCompleted(List<int> imageId, int categoryId) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
   Map<String, String> queries = {
     'format': 'json',
     'method': 'pwg.images.uploadCompleted',
   };
   FormData formData = FormData.fromMap({
     'image_id': imageId,
-    'pwg_token': appPreferences.getString(Preferences.tokenKey),
+    'pwg_token': prefs.getString(Preferences.tokenKey),
     'category_id': categoryId,
   });
 
   try {
-    Response response = await ApiClient.post(data: formData, queryParameters: queries);
+    Response response =
+        await ApiClient.post(data: formData, queryParameters: queries);
     if (response.statusCode == 200) {
       return true;
     }
@@ -229,17 +263,19 @@ Future<bool> uploadCompleted(List<int> imageId, int categoryId) async {
 }
 
 Future<bool> communityUploadCompleted(List<int> imageId, int categoryId) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
   Map<String, String> queries = {
     'format': 'json',
     'method': 'community.images.uploadCompleted',
   };
   FormData formData = FormData.fromMap({
     'image_id': imageId,
-    'pwg_token': appPreferences.getString(Preferences.tokenKey),
+    'pwg_token': prefs.getString(Preferences.tokenKey),
     'category_id': categoryId,
   });
   try {
-    Response response = await ApiClient.post(data: formData, queryParameters: queries);
+    Response response =
+        await ApiClient.post(data: formData, queryParameters: queries);
     if (response.statusCode == 200) {
       return true;
     }

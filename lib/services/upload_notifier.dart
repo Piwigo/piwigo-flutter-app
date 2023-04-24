@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
 class UploadNotifier extends ChangeNotifier {
@@ -22,7 +23,7 @@ class UploadNotifier extends ChangeNotifier {
   void itemUploadCompleted(UploadItem item, {bool error = false}) {
     _uploadList.remove(item);
     item.error = error;
-    _uploadHistoryList.add(item);
+    _uploadHistoryList.insert(0, item);
     notifyListeners();
   }
 
@@ -43,11 +44,14 @@ class UploadItem {
   final File file;
   final StreamController<double> progress;
   final int albumId;
+  final CancelToken cancelToken;
   bool error;
 
   UploadItem({
     required this.file,
     required this.albumId,
     this.error = false,
-  }) : progress = StreamController<double>.broadcast();
+    CancelToken? cancelToken,
+  })  : progress = StreamController<double>.broadcast(),
+        cancelToken = cancelToken ?? CancelToken();
 }

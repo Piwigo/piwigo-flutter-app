@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:piwigo_ng/services/preferences_service.dart';
 
 class LocaleNotifier extends ChangeNotifier {
-  final String key = 'LOCALE';
+  static final String key = 'LOCALE';
   late Locale _locale;
 
   LocaleNotifier() {
@@ -20,7 +20,8 @@ class LocaleNotifier extends ChangeNotifier {
   }
 
   _loadFromPrefs() {
-    _locale = Locale(appPreferences.getString(key) ?? Platform.localeName.split('_').first);
+    _locale = Locale(
+        appPreferences.getString(key) ?? Platform.localeName.split('_').first);
     notifyListeners();
   }
 

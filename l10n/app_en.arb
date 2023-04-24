@@ -194,6 +194,12 @@
     "categoryUpload_takePhoto": "Take Photo",
     "categoryUpload_takeVideo": "Take Video",
 
+    "uploadList_title": "Upload Status",
+    "uploadList_uploading": "Uploading",
+    "uploadList_history": "History",
+
+    "uploadList_empty": "Empty",
+
 
     "setDefaultCategory_select": "Please select an album or sub-album which will become the new root album.",
     "setDefaultCategory_title": "Default Album",
@@ -363,8 +369,8 @@
     "imageOptions_edit": "Edit",
     "imageOptions_download": "Download",
     "imageOptions_share": "Share",
-    "imageOptions_addFavorites": "Add favorites",
-    "imageOptions_removeFavorites": "Remove favorites",
+    "imageOptions_addFavorites": "Add to favorites",
+    "imageOptions_removeFavorites": "Remove from favorites",
     "imageOptions_setAlbumImage": "Set Album Thumbnail",
 
 
@@ -691,6 +697,7 @@
     "imageUploadCompleted_title": "Upload Completed",
     "imageUploadCompleted_message": "photo uploaded to your Piwigo server.",
     "imageUploadCompleted_message1": "photos uploaded to your Piwigo server.",
+    "imageUploadCompleted_warning": "some of your photos could not be uploaded.",
 
 
     "uploadError_title": "Upload Error",
@@ -867,6 +874,26 @@
     "settings_autoUploadDestination": "Destination",
     "settings_autoUploadDestinationInvalid": "Invalid destination album",
     "settings_autoUploadDestinationInfo": "Please select the album or sub-album into which photos and videos will be auto-uploaded.",
+    "settings_autoUploadDuplicateInfo": "Photos that are already in this Piwigo won't be uploaded.",
+    "settings_autoUploadFrequency": "Every",
+    "settings_autoUploadFrequencyMinutes": "{count, plural, =1{1 minute} other{{count} minutes}}",
+    "@settings_autoUploadFrequencyMinutes" : {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "settings_autoUploadFrequencyHours": "{count, plural, =1{1 hour} other{{count} hours}}",
+    "@settings_autoUploadFrequencyHours" : {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "settings_autoUploadFrequencyDays": "{count, plural, =1{1 day} other{{count} days}}",
+    "@settings_autoUploadFrequencyDays" : {
+        "placeholders": {
+            "count": {}
+        }
+    },
     "autoUploadError_Disabled": "The Auto-Upload option is disabled in the app settings.",
     "autoUploadError_Failed": "Several transfers failed and the upload queue is on hold. Please check in the app.",
 
@@ -891,9 +918,7 @@
 
 
     "settingsHeader_appearance": "Appearance",
-    "settingsHeader_colorPalette": "Color Palette",
-    "settings_lightColor": "Light",
-    "settings_darkColor": "Dark",
+    "settingsHeader_theme": "Dark Theme",
     "settings_switchPalette": "Automatic",
     "settings_brightness": "Brightness",
     "settings_brightnessHelp": "In low ambient brightness, the Automatic option uses a darker color palette to make photos stand out against darker backgrounds.",
@@ -932,5 +957,8 @@
     "settings_acknowledgements": "Acknowledgements",
     "settings_privacy": "Privacy Policy",
     "settings_unknownVersion": "Unknown version",
-    "settings_privacyUrl": "&lang=en_EN"
+    "settings_privacyLocale": "&lang=en_EN",
+    "@settings_privacyLocale": {
+        "description": "The language and country code for the url to Piwigo Mobile apps privacy policy: https://piwigo.org/mobile-apps-privacy-policy&webview&lang=en_EN"
+    }
 }
