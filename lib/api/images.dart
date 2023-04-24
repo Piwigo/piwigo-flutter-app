@@ -480,7 +480,8 @@ Future<bool> editImage(ImageModel image,
 }
 
 /// Return a list of files that are not in the server
-Future<List<File>> checkImagesNotExist(List<File> files) async {
+Future<List<File>> checkImagesNotExist(List<File> files,
+    {bool returnExistFiles = false}) async {
   Map<String, File> md5sumList = {};
 
   for (File file in files) {
@@ -503,7 +504,11 @@ Future<List<File>> checkImagesNotExist(List<File> files) async {
     if (data['stat'] == 'fail') return [];
     print(data['result']);
     Map<String, dynamic> existResult = data['result'];
-    existResult.removeWhere((key, value) => value != null);
+    if (returnExistFiles) {
+      existResult.removeWhere((key, value) => value == null);
+    } else {
+      existResult.removeWhere((key, value) => value != null);
+    }
     return existResult.keys.map((md5sum) => md5sumList[md5sum]!).toList();
   } on DioError catch (e) {
     debugPrint('Edit images: ${e.message}');

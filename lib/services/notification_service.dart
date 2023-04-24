@@ -33,7 +33,7 @@ Future<void> onSelectNotification(NotificationResponse response) async {
   debugPrint(result.message);
 }
 
-Future<bool?> requestPermissions() async {
+Future<bool?> askNotificationPermissions() async {
   return localNotification
       .resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin>()
@@ -43,11 +43,11 @@ Future<bool?> requestPermissions() async {
 Future<void> showLocalNotification({
   required int id,
   required String title,
-  required String body,
+  String? body,
   String? payload,
   AndroidNotificationDetails? details,
 }) async {
-  final bool? hasPermission = await requestPermissions();
+  final bool? hasPermission = await askNotificationPermissions();
   if (hasPermission != null && !hasPermission) {
     return;
   }
@@ -79,7 +79,6 @@ Future<void> showUploadNotification([int nbError = 0, int nbImage = 0]) async {
     priority: Priority.high,
     importance: Importance.high,
   );
-  final platform = NotificationDetails(android: android);
   late String title;
   String? message;
   if (nbError == 0 && nbImage == 0) {
@@ -100,21 +99,30 @@ Future<void> showUploadNotification([int nbError = 0, int nbImage = 0]) async {
     title = appStrings.uploadError_title;
     message = appStrings.uploadError_message;
   }
-  await localNotification.show(
-      Settings.uploadNotificationId, title, message, platform);
+  await showLocalNotification(
+    id: Settings.uploadNotificationId,
+    title: title,
+    body: message,
+    details: android,
+  );
 }
 
-Future<void> showAutoUploadNotification(
-    [int nbError = 0, int nbImage = 0]) async {
+Future<void> showAutoUploadNotification([
+  int nbError = 0,
+  int nbImage = 0,
+]) async {
+  debugPrint("$nbError / $nbImage");
+  // Is auto upload notification enabled
   SharedPreferences prefs = await SharedPreferences.getInstance();
-  if (!(prefs.getBool(Preferences.uploadNotificationKey) ?? false)) return;
+  if (!(prefs.getBool(AutoUploadPreferences.notificationKey) ?? false)) return;
 
+  // Find localizations
   Locale locale = Locale(prefs.getString(LocaleNotifier.key) ??
       Platform.localeName.split('_').first);
-
   AppLocalizations backgroundStrings =
       await AppLocalizations.delegate.load(locale);
 
+  // Init notifications
   final android = AndroidNotificationDetails(
     'piwigo-ng-auto-upload',
     'Piwigo NG Auto Upload',
@@ -123,6 +131,8 @@ Future<void> showAutoUploadNotification(
     importance: Importance.high,
   );
   final platform = NotificationDetails(android: android);
+
+  // Create title and message on case
   late String title;
   String? message;
   if (nbError == 0 && nbImage > 0) {
@@ -140,6 +150,12 @@ Future<void> showAutoUploadNotification(
     title = backgroundStrings.uploadError_title;
     message = backgroundStrings.uploadError_message;
   }
+
+  // Send notification
   await localNotification.show(
-      Settings.autoUploadNotificationId, title, message, platform);
+    Settings.autoUploadNotificationId,
+    title,
+    message,
+    platform,
+  );
 }

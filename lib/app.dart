@@ -24,8 +24,10 @@ import 'package:piwigo_ng/views/upload/upload_view_page.dart';
 class App extends StatelessWidget {
   const App({Key? key}) : super(key: key);
 
-  static final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
-  static final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+  static final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
+      GlobalKey<ScaffoldMessengerState>();
+  static final GlobalKey<NavigatorState> navigatorKey =
+      GlobalKey<NavigatorState>();
   static final GlobalKey appKey = GlobalKey();
 
   @override
@@ -83,7 +85,7 @@ Route<dynamic> generateRoute(RouteSettings settings) {
     arguments = settings.arguments as Map<String, dynamic>;
   }
 
-  bool isAdmin = appPreferences.getBool('IS_USER_ADMIN') ?? false;
+  bool isAdmin = appPreferences.getBool(Preferences.isAdminKey) ?? false;
 
   if (settings.name == null) {
     debugPrint("no route name");

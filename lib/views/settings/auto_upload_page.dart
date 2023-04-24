@@ -21,15 +21,17 @@ class _AutoUploadPageState extends State<AutoUploadPage> {
   AutoUploadManager _manager = AutoUploadManager();
   late bool _autoUploadEnabled;
   late Duration _selectedFrequency;
+  late bool _autoUploadNotification;
   AlbumModel? _album;
   String? _sourcePath;
 
   @override
   void initState() {
-    _sourcePath = AutoUploadPrefs.getAutoUploadSource;
-    _album = AutoUploadPrefs.getAutoUploadDestination;
-    _autoUploadEnabled = AutoUploadPrefs.getAutoUpload;
-    _selectedFrequency = AutoUploadPrefs.getAutoUploadFrequency;
+    _sourcePath = AutoUploadPreferences.getSource;
+    _album = AutoUploadPreferences.getDestination;
+    _autoUploadEnabled = AutoUploadPreferences.getEnabled;
+    _selectedFrequency = AutoUploadPreferences.getFrequency;
+    _autoUploadNotification = AutoUploadPreferences.getNotification;
     super.initState();
   }
 
@@ -48,8 +50,8 @@ class _AutoUploadPageState extends State<AutoUploadPage> {
                 title: appStrings.settings_autoUpload,
                 value: _autoUploadEnabled,
                 onChanged: (value) {
-                  if (AutoUploadPrefs.getAutoUploadDestination == null ||
-                      AutoUploadPrefs.getAutoUploadSource == null) {
+                  if (AutoUploadPreferences.getDestination == null ||
+                      AutoUploadPreferences.getSource == null) {
                     return;
                   }
                   setState(() {
@@ -79,7 +81,7 @@ class _AutoUploadPageState extends State<AutoUploadPage> {
                 onPressed: () async {
                   String? dir = await pickDirectoryPath();
                   if (dir == null || dir == _sourcePath) return;
-                  bool success = await AutoUploadPrefs.setAutoUploadSource(dir);
+                  bool success = await AutoUploadPreferences.setSource(dir);
                   if (!success) return;
                   setState(() {
                     _sourcePath = dir;
@@ -102,7 +104,7 @@ class _AutoUploadPageState extends State<AutoUploadPage> {
                       onSelected: (selectedAlbum) async {
                         if (_album == selectedAlbum) return true;
                         bool success =
-                            await AutoUploadPrefs.setAutoUploadDestination(
+                            await AutoUploadPreferences.setDestination(
                                 selectedAlbum);
                         if (!success) return false;
                         setState(() {
@@ -121,7 +123,7 @@ class _AutoUploadPageState extends State<AutoUploadPage> {
                 onChanged: (value) async {
                   if (value == null || _selectedFrequency == value) return;
                   bool success =
-                      await AutoUploadPrefs.setAutoUploadFrequency(value);
+                      await AutoUploadPreferences.setFrequency(value);
                   if (!success) return;
                   setState(() {
                     _autoUploadEnabled = false;
@@ -140,9 +142,19 @@ class _AutoUploadPageState extends State<AutoUploadPage> {
                   );
                 }),
               ),
+              SettingsSectionItemSwitch(
+                title: appStrings.settings_uploadNotification,
+                value: _autoUploadNotification,
+                onChanged: (value) => setState(() {
+                  _autoUploadNotification = value;
+                  AutoUploadPreferences.setNotification(
+                    _autoUploadNotification,
+                  );
+                }),
+              ),
             ],
           ),
-          if (AutoUploadPrefs.getAutoUploadDestination == null)
+          if (AutoUploadPreferences.getDestination == null)
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Row(
@@ -158,7 +170,7 @@ class _AutoUploadPageState extends State<AutoUploadPage> {
                 ],
               ),
             ),
-          if (AutoUploadPrefs.getAutoUploadSource == null)
+          if (AutoUploadPreferences.getSource == null)
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Row(

@@ -23,8 +23,9 @@ Future<List<XFile>?> onPickImages() async {
   try {
     if (!await askMediaPermission()) return null;
     final FilePickerResult? result = await FilePicker.platform.pickFiles(
+      allowedExtensions: appPreferences.getString('FILE_TYPES')?.split(','),
       allowMultiple: true,
-      type: FileType.media,
+      type: FileType.custom,
     );
     if (result == null) return null;
     return result.files
@@ -51,7 +52,7 @@ Future<XFile?> onTakePhoto(BuildContext context) async {
         image = await _picker.pickImage(
           source: ImageSource.camera,
           imageQuality: (Preferences.getUploadQuality * 100).round(),
-          requestFullMetadata: Preferences.getRemoveMetadata,
+          requestFullMetadata: !Preferences.getRemoveMetadata,
         );
         break;
       case 1:

@@ -45,7 +45,7 @@ Future<ApiResult<bool>> loginUser(
 
   ApiClient.cookieJar.deleteAll();
   FlutterSecureStorage secureStorage = const FlutterSecureStorage();
-  await secureStorage.write(key: 'SERVER_URL', value: url);
+  await secureStorage.write(key: Preferences.serverUrlKey, value: url);
 
   if (username.isEmpty && password.isEmpty) {
     ApiResult<StatusModel> status = await sessionStatus();

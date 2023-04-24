@@ -45,7 +45,7 @@ class _UploadGalleryViewPage extends State<UploadViewPage>
   final List<DropdownMenuItem<int?>> _levelItems = [];
   final List<TagModel> _tags = [];
   List<XFile> _imageList = [];
-  List<String> _imageNotExistList = [];
+  List<String> _imageExistList = [];
   int? _privacyLevel;
 
   @override
@@ -79,10 +79,12 @@ class _UploadGalleryViewPage extends State<UploadViewPage>
   }
 
   Future<void> checkImageExist() async {
-    List<File> files =
-        await checkImagesNotExist(_imageList.map((e) => File(e.path)).toList());
+    List<File> files = await checkImagesNotExist(
+      _imageList.map((e) => File(e.path)).toList(),
+      returnExistFiles: true,
+    );
     setState(() {
-      _imageNotExistList = files.map((e) => e.path).toList();
+      _imageExistList = files.map((e) => e.path).toList();
     });
   }
 
@@ -93,6 +95,32 @@ class _UploadGalleryViewPage extends State<UploadViewPage>
     _authorController.dispose();
     _tabController.dispose();
     super.dispose();
+  }
+
+  BorderRadiusGeometry _imageGridBorder(int index) {
+    Radius topLeft = Radius.circular(index == 0 ? 10.0 : 5.0);
+    Radius topRight = Radius.circular(
+        _imageList.length < Settings.getImageCrossAxisCount(context)
+            ? 10.0
+            : 5.0);
+    Radius bottomRight =
+        Radius.circular(index == _imageList.length - 1 ? 10.0 : 5.0);
+    Radius bottomLeft = Radius.circular(index ==
+            _imageList.length -
+                (_imageList.length % Settings.getImageCrossAxisCount(context) ==
+                        0
+                    ? Settings.getImageCrossAxisCount(context)
+                    : _imageList.length %
+                        Settings.getImageCrossAxisCount(context))
+        ? 10.0
+        : 5.0);
+
+    return BorderRadius.circular(5.0).copyWith(
+      topLeft: topLeft,
+      topRight: topRight,
+      bottomRight: bottomRight,
+      bottomLeft: bottomLeft,
+    );
   }
 
   Future<void> _addFiles() async {
@@ -143,7 +171,7 @@ class _UploadGalleryViewPage extends State<UploadViewPage>
   Future<void> _onRemoveFile(int index) async {
     String path = _imageList[index].path;
     setState(() {
-      _imageNotExistList.remove(path);
+      _imageExistList.remove(path);
       _imageList.removeAt(index);
     });
   }
@@ -158,7 +186,7 @@ class _UploadGalleryViewPage extends State<UploadViewPage>
     _btnController.start();
     List<int> tagIds = _tags.map<int>((tag) => tag.id).toList();
     List<XFile> filesToUpload =
-        _imageList.where((e) => _imageNotExistList.contains(e.path)).toList();
+        _imageList.where((e) => !_imageExistList.contains(e.path)).toList();
     var result = await uploadPhotos(filesToUpload, widget.albumId, info: {
       'name': _titleController.text,
       'comment': _descriptionController.text,
@@ -191,7 +219,7 @@ class _UploadGalleryViewPage extends State<UploadViewPage>
             AnimatedSize(
               duration: const Duration(milliseconds: 300),
               child: Builder(builder: (context) {
-                if (_imageNotExistList.length != _imageList.length) {
+                if (_imageExistList.length != _imageList.length) {
                   return Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Row(
@@ -393,9 +421,11 @@ class _UploadGalleryViewPage extends State<UploadViewPage>
             ),
             physics: const NeverScrollableScrollPhysics(),
             shrinkWrap: true,
+            addAutomaticKeepAlives: false,
+            cacheExtent: 0,
             itemCount: _imageList.length,
             itemBuilder: (context, index) {
-              final File file = File(_imageList[index].path);
+              File file = File(_imageList[index].path);
               return Stack(
                 children: [
                   Positioned(
@@ -404,28 +434,7 @@ class _UploadGalleryViewPage extends State<UploadViewPage>
                     left: 4.0,
                     bottom: 4.0,
                     child: ClipRRect(
-                      borderRadius: BorderRadius.circular(5.0).copyWith(
-                        topLeft: Radius.circular(index == 0 ? 10.0 : 5.0),
-                        topRight: Radius.circular(_imageList.length <
-                                Settings.getImageCrossAxisCount(context)
-                            ? 10.0
-                            : 5.0),
-                        bottomRight: Radius.circular(
-                            index == _imageList.length - 1 ? 10.0 : 5.0),
-                        bottomLeft: Radius.circular(index ==
-                                _imageList.length -
-                                    (_imageList.length %
-                                                Settings.getImageCrossAxisCount(
-                                                    context) ==
-                                            0
-                                        ? Settings.getImageCrossAxisCount(
-                                            context)
-                                        : _imageList.length %
-                                            Settings.getImageCrossAxisCount(
-                                                context))
-                            ? 10.0
-                            : 5.0),
-                      ),
+                      borderRadius: _imageGridBorder(index),
                       child: Stack(
                         fit: StackFit.expand,
                         children: [
@@ -436,7 +445,9 @@ class _UploadGalleryViewPage extends State<UploadViewPage>
                               return Image.file(
                                 file,
                                 fit: BoxFit.cover,
-                                scale: 0.7,
+                                scale: 7,
+                                gaplessPlayback: true,
+                                filterQuality: FilterQuality.low,
                                 errorBuilder: (context, object, stacktrace) =>
                                     Center(
                                   child: Icon(Icons.image_not_supported),
@@ -452,7 +463,7 @@ class _UploadGalleryViewPage extends State<UploadViewPage>
                               child: Icon(Icons.image_not_supported),
                             );
                           }),
-                          if (!_imageNotExistList.contains(file.path))
+                          if (_imageExistList.contains(file.path))
                             Container(
                               decoration: BoxDecoration(
                                 color: Colors.black45,
