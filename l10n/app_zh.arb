@@ -147,7 +147,8 @@
     "categoryUpload_loadSubCategories": "加载",
     "categoryUpload_images": "上传图片",
     "categoryUpload_videos": "上传视频",
-    "categoryUpload_take": "拍照",
+    "categoryUpload_takePhoto": "拍照",
+    "categoryUpload_takeVideo": "录制",
     "setDefaultCategory_select": "请选择一个相册或子相册作为新的根相册",
     "setDefaultCategory_title": "默认相册",
     "setDefaultCategory_message": "您确定要设置相册 {album} 作为默认相册？",
@@ -188,13 +189,16 @@
     },
     "deleteCategory_empty": "删除空相册",
     "deleteCategory_noImages": "保留图像",
+    "deleteCategory_noImages_subtitle": "可能创建无主照片",
     "deleteCategory_orphanedImages": "删除孤立图片",
-    "deleteCategory_allImages": "{count, plural,=0{Delete Photos} =1{Delete Photo} other{{count} sub-albums}}",
+    "deleteCategory_orphanedImages_subtitle": "默认模式，仅删除没有链接到其他相册的照片",
+    "deleteCategory_allImages": "{count, plural, =0{删除照片} =1{删除照片} other{删除 {count} 张照片}}",
     "@deleteCategory_allImages": {
         "placeholders": {
             "count": {}
         }
     },
+    "deleteCategory_allImages_subtitle": "删除所有照片，包括与其他相册相关联的照片。",
     "deleteCategoryConfirm_title": "您确定吗？",
     "deleteCategoryConfirm_message": "请输入照片数量以删除此相册。照片数量： {count}",
     "@deleteCategoryConfirm_message": {
@@ -243,7 +247,7 @@
             "album": {}
         }
     },
-    "categoryImageSetHUD_updating": "Updating Album Thumbnail…",
+    "categoryImageSetHUD_updating": "正在更新相册缩略图…",
     "categoryImageSetError_title": "照片设置出错",
     "categoryImageSetError_message": "设置相册封面失败",
     "singleImage": "照片",
@@ -277,6 +281,8 @@
     "imageOptions_edit": "编辑",
     "imageOptions_download": "下载",
     "imageOptions_share": "分享",
+    "imageOptions_addFavorites": "添加收藏",
+    "imageOptions_removeFavorites": "移除收藏",
     "imageOptions_setAlbumImage": "设为相册缩略图",
     "imageDetailsView_title": "属性",
     "editImageDetails_title": "标题",
@@ -376,6 +382,7 @@
         }
     },
     "removeSingleImage_title": "从相册中移除",
+    "removeSingleImage_subtitle": "一些照片已关联到其他相册",
     "removeImageHUD_removing": "{count, plural, =0{正在移除图片…} =1{正在移除图片…} other{正在移除图片…}}",
     "@removeImageHUD_removing": {
         "placeholders": {
@@ -422,6 +429,8 @@
             "count": {}
         }
     },
+    "downloadImageSuccess_title": "已下载的文件",
+    "downloadImageSuccess_message": "所有文件已成功下载",
     "downloadImageFail_title": "下载失败",
     "downloadImageFail_message": "无法下载照片！",
     "downloadVideoFail_message": "无法下载视频！",
@@ -430,6 +439,7 @@
     "imageSaveError_message": "照片保存失败",
     "videoSaveError_title": "视频保存失败",
     "videoSaveError_message": "视频保存失败",
+    "videoLoadError_message": "视频加载失败",
     "moveOrCopyImage_title": "{count, plural, =1{您想移动或复制这张照片吗？} other{您想移动或复制 {count} 张照片吗？}}",
     "@moveOrCopyImage_title": {
         "placeholders": {
@@ -636,9 +646,8 @@
     "defaultThumbnailSize": "尺寸",
     "defaultThumbnailSize320px": "缩略图大小",
     "defaultThumbnailSize414px": "缩略图默认大小",
+    "defaultNberOfThumbnailsShort": "每行数量",
     "defaultNberOfThumbnails": "每行缩略图数量",
-    "defaultNberOfThumbnails_portrait": "竖屏模式",
-    "defaultNberOfThumbnails_landscape": "横屏模式",
     "defaultThumbnailSizeTitle": "默认大小",
     "defaultThumbnailSizeHeader": "请选择图片缩略图大小",
     "settings_displayTitles": "缩略图标题",
@@ -718,6 +727,7 @@
     "settingsHeader_cache": "缓存设置 (已使用/总共)",
     "settings_cacheDisk": "存储",
     "settings_cacheMemory": "内存",
+    "settings_cacheSize": "缓存大小",
     "settings_cacheMegabytes": "MB",
     "settings_cacheClear": "清除缓存",
     "settings_cacheClearAll": "清除图片缓存",
@@ -759,5 +769,6 @@
     "settings_translateWithCrowdin": "协助翻译 Piwigo NG",
     "settings_acknowledgements": "鸣谢",
     "settings_privacy": "隐私政策",
+    "settings_unknownVersion": "未知版本",
     "settings_privacyLocale": "&lang=en_EN"
 }
