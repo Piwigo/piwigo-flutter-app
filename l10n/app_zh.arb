@@ -149,6 +149,10 @@
     "categoryUpload_videos": "上传视频",
     "categoryUpload_takePhoto": "拍照",
     "categoryUpload_takeVideo": "录制",
+    "uploadList_title": "Upload Status",
+    "uploadList_uploading": "Uploading",
+    "uploadList_history": "History",
+    "uploadList_empty": "Empty",
     "setDefaultCategory_select": "请选择一个相册或子相册作为新的根相册",
     "setDefaultCategory_title": "默认相册",
     "setDefaultCategory_message": "您确定要设置相册 {album} 作为默认相册？",
@@ -281,8 +285,8 @@
     "imageOptions_edit": "编辑",
     "imageOptions_download": "下载",
     "imageOptions_share": "分享",
-    "imageOptions_addFavorites": "添加收藏",
-    "imageOptions_removeFavorites": "移除收藏",
+    "imageOptions_addFavorites": "Add to favorites",
+    "imageOptions_removeFavorites": "Remove from favorites",
     "imageOptions_setAlbumImage": "设为相册缩略图",
     "imageDetailsView_title": "属性",
     "editImageDetails_title": "标题",
@@ -568,6 +572,7 @@
     "imageUploadCompleted_title": "上传完毕",
     "imageUploadCompleted_message": "照片成功上传到你的 Piwigo 服务器",
     "imageUploadCompleted_message1": "照片成功上传到你的Piwigo服务器",
+    "imageUploadCompleted_warning": "some of your photos could not be uploaded.",
     "uploadError_title": "上传出错",
     "uploadError_message": "无法上传你的照片",
     "uploadCancelled_title": "上传已取消",
@@ -715,6 +720,26 @@
     "settings_autoUploadDestination": "目标路径",
     "settings_autoUploadDestinationInvalid": "无效的目标相册",
     "settings_autoUploadDestinationInfo": "请选择相册或子相册，其中的照片和视频会被自动上传",
+    "settings_autoUploadDuplicateInfo": "Photos that are already in this Piwigo won't be uploaded.",
+    "settings_autoUploadFrequency": "Every",
+    "settings_autoUploadFrequencyMinutes": "{count, plural, =1{1 minute} other{{count} minutes}}",
+    "@settings_autoUploadFrequencyMinutes": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "settings_autoUploadFrequencyHours": "{count, plural, =1{1 hour} other{{count} hours}}",
+    "@settings_autoUploadFrequencyHours": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "settings_autoUploadFrequencyDays": "{count, plural, =1{1 day} other{{count} days}}",
+    "@settings_autoUploadFrequencyDays": {
+        "placeholders": {
+            "count": {}
+        }
+    },
     "autoUploadError_Disabled": "自动上传选项在应用设置中被禁用",
     "autoUploadError_Failed": "由于出现多次传输失败，上传队列已暂停，请在应用程序中检查",
     "uploadPhotoSize_title": "最大照片大小",
@@ -733,9 +758,7 @@
     "settings_cacheClearAll": "清除图片缓存",
     "settings_cacheClearMsg": "您确定要清除照片缓存吗？这将使相册和照片花费一段时间再加载。",
     "settingsHeader_appearance": "外观",
-    "settingsHeader_colorPalette": "调色板",
-    "settings_lightColor": "浅色",
-    "settings_darkColor": "深色",
+    "settingsHeader_theme": "Dark Theme",
     "settings_switchPalette": "自动",
     "settings_brightness": "亮度",
     "settings_brightnessHelp": "在环境亮度低的情况下，自动选项会使用暗色外观来使照片在黑暗背景下易于观看",
@@ -770,5 +793,8 @@
     "settings_acknowledgements": "鸣谢",
     "settings_privacy": "隐私政策",
     "settings_unknownVersion": "未知版本",
-    "settings_privacyLocale": "&lang=en_EN"
+    "settings_privacyLocale": "&lang=en_EN",
+    "@settings_privacyLocale": {
+        "description": "The language and country code for the url to Piwigo Mobile apps privacy policy: https://piwigo.org/mobile-apps-privacy-policy&webview&lang=en_EN"
+    }
 }
