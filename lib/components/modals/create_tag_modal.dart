@@ -50,7 +50,7 @@ class _CreateTagModalState extends State<CreateTagModal> {
   @override
   Widget build(BuildContext context) {
     return PiwigoModal(
-      title: appStrings.createNewAlbum_title,
+      title: appStrings.tagsAdd_title,
       subtitle: appStrings.tagsAdd_message,
       content: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -62,7 +62,7 @@ class _CreateTagModalState extends State<CreateTagModal> {
                 onChanged: (value) => setState(() {
                   _name = value;
                 }),
-                hint: appStrings.createNewAlbum_placeholder,
+                hint: appStrings.tagsAdd_placeholder,
               ),
             ),
             Padding(

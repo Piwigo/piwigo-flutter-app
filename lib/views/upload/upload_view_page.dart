@@ -354,23 +354,19 @@ class _UploadGalleryViewPage extends State<UploadViewPage>
             showModalBottomSheet(
               context: context,
               isScrollControlled: true,
-              builder: (_) => Padding(
-                padding: MediaQuery.of(context).padding,
-                child: AddTagsModal(
-                  selectedTags: _tags,
-                ),
+              useSafeArea: true,
+              builder: (_) => AddTagsModal(
+                selectedTags: _tags,
               ),
             ).whenComplete(() => setState(() {}));
           },
           actions: [
             const Icon(Icons.add_circle_outline),
           ],
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(10),
-            child: TagWrap(
-              tags: _tags,
-              onTap: _onDeselectTag,
-            ),
+          child: TagWrap(
+            tags: _tags,
+            onTap: _onDeselectTag,
+            isSelected: (tag) => true,
           ),
         ), // tags
       ],

@@ -11,6 +11,7 @@ final ThemeData lightTheme = ThemeData.light(useMaterial3: true).copyWith(
   focusColor: AppColors.accent,
   splashColor: AppColors.accent.withOpacity(0.3),
   cardColor: AppColors.cardLight,
+  shadowColor: Colors.black54,
   chipTheme: ChipThemeData(
     backgroundColor: AppColors.fieldLight,
   ),
@@ -26,9 +27,10 @@ final ThemeData lightTheme = ThemeData.light(useMaterial3: true).copyWith(
   ),
   appBarTheme: const AppBarTheme(
     backgroundColor: AppColors.backgroundLight,
+    surfaceTintColor: AppColors.backgroundLight,
+    shadowColor: Colors.black54,
     elevation: 0.0,
     scrolledUnderElevation: 5.0,
-    shadowColor: Colors.black54,
     iconTheme: IconThemeData(
       color: AppColors.accent,
     ),
@@ -100,7 +102,8 @@ final ThemeData lightTheme = ThemeData.light(useMaterial3: true).copyWith(
     selectionHandleColor: AppColors.accent,
   ),
   bottomSheetTheme: BottomSheetThemeData(
-    backgroundColor: AppColors.transparent,
+    surfaceTintColor: Colors.black.withOpacity(0),
+    backgroundColor: Colors.black.withOpacity(0),
   ),
   switchTheme: SwitchThemeData(
     thumbColor: MaterialStateProperty.all(AppColors.backgroundLight),
@@ -184,6 +187,7 @@ final ThemeData darkTheme = ThemeData.dark(useMaterial3: true).copyWith(
   focusColor: AppColors.accent,
   splashColor: AppColors.accent.withOpacity(0.3),
   cardColor: AppColors.cardDark,
+  shadowColor: Colors.black54,
   chipTheme: ChipThemeData(
     backgroundColor: AppColors.fieldDark,
   ),
@@ -199,9 +203,10 @@ final ThemeData darkTheme = ThemeData.dark(useMaterial3: true).copyWith(
   ),
   appBarTheme: const AppBarTheme(
     backgroundColor: AppColors.backgroundDark,
+    surfaceTintColor: AppColors.backgroundDark,
+    shadowColor: Colors.black54,
     elevation: 0.0,
     scrolledUnderElevation: 5.0,
-    shadowColor: Colors.black54,
     iconTheme: IconThemeData(
       color: AppColors.accent,
     ),
@@ -273,6 +278,7 @@ final ThemeData darkTheme = ThemeData.dark(useMaterial3: true).copyWith(
     selectionHandleColor: AppColors.accent,
   ),
   bottomSheetTheme: BottomSheetThemeData(
+    surfaceTintColor: Colors.black.withOpacity(0),
     backgroundColor: Colors.black.withOpacity(0),
   ),
   switchTheme: SwitchThemeData(

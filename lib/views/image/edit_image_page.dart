@@ -182,11 +182,9 @@ class _EditImagePageState extends State<EditImagePage> {
               showModalBottomSheet(
                 context: context,
                 isScrollControlled: true,
-                builder: (_) => Padding(
-                  padding: MediaQuery.of(context).padding,
-                  child: AddTagsModal(
-                    selectedTags: _tags,
-                  ),
+                useSafeArea: true,
+                builder: (_) => AddTagsModal(
+                  selectedTags: _tags,
                 ),
               ).whenComplete(() => setState(() {}));
             },
@@ -198,6 +196,7 @@ class _EditImagePageState extends State<EditImagePage> {
               child: TagWrap(
                 tags: _tags,
                 onTap: _onDeselectTag,
+                isSelected: (tag) => true,
               ),
             ),
           ), // tags

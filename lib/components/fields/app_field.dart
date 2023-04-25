@@ -19,6 +19,7 @@ class AppField extends StatelessWidget {
     this.keyboardType,
     this.minLines,
     this.maxLines = 1,
+    this.label,
   }) : super(key: key);
 
   final Widget? prefix;
@@ -28,6 +29,7 @@ class AppField extends StatelessWidget {
   final TextInputAction? textInputAction;
   final TextInputType? keyboardType;
   final String? hint;
+  final String? label;
   final int? minLines;
   final int? maxLines;
   final EdgeInsets? padding;
@@ -60,6 +62,8 @@ class AppField extends StatelessWidget {
         decoration: InputDecoration(
           contentPadding: padding ?? const EdgeInsets.all(16.0),
           hintText: hint,
+          labelText: label,
+          alignLabelWithHint: true,
           isDense: true,
           prefixIconConstraints: const BoxConstraints(
             minWidth: 32.0,

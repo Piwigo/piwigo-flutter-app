@@ -4,7 +4,6 @@ import 'package:piwigo_ng/api/tags.dart';
 import 'package:piwigo_ng/components/buttons/piwigo_button.dart';
 import 'package:piwigo_ng/components/cards/tag_chip.dart';
 import 'package:piwigo_ng/components/modals/create_tag_modal.dart';
-import 'package:piwigo_ng/components/sections/form_section.dart';
 import 'package:piwigo_ng/models/tag_model.dart';
 import 'package:piwigo_ng/utils/localizations.dart';
 import 'package:piwigo_ng/utils/resources.dart';
@@ -64,9 +63,15 @@ class _AddTagsModalState extends State<AddTagsModal> {
   }
 
   void _onSelectTag(TagModel tag) {
-    setState(() {
-      _selectedTagList.add(tag);
-    });
+    if (_selectedTagList.contains(tag)) {
+      setState(() {
+        _selectedTagList.remove(tag);
+      });
+    } else {
+      setState(() {
+        _selectedTagList.add(tag);
+      });
+    }
   }
 
   void _onDeselectTag(TagModel tag) {
@@ -78,7 +83,7 @@ class _AddTagsModalState extends State<AddTagsModal> {
   @override
   Widget build(BuildContext context) {
     return BottomSheet(
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       enableDrag: false,
       onClosing: () {},
       shape: const RoundedRectangleBorder(
@@ -152,6 +157,7 @@ class _AddTagsModalState extends State<AddTagsModal> {
         _tagList.where((tag) => !_selectedTagList.contains(tag)).toList();
     return RefreshIndicator(
       onRefresh: _onRefresh,
+      color: AppColors.accent,
       child: Theme(
         data: Theme.of(context).copyWith(
           scrollbarTheme: ScrollbarThemeData(
@@ -171,20 +177,18 @@ class _AddTagsModalState extends State<AddTagsModal> {
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             physics: const AlwaysScrollableScrollPhysics(),
             children: [
-              FormSection(
-                title: appStrings.tagsHeader_selected,
-                child: TagWrap(
-                  tags: _selectedTagList,
-                  onTap: _onDeselectTag,
-                ),
-              ),
-              FormSection(
-                title: appStrings.tagsHeader_notSelected,
-                child: TagWrap(
-                  tags: unselectedTags,
-                  removeAction: false,
-                  onTap: _onSelectTag,
-                ),
+              // FormSection(
+              //   title: appStrings.tagsHeader_selected,
+              //   child: TagWrap(
+              //     tags: _selectedTagList,
+              //     onTap: _onDeselectTag,
+              //     isSelected: (tag) => true,
+              //   ),
+              // ),
+              TagWrap(
+                tags: _tagList,
+                onTap: _onSelectTag,
+                isSelected: (tag) => _selectedTagList.contains(tag),
               ),
             ],
           ),
@@ -195,13 +199,16 @@ class _AddTagsModalState extends State<AddTagsModal> {
 }
 
 class TagWrap extends StatelessWidget {
-  const TagWrap(
-      {Key? key, this.tags = const [], this.removeAction = true, this.onTap})
-      : super(key: key);
+  const TagWrap({
+    Key? key,
+    this.tags = const [],
+    this.onTap,
+    this.isSelected,
+  }) : super(key: key);
 
   final List<TagModel> tags;
-  final bool removeAction;
   final Function(TagModel)? onTap;
+  final bool Function(TagModel)? isSelected;
 
   @override
   Widget build(BuildContext context) {
@@ -212,16 +219,8 @@ class TagWrap extends StatelessWidget {
         TagModel tag = tags[index];
         return TagChip(
           tag: tag,
+          selected: isSelected?.call(tag) ?? false,
           onTap: () => onTap?.call(tag),
-          icon: removeAction
-              ? Icon(
-                  Icons.remove_circle_outline,
-                  color: AppColors.error,
-                )
-              : Icon(
-                  Icons.add_circle_outline,
-                  color: AppColors.success,
-                ),
         );
       }),
     );
