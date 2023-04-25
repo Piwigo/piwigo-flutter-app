@@ -147,8 +147,12 @@
     "categoryUpload_loadSubCategories": "charger",
     "categoryUpload_images": "Transférer des photos",
     "categoryUpload_videos": "Transférer des Videos",
-    "categoryUpload_takePhoto": "Take Photo",
-    "categoryUpload_takeVideo": "Take Video",
+    "categoryUpload_takePhoto": "Prendre une photo",
+    "categoryUpload_takeVideo": "Prendre une Vidéo",
+    "uploadList_title": "État du transfert",
+    "uploadList_uploading": "Transfert en cours",
+    "uploadList_history": "Historique",
+    "uploadList_empty": "Vide",
     "setDefaultCategory_select": "Veuillez sélectionner un album ou un sous-album qui deviendra le nouvel album racine.",
     "setDefaultCategory_title": "Album par Défaut",
     "setDefaultCategory_message": "Etes-vous sûr de vouloir définir l'album {album} comme Album par Défaut ?",
@@ -189,16 +193,16 @@
     },
     "deleteCategory_empty": "Effacer Album Vide",
     "deleteCategory_noImages": "Conserver les photos",
-    "deleteCategory_noImages_subtitle": "may create orphan photos",
+    "deleteCategory_noImages_subtitle": "peut créer des photos orphelines",
     "deleteCategory_orphanedImages": "Effacer les images orphelines",
-    "deleteCategory_orphanedImages_subtitle": "Default mode, only deletes photos linked to no other album",
+    "deleteCategory_orphanedImages_subtitle": "Mode par défaut, ne supprime que les photos liées à aucun autre album",
     "deleteCategory_allImages": "{count, plural, =0{Effacer les photos} =1{Effacer la photo} other{Effacer {count} photos}}",
     "@deleteCategory_allImages": {
         "placeholders": {
             "count": {}
         }
     },
-    "deleteCategory_allImages_subtitle": "Delete all photos, even those linked to other albums",
+    "deleteCategory_allImages_subtitle": "Supprimer toutes les photos, même celles liées à d'autres albums",
     "deleteCategoryConfirm_title": "Etes-vous sûr ?",
     "deleteCategoryConfirm_message": "Veuillez entrer le nombre de photos afin de supprimer cet album. Nombre de photos : {count}",
     "@deleteCategoryConfirm_message": {
@@ -281,8 +285,8 @@
     "imageOptions_edit": "Editer",
     "imageOptions_download": "Télécharger",
     "imageOptions_share": "Partager",
-    "imageOptions_addFavorites": "Add favorites",
-    "imageOptions_removeFavorites": "Remove favorites",
+    "imageOptions_addFavorites": "Ajouter aux favoris",
+    "imageOptions_removeFavorites": "Retirer des favoris",
     "imageOptions_setAlbumImage": "Définir comme vignette d’album",
     "imageDetailsView_title": "Propriétés",
     "editImageDetails_title": "Titre",
@@ -382,7 +386,7 @@
         }
     },
     "removeSingleImage_title": "Supprimer de cet album",
-    "removeSingleImage_subtitle": "Some photos are assigned to other albums",
+    "removeSingleImage_subtitle": "Certaines photos sont affectées à d'autres albums",
     "removeImageHUD_removing": "{count, plural, =0{Suppression…} =1{Suppression de la photo…} other{Suppression de {count} photos…}}",
     "@removeImageHUD_removing": {
         "placeholders": {
@@ -429,8 +433,8 @@
             "count": {}
         }
     },
-    "downloadImageSuccess_title": "Files downloaded",
-    "downloadImageSuccess_message": "All files are downloaded successfully",
+    "downloadImageSuccess_title": "Fichiers téléchargés",
+    "downloadImageSuccess_message": "Tous les fichiers ont été téléchargés avec succès",
     "downloadImageFail_title": "Echec du Téléchargement",
     "downloadImageFail_message": "Impossible de télécharger la photo !",
     "downloadVideoFail_message": "Impossible de télécharger la vidéo !",
@@ -439,7 +443,7 @@
     "imageSaveError_message": "Impossible d’enregistrer la photo.",
     "videoSaveError_title": "Vidéo non Enregistrée",
     "videoSaveError_message": "Impossible d’enregistrer la vidéo.",
-    "videoLoadError_message": "Failed to load video",
+    "videoLoadError_message": "Impossible de charger la vidéo",
     "moveOrCopyImage_title": "{count, plural, =1{Voulez-vous déplacer ou copier cette image ?} other{Voulez-vous déplacer ou copier {count} images ?}}",
     "@moveOrCopyImage_title": {
         "placeholders": {
@@ -568,6 +572,7 @@
     "imageUploadCompleted_title": "Transfert Terminé",
     "imageUploadCompleted_message": "photo envoyée à votre serveur Piwigo.",
     "imageUploadCompleted_message1": "photos envoyées à votre serveur Piwigo.",
+    "imageUploadCompleted_warning": "certaines photos n'ont pas pu être transférées.",
     "uploadError_title": "Echec du Transfert",
     "uploadError_message": "Echec du Transfert de votre photo",
     "uploadCancelled_title": "Transfert Annulé",
@@ -646,7 +651,7 @@
     "defaultThumbnailSize": "Taille",
     "defaultThumbnailSize320px": "Taille des Vignettes",
     "defaultThumbnailSize414px": "Taille par Défaut des Vignettes",
-    "defaultNberOfThumbnailsShort": "Number per row",
+    "defaultNberOfThumbnailsShort": "Nombre par ligne",
     "defaultNberOfThumbnails": "Nombre de miniatures par lignes",
     "defaultThumbnailSizeTitle": "Taille par défaut",
     "defaultThumbnailSizeHeader": "Veuillez sélectionner une taille de vignette de photo",
@@ -715,6 +720,26 @@
     "settings_autoUploadDestination": "Destination",
     "settings_autoUploadDestinationInvalid": "Album de destination invalide",
     "settings_autoUploadDestinationInfo": "Veuillez sélectionner l'album ou le sous-album dans lequel les photos et les vidéos seront automatiquement téléchargées.",
+    "settings_autoUploadDuplicateInfo": "Les photos qui sont déjà dans ce Piwigo ne seront pas transférées.",
+    "settings_autoUploadFrequency": "Toutes les",
+    "settings_autoUploadFrequencyMinutes": "{count, plural, =1{1 minute} other{{count} minutes}}",
+    "@settings_autoUploadFrequencyMinutes": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "settings_autoUploadFrequencyHours": "{count, plural, =1{1 heure} other{{count} heures}}",
+    "@settings_autoUploadFrequencyHours": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "settings_autoUploadFrequencyDays": "{count, plural, =1{1 jour} other{{count} jours}}",
+    "@settings_autoUploadFrequencyDays": {
+        "placeholders": {
+            "count": {}
+        }
+    },
     "autoUploadError_Disabled": "Le transfert automatique est désactivé dans les paramètres de l'application.",
     "autoUploadError_Failed": "Plusieurs transferts ont échoué et la file d'attente est en pause. Veuillez vérifier dans l'application s'il vous plaît.",
     "uploadPhotoSize_title": "Taille maximale des photos",
@@ -727,15 +752,13 @@
     "settingsHeader_cache": "Paramètres de Cache (Utilisé/Total)",
     "settings_cacheDisk": "Disque",
     "settings_cacheMemory": "Mémoire",
-    "settings_cacheSize": "Cache size",
+    "settings_cacheSize": "Taille du cache",
     "settings_cacheMegabytes": "Mo",
     "settings_cacheClear": "Vider le cache",
     "settings_cacheClearAll": "Vider le cache des photos",
     "settings_cacheClearMsg": "Êtes-vous sûr de vouloir effacer le cache des photos? Les photos et les albums mettront un certain temps à se recharger.",
     "settingsHeader_appearance": "Apparence",
-    "settingsHeader_colorPalette": "Palette de couleurs",
-    "settings_lightColor": "Clair",
-    "settings_darkColor": "Sombre",
+    "settingsHeader_theme": "Thème Sombre",
     "settings_switchPalette": "Automatique",
     "settings_brightness": "Luminosité",
     "settings_brightnessHelp": "En cas de faible luminosité ambiante, l'option Automatique utilise une palette de couleurs plus foncées pour faire ressortir les photos sur des arrière-plans plus sombres.",
@@ -769,6 +792,9 @@
     "settings_translateWithCrowdin": "Traduire Piwigo NG",
     "settings_acknowledgements": "Remerciements",
     "settings_privacy": "Politique de Confidentialité",
-    "settings_unknownVersion": "Unknown version",
-    "settings_privacyLocale": "&lang=fr_FR"
+    "settings_unknownVersion": "Version inconnue",
+    "settings_privacyLocale": "&lang=fr_FR",
+    "@settings_privacyLocale": {
+        "description": "The language and country code for the url to Piwigo Mobile apps privacy policy: https://piwigo.org/mobile-apps-privacy-policy&webview&lang=en_EN"
+    }
 }
