@@ -64,9 +64,7 @@ class _AddTagsModalState extends State<AddTagsModal> {
 
   void _onSelectTag(TagModel tag) {
     if (_selectedTagList.contains(tag)) {
-      setState(() {
-        _selectedTagList.remove(tag);
-      });
+      _onDeselectTag(tag);
     } else {
       setState(() {
         _selectedTagList.add(tag);
@@ -82,72 +80,62 @@ class _AddTagsModalState extends State<AddTagsModal> {
 
   @override
   Widget build(BuildContext context) {
-    return BottomSheet(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      enableDrag: false,
-      onClosing: () {},
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(15.0),
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      appBar: AppBar(
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(15.0),
+          ),
         ),
+        elevation: 0.0,
+        scrolledUnderElevation: 5.0,
+        leading: IconButton(
+          icon: Icon(Icons.close),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+        title: Text(appStrings.tags),
+        actions: [
+          IconButton(
+            tooltip: appStrings.tagsAdd_placeholder,
+            onPressed: _onAddTag,
+            icon: Icon(Icons.new_label),
+          ),
+        ],
       ),
-      builder: (context) => Scaffold(
-        backgroundColor: Colors.transparent,
-        appBar: AppBar(
-          shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(
-              top: Radius.circular(15.0),
-            ),
-          ),
-          elevation: 0.0,
-          scrolledUnderElevation: 5.0,
-          leading: IconButton(
-            icon: Icon(Icons.close),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-          title: Text(appStrings.tags),
-          actions: [
-            IconButton(
-              tooltip: appStrings.tagsAdd_placeholder,
-              onPressed: _onAddTag,
-              icon: Icon(Icons.add),
-            ),
-          ],
-        ),
-        body: Column(
-          children: [
-            Expanded(
-              child: FutureBuilder<ApiResult<List<TagModel>>>(
-                  future: _tagsFuture,
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData) {
-                      if (!snapshot.data!.hasData) {
-                        return Center(
-                          child: Text(appStrings.errorHUD_label),
-                        );
-                      }
-                      if (_tagList.isEmpty) {
-                        _tagList = snapshot.data!.data ?? [];
-                      }
-                      return _tagLists;
-                    } else {
+      body: Column(
+        children: [
+          Expanded(
+            child: FutureBuilder<ApiResult<List<TagModel>>>(
+                future: _tagsFuture,
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    if (!snapshot.data!.hasData) {
                       return Center(
-                        child: CircularProgressIndicator(),
+                        child: Text(appStrings.errorHUD_label),
                       );
                     }
-                  }),
+                    if (_tagList.isEmpty) {
+                      _tagList = snapshot.data!.data ?? [];
+                    }
+                    return _tagLists;
+                  } else {
+                    return Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  }
+                }),
+          ),
+          Padding(
+            padding:
+                const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
+            child: PiwigoButton(
+              color: Theme.of(context).primaryColor,
+              onPressed: () => Navigator.of(context).pop(_selectedTagList),
+              text: appStrings.alertConfirmButton,
             ),
-            Padding(
-              padding:
-                  const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-              child: PiwigoButton(
-                color: Theme.of(context).primaryColor,
-                onPressed: () => Navigator.of(context).pop(),
-                text: appStrings.alertConfirmButton,
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -196,6 +184,28 @@ class _AddTagsModalState extends State<AddTagsModal> {
       ),
     );
   }
+}
+
+Future<List<TagModel>?> showAddTagsModal(
+    BuildContext context, List<TagModel> tags) {
+  return showModalBottomSheet<List<TagModel>?>(
+    context: context,
+    isScrollControlled: true,
+    useSafeArea: true,
+    //enableDrag: false,
+    backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+    constraints: BoxConstraints(
+      maxWidth: 600,
+    ),
+    // shape: const RoundedRectangleBorder(
+    //   borderRadius: BorderRadius.vertical(
+    //     top: Radius.circular(15.0),
+    //   ),
+    // ),
+    builder: (_) => AddTagsModal(
+      selectedTags: tags,
+    ),
+  );
 }
 
 class TagWrap extends StatelessWidget {

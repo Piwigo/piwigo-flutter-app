@@ -257,6 +257,7 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
   }
 
   Widget get _appBar {
+    Orientation orientation = MediaQuery.of(context).orientation;
     return SliverAppBar(
       backgroundColor: Theme.of(context).colorScheme.background,
       pinned: true,
@@ -269,24 +270,18 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
         style: Theme.of(context).appBarTheme.titleTextStyle,
       ),
       actions: [
-        AnimatedScale(
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.ease,
-          scale: _selectedList.isEmpty ? 0 : 1,
-          child: AnimatedOpacity(
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.ease,
-            opacity: _selectedList.isEmpty ? 0 : 1,
-            child: IconButton(
-              onPressed: () => setState(() {
-                _selectedList.clear();
-              }),
-              icon: Icon(Icons.cancel),
-            ),
+        if (_selectedList.isNotEmpty)
+          IconButton(
+            onPressed: () => setState(() {
+              _selectedList.clear();
+            }),
+            tooltip: appStrings.categoryImageList_deselectButton,
+            icon: Icon(Icons.cancel),
           ),
-        ),
+        if (orientation == Orientation.landscape) ..._actions,
         if (widget.isAdmin)
           PopupMenuButton(
+            tooltip: appStrings.imageOptions_title,
             position: PopupMenuPosition.under,
             itemBuilder: (context) => [
               if (_selectedList.isNotEmpty)
@@ -358,99 +353,6 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
     );
   }
 
-  Widget? get _adminActionsSpeedDial {
-    final Color childBackgroundColor = Theme.of(context).primaryColorLight;
-    final Color childIconColor = Theme.of(context).primaryColor;
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        Consumer<UploadNotifier>(
-          builder: (context, uploadNotifier, child) {
-            bool uploading = uploadNotifier.uploadList.isNotEmpty;
-            return FloatingActionButton(
-              shape: uploading ? CircleBorder() : null,
-              backgroundColor: Colors.grey.withOpacity(0.8),
-              onPressed: () {
-                if (uploading) {
-                  Navigator.of(context).pushNamed(UploadStatusPage.routeName);
-                } else {
-                  Navigator.of(context).popUntil((route) => route.isFirst);
-                }
-              },
-              child: Builder(builder: (context) {
-                if (uploading) {
-                  UploadItem item = uploadNotifier.uploadList.first;
-                  return Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      SizedBox.expand(
-                        child: StreamBuilder<double>(
-                          stream: item.progress.stream,
-                          initialData: 0.0,
-                          builder: (context, snapshot) {
-                            if (snapshot.hasData) {
-                              return CircularProgressIndicator(
-                                strokeWidth: 5.0,
-                                value: min(snapshot.data!, 1.0),
-                              );
-                            }
-                            return CircularProgressIndicator(strokeWidth: 5.0);
-                          },
-                        ),
-                      ),
-                      FittedBox(
-                        fit: BoxFit.scaleDown,
-                        child: Text(
-                          "${uploadNotifier.uploadList.length}",
-                          style: TextStyle(fontSize: 20),
-                        ),
-                      ),
-                    ],
-                  );
-                }
-                return child!;
-              }),
-            );
-          },
-          child: Icon(Icons.home, color: Colors.white),
-        ),
-        if (widget.isAdmin || widget.album.canUpload) ...[
-          SizedBox(width: 16.0),
-          SpeedDial(
-            heroTag: '<default FloatingActionButton tag>',
-            spacing: 5,
-            overlayOpacity: 0.3,
-            overlayColor: Colors.black,
-            animatedIcon: AnimatedIcons.menu_close,
-            children: [
-              SpeedDialChild(
-                shape: CircleBorder(),
-                backgroundColor: childBackgroundColor,
-                foregroundColor: childIconColor,
-                onTap: _onAddAlbum,
-                child: Icon(Icons.create_new_folder),
-              ),
-              SpeedDialChild(
-                shape: CircleBorder(),
-                backgroundColor: childBackgroundColor,
-                foregroundColor: childIconColor,
-                onTap: _onPickImages,
-                child: Icon(Icons.add_photo_alternate),
-              ),
-              SpeedDialChild(
-                shape: CircleBorder(),
-                backgroundColor: childBackgroundColor,
-                foregroundColor: childIconColor,
-                onTap: _onTakePhoto,
-                child: Icon(Icons.add_a_photo),
-              ),
-            ],
-          ),
-        ],
-      ],
-    );
-  }
-
   Widget _albumGrid(AsyncSnapshot snapshot) {
     // initialize album list
     if (_albumList == null) {
@@ -508,65 +410,168 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
     );
   }
 
-  Widget get _bottomBar {
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
-      height: _selectedList.isEmpty ? 0 : 56.0,
-      child: BottomAppBar(
-        height: 56.0,
-        child: Row(
-          children: widget.isAdmin
-              ? [
-                  Expanded(
-                    child: IconButton(
-                      onPressed: _onEditPhotos,
-                      icon: Icon(Icons.edit),
-                    ),
-                  ),
-                  Expanded(
-                    child: IconButton(
-                      onPressed: _onMovePhotos,
-                      icon: Icon(Icons.drive_file_move),
-                    ),
-                  ),
-                  Expanded(
-                    child: IconButton(
-                      onPressed: _onDeletePhotos,
-                      icon: Icon(Icons.delete),
-                    ),
-                  ),
-                ]
-              : [
-                  Expanded(
-                    child: IconButton(
-                      onPressed: () => share(_selectedList),
-                      icon: Icon(Icons.share),
-                    ),
-                  ),
-                  if (Preferences.getUserStatus != 'guest') // Todo: enum roles
-                    Expanded(
-                      child: IconButton(
-                        onPressed: _onLikePhotos,
-                        icon: Builder(
-                          builder: (context) {
-                            if (_hasNonFavorites) {
-                              return Icon(Icons.favorite_border);
+  Widget? get _adminActionsSpeedDial {
+    final Color childBackgroundColor = Theme.of(context).cardColor;
+    final Color childIconColor = Theme.of(context).primaryColor;
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        Consumer<UploadNotifier>(
+          builder: (context, uploadNotifier, child) {
+            bool uploading = uploadNotifier.uploadList.isNotEmpty;
+            return FloatingActionButton(
+              tooltip: uploading
+                  ? appStrings.uploadList_title
+                  : appStrings.categorySelection_root,
+              shape: uploading ? CircleBorder() : null,
+              backgroundColor: Theme.of(context).disabledColor.withOpacity(0.7),
+              onPressed: () {
+                if (uploading) {
+                  Navigator.of(context).pushNamed(UploadStatusPage.routeName);
+                } else {
+                  Navigator.of(context).popUntil((route) => route.isFirst);
+                }
+              },
+              child: Builder(builder: (context) {
+                if (uploading) {
+                  UploadItem item = uploadNotifier.uploadList.first;
+                  return Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      SizedBox.expand(
+                        child: StreamBuilder<double>(
+                          stream: item.progress.stream,
+                          initialData: 0.0,
+                          builder: (context, snapshot) {
+                            if (snapshot.hasData) {
+                              return CircularProgressIndicator(
+                                strokeWidth: 5.0,
+                                value: min(snapshot.data!, 1.0),
+                              );
                             }
-                            return Icon(Icons.favorite);
+                            return CircularProgressIndicator(strokeWidth: 5.0);
                           },
                         ),
                       ),
-                    ),
-                  Expanded(
-                    child: IconButton(
-                      onPressed: () => downloadImages(_selectedList),
-                      icon: Icon(Icons.download),
-                    ),
-                  ),
-                ],
+                      FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          "${uploadNotifier.uploadList.length}",
+                          style: TextStyle(fontSize: 20),
+                        ),
+                      ),
+                    ],
+                  );
+                }
+                return child!;
+              }),
+            );
+          },
+          child: Icon(Icons.home, color: Colors.white),
         ),
-      ),
+        if (widget.isAdmin || widget.album.canUpload) ...[
+          SizedBox(width: 16.0),
+          SpeedDial(
+            heroTag: '<default FloatingActionButton tag>',
+            spacing: 5,
+            overlayOpacity: 0.3,
+            overlayColor: Colors.black,
+            animatedIcon: AnimatedIcons.menu_close,
+            children: [
+              SpeedDialChild(
+                shape: CircleBorder(),
+                backgroundColor: childBackgroundColor,
+                foregroundColor: childIconColor,
+                labelBackgroundColor: childBackgroundColor,
+                label: appStrings.createNewAlbum_title,
+                onTap: _onAddAlbum,
+                child: Icon(Icons.create_new_folder),
+              ),
+              SpeedDialChild(
+                shape: CircleBorder(),
+                backgroundColor: childBackgroundColor,
+                foregroundColor: childIconColor,
+                labelBackgroundColor: childBackgroundColor,
+                label: appStrings.categoryUpload_images,
+                onTap: _onPickImages,
+                child: Icon(Icons.add_photo_alternate),
+              ),
+              SpeedDialChild(
+                shape: CircleBorder(),
+                backgroundColor: childBackgroundColor,
+                foregroundColor: childIconColor,
+                labelBackgroundColor: childBackgroundColor,
+                label: appStrings.categoryUpload_takePhoto,
+                onTap: _onTakePhoto,
+                child: Icon(Icons.add_a_photo),
+              ),
+            ],
+          ),
+        ],
+      ],
     );
+  }
+
+  Widget get _bottomBar {
+    return OrientationBuilder(builder: (context, orientation) {
+      return AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+        height: _selectedList.isEmpty || orientation == Orientation.landscape
+            ? 0
+            : 56.0,
+        child: BottomAppBar(
+          height: 56.0,
+          child: Row(
+            children:
+                _actions.map((action) => Expanded(child: action)).toList(),
+          ),
+        ),
+      );
+    });
+  }
+
+  List<Widget> get _actions {
+    List<Widget> adminActions = [
+      IconButton(
+        onPressed: _onEditPhotos,
+        tooltip: appStrings.imageOptions_edit,
+        icon: Icon(Icons.edit),
+      ),
+      IconButton(
+        onPressed: _onMovePhotos,
+        tooltip: appStrings.moveImage_title,
+        icon: Icon(Icons.drive_file_move),
+      ),
+      IconButton(
+        onPressed: _onDeletePhotos,
+        tooltip: appStrings.deleteImage_delete,
+        icon: Icon(Icons.delete),
+      ),
+    ];
+    List<Widget> userActions = [
+      IconButton(
+        onPressed: () => share(_selectedList),
+        tooltip: appStrings.imageOptions_share,
+        icon: Icon(Icons.share),
+      ),
+      if (Preferences.getUserStatus != 'guest') // Todo: enum roles
+        IconButton(
+          onPressed: _onLikePhotos,
+          tooltip: _hasNonFavorites
+              ? appStrings.imageOptions_addFavorites
+              : appStrings.imageOptions_removeFavorites,
+          isSelected: !_hasNonFavorites,
+          selectedIcon: Icon(Icons.favorite),
+          icon: Icon(Icons.favorite_border),
+        ),
+      IconButton(
+        onPressed: () => downloadImages(_selectedList),
+        tooltip: appStrings.imageOptions_download,
+        icon: Icon(Icons.download),
+      ),
+    ];
+
+    return widget.isAdmin ? adminActions : userActions;
   }
 }

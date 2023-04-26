@@ -38,7 +38,7 @@ class _EditImagePageState extends State<EditImagePage> {
       RoundedLoadingButtonController();
 
   final List<DropdownMenuItem<int?>> _levelItems = [];
-  final List<TagModel> _tags = [];
+  List<TagModel> _tags = [];
   int? _privacyLevel;
   List<ImageModel> _imageList = [];
 
@@ -179,17 +179,29 @@ class _EditImagePageState extends State<EditImagePage> {
             margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
             title: appStrings.tagsAdd_title,
             onTapTitle: () {
-              showModalBottomSheet(
-                context: context,
-                isScrollControlled: true,
-                useSafeArea: true,
-                builder: (_) => AddTagsModal(
-                  selectedTags: _tags,
-                ),
-              ).whenComplete(() => setState(() {}));
+              showAddTagsModal(
+                context,
+                _tags,
+              ).then((value) {
+                if (value is! List<TagModel>) return;
+                setState(() {
+                  _tags = value;
+                });
+              });
+              // showModalBottomSheet(
+              //   context: context,
+              //   isScrollControlled: true,
+              //   useSafeArea: true,
+              //   constraints: BoxConstraints(
+              //     maxWidth: 600,
+              //   ),
+              //   builder: (_) => AddTagsModal(
+              //     selectedTags: _tags,
+              //   ),
+              // ).whenComplete(() => setState(() {}));
             },
             actions: [
-              const Icon(Icons.add_circle_outline),
+              const Icon(Icons.add_circle),
             ],
             child: ClipRRect(
               borderRadius: BorderRadius.circular(10),

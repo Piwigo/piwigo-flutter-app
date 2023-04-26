@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 class PiwigoModal extends StatelessWidget {
   const PiwigoModal({
@@ -14,47 +15,54 @@ class PiwigoModal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BottomSheet(
-      backgroundColor: Theme.of(context).colorScheme.background,
-      enableDrag: false,
-      onClosing: () {},
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
-      ),
-      builder: (context) => Padding(
-        padding: MediaQuery.of(context).viewInsets,
-        child: ListView(
-          shrinkWrap: true,
-          children: [
-            AppBar(
-              shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.vertical(
-                  top: Radius.circular(15.0),
-                ),
-              ),
-              elevation: 0.0,
-              scrolledUnderElevation: 5.0,
-              centerTitle: true,
-              leading: IconButton(
-                icon: Icon(Icons.close),
-                onPressed: () => Navigator.of(context).pop(),
-              ),
-              title: Text(title ?? ''),
+    return ListView(
+      padding: EdgeInsets.zero,
+      controller: ModalScrollController.of(context),
+      shrinkWrap: true,
+      children: [
+        SizedBox(
+          height: 56.0,
+          child: Center(
+            child: Text(
+              title ?? '',
+              textAlign: TextAlign.center,
+              style: Theme.of(context).appBarTheme.titleTextStyle,
             ),
-            if (subtitle != null)
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: Text(
-                  subtitle!,
-                  softWrap: true,
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
-              ),
-            if (content != null) content!,
-          ],
+          ),
         ),
-      ),
+        if (subtitle != null)
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Text(
+              subtitle!,
+              softWrap: true,
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+          ),
+        if (content != null) content!,
+      ],
     );
   }
+}
+
+Future<T?> showPiwigoModal<T>({
+  required BuildContext context,
+  required Widget Function(BuildContext) builder,
+}) {
+  return showMaterialModalBottomSheet<T>(
+    context: context,
+    // isScrollControlled: true,
+    // useSafeArea: true,
+    backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+    // constraints: BoxConstraints(
+    //   maxWidth: Settings.modalMaxWidth,
+    // ),
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(
+        top: Radius.circular(15.0),
+      ),
+    ),
+    builder: builder,
+  );
 }

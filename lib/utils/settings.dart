@@ -83,7 +83,8 @@ extension SortMethodsExtension on SortMethods {
 }
 
 class Settings {
-  static const String privacyPolicyUrl = 'https://piwigo.org/mobile-apps-privacy-policy&webview';
+  static const String privacyPolicyUrl =
+      'https://piwigo.org/mobile-apps-privacy-policy&webview';
   static const String twitterUrl = 'https://twitter.com/piwigo';
   static const String forumUrl = 'https://piwigo.org/forum';
   static const String playStorePrefixUrl = 'market://details?id=';
@@ -104,6 +105,7 @@ class Settings {
   static const int defaultElementPerPage = 100; // API requests
   static const double defaultAlbumGridSize = 448.0;
   static const double defaultUploadQuality = 1.0;
+  static const double modalMaxWidth = 600.0;
   static const int uploadNotificationId = 1;
   static const int autoUploadNotificationId = 2;
   static const List<Duration> autoUploadFrequencies = [
@@ -121,7 +123,8 @@ class Settings {
   static int getImageCrossAxisCount(BuildContext context, [int? nbImageRow]) {
     final Size size = MediaQuery.of(context).size;
     final Orientation orientation = MediaQuery.of(context).orientation;
-    final int portraitImageRowCount = nbImageRow ?? Preferences.getImageRowCount;
+    final int portraitImageRowCount =
+        nbImageRow ?? Preferences.getImageRowCount;
     if (orientation == Orientation.portrait) return portraitImageRowCount;
     return (portraitImageRowCount * size.width / size.height).round();
     // final double crossAxisExtent = ((orientation == Orientation.portrait ? size.width : size.height)) / nbPortraitImageRow;

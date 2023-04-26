@@ -27,7 +27,7 @@ dependencies:
   flutter_slidable: ^2.0.0 # Album card's sliding cations
   drag_select_grid_view: ^0.6.1 # Drag to select image grid
   rounded_loading_button: ^2.1.0 # Loading button animation
-  modal_bottom_sheet: ^2.1.0 # Custom modals (might be useless)
+  modal_bottom_sheet: ^3.0.0-pre # Custom modals (might be useless)
   cached_network_image: ^3.2.2 # Better cache for images (used for album's thumbnail)
   flutter_speed_dial: ^6.1.0+1 # Speed dial
   pull_to_refresh: ^2.0.0 # Top and bottom refresh gestures

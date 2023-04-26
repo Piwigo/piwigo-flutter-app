@@ -38,7 +38,8 @@ class _MoveOrCopyModalState extends State<MoveOrCopyModal> {
     _disabledAlbums = [
       if (widget.album != null) widget.album!.id,
       if (parentAlbums.length == 1 || widget.isImage) 0,
-      if (!widget.isImage && parentAlbums.length > 1) int.parse(parentAlbums[parentAlbums.length - 2]),
+      if (!widget.isImage && parentAlbums.length > 1)
+        int.parse(parentAlbums[parentAlbums.length - 2]),
     ];
 
     super.initState();
@@ -51,57 +52,47 @@ class _MoveOrCopyModalState extends State<MoveOrCopyModal> {
 
   @override
   Widget build(BuildContext context) {
-    return BottomSheet(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      enableDrag: false,
-      onClosing: () {},
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(15.0),
-        ),
-      ),
-      builder: (context) => Scaffold(
-        backgroundColor: Colors.transparent,
-        appBar: _appBar,
-        body: Theme(
-          data: Theme.of(context).copyWith(
-            scrollbarTheme: ScrollbarThemeData(
-              crossAxisMargin: 8.0,
-              mainAxisMargin: 8.0,
-              radius: Radius.circular(10.0),
-              thumbColor: MaterialStateColor.resolveWith(
-                (states) => Theme.of(context).disabledColor,
-              ),
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      appBar: _appBar,
+      body: Theme(
+        data: Theme.of(context).copyWith(
+          scrollbarTheme: ScrollbarThemeData(
+            crossAxisMargin: 8.0,
+            mainAxisMargin: 8.0,
+            radius: Radius.circular(10.0),
+            thumbColor: MaterialStateColor.resolveWith(
+              (states) => Theme.of(context).disabledColor,
             ),
           ),
-          child: Scrollbar(
+        ),
+        child: Scrollbar(
+          controller: _scrollController,
+          thumbVisibility: true,
+          child: ListView(
             controller: _scrollController,
-            thumbVisibility: true,
-            child: ListView(
-              controller: _scrollController,
-              padding: const EdgeInsets.symmetric(
-                horizontal: 16.0,
-              ),
-              children: [
-                if (widget.subtitle != null)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 8.0,
-                    ),
-                    child: Text(
-                      widget.subtitle!,
-                      textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.bodyMedium,
-                    ),
-                  ),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 16.0,
+            ),
+            children: [
+              if (widget.subtitle != null)
                 Padding(
                   padding: const EdgeInsets.symmetric(
                     vertical: 8.0,
                   ),
-                  child: _albumTreeList,
+                  child: Text(
+                    widget.subtitle!,
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
                 ),
-              ],
-            ),
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 8.0,
+                ),
+                child: _albumTreeList,
+              ),
+            ],
           ),
         ),
       ),
@@ -235,7 +226,9 @@ class _ExpansionAlbumTileState extends State<ExpansionAlbumTile> {
                     child: Text(
                       "${List.generate(widget.index, (index) => ' ').join()}${widget.album.name}",
                       overflow: TextOverflow.ellipsis,
-                      style: _disabled ? Theme.of(context).textTheme.bodySmall : Theme.of(context).textTheme.bodyMedium,
+                      style: _disabled
+                          ? Theme.of(context).textTheme.bodySmall
+                          : Theme.of(context).textTheme.bodyMedium,
                     ),
                   ),
                 ),
@@ -255,7 +248,9 @@ class _ExpansionAlbumTileState extends State<ExpansionAlbumTile> {
                           child: Text(
                             appStrings.albumCount(widget.album.nbCategories),
                             style: TextStyle(
-                              color: Theme.of(context).primaryColor.withOpacity(0.7),
+                              color: Theme.of(context)
+                                  .primaryColor
+                                  .withOpacity(0.7),
                               fontSize: 14,
                             ),
                           ),

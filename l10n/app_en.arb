@@ -191,6 +191,7 @@
     "categoryUpload_loadSubCategories": "load",
     "categoryUpload_images": "Upload Photos",
     "categoryUpload_videos": "Upload Videos",
+    "categoryUpload_camera": "Camera",
     "categoryUpload_takePhoto": "Take Photo",
     "categoryUpload_takeVideo": "Take Video",
 

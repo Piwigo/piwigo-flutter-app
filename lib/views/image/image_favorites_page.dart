@@ -23,7 +23,8 @@ class ImageFavoritesPage extends StatefulWidget {
 }
 
 class _ImageFavoritesPageState extends State<ImageFavoritesPage> {
-  final RefreshController _refreshController = RefreshController(initialRefresh: false);
+  final RefreshController _refreshController =
+      RefreshController(initialRefresh: false);
   final ScrollController _scrollController = ScrollController();
 
   late final Future<ApiResult<Map>> _imageFuture;
@@ -46,7 +47,8 @@ class _ImageFavoritesPageState extends State<ImageFavoritesPage> {
     super.dispose();
   }
 
-  bool get _hasNonFavorites => _selectedList.where((image) => !image.favorite).isNotEmpty;
+  bool get _hasNonFavorites =>
+      _selectedList.where((image) => !image.favorite).isNotEmpty;
 
   Future<bool> _onWillPop() async {
     if (_selectedList.isNotEmpty) {
@@ -114,7 +116,8 @@ class _ImageFavoritesPageState extends State<ImageFavoritesPage> {
           _onRefresh();
         }
       });
-  void _onLikePhotos() => onLikePhotos(_selectedList, false).whenComplete(() => _onRefresh());
+  void _onLikePhotos() =>
+      onLikePhotos(_selectedList, false).whenComplete(() => _onRefresh());
   _onDeletePhotos() => onDeletePhotos(context, _selectedList).then((success) {
         if (success) _onRefresh();
       });
@@ -140,7 +143,7 @@ class _ImageFavoritesPageState extends State<ImageFavoritesPage> {
               slivers: [
                 _appBar,
                 SliverToBoxAdapter(
-                  child: _searchGrid,
+                  child: _favoriteGrid,
                 ),
               ],
             ),
@@ -157,41 +160,28 @@ class _ImageFavoritesPageState extends State<ImageFavoritesPage> {
   }
 
   Widget get _appBar {
+    Orientation orientation = MediaQuery.of(context).orientation;
     return SliverAppBar(
       pinned: true,
-      centerTitle: true,
+      centerTitle: false,
       titleSpacing: 0.0,
       leading: BackButton(
         onPressed: () => Navigator.of(context).pop(),
       ),
       title: Text(appStrings.categoryDiscoverFavorites_title),
       actions: [
-        AnimatedSize(
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.ease,
-          child: SizedBox(
-            width: _selectedList.isEmpty ? (widget.isAdmin ? 0.0 : 16.0) : null,
-            child: AnimatedScale(
-              duration: const Duration(milliseconds: 300),
-              curve: Curves.ease,
-              scale: _selectedList.isEmpty ? 0 : 1,
-              child: AnimatedOpacity(
-                duration: const Duration(milliseconds: 300),
-                curve: Curves.ease,
-                opacity: _selectedList.isEmpty ? 0 : 1,
-                child: IconButton(
-                  onPressed: () => setState(() {
-                    _selectedList.clear();
-                  }),
-                  icon: Icon(Icons.cancel),
-                ),
-              ),
-            ),
+        if (_selectedList.isNotEmpty)
+          IconButton(
+            onPressed: () => setState(() {
+              _selectedList.clear();
+            }),
+            tooltip: appStrings.categoryImageList_deselectButton,
+            icon: Icon(Icons.cancel),
           ),
-        ),
+        if (orientation == Orientation.landscape) ..._actions,
         if (widget.isAdmin)
           PopupMenuButton(
-            padding: EdgeInsets.zero,
+            tooltip: appStrings.imageOptions_title,
             enabled: _selectedList.isNotEmpty,
             position: PopupMenuPosition.under,
             itemBuilder: (context) => [
@@ -233,7 +223,7 @@ class _ImageFavoritesPageState extends State<ImageFavoritesPage> {
     );
   }
 
-  Widget get _searchGrid {
+  Widget get _favoriteGrid {
     return FutureBuilder<ApiResult<Map>>(
       future: _imageFuture,
       builder: (context, snapshot) {
@@ -253,61 +243,6 @@ class _ImageFavoritesPageState extends State<ImageFavoritesPage> {
     );
   }
 
-  Widget get _bottomBar {
-    return BottomAppBar(
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
-        height: _selectedList.isEmpty ? 0 : 56.0,
-        child: Row(
-          children: widget.isAdmin
-              ? [
-                  Expanded(
-                    child: IconButton(
-                      onPressed: _onEditPhotos,
-                      icon: Icon(Icons.edit),
-                    ),
-                  ),
-                  Expanded(
-                    child: IconButton(
-                      onPressed: _onDeletePhotos,
-                      icon: Icon(Icons.delete),
-                    ),
-                  ),
-                ]
-              : [
-                  Expanded(
-                    child: IconButton(
-                      onPressed: () => share(_selectedList),
-                      icon: Icon(Icons.share),
-                    ),
-                  ),
-                  if (Preferences.getUserStatus != 'guest') // Todo: enum roles
-                    Expanded(
-                      child: IconButton(
-                        onPressed: _onLikePhotos,
-                        icon: Builder(
-                          builder: (context) {
-                            if (_hasNonFavorites) {
-                              return Icon(Icons.favorite_border);
-                            }
-                            return Icon(Icons.favorite);
-                          },
-                        ),
-                      ),
-                    ),
-                  Expanded(
-                    child: IconButton(
-                      onPressed: () => downloadImages(_selectedList),
-                      icon: Icon(Icons.download),
-                    ),
-                  ),
-                ],
-        ),
-      ),
-    );
-  }
-
   Widget _buildImageGrid(AsyncSnapshot snapshot) {
     final ApiResult<Map> result = snapshot.data!;
     if (_imageList == null) {
@@ -315,7 +250,8 @@ class _ImageFavoritesPageState extends State<ImageFavoritesPage> {
       _imageList = result.data!['images'].cast<ImageModel>() ?? [];
     }
 
-    _selectedList = _imageList!.where((image) => _selectedList.contains(image)).toList();
+    _selectedList =
+        _imageList!.where((image) => _selectedList.contains(image)).toList();
 
     if (_imageList!.isEmpty) {
       return Center(
@@ -336,5 +272,63 @@ class _ImageFavoritesPageState extends State<ImageFavoritesPage> {
       }),
       onTapImage: _onTapPhoto,
     );
+  }
+
+  Widget get _bottomBar {
+    return OrientationBuilder(builder: (context, orientation) {
+      return AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+        height: _selectedList.isEmpty || orientation == Orientation.landscape
+            ? 0
+            : 56.0,
+        child: BottomAppBar(
+          height: 56.0,
+          child: Row(
+            children:
+                _actions.map((action) => Expanded(child: action)).toList(),
+          ),
+        ),
+      );
+    });
+  }
+
+  List<Widget> get _actions {
+    List<Widget> adminActions = [
+      IconButton(
+        onPressed: _onEditPhotos,
+        tooltip: appStrings.imageOptions_edit,
+        icon: Icon(Icons.edit),
+      ),
+      IconButton(
+        onPressed: _onDeletePhotos,
+        tooltip: appStrings.deleteImage_delete,
+        icon: Icon(Icons.delete),
+      ),
+    ];
+    List<Widget> userActions = [
+      IconButton(
+        onPressed: () => share(_selectedList),
+        tooltip: appStrings.imageOptions_share,
+        icon: Icon(Icons.share),
+      ),
+      if (Preferences.getUserStatus != 'guest') // Todo: enum roles
+        IconButton(
+          onPressed: _onLikePhotos,
+          tooltip: _hasNonFavorites
+              ? appStrings.imageOptions_addFavorites
+              : appStrings.imageOptions_removeFavorites,
+          isSelected: !_hasNonFavorites,
+          selectedIcon: Icon(Icons.favorite),
+          icon: Icon(Icons.favorite_border),
+        ),
+      IconButton(
+        onPressed: () => downloadImages(_selectedList),
+        tooltip: appStrings.imageOptions_download,
+        icon: Icon(Icons.download),
+      ),
+    ];
+
+    return widget.isAdmin ? adminActions : userActions;
   }
 }

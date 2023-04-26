@@ -361,7 +361,7 @@ class _UploadGalleryViewPage extends State<UploadViewPage>
             ).whenComplete(() => setState(() {}));
           },
           actions: [
-            const Icon(Icons.add_circle_outline),
+            const Icon(Icons.add_circle),
           ],
           child: TagWrap(
             tags: _tags,

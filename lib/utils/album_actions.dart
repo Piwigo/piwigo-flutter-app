@@ -6,6 +6,7 @@ import 'package:piwigo_ng/components/modals/create_album_modal.dart';
 import 'package:piwigo_ng/components/modals/delete_album_mode_modal.dart';
 import 'package:piwigo_ng/components/modals/edit_album_modal.dart';
 import 'package:piwigo_ng/components/modals/move_or_copy_modal.dart';
+import 'package:piwigo_ng/components/modals/piwigo_modal.dart';
 import 'package:piwigo_ng/components/snackbars.dart';
 import 'package:piwigo_ng/models/album_model.dart';
 import 'package:piwigo_ng/utils/localizations.dart';
@@ -28,19 +29,15 @@ Future<void> onAddAlbum(BuildContext context, int parentId) async {
 }
 
 Future<void> onEditAlbum(BuildContext context, AlbumModel album) async {
-  await showModalBottomSheet(
+  await showPiwigoModal(
     context: context,
-    isScrollControlled: true,
-    useSafeArea: true,
     builder: (_) => EditAlbumModal(album: album),
   );
 }
 
 Future<void> onMoveAlbum(BuildContext context, AlbumModel album) async {
-  await showModalBottomSheet(
+  await showPiwigoModal(
     context: context,
-    isScrollControlled: true,
-    useSafeArea: true,
     builder: (_) => MoveOrCopyModal(
       title: appStrings.moveCategory,
       subtitle: appStrings.moveCategory_select(album.name),
