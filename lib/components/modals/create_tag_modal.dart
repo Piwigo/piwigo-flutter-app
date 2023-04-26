@@ -5,7 +5,6 @@ import 'package:piwigo_ng/components/buttons/animated_piwigo_button.dart';
 import 'package:piwigo_ng/components/fields/app_field.dart';
 import 'package:piwigo_ng/components/modals/piwigo_modal.dart';
 import 'package:piwigo_ng/components/snackbars.dart';
-import 'package:piwigo_ng/models/tag_model.dart';
 import 'package:piwigo_ng/utils/localizations.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 
@@ -83,13 +82,4 @@ class _CreateTagModalState extends State<CreateTagModal> {
       ),
     );
   }
-}
-
-Future<TagModel?> showCreateTagModal(BuildContext context) async {
-  return await showModalBottomSheet<TagModel?>(
-    context: context,
-    isScrollControlled: true,
-    useSafeArea: true,
-    builder: (_) => CreateTagModal(),
-  );
 }

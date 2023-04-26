@@ -22,10 +22,14 @@ Future<void> onOpenAlbum(BuildContext context, AlbumModel album) async {
 }
 
 Future<void> onAddAlbum(BuildContext context, int parentId) async {
-  await showCreateAlbumModal(
-    context,
-    parentId,
+  await showPiwigoModal(
+    context: context,
+    builder: (context) => CreateAlbumModal(albumId: parentId),
   );
+  // await showCreateAlbumModal(
+  //   context,
+  //   parentId,
+  // );
 }
 
 Future<void> onEditAlbum(BuildContext context, AlbumModel album) async {
@@ -65,11 +69,8 @@ Future<void> onMoveAlbum(BuildContext context, AlbumModel album) async {
 Future<bool> onDeleteAlbum(BuildContext context, AlbumModel album) async {
   DeleteAlbumModes? mode = DeleteAlbumModes.deleteOrphans;
   if (album.nbTotalImages != 0) {
-    mode = await showModalBottomSheet<DeleteAlbumModes>(
+    mode = await showPiwigoModal<DeleteAlbumModes>(
       context: context,
-      isScrollControlled: true,
-      isDismissible: true,
-      useSafeArea: true,
       builder: (context) => DeleteAlbumModeModal(
         albumModel: album,
       ),

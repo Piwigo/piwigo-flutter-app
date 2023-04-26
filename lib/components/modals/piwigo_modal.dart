@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:piwigo_ng/utils/settings.dart';
 
 class PiwigoModal extends StatelessWidget {
   const PiwigoModal({
@@ -15,33 +16,38 @@ class PiwigoModal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      padding: EdgeInsets.zero,
-      controller: ModalScrollController.of(context),
-      shrinkWrap: true,
-      children: [
-        SizedBox(
-          height: 56.0,
-          child: Center(
-            child: Text(
-              title ?? '',
-              textAlign: TextAlign.center,
-              style: Theme.of(context).appBarTheme.titleTextStyle,
+    return ConstrainedBox(
+      constraints: BoxConstraints(
+        maxWidth: Settings.modalMaxWidth,
+      ),
+      child: ListView(
+        padding: EdgeInsets.zero,
+        controller: ModalScrollController.of(context),
+        shrinkWrap: true,
+        children: [
+          SizedBox(
+            height: 56.0,
+            child: Center(
+              child: Text(
+                title ?? '',
+                textAlign: TextAlign.center,
+                style: Theme.of(context).appBarTheme.titleTextStyle,
+              ),
             ),
           ),
-        ),
-        if (subtitle != null)
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Text(
-              subtitle!,
-              softWrap: true,
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodyMedium,
+          if (subtitle != null)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Text(
+                subtitle!,
+                softWrap: true,
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
             ),
-          ),
-        if (content != null) content!,
-      ],
+          if (content != null) content!,
+        ],
+      ),
     );
   }
 }

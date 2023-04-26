@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:path/path.dart' as path;
@@ -7,7 +8,8 @@ import 'package:piwigo_ng/services/preferences_service.dart';
 import 'package:provider/provider.dart';
 
 class ImageDetailsCard extends StatelessWidget {
-  const ImageDetailsCard({Key? key, required this.image, this.onRemove}) : super(key: key);
+  const ImageDetailsCard({Key? key, required this.image, this.onRemove})
+      : super(key: key);
 
   final ImageModel image;
   final Function()? onRemove;
@@ -43,7 +45,9 @@ class ImageDetailsCard extends StatelessWidget {
           child: ClipRRect(
             borderRadius: BorderRadius.circular(5.0),
             child: Builder(builder: (context) {
-              final String? imageUrl = image.getDerivativeFromString(Preferences.getImageThumbnailSize)?.url;
+              final String? imageUrl = image
+                  .getDerivativeFromString(Preferences.getImageThumbnailSize)
+                  ?.url;
               return Image.network(
                 imageUrl ?? '',
                 fit: BoxFit.cover,
@@ -56,7 +60,8 @@ class ImageDetailsCard extends StatelessWidget {
                   return Center(
                     child: CircularProgressIndicator(
                       value: loadingProgress.expectedTotalBytes != null
-                          ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                          ? loadingProgress.cumulativeBytesLoaded /
+                              loadingProgress.expectedTotalBytes!
                           : null,
                     ),
                   );
@@ -85,12 +90,15 @@ class ImageDetailsCard extends StatelessWidget {
             style: Theme.of(context).textTheme.bodySmall,
           ),
           Padding(
-            padding: const EdgeInsets.only(top: 4.0),
+            padding: const EdgeInsets.symmetric(vertical: 4.0),
             child: Row(
               children: [
                 Flexible(
                   child: Text(
-                    image.file.replaceAll('', '\u200B').split(path.extension(image.file))[0],
+                    image.file
+                        .replaceAll('', '\u200B')
+                        .split(path.extension(image.file))
+                        .first,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: Theme.of(context).textTheme.bodySmall,
@@ -98,27 +106,30 @@ class ImageDetailsCard extends StatelessWidget {
                 ),
                 Text(
                   path.extension(image.file),
+                  maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: Theme.of(context).textTheme.bodySmall,
                 ),
               ],
             ),
           ),
+          const Spacer(),
           if (image.dateAvailable != null)
-            Padding(
-              padding: const EdgeInsets.only(top: 4.0),
-              child: Builder(builder: (context) {
-                LocaleNotifier localeNotifier = Provider.of<LocaleNotifier>(context, listen: false);
-                String date = DateFormat.yMMMMd(localeNotifier.locale.languageCode).format(DateTime.parse(image.dateAvailable!));
-                String time = DateFormat.Hms(localeNotifier.locale.languageCode).format(DateTime.parse(image.dateAvailable!));
-                return Text(
-                  "$date $time",
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context).textTheme.bodySmall,
-                );
-              }),
-            ),
+            Builder(builder: (context) {
+              LocaleNotifier localeNotifier =
+                  Provider.of<LocaleNotifier>(context, listen: false);
+              String date =
+                  DateFormat.yMMMMd(localeNotifier.locale.languageCode)
+                      .format(DateTime.parse(image.dateAvailable!));
+              String time = DateFormat.Hms(localeNotifier.locale.languageCode)
+                  .format(DateTime.parse(image.dateAvailable!));
+              return AutoSizeText(
+                "$date $time",
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.bodySmall,
+              );
+            }),
         ],
       ),
     );

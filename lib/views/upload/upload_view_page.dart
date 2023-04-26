@@ -8,6 +8,7 @@ import 'package:piwigo_ng/api/images.dart';
 import 'package:piwigo_ng/components/buttons/animated_piwigo_button.dart';
 import 'package:piwigo_ng/components/fields/app_field.dart';
 import 'package:piwigo_ng/components/modals/add_tags_modal.dart';
+import 'package:piwigo_ng/components/modals/piwigo_modal.dart';
 import 'package:piwigo_ng/components/sections/form_section.dart';
 import 'package:piwigo_ng/services/preferences_service.dart';
 import 'package:piwigo_ng/utils/resources.dart';
@@ -43,7 +44,7 @@ class _UploadGalleryViewPage extends State<UploadViewPage>
       RoundedLoadingButtonController();
 
   final List<DropdownMenuItem<int?>> _levelItems = [];
-  final List<TagModel> _tags = [];
+  List<TagModel> _tags = [];
   List<XFile> _imageList = [];
   List<String> _imageExistList = [];
   int? _privacyLevel;
@@ -351,14 +352,17 @@ class _UploadGalleryViewPage extends State<UploadViewPage>
         FormSection(
           title: appStrings.tagsAdd_title,
           onTapTitle: () {
-            showModalBottomSheet(
+            showPiwigoModal<List<TagModel>>(
               context: context,
-              isScrollControlled: true,
-              useSafeArea: true,
               builder: (_) => AddTagsModal(
                 selectedTags: _tags,
               ),
-            ).whenComplete(() => setState(() {}));
+            ).then((value) {
+              if (value is! List<TagModel>) return;
+              setState(() {
+                _tags = value;
+              });
+            });
           },
           actions: [
             const Icon(Icons.add_circle),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:piwigo_ng/utils/settings.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 
 class AnimatedPiwigoButton extends StatelessWidget {
@@ -22,8 +23,11 @@ class AnimatedPiwigoButton extends StatelessWidget {
     return AnimatedOpacity(
       duration: const Duration(milliseconds: 150),
       opacity: disabled ? 0.5 : 1,
-      child: SizedBox(
+      child: Container(
         height: 56.0,
+        constraints: BoxConstraints(
+          maxWidth: Settings.modalMaxWidth,
+        ),
         child: LayoutBuilder(builder: (context, constraints) {
           return RoundedLoadingButton(
             controller: controller,

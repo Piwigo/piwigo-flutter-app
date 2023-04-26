@@ -90,11 +90,6 @@ final ThemeData lightTheme = ThemeData.light(useMaterial3: true).copyWith(
       fontWeight: FontWeight.normal,
       color: AppColors.disabled,
     ),
-    labelStyle: TextStyle(
-      fontSize: 14,
-      fontWeight: FontWeight.normal,
-      color: AppColors.textGrey,
-    ),
   ),
   textSelectionTheme: TextSelectionThemeData(
     cursorColor: AppColors.accent,
@@ -265,11 +260,6 @@ final ThemeData darkTheme = ThemeData.dark(useMaterial3: true).copyWith(
       fontStyle: FontStyle.italic,
       fontWeight: FontWeight.normal,
       color: AppColors.disabled,
-    ),
-    labelStyle: TextStyle(
-      fontSize: 14,
-      fontWeight: FontWeight.normal,
-      color: AppColors.white,
     ),
   ),
   textSelectionTheme: const TextSelectionThemeData(

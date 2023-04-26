@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:piwigo_ng/utils/settings.dart';
 
 class PiwigoButton extends StatelessWidget {
   const PiwigoButton({
@@ -24,7 +25,9 @@ class PiwigoButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color backgroundColor = disabled ? Theme.of(context).disabledColor : color ?? Theme.of(context).colorScheme.primary;
+    final Color backgroundColor = disabled
+        ? Theme.of(context).disabledColor
+        : color ?? Theme.of(context).colorScheme.primary;
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: disabled ? null : onPressed,
@@ -35,6 +38,7 @@ class PiwigoButton extends StatelessWidget {
         height: 56.0,
         constraints: const BoxConstraints(
           minWidth: 56.0,
+          maxWidth: Settings.modalMaxWidth,
         ),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10.0),

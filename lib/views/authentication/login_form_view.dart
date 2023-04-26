@@ -29,7 +29,8 @@ class _LoginFormViewState extends State<LoginFormView> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final GlobalKey _urlKey = GlobalKey();
-  final RoundedLoadingButtonController _btnController = RoundedLoadingButtonController();
+  final RoundedLoadingButtonController _btnController =
+      RoundedLoadingButtonController();
 
   String _url = '';
   String _username = '';
@@ -154,120 +155,118 @@ class _LoginFormViewState extends State<LoginFormView> {
 
   @override
   Widget build(BuildContext context) {
-    return Form(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          AppField(
-            key: _urlKey,
-            margin: const EdgeInsets.symmetric(vertical: 4.0),
-            padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 8.0),
-            controller: _urlController,
-            onChanged: (value) {
-              bool isError = !_urlValidator(value);
-              if (_urlError != isError) {
-                _urlError = isError;
-              }
-              setState(() {
-                _url = value;
-              });
-            },
-            textInputAction: TextInputAction.next,
-            prefix: _securedPrefix,
-            hint: 'example.piwigo.com',
-            error: _urlError,
-          ),
-          AppField(
-            margin: const EdgeInsets.symmetric(vertical: 4.0),
-            padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 8.0),
-            controller: _usernameController,
-            onChanged: (value) {
-              if (_idError) {
-                _idError = false;
-              }
-              setState(() {
-                _username = value;
-              });
-            },
-            textInputAction: TextInputAction.next,
-            hint: "username",
-            error: _idError,
-            prefix: const Icon(Icons.person),
-            suffix: _username.isNotEmpty
-                ? GestureDetector(
-                    behavior: HitTestBehavior.opaque,
-                    onTap: () => setState(() {
-                      _usernameController.clear();
-                      _username = '';
-                    }),
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Icon(
-                        Icons.clear,
-                        color: Theme.of(context).colorScheme.secondary,
-                      ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        AppField(
+          key: _urlKey,
+          margin: const EdgeInsets.symmetric(vertical: 4.0),
+          padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 8.0),
+          controller: _urlController,
+          onChanged: (value) {
+            bool isError = !_urlValidator(value);
+            if (_urlError != isError) {
+              _urlError = isError;
+            }
+            setState(() {
+              _url = value;
+            });
+          },
+          textInputAction: TextInputAction.next,
+          prefix: _securedPrefix,
+          hint: 'example.piwigo.com',
+          error: _urlError,
+        ),
+        AppField(
+          margin: const EdgeInsets.symmetric(vertical: 4.0),
+          padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 8.0),
+          controller: _usernameController,
+          onChanged: (value) {
+            if (_idError) {
+              _idError = false;
+            }
+            setState(() {
+              _username = value;
+            });
+          },
+          textInputAction: TextInputAction.next,
+          hint: "username",
+          error: _idError,
+          prefix: const Icon(Icons.person),
+          suffix: _username.isNotEmpty
+              ? GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () => setState(() {
+                    _usernameController.clear();
+                    _username = '';
+                  }),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Icon(
+                      Icons.clear,
+                      color: Theme.of(context).colorScheme.secondary,
                     ),
-                  )
-                : null,
+                  ),
+                )
+              : null,
+        ),
+        AppField(
+          margin: const EdgeInsets.symmetric(vertical: 4.0),
+          padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 8.0),
+          controller: _passwordController,
+          onFieldSubmitted: (String value) {
+            FocusScope.of(context).unfocus();
+            _onLogin();
+          },
+          onChanged: (value) {
+            if (_idError) {
+              _idError = false;
+            }
+            setState(() {
+              _password = value;
+            });
+          },
+          textInputAction: TextInputAction.done,
+          obscureText: !_showPassword,
+          hint: "password",
+          error: _idError,
+          prefix: GestureDetector(
+            onTap: () => setState(() {
+              _showPassword = !_showPassword;
+            }),
+            child: Icon(_showPassword ? Icons.lock_open : Icons.lock),
           ),
-          AppField(
-            margin: const EdgeInsets.symmetric(vertical: 4.0),
-            padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 8.0),
-            controller: _passwordController,
-            onFieldSubmitted: (String value) {
-              FocusScope.of(context).unfocus();
-              _onLogin();
-            },
-            onChanged: (value) {
-              if (_idError) {
-                _idError = false;
-              }
-              setState(() {
-                _password = value;
-              });
-            },
-            textInputAction: TextInputAction.done,
-            obscureText: !_showPassword,
-            hint: "password",
-            error: _idError,
-            prefix: GestureDetector(
-              onTap: () => setState(() {
-                _showPassword = !_showPassword;
-              }),
-              child: Icon(_showPassword ? Icons.lock_open : Icons.lock),
-            ),
-            suffix: _password.isNotEmpty
-                ? GestureDetector(
-                    behavior: HitTestBehavior.opaque,
-                    onTap: () => setState(() {
-                      _passwordController.clear();
-                      _password = '';
-                    }),
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Icon(
-                        Icons.clear,
-                        color: Theme.of(context).colorScheme.secondary,
-                      ),
+          suffix: _password.isNotEmpty
+              ? GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () => setState(() {
+                    _passwordController.clear();
+                    _password = '';
+                  }),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Icon(
+                      Icons.clear,
+                      color: Theme.of(context).colorScheme.secondary,
                     ),
-                  )
-                : null,
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 12.0),
-            child: AnimatedPiwigoButton(
-              controller: _btnController,
-              // disabled: _urlError,
-              color: Theme.of(context).primaryColor,
-              onPressed: _onLogin,
-              child: Text(
-                appStrings.login,
-                style: Theme.of(context).textTheme.displaySmall,
-              ),
+                  ),
+                )
+              : null,
+        ),
+        Padding(
+          padding: const EdgeInsets.only(top: 12.0),
+          child: AnimatedPiwigoButton(
+            controller: _btnController,
+            // disabled: _urlError,
+            color: Theme.of(context).primaryColor,
+            onPressed: _onLogin,
+            child: Text(
+              appStrings.login,
+              style: Theme.of(context).textTheme.displaySmall,
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -294,7 +293,10 @@ class _LoginFormViewState extends State<LoginFormView> {
                 top: Theme.of(context).textTheme.bodyMedium?.fontSize,
                 child: Text(
                   !_isSecured ? 'https' : 'http',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: 11),
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyMedium
+                      ?.copyWith(fontSize: 11),
                 ),
               ),
             ],

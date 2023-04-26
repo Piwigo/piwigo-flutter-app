@@ -10,6 +10,7 @@ import 'package:piwigo_ng/components/modals/choose_camera_picker_modal.dart';
 import 'package:piwigo_ng/components/modals/choose_move_option_modal.dart';
 import 'package:piwigo_ng/components/modals/delete_images_modal.dart';
 import 'package:piwigo_ng/components/modals/move_or_copy_modal.dart';
+import 'package:piwigo_ng/components/modals/piwigo_modal.dart';
 import 'package:piwigo_ng/components/snackbars.dart';
 import 'package:piwigo_ng/models/album_model.dart';
 import 'package:piwigo_ng/models/image_model.dart';
@@ -38,10 +39,8 @@ Future<List<XFile>?> onPickImages() async {
 }
 
 Future<XFile?> onTakePhoto(BuildContext context) async {
-  final int? choice = await showModalBottomSheet<int>(
+  final int? choice = await showPiwigoModal<int>(
     context: context,
-    isScrollControlled: true,
-    useSafeArea: true,
     builder: (context) => ChooseCameraPickerModal(),
   );
   if (choice == null) return null;
@@ -85,21 +84,19 @@ Future<dynamic> onMovePhotos(BuildContext context, List<ImageModel> images,
   } else {
     origin = album;
   }
-  return showModalBottomSheet<dynamic>(
+  return showPiwigoModal(
     context: context,
-    isScrollControlled: true,
-    useSafeArea: true,
     builder: (_) => MoveOrCopyModal(
       title: appStrings.moveImage_title,
-      subtitle:
-          appStrings.moveImage_selectAlbum(images.length, images.first.name),
+      subtitle: appStrings.moveImage_selectAlbum(
+        images.length,
+        images.first.name,
+      ),
       isImage: true,
       album: origin,
       onSelected: (selectedAlbum) async {
-        final int? choice = await showModalBottomSheet<int>(
+        final int? choice = await showPiwigoModal<int>(
           context: context,
-          isScrollControlled: true,
-          useSafeArea: true,
           builder: (context) => ChooseMoveOptionModal(),
         );
         if (choice == null ||
@@ -127,19 +124,20 @@ Future<dynamic> onMovePhotos(BuildContext context, List<ImageModel> images,
   );
 }
 
-Future<bool> onDeletePhotos(BuildContext context, List<ImageModel> images,
-    [AlbumModel? album]) async {
-  final DeleteAlbumModes? mode = await showModalBottomSheet<DeleteAlbumModes>(
+Future<bool> onDeletePhotos(
+  BuildContext context,
+  List<ImageModel> images, [
+  AlbumModel? album,
+]) async {
+  DeleteAlbumModes? mode = await showPiwigoModal<DeleteAlbumModes>(
     context: context,
-    isScrollControlled: true,
-    useSafeArea: true,
-    isDismissible: true,
     builder: (context) => DeleteImagesModal(
       imageList: images,
       album: album,
     ),
   );
   if (mode == null) return false;
+
   if (!await showConfirmDialog(
     context,
     message: appStrings.deleteImage_message(

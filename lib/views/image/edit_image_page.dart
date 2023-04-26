@@ -7,6 +7,7 @@ import 'package:piwigo_ng/components/cards/image_details_card.dart';
 import 'package:piwigo_ng/components/dialogs/confirm_dialog.dart';
 import 'package:piwigo_ng/components/fields/app_field.dart';
 import 'package:piwigo_ng/components/modals/add_tags_modal.dart';
+import 'package:piwigo_ng/components/modals/piwigo_modal.dart';
 import 'package:piwigo_ng/components/sections/form_section.dart';
 import 'package:piwigo_ng/models/image_model.dart';
 import 'package:piwigo_ng/models/tag_model.dart';
@@ -179,26 +180,17 @@ class _EditImagePageState extends State<EditImagePage> {
             margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
             title: appStrings.tagsAdd_title,
             onTapTitle: () {
-              showAddTagsModal(
-                context,
-                _tags,
+              showPiwigoModal<List<TagModel>>(
+                context: context,
+                builder: (context) => AddTagsModal(
+                  selectedTags: _tags,
+                ),
               ).then((value) {
                 if (value is! List<TagModel>) return;
                 setState(() {
                   _tags = value;
                 });
               });
-              // showModalBottomSheet(
-              //   context: context,
-              //   isScrollControlled: true,
-              //   useSafeArea: true,
-              //   constraints: BoxConstraints(
-              //     maxWidth: 600,
-              //   ),
-              //   builder: (_) => AddTagsModal(
-              //     selectedTags: _tags,
-              //   ),
-              // ).whenComplete(() => setState(() {}));
             },
             actions: [
               const Icon(Icons.add_circle),

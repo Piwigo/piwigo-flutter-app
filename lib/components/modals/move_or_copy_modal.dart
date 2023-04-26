@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:piwigo_ng/api/albums.dart';
 import 'package:piwigo_ng/api/api_error.dart';
 import 'package:piwigo_ng/models/album_model.dart';
@@ -47,7 +48,8 @@ class _MoveOrCopyModalState extends State<MoveOrCopyModal> {
 
   Future<void> _onTapAlbum(AlbumModel album) async {
     bool? result = await widget.onSelected?.call(album);
-    Navigator.of(context).pop(result ?? false);
+    if (result != true) return;
+    Navigator.of(context).pop(true);
   }
 
   @override
@@ -55,46 +57,31 @@ class _MoveOrCopyModalState extends State<MoveOrCopyModal> {
     return Scaffold(
       backgroundColor: Colors.transparent,
       appBar: _appBar,
-      body: Theme(
-        data: Theme.of(context).copyWith(
-          scrollbarTheme: ScrollbarThemeData(
-            crossAxisMargin: 8.0,
-            mainAxisMargin: 8.0,
-            radius: Radius.circular(10.0),
-            thumbColor: MaterialStateColor.resolveWith(
-              (states) => Theme.of(context).disabledColor,
-            ),
-          ),
+      body: ListView(
+        controller: ModalScrollController.of(context),
+        padding: const EdgeInsets.symmetric(
+          horizontal: 16.0,
         ),
-        child: Scrollbar(
-          controller: _scrollController,
-          thumbVisibility: true,
-          child: ListView(
-            controller: _scrollController,
-            padding: const EdgeInsets.symmetric(
-              horizontal: 16.0,
-            ),
-            children: [
-              if (widget.subtitle != null)
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 8.0,
-                  ),
-                  child: Text(
-                    widget.subtitle!,
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.bodyMedium,
-                  ),
-                ),
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  vertical: 8.0,
-                ),
-                child: _albumTreeList,
+        shrinkWrap: true,
+        children: [
+          if (widget.subtitle != null)
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                vertical: 8.0,
               ),
-            ],
+              child: Text(
+                widget.subtitle!,
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+            ),
+          Padding(
+            padding: const EdgeInsets.symmetric(
+              vertical: 8.0,
+            ),
+            child: _albumTreeList,
           ),
-        ),
+        ],
       ),
     );
   }
@@ -117,7 +104,7 @@ class _MoveOrCopyModalState extends State<MoveOrCopyModal> {
 
   Widget get _albumTreeList => DecoratedBox(
         decoration: BoxDecoration(
-          color: Theme.of(context).inputDecorationTheme.fillColor,
+          color: Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(15.0),
         ),
         child: _rootAlbum,
@@ -214,7 +201,7 @@ class _ExpansionAlbumTileState extends State<ExpansionAlbumTile> {
           widget.onTap?.call(widget.album);
         },
         child: SizedBox(
-          height: 48,
+          height: 48.0,
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -224,7 +211,7 @@ class _ExpansionAlbumTileState extends State<ExpansionAlbumTile> {
                   child: Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      "${List.generate(widget.index, (index) => ' ').join()}${widget.album.name}",
+                      "${List.generate(widget.index, (index) => '.').join()}${widget.index > 0 ? ' ' : ''}${widget.album.name}",
                       overflow: TextOverflow.ellipsis,
                       style: _disabled
                           ? Theme.of(context).textTheme.bodySmall
@@ -279,6 +266,7 @@ class _ExpansionAlbumTileState extends State<ExpansionAlbumTile> {
   Widget get _expandedList {
     if (_expanded) {
       return ListView.separated(
+        padding: EdgeInsets.zero,
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
         itemCount: widget.album.children.length,

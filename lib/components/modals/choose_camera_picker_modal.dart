@@ -8,20 +8,22 @@ class ChooseCameraPickerModal extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PiwigoModal(
-      title: appStrings.categoryUpload_images,
+      title: appStrings.categoryUpload_camera,
       content: Padding(
         padding: const EdgeInsets.symmetric(vertical: 8.0),
         child: Column(
           children: [
             ListTile(
               minLeadingWidth: 24,
-              leading: Icon(Icons.photo_camera, color: Theme.of(context).primaryColor),
+              leading: Icon(Icons.photo_camera,
+                  color: Theme.of(context).primaryColor),
               title: Text(appStrings.categoryUpload_takePhoto),
               onTap: () => Navigator.of(context).pop(0),
             ),
             ListTile(
               minLeadingWidth: 24,
-              leading: Icon(Icons.video_camera_back, color: Theme.of(context).primaryColor),
+              leading: Icon(Icons.video_camera_back,
+                  color: Theme.of(context).primaryColor),
               title: Text(appStrings.categoryUpload_takeVideo),
               onTap: () => Navigator.of(context).pop(1),
             ),

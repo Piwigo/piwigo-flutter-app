@@ -4,6 +4,7 @@ import 'package:piwigo_ng/api/tags.dart';
 import 'package:piwigo_ng/components/buttons/piwigo_button.dart';
 import 'package:piwigo_ng/components/cards/tag_chip.dart';
 import 'package:piwigo_ng/components/modals/create_tag_modal.dart';
+import 'package:piwigo_ng/components/modals/piwigo_modal.dart';
 import 'package:piwigo_ng/models/tag_model.dart';
 import 'package:piwigo_ng/utils/localizations.dart';
 import 'package:piwigo_ng/utils/resources.dart';
@@ -49,7 +50,10 @@ class _AddTagsModalState extends State<AddTagsModal> {
   }
 
   Future<void> _onAddTag() async {
-    TagModel? addedTag = await showCreateTagModal(context);
+    TagModel? addedTag = await showPiwigoModal<TagModel?>(
+      context: context,
+      builder: (context) => CreateTagModal(),
+    );
     if (addedTag == null) return;
     await _onRefresh();
     try {
@@ -184,28 +188,6 @@ class _AddTagsModalState extends State<AddTagsModal> {
       ),
     );
   }
-}
-
-Future<List<TagModel>?> showAddTagsModal(
-    BuildContext context, List<TagModel> tags) {
-  return showModalBottomSheet<List<TagModel>?>(
-    context: context,
-    isScrollControlled: true,
-    useSafeArea: true,
-    //enableDrag: false,
-    backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-    constraints: BoxConstraints(
-      maxWidth: 600,
-    ),
-    // shape: const RoundedRectangleBorder(
-    //   borderRadius: BorderRadius.vertical(
-    //     top: Radius.circular(15.0),
-    //   ),
-    // ),
-    builder: (_) => AddTagsModal(
-      selectedTags: tags,
-    ),
-  );
 }
 
 class TagWrap extends StatelessWidget {

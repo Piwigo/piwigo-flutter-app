@@ -15,7 +15,8 @@ class ChooseMoveOptionModal extends StatelessWidget {
           children: [
             ListTile(
               minLeadingWidth: 24,
-              leading: Icon(Icons.drive_file_move, color: Theme.of(context).primaryColor),
+              leading: Icon(Icons.drive_file_move,
+                  color: Theme.of(context).primaryColor),
               title: Text(appStrings.moveImage_title),
               onTap: () => Navigator.of(context).pop(0),
             ),

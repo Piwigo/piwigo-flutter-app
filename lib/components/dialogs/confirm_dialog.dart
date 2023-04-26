@@ -22,12 +22,15 @@ class ConfirmDialog extends StatelessWidget {
     return AlertDialog(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       title: _title,
+      titleTextStyle: Theme.of(context).textTheme.displayMedium,
       content: _message(context),
       actions: [
         TextButton(
           style: ButtonStyle(
             foregroundColor: MaterialStateColor.resolveWith(
-              (states) => Theme.of(context).textTheme.bodySmall?.color ?? AppColors.disabled,
+              (states) =>
+                  Theme.of(context).textTheme.bodySmall?.color ??
+                  AppColors.disabled,
             ),
             overlayColor: MaterialStateColor.resolveWith(
               (states) => AppColors.accent.withOpacity(0.3),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:piwigo_ng/api/images.dart';
 import 'package:piwigo_ng/components/modals/move_or_copy_modal.dart';
+import 'package:piwigo_ng/components/modals/piwigo_modal.dart';
 import 'package:piwigo_ng/components/sections/settings_section.dart';
 import 'package:piwigo_ng/models/album_model.dart';
 import 'package:piwigo_ng/services/auto_upload_manager.dart';
@@ -93,10 +94,8 @@ class _AutoUploadPageState extends State<AutoUploadPage> {
                 title: appStrings.settings_autoUploadDestination,
                 text: _album?.name ?? appStrings.none,
                 onPressed: () async {
-                  await showModalBottomSheet(
+                  await showPiwigoModal(
                     context: context,
-                    isScrollControlled: true,
-                    useSafeArea: true,
                     builder: (_) => MoveOrCopyModal(
                       title: appStrings.settings_autoUploadDestination,
                       subtitle: appStrings.settings_autoUploadDestinationInfo,
