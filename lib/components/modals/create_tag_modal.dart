@@ -18,8 +18,21 @@ class CreateTagModal extends StatefulWidget {
 class _CreateTagModalState extends State<CreateTagModal> {
   final RoundedLoadingButtonController _btnController =
       RoundedLoadingButtonController();
+  final FocusNode _focusNode = FocusNode();
 
   String _name = '';
+
+  @override
+  initState() {
+    super.initState();
+    _focusNode.requestFocus();
+  }
+
+  @override
+  dispose() {
+    _focusNode.dispose();
+    super.dispose();
+  }
 
   Future<void> _onCreateTag() async {
     if (_name.isEmpty) return;
@@ -58,8 +71,14 @@ class _CreateTagModalState extends State<CreateTagModal> {
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: AppField(
+                focusNode: _focusNode,
                 onChanged: (value) => setState(() {
                   _name = value;
+                }),
+                onFieldSubmitted: (value) => setState(() {
+                  _name = value;
+                  _focusNode.unfocus();
+                  _onCreateTag();
                 }),
                 hint: appStrings.tagsAdd_placeholder,
               ),

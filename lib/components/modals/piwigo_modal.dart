@@ -74,7 +74,9 @@ Future<T?> showPiwigoModal<T>({
       ),
     ),
     builder: (context) {
-      return Padding(
+      return AnimatedPadding(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.ease,
         padding: EdgeInsets.only(
           bottom: MediaQuery.of(context).viewInsets.bottom,
         ),

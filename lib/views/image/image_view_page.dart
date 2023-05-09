@@ -350,59 +350,28 @@ class _ImageViewPageState extends State<ImageViewPage> {
   Widget get _tags {
     List<TagModel> tags = _currentImage.tags;
     if (tags.isEmpty) return const SizedBox();
-    return Stack(
-      children: [
-        SizedBox(
-          height: 34.0,
-          child: ListView.separated(
-            padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-            scrollDirection: Axis.horizontal,
-            itemCount: tags.length,
-            itemBuilder: (context, index) {
-              TagModel tag = tags[index];
-              int colorIndex = tag.id % AppColors.foregroundColors.length;
-              return Text(
-                "#${tag.name}",
-                style: TextStyle(
-                  fontSize: 14,
-                  color: AppColors.foregroundColors[colorIndex],
-                ),
-              );
-            },
-            separatorBuilder: (context, index) => const SizedBox(width: 8.0),
-          ),
-        ),
-        Positioned(
-          top: 0.0,
-          bottom: 0.0,
-          right: 0.0,
-          width: 16.0,
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Color(0x00000000), Color(0xFF000000)],
-                begin: Alignment.centerLeft,
-                end: Alignment.centerRight,
+    return SizedBox(
+      height: 36.0,
+      child: Center(
+        child: ListView.separated(
+          padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+          scrollDirection: Axis.horizontal,
+          itemCount: tags.length,
+          itemBuilder: (context, index) {
+            TagModel tag = tags[index];
+            int colorIndex = tag.id % AppColors.foregroundColors.length;
+            return Text(
+              "#${tag.name}",
+              style: TextStyle(
+                fontSize: 14,
+                color: AppColors.disabled,
+                // color: AppColors.foregroundColors[colorIndex],
               ),
-            ),
-          ),
+            );
+          },
+          separatorBuilder: (context, index) => const SizedBox(width: 8.0),
         ),
-        Positioned(
-          top: 0.0,
-          bottom: 0.0,
-          left: 0.0,
-          width: 16.0,
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Color(0xFF000000), Color(0x00000000)],
-                begin: Alignment.centerLeft,
-                end: Alignment.centerRight,
-              ),
-            ),
-          ),
-        ),
-      ],
+      ),
     );
   }
 

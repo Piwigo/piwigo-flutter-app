@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:piwigo_ng/api/api_error.dart';
 import 'package:piwigo_ng/api/tags.dart';
 import 'package:piwigo_ng/components/buttons/piwigo_button.dart';
@@ -7,7 +8,6 @@ import 'package:piwigo_ng/components/modals/create_tag_modal.dart';
 import 'package:piwigo_ng/components/modals/piwigo_modal.dart';
 import 'package:piwigo_ng/models/tag_model.dart';
 import 'package:piwigo_ng/utils/localizations.dart';
-import 'package:piwigo_ng/utils/resources.dart';
 
 class AddTagsModal extends StatefulWidget {
   const AddTagsModal({
@@ -111,24 +111,25 @@ class _AddTagsModalState extends State<AddTagsModal> {
         children: [
           Expanded(
             child: FutureBuilder<ApiResult<List<TagModel>>>(
-                future: _tagsFuture,
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    if (!snapshot.data!.hasData) {
-                      return Center(
-                        child: Text(appStrings.errorHUD_label),
-                      );
-                    }
-                    if (_tagList.isEmpty) {
-                      _tagList = snapshot.data!.data ?? [];
-                    }
-                    return _tagLists;
-                  } else {
+              future: _tagsFuture,
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  if (!snapshot.data!.hasData) {
                     return Center(
-                      child: CircularProgressIndicator(),
+                      child: Text(appStrings.errorHUD_label),
                     );
                   }
-                }),
+                  if (_tagList.isEmpty) {
+                    _tagList = snapshot.data!.data ?? [];
+                  }
+                  return _tagLists;
+                } else {
+                  return Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+              },
+            ),
           ),
           Padding(
             padding:
@@ -145,47 +146,19 @@ class _AddTagsModalState extends State<AddTagsModal> {
   }
 
   Widget get _tagLists {
-    List<TagModel> unselectedTags =
-        _tagList.where((tag) => !_selectedTagList.contains(tag)).toList();
-    return RefreshIndicator(
-      onRefresh: _onRefresh,
-      color: AppColors.accent,
-      child: Theme(
-        data: Theme.of(context).copyWith(
-          scrollbarTheme: ScrollbarThemeData(
-            crossAxisMargin: 8.0,
-            mainAxisMargin: 8.0,
-            radius: Radius.circular(10.0),
-            thumbColor: MaterialStateColor.resolveWith(
-              (states) => Theme.of(context).disabledColor,
-            ),
-          ),
+    // List<TagModel> unselectedTags =
+    //     _tagList.where((tag) => !_selectedTagList.contains(tag)).toList();
+    return ListView(
+      controller: ModalScrollController.of(context),
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      physics: const AlwaysScrollableScrollPhysics(),
+      children: [
+        TagWrap(
+          tags: _tagList,
+          onTap: _onSelectTag,
+          isSelected: (tag) => _selectedTagList.contains(tag),
         ),
-        child: Scrollbar(
-          controller: _scrollController,
-          thumbVisibility: true,
-          child: ListView(
-            controller: _scrollController,
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            physics: const AlwaysScrollableScrollPhysics(),
-            children: [
-              // FormSection(
-              //   title: appStrings.tagsHeader_selected,
-              //   child: TagWrap(
-              //     tags: _selectedTagList,
-              //     onTap: _onDeselectTag,
-              //     isSelected: (tag) => true,
-              //   ),
-              // ),
-              TagWrap(
-                tags: _tagList,
-                onTap: _onSelectTag,
-                isSelected: (tag) => _selectedTagList.contains(tag),
-              ),
-            ],
-          ),
-        ),
-      ),
+      ],
     );
   }
 }

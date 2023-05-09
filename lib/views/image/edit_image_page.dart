@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:piwigo_ng/api/api_error.dart';
 import 'package:piwigo_ng/api/images.dart';
 import 'package:piwigo_ng/components/buttons/animated_piwigo_button.dart';
@@ -9,7 +10,6 @@ import 'package:piwigo_ng/components/cards/tag_chip.dart';
 import 'package:piwigo_ng/components/dialogs/confirm_dialog.dart';
 import 'package:piwigo_ng/components/fields/app_field.dart';
 import 'package:piwigo_ng/components/modals/add_tags_modal.dart';
-import 'package:piwigo_ng/components/modals/piwigo_modal.dart';
 import 'package:piwigo_ng/components/sections/form_section.dart';
 import 'package:piwigo_ng/models/image_model.dart';
 import 'package:piwigo_ng/models/tag_model.dart';
@@ -197,8 +197,9 @@ class _EditImagePageState extends State<EditImagePage> {
             margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
             title: appStrings.tagsAdd_title,
             onTapTitle: () {
-              showPiwigoModal<List<TagModel>>(
+              showMaterialModalBottomSheet<List<TagModel>>(
                 context: context,
+                backgroundColor: Theme.of(context).scaffoldBackgroundColor,
                 builder: (context) => AddTagsModal(
                   selectedTags: _tags,
                 ),

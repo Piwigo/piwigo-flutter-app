@@ -431,11 +431,17 @@ Future<bool> assignImage(int imageId, List<int> categories) async {
   return false;
 }
 
-Future<int> editImages(List<ImageModel> images,
-    [Map<String, dynamic> info = const {}]) async {
+Future<int> editImages(
+  List<ImageModel> images, [
+  Map<String, dynamic> info = const {},
+]) async {
   int nbEdited = 0;
   for (ImageModel image in images) {
-    bool response = await editImage(image, info);
+    bool response = await editImage(
+      image,
+      info: info,
+      single: images.length == 1,
+    );
     if (response == true) {
       nbEdited++;
     }
@@ -443,8 +449,11 @@ Future<int> editImages(List<ImageModel> images,
   return nbEdited;
 }
 
-Future<bool> editImage(ImageModel image,
-    [Map<String, dynamic> info = const {}]) async {
+Future<bool> editImage(
+  ImageModel image, {
+  Map<String, dynamic> info = const {},
+  bool single = true,
+}) async {
   final Map<String, String> queries = {
     'format': 'json',
     'method': 'pwg.images.setInfo',
@@ -452,7 +461,7 @@ Future<bool> editImage(ImageModel image,
   Map<String, dynamic> form = {
     'image_id': image.id,
     'single_value_mode': 'replace',
-    'multiple_value_mode': 'append',
+    'multiple_value_mode': single ? 'replace' : 'append',
   };
   if (info['title'] != null) form['name'] = info['title'];
   if (info['description'] != null) form['comment'] = info['description'];
