@@ -25,14 +25,18 @@ class PiwigoModal extends StatelessWidget {
         controller: ModalScrollController.of(context),
         shrinkWrap: true,
         children: [
-          SizedBox(
-            height: 56.0,
-            child: Center(
-              child: Text(
-                title ?? '',
-                textAlign: TextAlign.center,
-                style: Theme.of(context).appBarTheme.titleTextStyle,
-              ),
+          AppBar(
+            backgroundColor: Colors.transparent,
+            primary: false,
+            centerTitle: true,
+            leading: IconButton(
+              onPressed: () => Navigator.of(context).pop(),
+              icon: Icon(Icons.close),
+            ),
+            title: Text(
+              title ?? '',
+              textAlign: TextAlign.center,
+              style: Theme.of(context).appBarTheme.titleTextStyle,
             ),
           ),
           if (subtitle != null)
@@ -69,6 +73,13 @@ Future<T?> showPiwigoModal<T>({
         top: Radius.circular(15.0),
       ),
     ),
-    builder: builder,
+    builder: (context) {
+      return Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+        ),
+        child: builder.call(context),
+      );
+    },
   );
 }

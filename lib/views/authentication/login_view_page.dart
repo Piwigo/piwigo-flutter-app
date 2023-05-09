@@ -32,6 +32,7 @@ class _LoginViewPageState extends State<LoginViewPage> {
               child: Container(
                 padding: const EdgeInsets.symmetric(
                   vertical: 8.0,
+                  horizontal: 16.0,
                 ),
                 constraints: constraints.copyWith(
                   minHeight: constraints.maxHeight,

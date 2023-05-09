@@ -193,6 +193,7 @@ class AutoUploadManager {
   }
 
   Future<ApiResult<bool>> _login(Dio dio) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
     FlutterSecureStorage secureStorage = const FlutterSecureStorage();
     String? url = await secureStorage.read(key: AutoUploadPreferences.urlKey);
     if (url == null || url.isEmpty) {
@@ -207,10 +208,8 @@ class AutoUploadManager {
     String? password =
         await secureStorage.read(key: AutoUploadPreferences.passwordKey);
 
-    if (username == null ||
-        username.isEmpty ||
-        password == null ||
-        password.isEmpty) {
+    if ((username == null || username.isEmpty) &&
+        (password == null || password.isEmpty)) {
       return ApiResult<bool>(
         data: false,
         error: ApiErrors.wrongServerUrl,
@@ -221,7 +220,7 @@ class AutoUploadManager {
       'format': 'json',
       'method': 'pwg.session.login',
     };
-    Map<String, String> fields = {
+    Map<String, dynamic> fields = {
       'username': username,
       'password': password,
     };
@@ -247,6 +246,10 @@ class AutoUploadManager {
           secureStorage.write(
             key: AutoUploadPreferences.tokenKey,
             value: status.data!.pwgToken,
+          );
+          prefs.setString(
+            Preferences.tokenKey,
+            status.data!.pwgToken,
           );
         }
         return ApiResult<bool>(

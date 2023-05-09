@@ -39,7 +39,8 @@ class AlbumViewPage extends StatefulWidget {
   State<AlbumViewPage> createState() => _AlbumViewPageState();
 }
 
-class _AlbumViewPageState extends State<AlbumViewPage> {
+class _AlbumViewPageState extends State<AlbumViewPage>
+    with AutomaticKeepAliveClientMixin<AlbumViewPage> {
   final RefreshController _refreshController =
       RefreshController(initialRefresh: false);
   final ScrollController _scrollController = ScrollController();
@@ -574,4 +575,7 @@ class _AlbumViewPageState extends State<AlbumViewPage> {
 
     return widget.isAdmin ? adminActions : userActions;
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }

@@ -22,7 +22,8 @@ class PlayerControls extends StatefulWidget {
   }
 }
 
-class _PlayerControlsState extends State<PlayerControls> with SingleTickerProviderStateMixin {
+class _PlayerControlsState extends State<PlayerControls>
+    with SingleTickerProviderStateMixin {
   late PlayerProvider notifier;
   late VideoPlayerValue _latestValue;
   double? _latestVolume;
@@ -115,7 +116,8 @@ class _PlayerControlsState extends State<PlayerControls> with SingleTickerProvid
       widget.onToggleOverlay?.call(false);
 
       chewieController.toggleFullScreen();
-      _showAfterExpandCollapseTimer = Timer(const Duration(milliseconds: 300), () {
+      _showAfterExpandCollapseTimer =
+          Timer(const Duration(milliseconds: 300), () {
         setState(() {
           _cancelAndRestartTimer();
         });
@@ -220,7 +222,8 @@ class _PlayerControlsState extends State<PlayerControls> with SingleTickerProvid
             ? '00'
             : '0$seconds';
 
-    final formattedTime = '${hoursString == '00' ? '' : '$hoursString:'}$minutesString:$secondsString';
+    final formattedTime =
+        '${hoursString == '00' ? '' : '$hoursString:'}$minutesString:$secondsString';
 
     return formattedTime;
   }
@@ -350,8 +353,12 @@ class _PlayerControlsState extends State<PlayerControls> with SingleTickerProvid
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
-                    if (chewieController.isLive) const Expanded(child: Text('LIVE')) else _buildPosition(iconColor),
-                    if (chewieController.allowMuting) _buildMuteButton(controller),
+                    if (chewieController.isLive)
+                      const Expanded(child: Text('LIVE'))
+                    else
+                      _buildPosition(iconColor),
+                    if (chewieController.allowMuting)
+                      _buildMuteButton(controller),
                     const Spacer(),
                     if (chewieController.allowFullScreen) _buildExpandButton(),
                   ],
@@ -374,7 +381,8 @@ class _PlayerControlsState extends State<PlayerControls> with SingleTickerProvid
               // Show bottom overlay over bottom bar
               // No bottom bar when on portrait mode
               Builder(builder: (context) {
-                if (MediaQuery.of(context).orientation == Orientation.landscape) {
+                if (MediaQuery.of(context).orientation ==
+                    Orientation.landscape) {
                   return const SizedBox();
                 }
                 return const SizedBox(height: 56.0);
@@ -434,7 +442,9 @@ class _PlayerControlsState extends State<PlayerControls> with SingleTickerProvid
           ),
           child: Center(
             child: Icon(
-              chewieController.isFullScreen ? Icons.fullscreen_exit : Icons.fullscreen,
+              chewieController.isFullScreen
+                  ? Icons.fullscreen_exit
+                  : Icons.fullscreen,
               color: Colors.white,
             ),
           ),
@@ -445,7 +455,8 @@ class _PlayerControlsState extends State<PlayerControls> with SingleTickerProvid
 
   Widget _buildHitArea() {
     final bool isFinished = _latestValue.position >= _latestValue.duration;
-    final bool showPlayButton = widget.showPlayButton && !_dragging && !notifier.hideStuff;
+    final bool showPlayButton =
+        widget.showPlayButton && !_dragging && !notifier.hideStuff;
 
     return GestureDetector(
       onTap: () {
@@ -530,8 +541,8 @@ class _PlayerControlsState extends State<PlayerControls> with SingleTickerProvid
     return Expanded(
       child: VideoProgressBar(
         controller,
-        barHeight: 10,
-        handleHeight: 6,
+        barHeight: 4,
+        handleHeight: 8,
         drawShadow: true,
         onDragStart: () {
           setState(() {
@@ -548,7 +559,7 @@ class _PlayerControlsState extends State<PlayerControls> with SingleTickerProvid
           _startHideTimer();
         },
         colors: ChewieProgressColors(
-          playedColor: Theme.of(context).colorScheme.secondary.withOpacity(0.5),
+          playedColor: Theme.of(context).colorScheme.secondary.withOpacity(0.7),
           handleColor: Theme.of(context).colorScheme.secondary,
           bufferedColor: Theme.of(context).colorScheme.primary.withOpacity(0.5),
           backgroundColor: Theme.of(context).disabledColor.withOpacity(0.3),
@@ -638,10 +649,11 @@ class _VideoProgressBarState extends State<VideoProgressBar> {
           return;
         }
         // Should only seek if the VideoPlayerController cannot be buffering.
-        final shouldSeekToRelativePosition = !controller.value.isBuffering;
-        if (shouldSeekToRelativePosition) {
-          _seekToRelativePosition(details.globalPosition);
-        }
+        // final shouldSeekToRelativePosition = !controller.value.isBuffering;
+        // if (shouldSeekToRelativePosition) {
+        //   _seekToRelativePosition(details.globalPosition);
+        // }
+        _seekToRelativePosition(details.globalPosition);
 
         widget.onDragUpdate?.call();
       },
@@ -716,8 +728,10 @@ class _ProgressBarPainter extends CustomPainter {
     if (!value.isInitialized) {
       return;
     }
-    final double playedPartPercent = value.position.inMilliseconds / value.duration.inMilliseconds;
-    final double playedPart = playedPartPercent > 1 ? size.width : playedPartPercent * size.width;
+    final double playedPartPercent =
+        value.position.inMilliseconds / value.duration.inMilliseconds;
+    final double playedPart =
+        playedPartPercent > 1 ? size.width : playedPartPercent * size.width;
     for (final DurationRange range in value.buffered) {
       final double start = range.startFraction(value.duration) * size.width;
       final double end = range.endFraction(value.duration) * size.width;
