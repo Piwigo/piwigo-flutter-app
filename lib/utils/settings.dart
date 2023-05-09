@@ -16,6 +16,7 @@ enum SortMethods {
   hitAsc,
   hitDesc,
   random,
+  custom,
 }
 
 extension SortMethodsExtension on SortMethods {
@@ -47,6 +48,8 @@ extension SortMethodsExtension on SortMethods {
         return appStrings.categorySort_visitsDescending;
       case SortMethods.random:
         return appStrings.categorySort_random;
+      default:
+        return appStrings.categorySort_manual;
     }
   }
 
@@ -78,6 +81,8 @@ extension SortMethodsExtension on SortMethods {
         return 'hit DESC';
       case SortMethods.random:
         return 'random';
+      default:
+        return '';
     }
   }
 }
@@ -93,7 +98,7 @@ class Settings {
   static const String defaultAlbumThumbnailSize = 'medium';
   static const String defaultImageThumbnailSize = 'medium';
   static const String defaultImageFullScreenSize = 'medium';
-  static const SortMethods defaultImageSort = SortMethods.nameAsc;
+  static const SortMethods defaultImageSort = SortMethods.custom;
   static const bool defaultRemoveMetadata = false;
   static const bool defaultCompress = false;
   static const bool defaultDeleteAfterUpload = false;
@@ -187,8 +192,10 @@ class Settings {
         return SortMethods.hitAsc;
       case 'hit DESC':
         return SortMethods.hitDesc;
-      default:
+      case 'random':
         return SortMethods.random;
+      default:
+        return SortMethods.custom;
     }
   }
 }

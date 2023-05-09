@@ -256,7 +256,7 @@ class _PlayerControlsState extends State<PlayerControls>
                   duration: const Duration(milliseconds: 300),
                   opacity: notifier.hideStuff ? 0.0 : 1.0,
                   child: Material(
-                    color: Colors.black.withOpacity(0.2),
+                    color: Colors.black.withOpacity(0.5),
                   ),
                 ),
               ),
@@ -267,19 +267,24 @@ class _PlayerControlsState extends State<PlayerControls>
               )
             else
               _buildHitArea(),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: <Widget>[
-                if (_subtitleOn)
-                  Transform.translate(
-                    offset: Offset(
-                      0.0,
-                      notifier.hideStuff ? barHeight * 0.8 : 0.0,
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: <Widget>[
+                  if (_subtitleOn)
+                    Transform.translate(
+                      offset: Offset(
+                        0.0,
+                        notifier.hideStuff ? barHeight * 0.8 : 0.0,
+                      ),
+                      child:
+                          _buildSubtitles(context, chewieController.subtitle!),
                     ),
-                    child: _buildSubtitles(context, chewieController.subtitle!),
-                  ),
-                _buildBottomBar(context),
-              ],
+                  _buildBottomBar(context),
+                ],
+              ),
             ),
           ],
         ),
@@ -326,37 +331,26 @@ class _PlayerControlsState extends State<PlayerControls>
     BuildContext context,
   ) {
     final iconColor = Theme.of(context).textTheme.labelLarge!.color;
-    double height = barHeight;
-    if (chewieController.isFullScreen) {
-      height += 8.0;
-    } else if (MediaQuery.of(context).orientation == Orientation.portrait) {
-      height += 56.0;
-    }
-
     return AnimatedOpacity(
       opacity: notifier.hideStuff ? 0.0 : 1.0,
       duration: const Duration(milliseconds: 300),
-      child: Container(
-        height: height,
-        padding: EdgeInsets.only(
-          left: 16.0,
-          bottom: !chewieController.isFullScreen ? 10.0 : 0,
-        ),
+      child: Padding(
+        padding: EdgeInsets.only(bottom: 8.0),
         child: SafeArea(
           bottom: chewieController.isFullScreen,
+          top: false,
           minimum: chewieController.controlsSafeAreaMinimum,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Flexible(
+              Padding(
+                padding: const EdgeInsets.only(left: 16.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
-                    if (chewieController.isLive)
-                      const Expanded(child: Text('LIVE'))
-                    else
-                      _buildPosition(iconColor),
+                    _buildPosition(iconColor),
                     if (chewieController.allowMuting)
                       _buildMuteButton(controller),
                     const Spacer(),
@@ -364,29 +358,10 @@ class _PlayerControlsState extends State<PlayerControls>
                   ],
                 ),
               ),
-              SizedBox(
-                height: chewieController.isFullScreen ? 15.0 : 0,
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.0),
+                child: _buildProgressBar(),
               ),
-              if (!chewieController.isLive)
-                Expanded(
-                  child: Container(
-                    padding: EdgeInsets.only(right: 16.0),
-                    child: Row(
-                      children: [
-                        _buildProgressBar(),
-                      ],
-                    ),
-                  ),
-                ),
-              // Show bottom overlay over bottom bar
-              // No bottom bar when on portrait mode
-              Builder(builder: (context) {
-                if (MediaQuery.of(context).orientation ==
-                    Orientation.landscape) {
-                  return const SizedBox();
-                }
-                return const SizedBox(height: 56.0);
-              }),
             ],
           ),
         ),
@@ -397,58 +372,37 @@ class _PlayerControlsState extends State<PlayerControls>
   Widget _buildMuteButton(
     VideoPlayerController controller,
   ) {
-    return GestureDetector(
-      onTap: () {
-        _cancelAndRestartTimer();
-
-        if (_latestValue.volume == 0) {
-          controller.setVolume(_latestVolume ?? 0.5);
-        } else {
-          _latestVolume = controller.value.volume;
-          controller.setVolume(0.0);
-        }
-      },
-      child: AnimatedOpacity(
-        opacity: notifier.hideStuff ? 0.0 : 1.0,
-        duration: const Duration(milliseconds: 300),
-        child: ClipRect(
-          child: Container(
-            height: barHeight,
-            padding: const EdgeInsets.only(
-              left: 6.0,
-            ),
-            child: Icon(
-              _latestValue.volume > 0 ? Icons.volume_up : Icons.volume_off,
-              color: Colors.white,
-            ),
-          ),
-        ),
+    return AnimatedOpacity(
+      opacity: notifier.hideStuff ? 0.0 : 1.0,
+      duration: const Duration(milliseconds: 300),
+      child: IconButton(
+        color: Colors.white,
+        icon: Icon(Icons.volume_up),
+        selectedIcon: Icon(Icons.volume_off),
+        isSelected: _latestValue.volume == 0,
+        onPressed: () {
+          _cancelAndRestartTimer();
+          if (_latestValue.volume == 0) {
+            controller.setVolume(_latestVolume ?? 0.5);
+          } else {
+            _latestVolume = controller.value.volume;
+            controller.setVolume(0.0);
+          }
+        },
       ),
     );
   }
 
   Widget _buildExpandButton() {
-    return GestureDetector(
-      onTap: _onExpandCollapse,
-      child: AnimatedOpacity(
-        opacity: notifier.hideStuff ? 0.0 : 1.0,
-        duration: const Duration(milliseconds: 300),
-        child: Container(
-          height: barHeight + (chewieController.isFullScreen ? 15.0 : 0),
-          margin: const EdgeInsets.only(right: 12.0),
-          padding: const EdgeInsets.only(
-            left: 8.0,
-            right: 8.0,
-          ),
-          child: Center(
-            child: Icon(
-              chewieController.isFullScreen
-                  ? Icons.fullscreen_exit
-                  : Icons.fullscreen,
-              color: Colors.white,
-            ),
-          ),
-        ),
+    return AnimatedOpacity(
+      opacity: notifier.hideStuff ? 0.0 : 1.0,
+      duration: const Duration(milliseconds: 300),
+      child: IconButton(
+        color: Colors.white,
+        onPressed: _onExpandCollapse,
+        icon: Icon(Icons.fullscreen),
+        selectedIcon: Icon(Icons.fullscreen_exit),
+        isSelected: chewieController.isFullScreen,
       ),
     );
   }
@@ -538,32 +492,28 @@ class _PlayerControlsState extends State<PlayerControls>
   }
 
   Widget _buildProgressBar() {
-    return Expanded(
-      child: VideoProgressBar(
-        controller,
-        barHeight: 4,
-        handleHeight: 8,
-        drawShadow: true,
-        onDragStart: () {
-          setState(() {
-            _dragging = true;
-          });
-
-          _hideTimer?.cancel();
-        },
-        onDragEnd: () {
-          setState(() {
-            _dragging = false;
-          });
-
-          _startHideTimer();
-        },
-        colors: ChewieProgressColors(
-          playedColor: Theme.of(context).colorScheme.secondary.withOpacity(0.7),
-          handleColor: Theme.of(context).colorScheme.secondary,
-          bufferedColor: Theme.of(context).colorScheme.primary.withOpacity(0.5),
-          backgroundColor: Theme.of(context).disabledColor.withOpacity(0.3),
-        ),
+    return VideoProgressBar(
+      controller,
+      barHeight: 4,
+      handleHeight: 8,
+      drawShadow: true,
+      onDragStart: () {
+        setState(() {
+          _dragging = true;
+        });
+        _hideTimer?.cancel();
+      },
+      onDragEnd: () {
+        setState(() {
+          _dragging = false;
+        });
+        _startHideTimer();
+      },
+      colors: ChewieProgressColors(
+        playedColor: Theme.of(context).colorScheme.secondary.withOpacity(0.7),
+        handleColor: Theme.of(context).colorScheme.secondary,
+        bufferedColor: Theme.of(context).colorScheme.primary.withOpacity(0.5),
+        backgroundColor: Theme.of(context).disabledColor.withOpacity(0.3),
       ),
     );
   }
@@ -672,7 +622,7 @@ class _VideoProgressBarState extends State<VideoProgressBar> {
       },
       child: Center(
         child: Container(
-          height: MediaQuery.of(context).size.height,
+          padding: EdgeInsets.symmetric(vertical: 8.0),
           width: MediaQuery.of(context).size.width,
           color: Colors.transparent,
           child: CustomPaint(

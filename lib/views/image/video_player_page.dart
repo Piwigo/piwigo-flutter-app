@@ -73,10 +73,6 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
       allowFullScreen: false,
       showControlsOnInitialize: true,
       showOptions: false,
-      materialProgressColors: ChewieProgressColors(
-        playedColor: Theme.of(context).colorScheme.secondary.withOpacity(0.7),
-        handleColor: Colors.white,
-      ),
       hideControlsTimer: const Duration(seconds: 3),
       customControls: PlayerControls(onToggleOverlay: _onToggleOverlay),
     )..setVolume(0);
