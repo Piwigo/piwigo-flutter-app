@@ -27,7 +27,7 @@ class PiwigoButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final Color backgroundColor = disabled
         ? Theme.of(context).disabledColor
-        : color ?? Theme.of(context).colorScheme.primary;
+        : color ?? Theme.of(context).colorScheme.secondary;
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: disabled ? null : onPressed,
