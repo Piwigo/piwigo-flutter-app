@@ -13,6 +13,7 @@ import 'package:piwigo_ng/views/image/edit_image_page.dart';
 import 'package:piwigo_ng/views/image/image_favorites_page.dart';
 import 'package:piwigo_ng/views/image/image_search_view_page.dart';
 import 'package:piwigo_ng/views/image/image_view_page.dart';
+import 'package:piwigo_ng/views/image/video_player_page.dart';
 import 'package:piwigo_ng/views/settings/auto_upload_page.dart';
 import 'package:piwigo_ng/views/settings/privacy_policy_view_page.dart';
 import 'package:piwigo_ng/views/settings/select_language_view_page.dart';
@@ -156,6 +157,14 @@ Route<dynamic> generateRoute(RouteSettings settings) {
           startId: arguments['startId'],
           album: arguments['album'],
           isAdmin: arguments['isAdmin'] ?? isAdmin,
+        ),
+        settings: settings,
+      );
+    case VideoPlayerPage.routeName:
+      return MaterialPageRoute(
+        builder: (_) => VideoPlayerPage(
+          videoUrl: arguments['videoUrl'],
+          thumbnailUrl: arguments['thumbnailUrl'],
         ),
         settings: settings,
       );

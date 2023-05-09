@@ -209,7 +209,7 @@ class TagWrap extends StatelessWidget {
       runSpacing: 8.0,
       children: List.generate(tags.length, (index) {
         TagModel tag = tags[index];
-        return TagChip(
+        return SelectTagChip(
           tag: tag,
           selected: isSelected?.call(tag) ?? false,
           onTap: () => onTap?.call(tag),

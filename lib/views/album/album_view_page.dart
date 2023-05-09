@@ -183,6 +183,7 @@ class _AlbumViewPageState extends State<AlbumViewPage>
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
       body: SafeArea(
         child: SmartRefresher(
@@ -279,7 +280,8 @@ class _AlbumViewPageState extends State<AlbumViewPage>
             tooltip: appStrings.categoryImageList_deselectButton,
             icon: Icon(Icons.cancel),
           ),
-        if (orientation == Orientation.landscape) ..._actions,
+        if (orientation == Orientation.landscape && _selectedList.isNotEmpty)
+          ..._actions,
         if (widget.isAdmin)
           PopupMenuButton(
             tooltip: appStrings.imageOptions_title,
@@ -399,6 +401,7 @@ class _AlbumViewPageState extends State<AlbumViewPage>
     _selectedList =
         _imageList!.where((image) => _selectedList.contains(image)).toList();
     return ImageGridView(
+      album: _currentAlbum,
       imageList: _imageList!,
       selectedList: _selectedList,
       onTapImage: _onTapPhoto,

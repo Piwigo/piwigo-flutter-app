@@ -30,4 +30,20 @@ class AppColors {
   static const Color fieldDark = const Color(0xFF2D2D2D);
   static const Color cardLight = const Color(0xFFFFFFFF);
   static const Color cardDark = const Color(0xFF333333);
+
+  static const Color lightGreen = const Color(0xFFD6FFCF);
+  static const Color green = const Color(0xFF6ECE5E);
+  static const Color lightOrange = const Color(0xFFFFE9CF);
+  static const Color orange = const Color(0xFFFFA744);
+  static const Color lightBlue = const Color(0xFFCFEBFF);
+  static const Color blue = const Color(0xFF2883C3);
+  static const Color lightPink = const Color(0xFFFFCFCF);
+  static const Color pink = const Color(0xFFFF5252);
+
+  static const List<Color> foregroundColors = [
+    AppColors.green,
+    AppColors.orange,
+    AppColors.blue,
+    AppColors.pink,
+  ];
 }

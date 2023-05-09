@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:piwigo_ng/utils/settings.dart';
 
 class AppField extends StatelessWidget {
   const AppField({
@@ -45,9 +44,6 @@ class AppField extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: margin,
-      constraints: BoxConstraints(
-        maxWidth: Settings.modalMaxWidth,
-      ),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10.0),
         color: color ?? Theme.of(context).inputDecorationTheme.fillColor,

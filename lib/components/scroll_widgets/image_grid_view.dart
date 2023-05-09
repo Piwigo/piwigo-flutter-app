@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:piwigo_ng/components/cards/image_card.dart';
+import 'package:piwigo_ng/models/album_model.dart';
 import 'package:piwigo_ng/models/image_model.dart';
 import 'package:piwigo_ng/utils/settings.dart';
 
 class ImageGridView extends StatefulWidget {
   const ImageGridView({
     Key? key,
+    this.album,
     this.imageList = const [],
     this.selectedList = const [],
     this.onSelectImage,
@@ -14,6 +16,7 @@ class ImageGridView extends StatefulWidget {
     this.onTapImage,
   }) : super(key: key);
 
+  final AlbumModel? album;
   final List<ImageModel> imageList;
   final List<ImageModel> selectedList;
   final Function(ImageModel)? onTapImage;
@@ -73,11 +76,14 @@ class _ImageGridViewState extends State<ImageGridView> {
                       bottomRight: Radius.circular(10.0),
                     )
                   : BorderRadius.zero,
-              child: ImageCard(
-                image: image,
-                selected: widget.selectedList.isNotEmpty ? selected : null,
-                onPressed: () => _onTapImage(image),
-                onLongPress: () => _onLongPressImage(image),
+              child: Hero(
+                tag: "<hero image ${image.id}-${widget.album?.id ?? -1}>",
+                child: ImageCard(
+                  image: image,
+                  selected: widget.selectedList.isNotEmpty ? selected : null,
+                  onPressed: () => _onTapImage(image),
+                  onLongPress: () => _onLongPressImage(image),
+                ),
               ),
             );
           },

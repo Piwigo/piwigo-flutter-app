@@ -1,4 +1,5 @@
 import 'package:mime_type/mime_type.dart';
+import 'package:piwigo_ng/models/tag_model.dart';
 
 class ImageModel {
   int id;
@@ -15,6 +16,7 @@ class ImageModel {
   String elementUrl;
   Derivatives derivatives;
   List<dynamic> categories;
+  List<TagModel> tags;
 
   ImageModel({
     required this.id,
@@ -31,6 +33,7 @@ class ImageModel {
     required this.elementUrl,
     required this.derivatives,
     this.categories = const [],
+    this.tags = const [],
   });
 
   ImageModel.fromJson(Map<String, dynamic> json)
@@ -47,7 +50,11 @@ class ImageModel {
         pageUrl = json['page_url'],
         elementUrl = json['element_url'],
         derivatives = Derivatives.fromJson(json['derivatives']),
-        categories = json['categories'] ?? [];
+        categories = json['categories'] ?? [],
+        tags = json['tags']
+                ?.map<TagModel>((tag) => TagModel.fromJson(tag))
+                .toList() ??
+            [];
 
   Derivative? getDerivativeFromString(String derivative) {
     switch (derivative) {
@@ -77,7 +84,8 @@ class ImageModel {
   }
 
   bool get isVideo {
-    String? mimeType = mime(file) ?? mime(elementUrl) ?? mime(derivatives.medium.url);
+    String? mimeType =
+        mime(file) ?? mime(elementUrl) ?? mime(derivatives.medium.url);
     return mimeType != null && mimeType.startsWith('video');
   }
 

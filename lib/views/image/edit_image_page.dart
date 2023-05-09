@@ -1,9 +1,11 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:piwigo_ng/api/api_error.dart';
 import 'package:piwigo_ng/api/images.dart';
 import 'package:piwigo_ng/components/buttons/animated_piwigo_button.dart';
 import 'package:piwigo_ng/components/cards/image_details_card.dart';
+import 'package:piwigo_ng/components/cards/tag_chip.dart';
 import 'package:piwigo_ng/components/dialogs/confirm_dialog.dart';
 import 'package:piwigo_ng/components/fields/app_field.dart';
 import 'package:piwigo_ng/components/modals/add_tags_modal.dart';
@@ -33,8 +35,9 @@ class _EditImagePageState extends State<EditImagePage> {
   static const double maxCarouselElementWidth = 300.0;
   static const double carouselHeight = 128.0;
   late final TextEditingController _authorController;
-  final TextEditingController _titleController = TextEditingController();
-  final TextEditingController _descriptionController = TextEditingController();
+  late final TextEditingController _titleController = TextEditingController();
+  late final TextEditingController _descriptionController =
+      TextEditingController();
   final RoundedLoadingButtonController _btnController =
       RoundedLoadingButtonController();
 
@@ -48,8 +51,13 @@ class _EditImagePageState extends State<EditImagePage> {
     _imageList = widget.images;
     _authorController =
         TextEditingController(text: Preferences.getUploadAuthor);
+    if (_imageList.length == 1) {
+      _titleController.text = _imageList.first.name;
+      _descriptionController.text = _imageList.first.comment ?? '';
+      _tags = _imageList.first.tags;
+    }
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       PrivacyLevel.values.forEach((privacy) {
         _levelItems.add(DropdownMenuItem<int?>(
           value: privacy.value,
@@ -59,6 +67,15 @@ class _EditImagePageState extends State<EditImagePage> {
           ),
         ));
       });
+      if (_imageList.length == 1) {
+        ApiResult<ImageModel>? result = await getImage(_imageList.first.id);
+        if (result.hasData) {
+          setState(() {
+            _imageList[0] = result.data!;
+            _tags = result.data!.tags;
+          });
+        }
+      }
       setState(() {});
     });
   }
@@ -95,7 +112,7 @@ class _EditImagePageState extends State<EditImagePage> {
           ? null
           : _descriptionController.text,
       'level': _privacyLevel,
-      'tags': tagIds.isEmpty ? null : tagIds,
+      'tags': tagIds.isEmpty ? null : tagIds.join(','),
     });
     if (!mounted) return;
     if (result <= 0) {
@@ -197,10 +214,20 @@ class _EditImagePageState extends State<EditImagePage> {
             ],
             child: ClipRRect(
               borderRadius: BorderRadius.circular(10),
-              child: TagWrap(
-                tags: _tags,
-                onTap: _onDeselectTag,
-                isSelected: (tag) => true,
+              child: Wrap(
+                spacing: 8.0,
+                runSpacing: 8.0,
+                children: List.generate(_tags.length, (index) {
+                  TagModel tag = _tags[index];
+                  return TagChip(
+                    tag: tag,
+                    icon: Icon(
+                      Icons.close,
+                      color: Theme.of(context).colorScheme.error,
+                    ),
+                    onTap: () => _onDeselectTag(tag),
+                  );
+                }),
               ),
             ),
           ), // tags

@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:mime_type/mime_type.dart';
 import 'package:piwigo_ng/api/images.dart';
 import 'package:piwigo_ng/components/buttons/animated_piwigo_button.dart';
+import 'package:piwigo_ng/components/cards/tag_chip.dart';
 import 'package:piwigo_ng/components/fields/app_field.dart';
 import 'package:piwigo_ng/components/modals/add_tags_modal.dart';
 import 'package:piwigo_ng/components/modals/piwigo_modal.dart';
@@ -367,10 +368,20 @@ class _UploadGalleryViewPage extends State<UploadViewPage>
           actions: [
             const Icon(Icons.add_circle),
           ],
-          child: TagWrap(
-            tags: _tags,
-            onTap: _onDeselectTag,
-            isSelected: (tag) => true,
+          child: Wrap(
+            spacing: 8.0,
+            runSpacing: 8.0,
+            children: List.generate(_tags.length, (index) {
+              TagModel tag = _tags[index];
+              return TagChip(
+                tag: tag,
+                icon: Icon(
+                  Icons.close,
+                  color: Theme.of(context).colorScheme.error,
+                ),
+                onTap: () => _onDeselectTag(tag),
+              );
+            }),
           ),
         ), // tags
       ],

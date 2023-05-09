@@ -105,16 +105,13 @@ class ImageCard extends StatelessWidget {
     return CachedNetworkImage(
       imageUrl: imageUrl ?? '',
       fadeInDuration: const Duration(milliseconds: 300),
-      imageBuilder: (context, provider) => Hero(
-        tag: "<hero image ${image.id}>",
-        child: Image(
-          image: provider,
-          fit: BoxFit.cover,
-          errorBuilder: (context, o, s) {
-            debugPrint("$o\n$s");
-            return _buildErrorWidget(context);
-          },
-        ),
+      imageBuilder: (context, provider) => Image(
+        image: provider,
+        fit: BoxFit.cover,
+        errorBuilder: (context, o, s) {
+          debugPrint("$o\n$s");
+          return _buildErrorWidget(context);
+        },
       ),
       progressIndicatorBuilder: (context, url, download) {
         if (download.downloaded >= (download.totalSize ?? 0)) {

@@ -462,6 +462,8 @@ Future<bool> editImage(ImageModel image,
 
   final FormData formData = FormData.fromMap(form);
 
+  print(formData.fields);
+
   try {
     Response response = await ApiClient.post(
       data: formData,

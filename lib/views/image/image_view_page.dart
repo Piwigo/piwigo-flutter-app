@@ -12,10 +12,12 @@ import 'package:piwigo_ng/api/images.dart';
 import 'package:piwigo_ng/components/popup_list_item.dart';
 import 'package:piwigo_ng/models/album_model.dart';
 import 'package:piwigo_ng/models/image_model.dart';
+import 'package:piwigo_ng/models/tag_model.dart';
 import 'package:piwigo_ng/services/preferences_service.dart';
 import 'package:piwigo_ng/utils/image_actions.dart';
 import 'package:piwigo_ng/utils/localizations.dart';
-import 'package:piwigo_ng/views/image/video_view.dart';
+import 'package:piwigo_ng/utils/resources.dart';
+import 'package:piwigo_ng/views/image/video_player_page.dart';
 
 /// Media Full Screen page
 /// * Video player
@@ -84,7 +86,9 @@ class _ImageViewPageState extends State<ImageViewPage> {
     _pageController = PageController(initialPage: _page);
 
     _loadCookies();
-
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      _getImagesInfo(_imageList);
+    });
     super.initState();
   }
 
@@ -106,6 +110,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
       _imagePage += 1;
       _imageList.addAll(result.data!);
     });
+    _getImagesInfo(_imageList);
   }
 
   Future<void> _loadCookies() async {
@@ -119,6 +124,18 @@ class _ImageViewPageState extends State<ImageViewPage> {
     setState(() {
       _serverCookie = cookiesStr;
     });
+  }
+
+  Future<void> _getImagesInfo(List<ImageModel> images) async {
+    for (ImageModel image in images) {
+      ApiResult<ImageModel>? result = await getImage(image.id);
+      if (result.hasData) {
+        int index = _imageList.indexWhere((i) => i.id == image.id);
+        setState(() {
+          _imageList[index] = result.data!;
+        });
+      }
+    }
   }
 
   /// Get image that is shown in the [PhotoViewGallery] at [_page]
@@ -175,13 +192,10 @@ class _ImageViewPageState extends State<ImageViewPage> {
 
   /// Edit current image action.
   Future<void> _onEdit() async {
-    bool? success = await onEditPhotos(context, [_currentImage]);
+    ImageModel image = _currentImage;
+    bool? success = await onEditPhotos(context, [image]);
     if (success == null || success == false) return;
-    ApiResult<ImageModel> result = await getImage(_currentImage.id);
-    if (!result.hasData) return;
-    setState(() {
-      _imageList[_page] = result.data!;
-    });
+    _getImagesInfo([image]);
   }
 
   /// Move current image action.
@@ -231,18 +245,13 @@ class _ImageViewPageState extends State<ImageViewPage> {
           extendBody: true,
           primary: false,
           body: SafeArea(
-            child: OrientationBuilder(builder: (context, orientation) {
-              return Stack(
-                children: [
-                  _content,
-                  _top,
-
-                  /// Show bottom on portrait mode only
-                  /// (to keep vertical space in landscape mode).
-                  if (orientation == Orientation.portrait) _bottom,
-                ],
-              );
-            }),
+            child: Stack(
+              children: [
+                _content,
+                _top,
+                _bottom,
+              ],
+            ),
           ),
         ),
       ),
@@ -286,23 +295,8 @@ class _ImageViewPageState extends State<ImageViewPage> {
                     style: TextStyle(fontSize: 16, color: Colors.white),
                   ),
                 ),
-                if (MediaQuery.of(context).orientation ==
-                    Orientation.landscape) ...[
-                  IconButton(
-                    onPressed: _onEdit,
-                    icon: Icon(Icons.edit),
-                  ),
-                  if (_album.id != -1)
-                    IconButton(
-                      onPressed: _onMove,
-                      icon: Icon(Icons.drive_file_move),
-                    ),
-                  IconButton(
-                    onPressed: _onDelete,
-                    icon: Icon(Icons.delete,
-                        color: Theme.of(context).colorScheme.error),
-                  ),
-                ],
+                if (MediaQuery.of(context).orientation == Orientation.landscape)
+                  ..._actions,
                 if (widget.isAdmin)
                   PopupMenuButton(
                     position: PopupMenuPosition.under,
@@ -352,6 +346,66 @@ class _ImageViewPageState extends State<ImageViewPage> {
     );
   }
 
+  /// Image tags
+  Widget get _tags {
+    List<TagModel> tags = _currentImage.tags;
+    if (tags.isEmpty) return const SizedBox();
+    return Stack(
+      children: [
+        SizedBox(
+          height: 34.0,
+          child: ListView.separated(
+            padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+            scrollDirection: Axis.horizontal,
+            itemCount: tags.length,
+            itemBuilder: (context, index) {
+              TagModel tag = tags[index];
+              int colorIndex = tag.id % AppColors.foregroundColors.length;
+              return Text(
+                "#${tag.name}",
+                style: TextStyle(
+                  fontSize: 14,
+                  color: AppColors.foregroundColors[colorIndex],
+                ),
+              );
+            },
+            separatorBuilder: (context, index) => const SizedBox(width: 8.0),
+          ),
+        ),
+        Positioned(
+          top: 0.0,
+          bottom: 0.0,
+          right: 0.0,
+          width: 16.0,
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0x00000000), Color(0xFF000000)],
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight,
+              ),
+            ),
+          ),
+        ),
+        Positioned(
+          top: 0.0,
+          bottom: 0.0,
+          left: 0.0,
+          width: 16.0,
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xFF000000), Color(0x00000000)],
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   /// Page content
   ///
   /// Show video or image
@@ -360,70 +414,110 @@ class _ImageViewPageState extends State<ImageViewPage> {
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: () => _onToggleOverlay(MediaQuery.of(context).orientation),
-        child: _serverCookie == ''
-            ? null
-            : PhotoViewGallery.builder(
-                /// Compatibility with PageView and PhotoView
-                pageController: _pageController,
-                onPageChanged: (page) => setState(() {
-                  _page = page;
-                  if (page == _imageList.length - 1) {
-                    _loadMoreImages();
-                  }
-                }),
-                itemCount: _imageList.length,
-                builder: (context, index) {
-                  final ImageModel image = _imageList[index];
+        child: Builder(builder: (context) {
+          if (_serverCookie.isEmpty) return const SizedBox();
+          return PhotoViewGallery.builder(
+            // Compatibility with PageView and PhotoView
+            pageController: _pageController,
+            onPageChanged: (page) => setState(() {
+              _page = page;
+              if (page == _imageList.length - 1) {
+                _loadMoreImages();
+              }
+            }),
+            itemCount: _imageList.length,
+            builder: (context, index) {
+              final ImageModel image = _imageList[index];
 
-                  // Check mime type of file (multiple test to ensure it is not null)
-                  if (image.isVideo) {
-                    // Returns video player
-                    return PhotoViewGalleryPageOptions.customChild(
-                      disableGestures: true,
-                      child: VideoPlayerView(
-                        videoUrl: image.elementUrl,
-                        thumbnailUrl: image.derivatives.medium.url,
-                        showOverlay: _showOverlay,
-                        screenPadding: const EdgeInsets.only(bottom: 56.0),
-                        onToggleOverlay: (value) => _onToggleOverlay(
-                            MediaQuery.of(context).orientation, value),
+              String imageUrl = '';
+              if (Preferences.getImageFullScreenSize == 'full') {
+                imageUrl = image.elementUrl;
+                imageUrl = HtmlUnescape().convert(imageUrl);
+              } else {
+                imageUrl = image
+                        .getDerivativeFromString(
+                            Preferences.getImageFullScreenSize)
+                        ?.url ??
+                    '';
+              }
+
+              ApiClient.cookieJar.loadForRequest(Uri.parse(imageUrl));
+
+              // Check mime type of file (multiple test to ensure it is not null)
+              if (image.isVideo) {
+                // Returns video player
+                return PhotoViewGalleryPageOptions.customChild(
+                  disableGestures: true,
+                  child: Stack(
+                    children: [
+                      Positioned.fill(
+                        child: Image.network(
+                          image.derivatives.medium.url,
+                          fit: BoxFit.contain,
+                          errorBuilder: (context, o, s) {
+                            debugPrint("$o\n$s");
+                            return Center(
+                              child: Icon(Icons.image_not_supported),
+                            );
+                          },
+                        ),
                       ),
-                    );
-                  }
+                      Center(
+                        child: IconButton(
+                          color: Colors.white,
+                          style: ButtonStyle(
+                            backgroundColor: MaterialStateProperty.resolveWith(
+                                (states) => Colors.black.withOpacity(0.5)),
+                            shape: MaterialStateProperty.resolveWith(
+                                (states) => CircleBorder()),
+                          ),
+                          onPressed: () {
+                            Navigator.of(context).pushNamed(
+                              VideoPlayerPage.routeName,
+                              arguments: {
+                                'videoUrl': image.elementUrl,
+                                'thumbnailUrl': imageUrl,
+                              },
+                            );
+                          },
+                          icon: Icon(
+                            Icons.play_arrow,
+                            size: 32,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  // child: VideoPlayerView(
+                  //   videoUrl: image.elementUrl,
+                  //   thumbnailUrl: image.derivatives.medium.url,
+                  //   showOverlay: _showOverlay,
+                  //   screenPadding: const EdgeInsets.only(bottom: 56.0),
+                  //   onToggleOverlay: (value) => _onToggleOverlay(
+                  //       MediaQuery.of(context).orientation, value),
+                  // ),
+                );
+              }
 
-                  String imageUrl = '';
-                  if (Preferences.getImageFullScreenSize == 'full') {
-                    imageUrl = image.elementUrl;
-                    imageUrl = HtmlUnescape().convert(imageUrl);
-                  } else {
-                    imageUrl = image
-                            .getDerivativeFromString(
-                                Preferences.getImageFullScreenSize)
-                            ?.url ??
-                        '';
-                  }
-
-                  ApiClient.cookieJar.loadForRequest(Uri.parse(imageUrl));
-
-                  // Default behavior: Zoomable image
-
-                  return PhotoViewGalleryPageOptions(
-                    heroAttributes: PhotoViewHeroAttributes(
-                      tag: "<hero image ${image.id}>",
-                    ),
-                    imageProvider: NetworkImage(
-                      imageUrl,
-                      headers: {HttpHeaders.cookieHeader: _serverCookie},
-                    ),
-                    maxScale: 2.0,
-                    minScale: PhotoViewComputedScale.contained,
-                    errorBuilder: (context, o, s) {
-                      debugPrint("$o");
-                      return SizedBox();
-                    },
-                  );
+              // Default behavior: Zoomable image
+              return PhotoViewGalleryPageOptions(
+                heroAttributes: PhotoViewHeroAttributes(
+                  tag: "<hero image ${image.id}-${_album.id}>",
+                ),
+                imageProvider: NetworkImage(
+                  imageUrl,
+                  headers: {HttpHeaders.cookieHeader: _serverCookie},
+                ),
+                maxScale: 2.0,
+                minScale: PhotoViewComputedScale.contained,
+                errorBuilder: (context, o, s) {
+                  debugPrint("$o\n$s");
+                  return SizedBox();
                 },
-              ),
+              );
+            },
+          );
+        }),
       ),
     );
   }
@@ -447,65 +541,115 @@ class _ImageViewPageState extends State<ImageViewPage> {
           duration: _overlayAnimationDuration,
           curve: _overlayAnimationCurve,
           opacity: _showOverlay ? 1 : 0,
-          child: Container(
-            height: 56.0,
-            decoration: BoxDecoration(color: Colors.black.withOpacity(0.5)),
-            child: Row(
-              children: widget.isAdmin
-                  ? [
-                      Expanded(
-                        child: IconButton(
-                          onPressed: _onEdit,
-                          icon: Icon(Icons.edit),
-                        ),
-                      ),
-                      if (_album.id != -1)
-                        Expanded(
-                          child: IconButton(
-                            onPressed: _onMove,
-                            icon: Icon(Icons.drive_file_move),
-                          ),
-                        ),
-                      Expanded(
-                        child: IconButton(
-                          onPressed: _onDelete,
-                          icon: Icon(Icons.delete,
-                              color: Theme.of(context).colorScheme.error),
-                        ),
-                      ),
-                    ]
-                  : [
-                      Expanded(
-                        child: IconButton(
-                          onPressed: () => share([_currentImage]),
-                          icon: Icon(Icons.share),
-                        ),
-                      ),
-                      if (Preferences.getUserStatus != 'guest')
-                        Expanded(
-                          child: IconButton(
-                            onPressed: _onLike,
-                            icon: Builder(
-                              builder: (context) {
-                                if (!_currentImage.favorite) {
-                                  return Icon(Icons.favorite_border);
-                                }
-                                return Icon(Icons.favorite);
-                              },
-                            ),
-                          ),
-                        ),
-                      Expanded(
-                        child: IconButton(
-                          onPressed: () => downloadImages([_currentImage]),
-                          icon: Icon(Icons.download),
-                        ),
-                      ),
-                    ],
-            ),
+          child: OrientationBuilder(builder: (context, orientation) {
+            return Column(
+              children: [
+                _comment,
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.5),
+                  ),
+                  child: AnimatedSize(
+                    duration: _overlayAnimationDuration,
+                    curve: _overlayAnimationCurve,
+                    child: _tags,
+                  ),
+                ),
+                if (MediaQuery.of(context).orientation == Orientation.portrait)
+                  Container(
+                    height: 56.0,
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.5),
+                    ),
+                    child: Row(
+                      children: _actions
+                          .map((action) => Expanded(child: action))
+                          .toList(),
+                    ),
+                  ),
+              ],
+            );
+          }),
+        ),
+      ),
+    );
+  }
+
+  Widget get _comment {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(10.0),
+        child: Container(
+          constraints: BoxConstraints(maxHeight: 80),
+          decoration: BoxDecoration(
+            color: Theme.of(context).cardColor.withOpacity(0.8),
+          ),
+          child: AnimatedSize(
+            duration: _overlayAnimationDuration,
+            curve: _overlayAnimationCurve,
+            child: Builder(builder: (context) {
+              if (_currentImage.comment == null ||
+                  _currentImage.comment!.isEmpty) return const SizedBox();
+              return Scrollbar(
+                radius: Radius.circular(8.0),
+                thumbVisibility: true,
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 8.0,
+                    horizontal: 16.0,
+                  ),
+                  child: Text(
+                    _currentImage.comment?.replaceAll('\n', ' ') ?? '',
+                  ),
+                ),
+              );
+            }),
           ),
         ),
       ),
     );
+  }
+
+  List<Widget> get _actions {
+    List<Widget> adminActions = [
+      IconButton(
+        onPressed: _onEdit,
+        icon: Icon(Icons.edit),
+      ),
+      if (_album.id != -1)
+        IconButton(
+          onPressed: _onMove,
+          icon: Icon(Icons.drive_file_move),
+        ),
+      IconButton(
+        onPressed: _onDelete,
+        icon: Icon(Icons.delete, color: Theme.of(context).colorScheme.error),
+      ),
+    ];
+    List<Widget> userActions = [
+      IconButton(
+        onPressed: () => share([_currentImage]),
+        icon: Icon(Icons.share),
+      ),
+      if (Preferences.getUserStatus != 'guest')
+        IconButton(
+          onPressed: _onLike,
+          icon: Builder(
+            builder: (context) {
+              if (!_currentImage.favorite) {
+                return Icon(Icons.favorite_border);
+              }
+              return Icon(Icons.favorite);
+            },
+          ),
+        ),
+      IconButton(
+        onPressed: () => downloadImages([_currentImage]),
+        icon: Icon(Icons.download),
+      ),
+    ];
+
+    return widget.isAdmin ? adminActions : userActions;
   }
 }
