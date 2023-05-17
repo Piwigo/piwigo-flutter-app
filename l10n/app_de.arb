@@ -149,6 +149,10 @@
     "categoryUpload_videos": "Videos hochladen",
     "categoryUpload_takePhoto": "Foto aufnehmen",
     "categoryUpload_takeVideo": "Video aufnehmen",
+    "uploadList_title": "Upload Status",
+    "uploadList_uploading": "Uploading",
+    "uploadList_history": "History",
+    "uploadList_empty": "Empty",
     "setDefaultCategory_select": "Bitte ein Album oder Unteralbum auswählen, welches das neue Wurzelalbum wird.",
     "setDefaultCategory_title": "Standard-Album",
     "setDefaultCategory_message": "Sind Sie sicher, dass Sie das Album {album} als Standard-Album festlegen möchten?",
@@ -281,8 +285,8 @@
     "imageOptions_edit": "Bearbeiten",
     "imageOptions_download": "Herunterladen",
     "imageOptions_share": "Teilen",
-    "imageOptions_addFavorites": "Favoriten hinzufügen",
-    "imageOptions_removeFavorites": "Favoriten entfernen",
+    "imageOptions_addFavorites": "Add to favorites",
+    "imageOptions_removeFavorites": "Remove from favorites",
     "imageOptions_setAlbumImage": "Album-Vorschaubild festlegen",
     "imageDetailsView_title": "Eigenschaften",
     "editImageDetails_title": "Titel",
@@ -568,6 +572,7 @@
     "imageUploadCompleted_title": "Hochladen abgeschlossen",
     "imageUploadCompleted_message": "Foto auf Ihren Piwigo-Server hochgeladen.",
     "imageUploadCompleted_message1": "Fotos auf Ihren Piwigo-Server hochgeladen.",
+    "imageUploadCompleted_warning": "some of your photos could not be uploaded.",
     "uploadError_title": "Fehler beim Hochladen",
     "uploadError_message": "Foto konnte nicht hochgeladen werden.",
     "uploadCancelled_title": "Hochladen abgebrochen",
@@ -715,6 +720,26 @@
     "settings_autoUploadDestination": "Ziel",
     "settings_autoUploadDestinationInvalid": "Ungültiges Ziel-Album",
     "settings_autoUploadDestinationInfo": "Bitte Album oder Unter-Album auswählen, in welches Fotos und Videos automatisch hochgeladen werden.",
+    "settings_autoUploadDuplicateInfo": "Photos that are already in this Piwigo won't be uploaded.",
+    "settings_autoUploadFrequency": "Every",
+    "settings_autoUploadFrequencyMinutes": "{count, plural, =1{1 minute} other{{count} minutes}}",
+    "@settings_autoUploadFrequencyMinutes": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "settings_autoUploadFrequencyHours": "{count, plural, =1{1 hour} other{{count} hours}}",
+    "@settings_autoUploadFrequencyHours": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "settings_autoUploadFrequencyDays": "{count, plural, =1{1 day} other{{count} days}}",
+    "@settings_autoUploadFrequencyDays": {
+        "placeholders": {
+            "count": {}
+        }
+    },
     "autoUploadError_Disabled": "Die Auto-Upload-Option ist in den App-Einstellungen deaktiviert.",
     "autoUploadError_Failed": "Mehrere Übertragungen sind fehlgeschlagen und die Upload-Warteschlange wurde angehalten. Bitte in der App überprüfen.",
     "uploadPhotoSize_title": "Max. Foto-Größe",
@@ -733,9 +758,7 @@
     "settings_cacheClearAll": "Foto-Cache löschen",
     "settings_cacheClearMsg": "Sind Sie sicher, dass Sie den Foto-Cache löschen möchten? Alben und Fotos werden danach eine Weile benötigen, um erneut zu laden.",
     "settingsHeader_appearance": "Darstellung",
-    "settingsHeader_colorPalette": "Farbpalette",
-    "settings_lightColor": "Hell",
-    "settings_darkColor": "Dunkel",
+    "settingsHeader_theme": "Dark Theme",
     "settings_switchPalette": "Automatisch",
     "settings_brightness": "Helligkeit",
     "settings_brightnessHelp": "Bei geringer Umgebungshelligkeit verwendet die Option »Automatisch« eine dunklere Farbpalette, um Fotos vor einem dunkleren Hintergrund hervorzuheben.",
@@ -770,5 +793,8 @@
     "settings_acknowledgements": "Danksagungen",
     "settings_privacy": "Datenschutzerklärung",
     "settings_unknownVersion": "Unbekannte Version",
-    "settings_privacyLocale": "&lang=de_DE"
+    "settings_privacyLocale": "&lang=de_DE",
+    "@settings_privacyLocale": {
+        "description": "The language and country code for the url to Piwigo Mobile apps privacy policy: https://piwigo.org/mobile-apps-privacy-policy&webview&lang=en_EN"
+    }
 }
