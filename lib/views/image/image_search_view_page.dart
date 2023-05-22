@@ -109,6 +109,7 @@ class _ImageSearchViewPageState extends State<ImageSearchViewPage> {
       if (total != null) {
         _nbImages = total;
       }
+      _page += 1;
       _searchList!.addAll(result.data!["images"].cast<ImageModel>() ?? []);
     });
     _refreshController.loadComplete();
