@@ -86,15 +86,6 @@ class Preferences {
     return Settings.sortFromValue(sortValue);
   }
 
-  static const String imageSortKey = 'IMAGE_SORT';
-  static SortMethods get getImageSort {
-    String? sortValue = appPreferences.getString(imageSortKey);
-    if (sortValue == null) {
-      return Settings.defaultImageSort;
-    }
-    return Settings.sortFromValue(sortValue);
-  }
-
   static const String albumThumbnailSizeKey = 'ALBUM_THUMBNAIL_SIZE';
 
   static String get getAlbumThumbnailSize {
@@ -153,16 +144,6 @@ class Preferences {
 
   static bool get getUploadNotification {
     return appPreferences.getBool(uploadNotificationKey) ?? true;
-  }
-
-  static const String downloadNotification = 'DOWNLOAD_NOTIFICATION';
-  static bool get getDownloadNotification {
-    return appPreferences.getBool(downloadNotification) ?? true;
-  }
-
-  static const String uploadNotification = 'UPLOAD_NOTIFICATION';
-  static bool get getUploadNotification {
-    return appPreferences.getBool(uploadNotification) ?? true;
   }
 
   // ------------ Set preferences ------------

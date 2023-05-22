@@ -36,23 +36,6 @@ class ImageModel {
     this.tags = const [],
   });
 
-  ImageModel({
-    required this.id,
-    this.width = 1,
-    this.height = 1,
-    this.hit = 0,
-    this.favorite = false,
-    this.file = '',
-    required this.name,
-    this.comment,
-    this.dateCreation,
-    this.dateAvailable,
-    this.pageUrl,
-    required this.elementUrl,
-    required this.derivatives,
-    this.categories = const [],
-  });
-
   ImageModel.fromJson(Map<String, dynamic> json)
       : id = json['id'],
         width = int.tryParse(json['width'].toString()) ?? 0,
@@ -104,33 +87,6 @@ class ImageModel {
     String? mimeType =
         mime(file) ?? mime(elementUrl) ?? mime(derivatives.medium.url);
     return mimeType != null && mimeType.startsWith('video');
-  }
-
-  Derivative? getDerivativeFromString(String derivative) {
-    switch (derivative) {
-      case 'square':
-        return derivatives.square;
-      case 'thumb':
-        return derivatives.thumbnail;
-      case '2small':
-        return derivatives.xxsmall;
-      case 'xsmall':
-        return derivatives.xsmall;
-      case 'small':
-        return derivatives.small;
-      case 'medium':
-        return derivatives.medium;
-      case 'large':
-        return derivatives.large;
-      case 'xlarge':
-        return derivatives.xlarge;
-      case 'xxlarge':
-        return derivatives.xxlarge;
-      case 'full':
-        return derivatives.full;
-      default:
-        return null;
-    }
   }
 
   @override
