@@ -1,0 +1,800 @@
+{
+    "tabBar_albums": "Albumai",
+    "tabBar_upload": "Įkelti",
+    "tabBar_preferences": "Nustatymai",
+    "alertOkButton": "Gerai",
+    "alertDismissButton": "Atšaukti",
+    "alertYesButton": "Taip",
+    "alertNoButton": "Ne",
+    "alertTryAgainButton": "Bandyti dar kartą",
+    "alertCancelButton": "Atšaukti",
+    "alertAddButton": "Pridėti",
+    "alertRetryButton": "Kartoti",
+    "alertNextButton": "Kita nuotrauka",
+    "alertTryButton": "Bandyti",
+    "alertClearButton": "Išvalyti",
+    "alertConfirmButton": "Patvirtinti",
+    "alertRemoveButton": "Pašalinti",
+    "alertMoveButton": "Perkelti",
+    "alertCopyButton": "Kopijuoti",
+    "loadingHUD_label": "Kraunasi…",
+    "completeHUD_label": "Baigta",
+    "errorHUD_label": "Klaida",
+    "uploadRights_title": "Reikalingos įkėlimo teisės",
+    "uploadRights_message": "Reikalingos įkėlimo teisės, nuotraukos ar vaizdo įrašo įkėlimui.",
+    "internetErrorGeneral_title": "Prisijungimo klaida",
+    "internetErrorGeneral_broken": "Apgailestaujame, ryšis nutrūko. Bandykite prisijungti iš naujo.",
+    "internetCancellingConnection_button": "Atšaukiamas prisijungimas…",
+    "internetCancelledConnection_button": "Atšaukti prisijungimą",
+    "internetCancelledConnection_title": "Prisijungimas atšauktas",
+    "piwigoServer_wrongJSONobject": "Nepavyko apdoroti JSON objekto grąžinto iš Piwigo serverio.",
+    "piwigoServer_invalidJSONobject": "Piwigo serveris grąžino netinkamą JSON objektą.",
+    "piwigoServer_emptyJSONobject": "Piwigo serveris grąžino tuščią JSON objektą.",
+    "coreDataStore_WarningTitle": "Įspėjimas",
+    "coreDataStore_WarningMessage": "Įvyko rimta programos klaida Piwigo bandant nuskaityti duomenis iš podėlio. Todėl buvo sukurtas naujas podėlis.",
+    "coreDataFetch_DigestError": "Nepavyko apdoroti gautų duomenų.",
+    "coreDataFetch_TagError": "Žymų gavimo klaida!",
+    "coreDataFetch_TagMissingData": "Rasta ir bus atmesta žyma, kurioje nėra galiojančio kodo arba pavadinimo.",
+    "coreDataFetch_TagCreateFailed": "Nepavyko sukurti naujo Žymos objekto.",
+    "coreDataFetch_UploadCreateFailed": "Nepavyko sukurti naujo Įkėlimo objekto.",
+    "coreDataFetch_UploadMissingAsset": "Nepavyko gauti nuotraukos.",
+    "login": "Prisijungti",
+    "login_serverPlaceholder": "pavyzdys.com",
+    "login_userPlaceholder": "Vartotojo vardas (nebūtina)",
+    "login_passwordPlaceholder": "Slaptažodis (nebūtina)",
+    "login_loggingIn": "Prisijungiama...",
+    "login_connecting": "Jungiamasi",
+    "login_newSession": "Atidaroma sesija",
+    "login_communityParameters": "Bendruomenės parametrai",
+    "login_serverParameters": "Piwigo parametrai",
+    "login_connectionChanged": "Prisijungimas pasikeitė!",
+    "loginHTTP_title": "HTTP Prisijungimo duomenys",
+    "loginHTTP_message": "Piwigo serveriui reikalingas pagrindinės prieigos autentifikavimas:",
+    "loginHTTPuser_placeholder": "Vartotojo vardas",
+    "loginHTTPpwd_placeholder": "Slaptažodis",
+    "loginCertFailed_title": "Ryšys nėra privatus",
+    "loginCertFailed_message": "Piwigo perspėja, kad puslapio sertifikatas negalioja. Ar vistiek norite naudoti šį sertifikatą?",
+    "loginHTTPSfailed_title": "Saugus ryšys nepavyko",
+    "loginHTTPSfailed_message": "Piwigo negali užmegzti saugaus ryšio. Ar norite pabandyti užmegzti nesaugų ryšį?",
+    "serverURLerror_title": "Neteisingas URL",
+    "serverURLerror_message": "Pataisykite Piwigo žiniatinklio serverio adresą.",
+    "serverMethodsError_title": "Nežinomi metodai",
+    "serverMethodsError_message": "Nepavyko gauti serverio metodų. Problema su Piwigo serveriu?",
+    "serverInvalidMethodError_message": "Nepavyko iškviesti serverio metodo.",
+    "serverMissingParamError_message": "Nepavyko vykdyti serverio metodo su trūkstamu parametru.",
+    "serverInvalidParamError_message": "Nepavyko iškviesti serverio metodo su pateiktais parametrais.",
+    "serverUnknownError_message": "Iškviečiant serverio metodą su pateiktais parametrais įvyko netikėta klaida.",
+    "loginError_title": "Prisijungimas nepavyko",
+    "loginError_message": "Vartotojo vardas ir slaptažodis nesutampa nurodytus žiniatinklio adresu",
+    "loginEmptyServer_title": "Įveskite žiniatinklio adresą",
+    "loginEmptyServer_message": "Norėdami tęsti, pasirinkite protokolą ir įveskite Piwigo žiniatinklio adresą.",
+    "serverConnectionError_title": "Prisijungimas nepavyko",
+    "serverConnectionError_message": "Nepavyko sukurti saugaus HTTPS ryšio. Patikrinkite adresą arba pabandykite nešifruotu HTTP režimu?",
+    "serverVersionNotCompatible_title": "Serveris nesuderinamas",
+    "serverVersionNotCompatible_message": "Jūsų Piwigo serverio versija yra {version}. Piwigo NG palaiko tik bent 2.8 versiją. Atnaujinkite savo serverį, kad galėtumėte naudoti Piwigo NG. Ar vis tiek norite tęsti?",
+    "@serverVersionNotCompatible_message": {
+        "placeholders": {
+            "version": {}
+        }
+    },
+    "sessionStatusError_title": "Autentifikavimas nepavyko",
+    "sessionStatusError_message": "Nepavyko autentifikuoti serverio. Pabandykite prisijungti dar kartą.",
+    "serverCommunityError_title": "Bendruomenės klaida",
+    "serverCommunityError_message": "Nepavyko gauti bendruomenės plėtinio parametrų. Pabandykite prisijungti dar kartą.",
+    "logoutConfirmation_title": "Atsijungti",
+    "logoutConfirmation_message": "Ar tikrai norite atsijungti?",
+    "logoutFail_title": "Atsijungti nepavyko",
+    "albumCount": "{count, plural, =0{0 albumų} =1{1 albumas} few{{count} albumai} other{{count} albumų}}",
+    "@albumCount": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "subAlbumCount": "{count, plural, =0{0 poalbumių} =1{1 poalbumis} few{{count} poalbumiai} other{{count} poalbumių}}",
+    "@subAlbumCount": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "showMore": "Rodyti daugiau… ({count})",
+    "@showMore": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "showPhotos": "Rodyti nuotraukas",
+    "categoryMainEmpty": "Piwigo dar nėra albumų.\nGalite pabraukti žemyn, kad atnaujintumėte arba prisijunkite iš naujo.",
+    "categoryImageList_selectButton": "Pasirinkti",
+    "categoryImageList_deselectButton": "Atžymėti",
+    "categoryImageList_noDataError": "Klaida Nėra duomenų",
+    "categoryDiscover_title": "Atrasti",
+    "categoryDiscoverVisits_title": "Dažniausiai lankomi",
+    "categoryDiscoverVisits_legend": "hitai",
+    "categoryDiscoverBest_title": "Geriausiai įvertinti",
+    "categoryDiscoverRecent_title": "Naujausios nuotraukos",
+    "categoryDiscoverFavorites_title": "Jūsų mėgstamos",
+    "categorySort_nameAscending": "Nuotraukos pavadinimas, A → Z",
+    "categorySort_nameDescending": "Nuotraukos pavadinimas, Z → A",
+    "categorySort_fileNameAscending": "Failo vardas, A → Z",
+    "categorySort_fileNameDescending": "Failo vardas, Z → A",
+    "categorySort_dateCreatedDescending": "Sukūrimo data, naujas → senas",
+    "categorySort_dateCreatedAscending": "Sukūrimo data, senas → naujas",
+    "categorySort_datePostedDescending": "Paskelbimo data, naujas → senas",
+    "categorySort_datePostedAscending": "Paskelbimo data, senas → naujas",
+    "categorySort_ratingScoreDescending": "Įvertinimo balas, aukštas → žemas",
+    "categorySort_ratingScoreAscending": "Įvertinimo balas, žemas → aukštas",
+    "categorySort_visitsDescending": "Apsilankymai, dažnai → retai",
+    "categorySort_visitsAscending": "Apsilankymai, retai → dažnai",
+    "categorySort_manual": "Rankinė tvarka",
+    "categorySort_random": "Atsitiktinė tvarka",
+    "categorySort_videosOnly": "Tik vaizdo įrašai",
+    "categorySort_imagesOnly": "Tik nuotraukos",
+    "categorySelection_title": "Albumas",
+    "categorySelection_titleSub": "Poalbumis",
+    "categorySelection_root": "Pirminis albumas",
+    "categorySelection_root375pt": "Pagrindinis",
+    "categorySelection_action": "Pasirinkite veiksmą šiam albumui",
+    "categorySelectionHUD_label": "Gaunami albumų duomenys…",
+    "categorySelection_allAlbums": "Visi albumai",
+    "categoryUpload_noSubAlbum": "Nėra poalbumo, į kurį būtų galima įkelti nuotraukas",
+    "categoryUpload_chooseAlbum": "Pasirinkite poalbumį, į kurį norite įkelti nuotraukas",
+    "categoryUpload_LocalAlbums": "Vietiniai albumai",
+    "categoryUpload_chooseLocalAlbum": "Pasirinkite albumą, iš kurio norite gauti nuotraukų",
+    "categoryUpload_sharedAlbums": "Bendrinami albumai",
+    "categoryUpload_mediaTypes": "Medijos tipai",
+    "categoryUpload_otherAlbums": "Kiti albumai",
+    "categoryUpload_pasteboard": "Iškarpinė",
+    "categoryUpload_loadSubCategories": "užkrauti",
+    "categoryUpload_images": "Įkelti nuotraukas",
+    "categoryUpload_videos": "Įkelti vaizdo įrašus",
+    "categoryUpload_takePhoto": "Fotografuoti",
+    "categoryUpload_takeVideo": "Filmuoti",
+    "uploadList_title": "Upload Status",
+    "uploadList_uploading": "Uploading",
+    "uploadList_history": "History",
+    "uploadList_empty": "Empty",
+    "setDefaultCategory_select": "Pasirinkite albumą arba poalbumį, kuris taps nauju pagrindiniu albumu.",
+    "setDefaultCategory_title": "Numatytasis albumas",
+    "setDefaultCategory_message": "Ar tikrai norite nustatyti albumą {album} kaip numatytąjį albumą?",
+    "@setDefaultCategory_message": {
+        "placeholders": {
+            "album": {}
+        }
+    },
+    "createNewAlbum_title": "Naujas albumas",
+    "createNewAlbum_message": "Įveskite šio albumo pavadinimą:",
+    "createNewAlbum_placeholder": "Albumo pavadinimas",
+    "createNewAlbumDescription_placeholder": "Aprašymas",
+    "createNewAlbumDescription_noDescription": "nėra aprašymo",
+    "createNewAlbumHUD_label": "Kuriamas albumas…",
+    "createNewAlbumHUD_created": "Albumas sukurtas",
+    "createAlbumError_title": "Albumo kūrimo klaida",
+    "createAlbumError_message": "Nepavyko sukurti naujo albumo",
+    "categoryCellOption_rename": "Pervadinti",
+    "categoryCellOption_move": "Perkelti",
+    "categoryCellOption_delete": "Ištrinti",
+    "renameCategory_title": "Pervadinti albumą",
+    "renameCategory_message": "Įveskite naują šio albumo pavadinimą",
+    "renameCategory_button": "Pervadinti",
+    "renameCategoryHUD_label": "Pervardijamas albumas…",
+    "renameCategoryHUD_renamed": "Albumas pervadintas",
+    "renameCategoryError_title": "Nepavyko pervardinti",
+    "renameCategoryError_message": "Nepavyko pervardyti albumo",
+    "refreshCategoryHUD_label": "Atnaujinamas atvaizdavimas…",
+    "refreshCategoryError_title": "Atnaujinti nepavyko",
+    "refreshCategoryError_message": "Nepavyko atnaujinti albumo atvaizdavimo",
+    "deleteCategory_title": "IŠTRINTI ALBUMĄ",
+    "deleteCategory_message": "{count, plural, =0{AR TIKRAI NORITE IŠTRINTI ALBUMĄ {album}} =1{AR TIKRAI NORITE IŠTRINTI ALBUMĄ {album} IR JO NUOTRAUKĄ} few{AR TIKRAI NORITE IŠTRINTI ALBUMĄ {album} IR VISAS {count} NUOTRAUKAS ?} other{AR TIKRAI NORITE IŠTRINTI ALBUMĄ {album} IR VISAS {count} NUOTRAUKŲ ?}}",
+    "@deleteCategory_message": {
+        "placeholders": {
+            "count": {},
+            "album": {}
+        }
+    },
+    "deleteCategory_empty": "Ištrinti tuščią albumą",
+    "deleteCategory_noImages": "Palikti nuotraukas",
+    "deleteCategory_noImages_subtitle": "gali sukurti nuotraukas našlaičius",
+    "deleteCategory_orphanedImages": "Ištrinti našlaičius",
+    "deleteCategory_orphanedImages_subtitle": "Numatytasis režimas, ištrina tik nuotraukas, nesusietas su jokiu kitu albumu",
+    "deleteCategory_allImages": "{count, plural, =0{Ištrinti nuotraukų} =1{Ištrinti nuotrauką} few{Ištrinti {count} nuotraukas} other{Ištrinti {count} nuotraukų}}",
+    "@deleteCategory_allImages": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "deleteCategory_allImages_subtitle": "Ištrinkite visas nuotraukas, net ir tas, kurios susietos su kitais albumais",
+    "deleteCategoryConfirm_title": "Ar tikrai?",
+    "deleteCategoryConfirm_message": "Įveskite nuotraukų skaičių, kad ištrintumėte šį albumą. Nuotraukų skaičius: {count}",
+    "@deleteCategoryConfirm_message": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "deleteCategoryConfirm_deleteButton": "IŠTRINTI",
+    "deleteCategoryHUD_label": "Ištrinamas albumas…",
+    "deleteCategoryHUD_deleted": "Albumas ištrintas",
+    "deleteCategoryMatchError_title": "Skaičius nesutampa",
+    "deleteCategoryMatchError_message": "Įvestas nuotraukų skaičius nesutampa su nuotraukų skaičiumi kategorijoje. Bandykite dar kartą, jei norite ištrinti šį albumą",
+    "deleteCategoryError_title": "Nepavyko ištrinti",
+    "deleteCategoryError_message": "Nepavyko ištrinti albumo",
+    "moveCategory": "Perkelti albumą",
+    "moveCategory_select": "Pasirinkite albumą arba poalbumį, į kurį norite perkelti albumą {album}.",
+    "@moveCategory_select": {
+        "placeholders": {
+            "album": {}
+        }
+    },
+    "moveCategory_message": "Ar tikrai norite perkelti {album} į albumą {parent}?",
+    "@moveCategory_message": {
+        "placeholders": {
+            "album": {},
+            "parent": {}
+        }
+    },
+    "moveCategoryHUD_moving": "Perkeliamas albumas…",
+    "moveCategoryHUD_moved": "Albumas perkeltas",
+    "moveCategoryError_title": "Perkelti nepavyko",
+    "moveCategoryError_message": "Nepavyko perkelti albumo",
+    "categorySelection_setThumbnail": "Pasirinkite albumą, kuriame nuotrauka {photo} bus naudojama kaip miniatiūra.",
+    "@categorySelection_setThumbnail": {
+        "placeholders": {
+            "photo": {}
+        }
+    },
+    "categorySelection_current": "Pasirinkite dabartinį albumą šiai nuotraukai",
+    "categorySelection_one": "Pasirinkite vieną iš albumų, kuriame yra ši nuotrauka",
+    "categorySelection_other": "Arba pasirinkite kitą albumą šiai nuotraukai",
+    "categoryImageSet_title": "Albumo miniatiūra",
+    "categoryImageSet_message": "Ar tikrai norite pritaikyti šią nuotrauką albumui {album}?",
+    "@categoryImageSet_message": {
+        "placeholders": {
+            "album": {}
+        }
+    },
+    "categoryImageSetHUD_updating": "Atnaujinama albumo miniatiūra…",
+    "categoryImageSetError_title": "Nuotraukų nustatymo klaida",
+    "categoryImageSetError_message": "Nepavyko nustatyti albumo nuotraukos",
+    "singleImage": "Nuotrauka",
+    "imageCount": "{count, plural, =0{0 nuotraukų} =1{1 nuotrauka} few{{count} nuotraukos} other{{count} nuotraukų}}",
+    "@imageCount": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "singleVideo": "Vaizdo įrašas",
+    "singleAudio": "Garso įrašas",
+    "severalImages": "Nuotraukos",
+    "all_Photos": "Visos nuotraukos",
+    "severalVideos": "Vaizdo įrašai",
+    "noImages": "Nėra nuotraukų",
+    "pullToRefresh": "Perkrauti nuotraukas",
+    "andMore": " & daugiau",
+    "months": "Mėnesiai",
+    "weeks": "Savaitės",
+    "days": "Dienos",
+    "date": "Data",
+    "albumPhotoError_title": "Gauti albumo nuotraukų klaidą",
+    "albumPhotoError_message": "Nepavyko gauti albumo nuotraukų (sugadinta nuotrauka jūsų albume?)",
+    "sortBy": "Rūšiuoti pagal",
+    "imageSortTitle": "Rūšiuoti nuotraukas",
+    "imageSortMessage": "Pasirinkite, kaip norite rūšiuoti nuotraukas",
+    "imageSortingHUD": "Rūšiuojamos nuotraukos…",
+    "imageSelectingHUD": "Parenkamos nuotraukos…",
+    "imageDeselectingHUD": "Atšaukiamas nuotraukų pasirinkimas…",
+    "imageOptions_title": "Nuotraukų parinktys",
+    "imageOptions_edit": "Redaguoti",
+    "imageOptions_download": "Atsisiųsti",
+    "imageOptions_share": "Bendrinti",
+    "imageOptions_addFavorites": "Add to favorites",
+    "imageOptions_removeFavorites": "Remove from favorites",
+    "imageOptions_setAlbumImage": "Nustatyti albumo miniatiūrą",
+    "imageDetailsView_title": "Savybės",
+    "editImageDetails_title": "Pavadinimas",
+    "editImageDetails_titlePlaceholder": "Vaizdo pavadinimas",
+    "editImageDetails_author": "Autorius",
+    "editImageDetails_tags": "Žymės",
+    "editImageDetails_privacyLevel": "Kas gali matyti šią nuotrauką?",
+    "editImageDetails_description": "Aprašymas",
+    "editImageDetails_descriptionPlaceholder": "Vaizdo aprašymas",
+    "editImageDetails_comments": "Komentarai",
+    "editImageDetails_dateCreation": "Sukūrimo data",
+    "editImageDetails_dateUnset": "Nenustatyti",
+    "editImageDetails_dateToday": "Šiandien",
+    "editImageDetails_dateMonthInc": "+1 mėnuo",
+    "editImageDetails_dateMonthDec": "-1 mėnuo",
+    "editImageDetails_dateYearInc": "+1 metai",
+    "editImageDetails_dateYearDec": "-1 metai",
+    "editImageDetailsHUD_updating": "{count, plural, =1{Atnaujinama nuotrauka…} other{Atnaujinamos nuotraukos…}}",
+    "@editImageDetailsHUD_updating": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "editImageDetailsError_title": "Nepavyko atnaujinti",
+    "editImageDetailsError_message": "Nepavyko atnaujinti serverio pakeitimų. Bandyti iš naujo?",
+    "imageDetailsFetchError_title": "Nepavyko gauti išsamios nuotraukos informacijos",
+    "imageDetailsFetchError_retryMessage": "Nepavyko gauti nuotraukos duomenų. Bandyti iš naujo?",
+    "imageDetailsFetchError_continueMessage": "Nepavyko gauti nuotraukos duomenų. Tęsti?",
+    "privacyLevel": "Privatumo lygis",
+    "privacyLevel_admin": "Administratoriai",
+    "privacyLevel_adminFamily": "Administratoriai, Šeima",
+    "privacyLevel_adminsFamilyFriends": "Administratoriai, Šeima, Draugai",
+    "privacyLevel_adminsFamilyFriendsContacts": "Administratoriai, Šeima, Draugai, Kontaktai",
+    "privacyLevel_everybody": "Visi",
+    "privacyLevel_unchanged": "Nepakeista",
+    "none": "niekas",
+    "tag": "Žyma",
+    "tags": "Žymos",
+    "tagCount": "{count, plural, =0{0 žymų} =1{1 žyma} few{{count} žymos} other{{count} žymų}}",
+    "@tagCount": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "tagsTitle_selectOne": "Pasirinkite žymą",
+    "tagsHeader_selected": "Pasirinkta",
+    "tagsHeader_notSelected": "Nepasirinkta",
+    "tagsHeader_all": "Visi",
+    "tagsAdd_title": "Pridėti žymą",
+    "tagsAdd_message": "Įveskite šios naujos žymos pavadinimą",
+    "tagsAdd_placeholder": "Nauja žyma",
+    "tagsAddHUD_label": "Kuriama žyma…",
+    "tagsAddHUD_created": "Žyma sukurta",
+    "tagsAddError_message": "Nepavyko sukurti naujos žymos",
+    "tagsAddError_title": "Sukurti nepavyko",
+    "selectImages": "Pasirinkite Nuotraukos",
+    "selectImageSelectedCount": "{count, plural, =0{0 Pasirinktų nuotraukų} =1{1 Pasirinkta nuotrauka} few{{count} Pasirinktos nuotraukos} other{{count} Pasirinktų nuotraukų}}",
+    "@selectImageSelectedCount": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "selectAll": "Pasirinkti viską",
+    "selectLimit": "Pasiektas pasirinkimo limitas",
+    "renameImage_title": "Originalus failas",
+    "renameImage_message": "Įveskite naują šios nuotraukos failo pavadinimą „{file}“",
+    "@renameImage_message": {
+        "placeholders": {
+            "file": {}
+        }
+    },
+    "renameImageHUD_label": "Pervardijamas failas…",
+    "renameImageHUD_renamed": "{count, plural, =0{0 Failų pervardyti} =1{Failas pervardytas} few{{count} Failai pervardyti} other{{count} Failų pervardytų}}",
+    "@renameImageHUD_renamed": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "renameImageError_message": "Nepavyko pervardyti nuotraukos failo",
+    "deleteImage_delete": "Ištrinti",
+    "deleteImageProgress_title": "Ištrinama {progress}% atlikta",
+    "@deleteImageProgress_title": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "deleteImageCount_title": "{count, plural, =0{Ištrinti 0 nuotraukų} =1{Ištrinti nuotrauką} few{Ištrinti {count} nuotraukas} other{Ištrinti {count} nuotraukų}}",
+    "@deleteImageCount_title": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "deleteImageHUD_deleting": "{count, plural, =0{Trinamos nuotraukos…} =1{Trinama nuotrauka…} other{Trinamos nuotraukos…}}",
+    "@deleteImageHUD_deleting": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "removeSingleImage_title": "Pašalinti iš albumo",
+    "removeSingleImage_subtitle": "Kai kurios nuotraukos priskiriamos kitiems albumams",
+    "removeImageHUD_removing": "{count, plural, =0{Šalinamos nuotraukos…} =1{Šalinama nuotrauka…} other{Šalinamos nuotraukos…}}",
+    "@removeImageHUD_removing": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "deleteImage_message": "{count, plural, =1{Ar tikrai norite ištrinti šią nuotrauką? To negalima anuliuoti!} few{Ar tikrai norite ištrinti {count} pasirinktas nuotraukas? To negalima anuliuoti!} other{Ar tikrai norite ištrinti {count} pasirinktų nuotraukų? To negalima anuliuoti!}}",
+    "@deleteImage_message": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "deleteImageFail_title": "Nepavyko ištrinti",
+    "deleteImageFail_message": "Nuotraukos ištrinti nepavyko.",
+    "deleteImageSuccess_message": "{count, plural, =0{Sėkmingai ištrinta 0 nuotraukų} =1{Sėkmingai ištrinta 1 nuotrauka} few{Sėkmingai ištrintos {count} nuotraukos} other{Sėkmingai ištrinta {count} nuotraukų}}",
+    "@deleteImageSuccess_message": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "removeSelectedImage_title": "Pašalinti pasirinktą vaizdą",
+    "removeSelectedImage_message": "Ar tikrai norite pašalinti šį vaizdą iš pasirinkimo?",
+    "downloadImage_title": "{count, plural, =0{Atsisiųsti nuotraukas} =1{Atsisiųsti nuotrauką} few{Atsisiųsti {count} nuotraukas} other{Atsisiųsti {count} nuotraukų}}",
+    "@downloadImage_title": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "downloadImage_confirmation": "{count, plural, =1{Ar tikrai norite atsisiųsti pasirinktą nuotrauką?} few{Ar tikrai norite atsisiųsti {count} pasirinktas nuotraukas?} other{Ar tikrai norite atsisiųsti {count} pasirinktų nuotraukų?}}",
+    "@downloadImage_confirmation": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "downloadingImages": "{count, plural, =1{Atsisiunčiama nuotrauka} other{Atsisiunčiamos nuotraukos}}",
+    "@downloadingImages": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "downloadingVideos": "{count, plural, =1{Atsisiunčiamas vaizdo įrašas} other{Atsisiunčiami vaizdo įrašai}}",
+    "@downloadingVideos": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "downloadImageSuccess_title": "Failai atsisiųsti",
+    "downloadImageSuccess_message": "Visi failai sėkmingai atsisiųsti",
+    "downloadImageFail_title": "Atsisiųsti nepavyko",
+    "downloadImageFail_message": "Nepavyko atsisiųsti nuotraukos!",
+    "downloadVideoFail_message": "Nepavyko atsisiųsti vaizdo įrašo!",
+    "downloadVideoFail_Photos": "Vaizdo įrašo formatas nepriimtas nuotraukose!",
+    "imageSaveError_title": "Nepavyko išsaugoti nuotraukos",
+    "imageSaveError_message": "Nepavyko išsaugoti nuotraukos",
+    "videoSaveError_title": "Nepavyko išsaugoti vaizdo įrašo",
+    "videoSaveError_message": "Nepavyko išsaugoti vaizdo įrašo",
+    "videoLoadError_message": "Nepavyko įkelti vaizdo įrašo",
+    "moveOrCopyImage_title": "{count, plural, =1{Ar norite perkelti ar kopijuoti šį vaizdą?} few{Ar norite perkelti ar kopijuoti {count} vaizdus?} other{Ar norite perkelti ar kopijuoti {count} vaizdų?}}",
+    "@moveOrCopyImage_title": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "moveImage_title": "Perkelti į albumą",
+    "moveImage_selectAlbum": "{count, plural, =1{Pasirinkite albumą, į kurį norite perkelti nuotrauką {photo}.} other{Pasirinkite albumą, į kurį norite perkelti nuotraukas.}}",
+    "@moveImage_selectAlbum": {
+        "placeholders": {
+            "count": {},
+            "photo": {}
+        }
+    },
+    "moveImage_message": "{count, plural, =1{Ar tikrai norite perkelti nuotrauką {photo} į albumą {album} ?} other{Ar tikrai norite perkelti nuotraukas į albumą {album} ?}}",
+    "@moveImage_message": {
+        "placeholders": {
+            "count": {},
+            "photo": {},
+            "album": {}
+        }
+    },
+    "moveImageHUD_moving": "{count, plural, =1{Perkeliama nuotrauka…} other{Perkeliamos nuotraukos…}}",
+    "@moveImageHUD_moving": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "moveImageHUD_moved": "{count, plural, =1{Nuotrauka perkelta} other{Nuotraukos perkeltos}}",
+    "@moveImageHUD_moved": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "moveImageError_title": "Perkelti nepavyko",
+    "moveImageError_message": "{count, plural, =1{Nepavyko perkelti nuotraukos} other{Nepavyko perkelti kai kurių nuotraukų}}",
+    "@moveImageError_message": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "copyImage_title": "Kopijuoti į albumą",
+    "copyImage_selectAlbum": "{count, plural, =1{Pasirinkite albumą, į kurį norite nukopijuoti nuotrauką {photo}.} other{Pasirinkite albumą, į kurį norite nukopijuoti nuotraukas.}}",
+    "@copyImage_selectAlbum": {
+        "placeholders": {
+            "count": {},
+            "photo": {}
+        }
+    },
+    "copyImage_message": "{count, plural, =1{Ar tikrai norite nukopijuoti nuotrauką {photo} į albumą {album} ?} other{Ar tikrai norite nukopijuoti nuotraukas į albumą {album} ?}}",
+    "@copyImage_message": {
+        "placeholders": {
+            "count": {},
+            "photo": {},
+            "album": {}
+        }
+    },
+    "copyImageHUD_copying": "{count, plural, =1{Kopijuojama nuotrauka…} other{Kopijuojamos nuotraukos…}}",
+    "@copyImageHUD_copying": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "copyImageHUD_copied": "{count, plural, =1{Nuotrauka nukopijuota} other{Nuotraukos nukopijuotos}}",
+    "@copyImageHUD_copied": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "copyImageError_title": "Kopijuoti nepavyko",
+    "copyImageError_message": "{count, plural, =1{Nepavyko nukopijuoti nuotraukos} other{Nepavyko nukopijuoti kai kurių nuotraukų}}",
+    "@copyImageError_message": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "imageUploadHeader": "Pasirinkite albumą arba poalbumį, iš kurio bus įkeliamos jūsų įrenginio nuotraukos ir vaizdo įrašai.",
+    "imageUploadHeaderTitle_images": "Nuotraukos Parametrai",
+    "imageUploadHeaderText_images": "Nustatykite parametrus, kurie bus taikomi renkantis nuotraukas / vaizdo įrašus",
+    "imageUploadHeaderTitle_upload": "Įkėlimo nustatymai",
+    "imageUploadHeaderText_upload": "Nustatykite įkėlimo parametrus, kurie būtų taikomi renkantis nuotraukas / vaizdo įrašus",
+    "imageUploadDetails_title": "Pavadinimas:",
+    "imageUploadDetails_author": "Autorius:",
+    "imageUploadDetails_privacy": "Privatumas:",
+    "imageUploadDetails_tags": "Žymės:",
+    "imageUploadDetails_description": "Aprašymas:",
+    "imageUploadDetailsView_title": "Nuotraukos",
+    "imageUploadDetailsButton_title": "Įkelti",
+    "imageUploadDetailsEdit_title": "Redaguoti nuotraukas, kurias norite įkelti",
+    "imageUploadDetailsUploading_title": "Nuotraukos, kurios yra įkeliamos",
+    "imageUploadDetailsCell_uploadComplete": "Baigta! Patvirtinama...",
+    "imageUploadRemove": "Įkeltų nuotraukų pašalinimas",
+    "imageUploadTableCell_waiting": "Laukiama...",
+    "imageUploadTableCell_preparing": "Rengiama...",
+    "imageUploadTableCell_prepared": "Paruošta įkelti...",
+    "imageUploadTableCell_uploading": "Įkeliama...",
+    "imageUploadTableCell_uploaded": "Įkelta",
+    "imageUploadTableCell_finishing": "Baigiama...",
+    "imageUploadClearFailed": "{count, plural, =1{Išvalyti nepavykusį įkėlimą} few{Išvalyti {count} nepavykusius įkėlimus} other{Išvalyti {count} nepavykusių įkėlimų}}",
+    "@imageUploadClearFailed": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "imageUploadClearCompleted": "{count, plural, =1{Išvalyti užbaigtą įkėlimą} few{Išvalyti {count} užbaigtus įkėlimus} other{Išvalyti {count} užbaigtų įkėlimų}}",
+    "@imageUploadClearCompleted": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "imageUploadResume": "{count, plural, =1{Pratęsti įkėlimą} few{Pratęsti {count} įkėlimus} other{Pratęsti {count} įkėlimų}}",
+    "@imageUploadResume": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "imageUploadProgressBar_zero": "Įkeliama 0/0",
+    "imageUploadProgressBar_nonZero": "Įkeliama {index}/{max}",
+    "@imageUploadProgressBar_nonZero": {
+        "placeholders": {
+            "index": {},
+            "max": {}
+        }
+    },
+    "imageUploadProgressBar_completed": "Baigta",
+    "imageUploadCompleted_title": "Įkėlimas baigtas",
+    "imageUploadCompleted_message": "nuotrauka įkelta į jūsų Piwigo serverį.",
+    "imageUploadCompleted_message1": "nuotraukos, įkeltos į jūsų Piwigo serverį.",
+    "imageUploadCompleted_warning": "some of your photos could not be uploaded.",
+    "uploadError_title": "Įkėlimo klaida",
+    "uploadError_message": "Nepavyko įkelti jūsų nuotraukos.",
+    "uploadCancelled_title": "Įkėlimas atšauktas",
+    "uploadNoInternetNetwork": "Nėra interneto ryšio",
+    "uploadNoWiFiNetwork": "Nėra Wi-Fi ryšio",
+    "uploadLowPowerMode": "Mažos galios režimas įjungtas",
+    "uploadSection_impossible": "Neįmanomi įkėlimai",
+    "uploadSection_resumable": "Tęstini įkėlimai",
+    "uploadSection_queue": "Įkėlimų eilė",
+    "imageUploadError_title": "Nuotraukų įkėlimo klaida",
+    "imageUploadError_format": "Piwigo serveris nepriima failo formato.",
+    "imageUploadError_source": "negalima sukurti nuotraukos šaltinio",
+    "imageUploadError_destination": "negali sukurti nuotraukos įkėlimo vietos",
+    "imageUploadError_iCloud": "Nepavyko gauti nuotraukos.",
+    "audioUploadError_title": "Garso įkėlimo klaida",
+    "audioUploadError_format": "Atsiprašome, garso failų Piwigo NG dar nepalaiko.",
+    "videoUploadError_title": "Vaizdo įrašo įkėlimo klaida",
+    "videoUploadError_format": "Atsiprašome, Piwigo serveris nepriima vaizdo failų su plėtiniu .{extension}.",
+    "@videoUploadError_format": {
+        "placeholders": {
+            "extension": {}
+        }
+    },
+    "videoUploadError_export": "Atsiprašome, vaizdo įrašo nepavyko gauti, kad būtų galima įkelti.",
+    "videoUploadError_unknown": "Atsiprašome, vaizdo įrašo įkėlimas nepavyko dėl nežinomos klaidos konvertuojant MP4.",
+    "videoUploadCancelled_message": "Vaizdo įrašo įkėlimas atšauktas.",
+    "localAlbums": "Nuotraukų albumas",
+    "localAlbums_accessible": "Prieinamos nuotraukos",
+    "localAlbums_photosNotAuthorized_title": "Nėra prieigos",
+    "localAlbums_photosNiltitle": "Problema skaitant nuotraukas",
+    "localAlbums_photosNnil_msg": "Skaitant vietinę nuotraukų biblioteką kilo problema.",
+    "localAlbums_photosNotAuthorized_msg": "Negalima atidaryti vietinės nuotraukų bibliotekos. Eikite į nustatymų programą ir įgalinkite prieigą Piwigo programai.",
+    "localImages_deleteTitle": "Pašalinti iš galerijos",
+    "localImages_deleteMessage": "Ar norite ištrinti įkeltas nuotraukas ar vaizdo įrašus iš galerijos? Ištrintos nuotraukos ar vaizdo įrašai vis tiek bus pasiekiami iOS nuotraukų šiukšliadėžėje 30 dienų.",
+    "settingsHeader_server": "Piwigo serveris {version}",
+    "@settingsHeader_server": {
+        "placeholders": {
+            "version": {}
+        }
+    },
+    "settingsHeader_notSecure": "Svetainė nesaugi!",
+    "settings_server": "Adresas",
+    "settings_username": "Vartotojo vardas",
+    "settings_notLoggedIn": " - Neprisijungęs - ",
+    "settings_logout": "Atsijungti",
+    "settingsFooter_formats": "Serveris priima šiuos failų tipus: {types}.",
+    "@settingsFooter_formats": {
+        "placeholders": {
+            "types": {}
+        }
+    },
+    "settingsHeader_general": "Bendrieji nustatymai",
+    "settingsHeader_thumbnails": "Miniatiūros",
+    "defaultImageSort": "Rūšiuoti",
+    "defaultImageSort320px": "Numatytasis rūšiavimas",
+    "defaultImageSort414px": "Numatytasis nuotraukų rūšiavimas",
+    "defaultAlbumThumbnailFile414px": "Albumų miniatiūrų failas",
+    "defaultAlbumThumbnailSizeHeader": "Pasirinkite albumo miniatiūros dydį",
+    "maxNberOfRecentAlbums": "Naujausi",
+    "maxNberOfRecentAlbums320px": "Naujausi albumai",
+    "maxNberOfRecentAlbums414px": "Naujausių albumų skaičius",
+    "thumbnailSizeSquare": "Kvadratas",
+    "thumbnailSizeThumbnail": "Miniatiūra",
+    "thumbnailSizeXXSmall": "Smulkus",
+    "thumbnailSizeXSmall": "Labai mažas",
+    "thumbnailSizeSmall": "Mažas",
+    "thumbnailSizeMedium": "Vidutinis",
+    "thumbnailSizeLarge": "Didelis",
+    "thumbnailSizeXLarge": "Labai didelis",
+    "thumbnailSizeXXLarge": "Didžiulis",
+    "thumbnailSizexFullRes": "Pilna raiška",
+    "settingsHeader_images": "Nuotraukos",
+    "defaultThumbnailFile": "Failas",
+    "defaultThumbnailFile320px": "Miniatiūros failas",
+    "defaultThumbnailFile414px": "Nuotraukų miniatiūrų failas",
+    "defaultThumbnailSize": "Dydis",
+    "defaultThumbnailSize320px": "Miniatiūrų dydis",
+    "defaultThumbnailSize414px": "Default Size of Thumbnails",
+    "defaultNberOfThumbnailsShort": "Skaičius eilutėje",
+    "defaultNberOfThumbnails": "Miniatiūrų skaičius eilutėje",
+    "defaultThumbnailSizeTitle": "Numatytasis dydis",
+    "defaultThumbnailSizeHeader": "Pasirinkite nuotraukos miniatiūros dydį",
+    "settings_displayTitles": "Pavadinimai ant miniatiūrų",
+    "settings_displayTitles320px": "Rodyti pavadinimus miniatiūrose",
+    "defaultPreviewFile": "Peržiūra",
+    "defaultPreviewFile320px": "Peržiūrėti failą",
+    "defaultPreviewFile414px": "Peržiūrėti nuotraukos failą",
+    "defaultImageSize": "Nuotraukos",
+    "defaultImageSize320px": "Nuotraukų dydis",
+    "defaultImageSize414px": "Numatytasis nuotraukų dydis",
+    "defaultImageSizeTitle": "Numatytasis dydis",
+    "defaultImageSizeHeader": "Pasirinkite nuotraukos dydį",
+    "defaultImageSize_recommended": " (Rekomenduojamas)",
+    "defaultSize_disabled": " (išjungta serveryje)",
+    "defaultSizeFooter": "Pilki dydžiai nerekomenduojami arba nepasiekiami Piwigo serveryje.",
+    "settings_shareGPSdata": "Bendrinkite privačius metaduomenis",
+    "settings_shareGPSdata375px": "Bendrinkite su privačiais metaduomenimis",
+    "imageSizeSquare": "Kvadratas",
+    "imageSizeThumbnail": "Miniatiūra",
+    "imageSizeXXSmall": "Mažytis",
+    "imageSizeXSmall": "Labai mažas",
+    "imageSizeSmall": "Mažas",
+    "imageSizeMedium": "Vidutinis",
+    "imageSizeLarge": "Didelis",
+    "imageSizeXLarge": "Labai didelis",
+    "imageSizeXXLarge": "Didžiulis",
+    "imageSizexFullRes": "Pilna raiška",
+    "settingsHeader_upload": "Numatytieji įkėlimo nustatymai",
+    "settings_defaultAuthor": "Autorius",
+    "settings_defaultAuthor320px": "Autoriaus vardas",
+    "settings_defaultAuthorPlaceholder": "Autoriaus vardas",
+    "settings_defaultPrivacy": "Privatumas",
+    "settings_defaultPrivacy414px": "Pasirinkite, kas galės matyti nuotraukas",
+    "settings_stripGPSdata": "Ištrinkite privačius metaduomenis",
+    "settings_stripGPSdata375px": "Pašalinti privačius metaduomenis prieš įkeliant",
+    "settings_photoResize": "Sumažinti dydį prieš įkeliant",
+    "settings_photoSize": "Dydis",
+    "settings_placeholderSize": "Įveskite nuotraukos dydį nuo 5 iki 100",
+    "settings_photoCompress": "Suspausti prieš įkeliant",
+    "settings_photoCompress375px": "Suspausti nuotrauką prieš įkeliant",
+    "settings_photoQuality": "Kokybė",
+    "settings_placeholderQuality": "Įveskite nuotraukos kokybę nuo 50 iki 98",
+    "settings_prefixFilename414px": "Pridėti priešdėlį nuotraukos pavadinimui prieš įkeliant",
+    "settings_prefixFilename375px": "Pridėti priešdėlį failo pavadinimui prieš įkeliant",
+    "settings_prefixFilename": "Pridėti priešdėlį nuotraukos pavadinimui",
+    "settings_defaultPrefix": "Priešdėlis",
+    "settings_defaultPrefix320px": "Failo pavadinimo priešdėlis",
+    "settings_defaultPrefixPlaceholder": "Priešdėlis",
+    "settings_deleteImage375px": "Ištrinkite nuotrauką po įkėlimo",
+    "settings_wifiOnly": "Tik Wi-Fi",
+    "settings_deleteImage": "Ištrinti po įkėlimo",
+    "settings_uploadNotification": "Įkėlimo pranešimas",
+    "settings_downloadNotification": "Atsisiuntimo pranešimas",
+    "settings_downloadDestination": "Atsisiuntimo aplankas",
+    "settings_autoUpload": "Automatinis įkėlimas",
+    "settings_autoUpload414px": "Automatinis nuotraukų įkėlimas",
+    "settings_autoUploadEnabled": "Įjungta",
+    "settings_autoUploadEnabledInfo": "Nuotraukos bus automatiškai įkeltos į jūsų Piwigo.",
+    "settings_autoUploadEnabledInfoAll": "Nuotraukos ir vaizdo įrašai bus automatiškai įkeliami į jūsų Piwigo.",
+    "settings_autoUploadDisabled": "Išjungta",
+    "settings_autoUploadDisabledInfo": "Nuotraukos nebus automatiškai įkeltos į jūsų Piwigo.",
+    "settings_autoUploadSource": "Šaltinis",
+    "settings_autoUploadSourceInvalid": "Netinkamas šaltinio albumas",
+    "settings_autoUploadSourceInfo": "Pasirinkite albumą arba poalbumį, iš kurio bus automatiškai įkeliamos jūsų įrenginio nuotraukos ir vaizdo įrašai.",
+    "settings_autoUploadDestination": "Įkėlimo vieta",
+    "settings_autoUploadDestinationInvalid": "Netinkamas įkėlimo albumas",
+    "settings_autoUploadDestinationInfo": "Pasirinkite albumą arba poalbumį, į kurį bus automatiškai įkeliamos nuotraukos ir vaizdo įrašai.",
+    "settings_autoUploadDuplicateInfo": "Photos that are already in this Piwigo won't be uploaded.",
+    "settings_autoUploadFrequency": "Every",
+    "settings_autoUploadFrequencyMinutes": "{count, plural, =1{1 minute} other{{count} minutes}}",
+    "@settings_autoUploadFrequencyMinutes": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "settings_autoUploadFrequencyHours": "{count, plural, =1{1 hour} other{{count} hours}}",
+    "@settings_autoUploadFrequencyHours": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "settings_autoUploadFrequencyDays": "{count, plural, =1{1 day} other{{count} days}}",
+    "@settings_autoUploadFrequencyDays": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "autoUploadError_Disabled": "Automatinio įkėlimo parinktis išjungta programos nustatymuose.",
+    "autoUploadError_Failed": "Keli perkėlimai nepavyko, o įkėlimo eilė sulaikyta. Patikrinkite programėlę.",
+    "uploadPhotoSize_title": "Maksimalus nuotraukos dydis",
+    "uploadPhotoSize_header": "Pasirinkite didžiausią nuotraukų, kurios bus įkeliamos, dydį.",
+    "uploadPhotoSize_resolution": "Integruotos kameros maksimali skiriamoji geba:",
+    "uploadVideoSize_title": "Maksimalus vaizdo įrašo dydis",
+    "uploadVideoSize_header": "Pasirinkite didžiausią vaizdo įrašų, kurie bus įkeliami, dydį.",
+    "uploadVideoSize_resolution": "Integruotos kameros maksimalios specifikacijos:",
+    "uploadPhotoSize_original": "Jokio sumažinimo",
+    "settingsHeader_cache": "Podėlio nustatymai (naudota / iš viso)",
+    "settings_cacheDisk": "Diskas",
+    "settings_cacheMemory": "Atmintis",
+    "settings_cacheSize": "Talpyklos dydis",
+    "settings_cacheMegabytes": "MB",
+    "settings_cacheClear": "Išvalyti podėlį",
+    "settings_cacheClearAll": "Išvalyti nuotraukos podėlį",
+    "settings_cacheClearMsg": "Ar tikrai norite išvalyti nuotraukų podėlį? Todėl šiek tiek užtruks, kol albumai ir nuotraukos vėl bus įkelti.",
+    "settingsHeader_appearance": "Išvaizda",
+    "settingsHeader_theme": "Dark Theme",
+    "settings_switchPalette": "Automatinė",
+    "settings_brightness": "Ryškumas",
+    "settings_brightnessHelp": "Esant mažam aplinkos ryškumui, parinktis Automatinė naudoja tamsesnę spalvų paletę, kad nuotraukos išsiskirtų tamsesniame fone.",
+    "userCount": "{count, plural, =0{0 vartotojų} =1{1 vartotojas} few{{count} vartotojai} other{{count} vartotojų}}",
+    "@userCount": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "groupCount": "{count, plural, =0{0 grupių} =1{1 grupė} few{{count} grupės} other{{count} grupių}}",
+    "@groupCount": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "commentCount": "{count, plural, =0{0 komentarų} =1{1 komentaras} few{{count} komentarai} other{{count} komentarų}}",
+    "@commentCount": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "settings_appName": "Piwigo NG",
+    "settings_language": "Pasirinkite kalbą",
+    "settingsHeader_about": "Informacija",
+    "settings_twitter": "@piwigo",
+    "settings_contactUs": "Susisiekite su mumis",
+    "settings_feedback": "Atsiliepimas",
+    "settings_supportForum": "Pagalbos forumas",
+    "settings_releaseNotes": "Išleidimo pastabos",
+    "settings_rateInAppStore": "Įvertinti Piwigo NG",
+    "settings_translateWithCrowdin": "Išversti Piwigo NG",
+    "settings_acknowledgements": "Padėkos",
+    "settings_privacy": "Privatumo politika",
+    "settings_unknownVersion": "Nežinoma versija",
+    "settings_privacyLocale": "&lang=en_EN",
+    "@settings_privacyLocale": {
+        "description": "The language and country code for the url to Piwigo Mobile apps privacy policy: https://piwigo.org/mobile-apps-privacy-policy&webview&lang=en_EN"
+    }
+}

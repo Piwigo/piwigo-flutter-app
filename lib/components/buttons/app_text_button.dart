@@ -30,7 +30,7 @@ class AppTextButton extends StatelessWidget {
               TextStyle(
                 color: Theme.of(context).primaryColor,
                 fontWeight: FontWeight.w500,
-              ), // Todo: Text button text style
+              ),
         ),
       ),
     );

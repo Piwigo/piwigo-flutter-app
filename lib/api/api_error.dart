@@ -1,10 +1,19 @@
 enum ApiErrors {
+  error,
   wrongLoginId,
   wrongServerUrl,
   fetchAlbumsError,
   fetchAlbumListError,
   fetchImagesError,
+  fetchFavoritesError,
+  searchImagesError,
   getStatusError,
+  getInfoError,
+  getMethodsError,
+  createAlbumError,
+  deleteAlbumError,
+  editAlbumError,
+  moveAlbumError,
 }
 
 class ApiResult<T> {

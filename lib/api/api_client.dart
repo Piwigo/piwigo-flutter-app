@@ -1,29 +1,31 @@
+import 'dart:io';
+
 import 'package:cookie_jar/cookie_jar.dart';
+import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 
 import 'api_interceptor.dart';
 
 class ApiClient {
-  // static final ApiClient _singleton = ApiClient._internal();
-
-  // static PersistCookieJar cookieJar = PersistCookieJar();
   static CookieJar cookieJar = CookieJar();
   static Dio dio = Dio(BaseOptions())
     ..interceptors.add(ApiInterceptor())
-    ..interceptors.add(CookieManager(cookieJar));
+    ..interceptors.add(CookieManager(cookieJar))
+    ..httpClientAdapter = sslHttpClientAdapter;
 
-  // factory ApiClient() {
-  //   return _singleton;
-  // }
-
-  void createDio() {
-    dio = Dio(BaseOptions())
-      ..interceptors.add(CookieManager(cookieJar))
-      ..interceptors.add(ApiInterceptor());
+  static HttpClientAdapter get sslHttpClientAdapter {
+    return DefaultHttpClientAdapter()
+      ..onHttpClientCreate = (HttpClient client) {
+        client.badCertificateCallback = piwigoSSLBypass;
+        return client;
+      };
   }
 
-  // ApiClient._internal();
+  static bool piwigoSSLBypass(X509Certificate cert, String host, int port) {
+    // todo: accept certs
+    return true;
+  }
 
   static Future<Response> get({
     String path = 'ws.php',
@@ -101,5 +103,36 @@ class ApiClient {
       cancelToken: cancelToken,
     );
     return response;
+  }
+
+  static Future<Response> download({
+    required String path,
+    required String outputPath,
+    dynamic data,
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+    String lengthHeader = Headers.contentLengthHeader,
+    CancelToken? cancelToken,
+    void Function(int, int)? onReceiveProgress,
+  }) async {
+    Response response = await dio.download(
+      path,
+      outputPath,
+      data: data,
+      queryParameters: queryParameters,
+      options: options,
+      lengthHeader: lengthHeader,
+      cancelToken: cancelToken,
+      deleteOnError: true,
+      onReceiveProgress: onReceiveProgress,
+    );
+    return response;
+  }
+}
+
+class SSLHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context)..badCertificateCallback = ApiClient.piwigoSSLBypass;
   }
 }

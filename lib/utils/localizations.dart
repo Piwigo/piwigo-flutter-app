@@ -1,41 +1,76 @@
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:piwigo_ng/app.dart';
 
-AppLocalizations appStrings = AppLocalizations.of(App.appKey.currentContext!)!;
+AppLocalizations get appStrings =>
+    AppLocalizations.of(App.scaffoldMessengerKey.currentContext!)!;
 
-Map<int, String> privacyLevels(context) => {
-      -1: appStrings.privacyLevel_unchanged,
-      0: appStrings.privacyLevel_everybody,
-      1: appStrings.privacyLevel_adminsFamilyFriendsContacts,
-      2: appStrings.privacyLevel_adminsFamilyFriends,
-      4: appStrings.privacyLevel_adminFamily,
-      8: appStrings.privacyLevel_admin,
-    };
+enum PrivacyLevel {
+  unchanged,
+  everybody,
+  contacts,
+  friends,
+  family,
+  admins,
+}
+
+extension PrivacyLevelExtension on PrivacyLevel {
+  String get localization {
+    switch (this) {
+      case PrivacyLevel.unchanged:
+        return appStrings.privacyLevel_unchanged;
+      case PrivacyLevel.everybody:
+        return appStrings.privacyLevel_everybody;
+      case PrivacyLevel.contacts:
+        return appStrings.privacyLevel_adminsFamilyFriendsContacts;
+      case PrivacyLevel.friends:
+        return appStrings.privacyLevel_adminsFamilyFriends;
+      case PrivacyLevel.family:
+        return appStrings.privacyLevel_adminFamily;
+      case PrivacyLevel.admins:
+        return appStrings.privacyLevel_admin;
+    }
+  }
+
+  int? get value {
+    switch (this) {
+      case PrivacyLevel.unchanged:
+        return null;
+      case PrivacyLevel.everybody:
+        return 0;
+      case PrivacyLevel.contacts:
+        return 1;
+      case PrivacyLevel.friends:
+        return 2;
+      case PrivacyLevel.family:
+        return 4;
+      case PrivacyLevel.admins:
+        return 8;
+    }
+  }
+}
 
 String getLanguageFromCode(String code) {
   switch (code) {
     case 'de':
       return 'Deutsch';
-      break;
     case 'en':
       return 'English';
-      break;
     case 'es':
       return 'Español';
-      break;
     case 'fr':
       return 'Français';
-      break;
+    case 'lt':
+      return 'Lietuvių kalba';
+    case 'sk':
+      return 'Slovenčina';
     case 'zh':
-      return '中国人';
-      break;
+      return '中文';
     default:
       return code;
-      break;
   }
 }
 
-Map<int, String> albumSort(context) => {
+Map<int, String> get albumSort => {
       0: appStrings.categorySort_nameAscending,
       1: appStrings.categorySort_nameDescending,
       2: appStrings.categorySort_fileNameAscending,
@@ -52,86 +87,56 @@ Map<int, String> albumSort(context) => {
       13: appStrings.categorySort_random,
     };
 
-String thumbnailSize(context, String size) {
-  String sizeName = "";
-
+String thumbnailSize(String size) {
   switch (size) {
-    case "square":
-      sizeName = appStrings.thumbnailSizeSquare;
-      break;
-    case "thumb":
-      sizeName = appStrings.thumbnailSizeThumbnail;
-      break;
-    case "2small":
-      sizeName = appStrings.thumbnailSizeXXSmall;
-      break;
-    case "xsmall":
-      sizeName = appStrings.thumbnailSizeXSmall;
-      break;
-    case "small":
-      sizeName = appStrings.thumbnailSizeSmall;
-      break;
-    case "medium":
-      sizeName = appStrings.thumbnailSizeMedium;
-      break;
-    case "large":
-      sizeName = appStrings.thumbnailSizeLarge;
-      break;
-    case "xlarge":
-      sizeName = appStrings.thumbnailSizeXLarge;
-      break;
-    case "xxlarge":
-      sizeName = appStrings.thumbnailSizeXXLarge;
-      break;
-    case "full":
-      sizeName = appStrings.thumbnailSizexFullRes;
-      break;
+    case 'square':
+      return appStrings.thumbnailSizeSquare;
+    case 'thumb':
+      return appStrings.thumbnailSizeThumbnail;
+    case '2small':
+      return appStrings.thumbnailSizeXXSmall;
+    case 'xsmall':
+      return appStrings.thumbnailSizeXSmall;
+    case 'small':
+      return appStrings.thumbnailSizeSmall;
+    case 'medium':
+      return appStrings.thumbnailSizeMedium;
+    case 'large':
+      return appStrings.thumbnailSizeLarge;
+    case 'xlarge':
+      return appStrings.thumbnailSizeXLarge;
+    case 'xxlarge':
+      return appStrings.thumbnailSizeXXLarge;
+    case 'full':
+      return appStrings.thumbnailSizexFullRes;
     default:
-      sizeName = "null";
-      break;
+      return 'null';
   }
-
-  return sizeName;
 }
 
-String photoSize(context, String size) {
-  String sizeName = "";
-
+String photoSize(String size) {
   switch (size) {
-    case "square":
-      sizeName = appStrings.imageSizeSquare;
-      break;
-    case "thumb":
-      sizeName = appStrings.imageSizeThumbnail;
-      break;
-    case "2small":
-      sizeName = appStrings.imageSizeXXSmall;
-      break;
-    case "xsmall":
-      sizeName = appStrings.imageSizeXSmall;
-      break;
-    case "small":
-      sizeName = appStrings.imageSizeSmall;
-      break;
-    case "medium":
-      sizeName = appStrings.imageSizeMedium;
-      break;
-    case "large":
-      sizeName = appStrings.imageSizeLarge;
-      break;
-    case "xlarge":
-      sizeName = appStrings.imageSizeXLarge;
-      break;
-    case "xxlarge":
-      sizeName = appStrings.imageSizeXXLarge;
-      break;
-    case "full":
-      sizeName = appStrings.imageSizexFullRes;
-      break;
+    case 'square':
+      return appStrings.imageSizeSquare;
+    case 'thumb':
+      return appStrings.imageSizeThumbnail;
+    case '2small':
+      return appStrings.imageSizeXXSmall;
+    case 'xsmall':
+      return appStrings.imageSizeXSmall;
+    case 'small':
+      return appStrings.imageSizeSmall;
+    case 'medium':
+      return appStrings.imageSizeMedium;
+    case 'large':
+      return appStrings.imageSizeLarge;
+    case 'xlarge':
+      return appStrings.imageSizeXLarge;
+    case 'xxlarge':
+      return appStrings.imageSizeXXLarge;
+    case 'full':
+      return appStrings.imageSizexFullRes;
     default:
-      sizeName = "null";
-      break;
+      return 'null';
   }
-
-  return sizeName;
 }

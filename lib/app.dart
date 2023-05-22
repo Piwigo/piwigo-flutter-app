@@ -3,27 +3,38 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:piwigo_ng/services/app_providers.dart';
+import 'package:piwigo_ng/services/preferences_service.dart';
+import 'package:piwigo_ng/utils/overscroll_behavior.dart';
 import 'package:piwigo_ng/utils/themes.dart';
 import 'package:piwigo_ng/views/album/album_view_page.dart';
 import 'package:piwigo_ng/views/album/root_album_view_page.dart';
 import 'package:piwigo_ng/views/authentication/login_view_page.dart';
+import 'package:piwigo_ng/views/image/edit_image_page.dart';
+import 'package:piwigo_ng/views/image/image_favorites_page.dart';
 import 'package:piwigo_ng/views/image/image_search_view_page.dart';
+import 'package:piwigo_ng/views/image/image_view_page.dart';
+import 'package:piwigo_ng/views/image/video_player_page.dart';
+import 'package:piwigo_ng/views/settings/auto_upload_page.dart';
 import 'package:piwigo_ng/views/settings/privacy_policy_view_page.dart';
+import 'package:piwigo_ng/views/settings/select_language_view_page.dart';
 import 'package:piwigo_ng/views/settings/settings_view_page.dart';
 import 'package:piwigo_ng/views/unknown_route_page.dart';
+import 'package:piwigo_ng/views/upload/upload_status_page.dart';
 import 'package:piwigo_ng/views/upload/upload_view_page.dart';
 
 class App extends StatelessWidget {
   const App({Key? key}) : super(key: key);
 
-  static final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
-  static final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+  static final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
+      GlobalKey<ScaffoldMessengerState>();
+  static final GlobalKey<NavigatorState> navigatorKey =
+      GlobalKey<NavigatorState>();
   static final GlobalKey appKey = GlobalKey();
 
   @override
   Widget build(BuildContext context) {
     return AppProviders(
-      builder: (themeNotifier) {
+      builder: (localNotifier, themeNotifier) {
         return MaterialApp(
           title: 'Piwigo NG',
           key: appKey,
@@ -39,8 +50,21 @@ class App extends StatelessWidget {
             Locale('en'),
             Locale('de'),
             Locale('fr'),
+            Locale('es'),
+            Locale('lt'),
+            Locale('sk'),
+            Locale('zh'),
           ],
-          theme: themeNotifier.isDark ? darkTheme : lightTheme,
+          locale: localNotifier.locale,
+          themeMode: themeNotifier.isDark ? ThemeMode.dark : ThemeMode.light,
+          darkTheme: darkTheme,
+          theme: lightTheme,
+          builder: (context, child) {
+            return ScrollConfiguration(
+              behavior: OverscrollBehavior(),
+              child: child!,
+            );
+          },
           onGenerateRoute: generateRoute,
           onGenerateInitialRoutes: (String route) {
             return [
@@ -61,6 +85,17 @@ Route<dynamic> generateRoute(RouteSettings settings) {
   if (settings.arguments != null) {
     arguments = settings.arguments as Map<String, dynamic>;
   }
+
+  bool isAdmin = appPreferences.getBool(Preferences.isAdminKey) ?? false;
+
+  if (settings.name == null) {
+    debugPrint("no route name");
+    return MaterialPageRoute(
+      builder: (_) => UnknownRoutePage(route: settings),
+      settings: settings,
+    );
+  }
+
   switch (settings.name) {
     case LoginViewPage.routeName:
       return MaterialPageRoute(
@@ -70,8 +105,8 @@ Route<dynamic> generateRoute(RouteSettings settings) {
     case RootAlbumViewPage.routeName:
       return MaterialPageRoute(
         builder: (_) => RootAlbumViewPage(
-          albumId: arguments['albumId'] ?? "0",
-          isAdmin: arguments['isAdmin'] ?? false,
+          albumId: arguments['albumId'] ?? 0,
+          isAdmin: arguments['isAdmin'] ?? isAdmin,
         ),
         settings: settings,
       );
@@ -79,18 +114,70 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       return MaterialPageRoute(
         builder: (_) => AlbumViewPage(
           album: arguments['album'],
-          isAdmin: arguments['isAdmin'] ?? false,
+          isAdmin: arguments['isAdmin'] ?? isAdmin,
         ),
         settings: settings,
       );
     case ImageSearchViewPage.routeName:
-      return FadePageRoute(
-        page: const ImageSearchViewPage(),
+      return MaterialPageRoute(
+        builder: (_) => ImageSearchViewPage(
+          isAdmin: arguments['isAdmin'] ?? isAdmin,
+        ),
+        settings: settings,
+      );
+    case ImageFavoritesPage.routeName:
+      return MaterialPageRoute(
+        builder: (_) => ImageFavoritesPage(
+          isAdmin: arguments['isAdmin'] ?? isAdmin,
+        ),
+        settings: settings,
+      );
+    case UploadViewPage.routeName:
+      return MaterialPageRoute(
+        builder: (_) => UploadViewPage(
+          imageList: arguments["images"] ?? <XFile>[],
+          albumId: arguments["category"],
+        ),
+        settings: settings,
+      );
+    case UploadStatusPage.routeName:
+      return MaterialPageRoute(
+        builder: (_) => UploadStatusPage(),
+        settings: settings,
+      );
+    case AutoUploadPage.routeName:
+      return MaterialPageRoute(
+        builder: (_) => AutoUploadPage(),
+        settings: settings,
+      );
+    case ImageViewPage.routeName:
+      return MaterialPageRoute(
+        builder: (_) => ImageViewPage(
+          images: arguments['images'] ?? [],
+          startId: arguments['startId'],
+          album: arguments['album'],
+          isAdmin: arguments['isAdmin'] ?? isAdmin,
+        ),
+        settings: settings,
+      );
+    case VideoPlayerPage.routeName:
+      return MaterialPageRoute(
+        builder: (_) => VideoPlayerPage(
+          videoUrl: arguments['videoUrl'],
+          thumbnailUrl: arguments['thumbnailUrl'],
+        ),
+        settings: settings,
+      );
+    case EditImagePage.routeName:
+      return MaterialPageRoute<bool>(
+        builder: (_) => EditImagePage(
+          images: arguments['images'] ?? [],
+        ),
         settings: settings,
       );
     case SettingsViewPage.routeName:
       return MaterialPageRoute(
-        builder: (_) => const SettingsViewPage(),
+        builder: (_) => SettingsViewPage(),
         settings: settings,
       );
     case PrivacyPolicyViewPage.routeName:
@@ -98,12 +185,9 @@ Route<dynamic> generateRoute(RouteSettings settings) {
         builder: (_) => const PrivacyPolicyViewPage(),
         settings: settings,
       );
-    case UploadViewPage.routeName:
+    case SelectLanguageViewPage.routeName:
       return MaterialPageRoute(
-        builder: (_) => UploadViewPage(
-          imageData: arguments["images"] ?? <XFile>[],
-          category: arguments["category"],
-        ),
+        builder: (_) => const SelectLanguageViewPage(),
         settings: settings,
       );
     default:
@@ -112,46 +196,4 @@ Route<dynamic> generateRoute(RouteSettings settings) {
         settings: settings,
       );
   }
-}
-
-class FadePageRoute extends PageRouteBuilder {
-  final Widget page;
-
-  FadePageRoute({required this.page, RouteSettings? settings})
-      : super(
-          settings: settings,
-          pageBuilder: (context, animation, secondaryAnimation) => page,
-          transitionDuration: const Duration(milliseconds: 300),
-          reverseTransitionDuration: const Duration(milliseconds: 500),
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            if (animation.status == AnimationStatus.reverse) {
-              return FadeTransition(
-                opacity: Tween<double>(begin: 1, end: 0).animate(CurvedAnimation(parent: secondaryAnimation, curve: Curves.ease)),
-                child: FadeTransition(
-                  opacity: Tween<double>(begin: 0, end: 1).animate(
-                    CurvedAnimation(
-                      parent: animation,
-                      curve: Curves.ease,
-                      reverseCurve: Curves.easeInOut,
-                    ),
-                  ),
-                  child: child,
-                ),
-              );
-            }
-            return FadeTransition(
-              opacity: Tween<double>(begin: 0, end: 1).animate(
-                CurvedAnimation(
-                  parent: animation,
-                  curve: Curves.ease,
-                  reverseCurve: Curves.easeInOut,
-                ),
-              ),
-              child: FadeTransition(
-                opacity: Tween<double>(begin: 1, end: 0).animate(CurvedAnimation(parent: secondaryAnimation, curve: Curves.ease)),
-                child: child,
-              ),
-            );
-          },
-        );
 }

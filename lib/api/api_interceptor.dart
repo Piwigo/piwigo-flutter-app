@@ -1,5 +1,10 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:piwigo_ng/app.dart';
+import 'package:piwigo_ng/components/snackbars.dart';
+import 'package:piwigo_ng/services/preferences_service.dart';
+import 'package:piwigo_ng/utils/localizations.dart';
 
 class ApiInterceptor extends Interceptor {
   @override
@@ -7,7 +12,8 @@ class ApiInterceptor extends Interceptor {
       RequestOptions options, RequestInterceptorHandler handler) async {
     print('[${options.method}] ${options.queryParameters['method']}');
     FlutterSecureStorage secureStorage = const FlutterSecureStorage();
-    options.baseUrl = (await secureStorage.read(key: 'SERVER_URL'))!;
+    options.baseUrl =
+        (await secureStorage.read(key: Preferences.serverUrlKey))!;
     return super.onRequest(options, handler);
   }
 
@@ -20,8 +26,19 @@ class ApiInterceptor extends Interceptor {
 
   @override
   void onError(DioError err, ErrorInterceptorHandler handler) async {
-    print(
+    debugPrint(
         '[${err.response?.statusCode}] ${err.requestOptions.queryParameters['method']}');
+    debugPrint('${err.error}\n${err.stackTrace}');
+    switch (err.response?.statusCode) {
+      case null:
+        App.scaffoldMessengerKey.currentState?.showSnackBar(
+          errorSnackBar(
+            message: appStrings.internetErrorGeneral_title,
+            icon: Icons.signal_wifi_connected_no_internet_4,
+          ),
+        );
+        break;
+    }
     return super.onError(err, handler);
   }
 }

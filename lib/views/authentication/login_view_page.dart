@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:piwigo_ng/app.dart';
+import 'package:piwigo_ng/utils/localizations.dart';
+import 'package:piwigo_ng/utils/settings.dart';
 import 'package:piwigo_ng/views/settings/privacy_policy_view_page.dart';
 
 import '../../components/buttons/app_text_button.dart';
@@ -28,12 +30,14 @@ class _LoginViewPageState extends State<LoginViewPage> {
               builder: (BuildContext context, BoxConstraints constraints) {
             return SingleChildScrollView(
               child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 8.0),
-                width: MediaQuery.of(context).size.width * 0.8,
+                padding: const EdgeInsets.symmetric(
+                  vertical: 8.0,
+                  horizontal: 16.0,
+                ),
                 constraints: constraints.copyWith(
                   minHeight: constraints.maxHeight,
                   maxHeight: double.infinity,
-                  maxWidth: 400.0,
+                  maxWidth: Settings.modalMaxWidth,
                 ),
                 child: IntrinsicHeight(
                   child: Column(
@@ -62,7 +66,7 @@ class _LoginViewPageState extends State<LoginViewPage> {
                         ),
                       ),
                       AppTextButton(
-                        text: "Privacy Policy", // Todo: Use translations
+                        text: appStrings.settings_privacy,
                         onPressed: () {
                           App.navigatorKey.currentState?.pushNamed(
                             PrivacyPolicyViewPage.routeName,
@@ -74,13 +78,9 @@ class _LoginViewPageState extends State<LoginViewPage> {
                         builder: (context, snapshot) {
                           if (snapshot.hasData) {
                             PackageInfo packageInfo = snapshot.data!;
-                            return Text(
-                              packageInfo.version,
-                            );
+                            return Text(packageInfo.version);
                           }
-                          return const Text(
-                            "Unknown version",
-                          ); // Todo: Add to translations
+                          return Text(appStrings.settings_unknownVersion);
                         },
                       ),
                     ],

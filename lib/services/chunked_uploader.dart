@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
@@ -21,25 +22,27 @@ class ChunkedUploader {
     required int maxChunkSize,
     required Function(double) onUploadProgress,
     String method = 'POST',
-    String fileKey = 'file',
   }) =>
       UploadRequest(_dio,
               filePath: filePath,
               path: path,
               contentType: contentType,
               params: params,
-              fileKey: fileKey,
               method: method,
               data: data,
               cancelToken: cancelToken,
               maxChunkSize: maxChunkSize,
               onUploadProgress: onUploadProgress)
           .upload();
+
+  static Future<String> generateMd5(Stream<List<int>> stream) async {
+    return (await md5.bind(stream).first).toString();
+  }
 }
 
 class UploadRequest {
   final Dio dio;
-  final String filePath, fileName, path, fileKey;
+  final String filePath, fileName, path;
   final Map<String, String> params;
   final String method;
   final String contentType;
@@ -55,7 +58,6 @@ class UploadRequest {
       required this.params,
       required this.contentType,
       required this.path,
-      required this.fileKey,
       required this.method,
       required this.data,
       this.cancelToken,
@@ -71,12 +73,12 @@ class UploadRequest {
     Response? finalResponse;
     String originalSum;
     List<String> chunkSums = [];
-    originalSum = await generateMd5(_file.openRead());
+    originalSum = await ChunkedUploader.generateMd5(_file.openRead());
     for (int i = 0; i < _chunksCount; i++) {
       final start = _getChunkStart(i);
       final end = _getChunkEnd(i);
       final chunkStream = _getChunkStream(start, end);
-      chunkSums.add(await generateMd5(chunkStream));
+      chunkSums.add(await ChunkedUploader.generateMd5(chunkStream));
     }
 
     for (int i = 0; i < _chunksCount; i++) {
@@ -85,25 +87,37 @@ class UploadRequest {
       final chunkStream = _getChunkStream(start, end);
 
       final formData = FormData.fromMap({
-        "chunks": _chunksCount,
-        "chunk": i,
-        "chunk_sum": chunkSums[i],
-        "original_sum": originalSum,
-        "file": MultipartFile(chunkStream, end - start, filename: fileName),
+        'chunks': _chunksCount,
+        'chunk': i,
+        'chunk_sum': chunkSums[i],
+        'original_sum': originalSum,
+        'file': MultipartFile(chunkStream, end - start, filename: fileName),
         ...data
       });
-      finalResponse = await dio.request(
+
+      Response response = await dio.request(
         path,
         data: formData,
         queryParameters: params,
-        options: Options(method: method, contentType: contentType),
+        cancelToken: cancelToken,
+        options: Options(
+          method: method,
+          contentType: contentType,
+          headers: _getHeaders(start, end),
+        ),
         onSendProgress: (current, total) => _updateProgress(i, current, total),
       );
+
+      if (response.data != null &&
+          json.decode(response.data)?['result']?['id'] != null) {
+        finalResponse = response;
+      }
     }
     return finalResponse;
   }
 
-  Stream<List<int>> _getChunkStream(int start, int end) => _file.openRead(start, end);
+  Stream<List<int>> _getChunkStream(int start, int end) =>
+      _file.openRead(start, end);
 
   _updateProgress(int chunkIndex, int chunkCurrent, int chunkTotal) {
     int totalUploadedSize = (chunkIndex * _maxChunkSize) + chunkCurrent;
@@ -113,13 +127,11 @@ class UploadRequest {
 
   int _getChunkStart(int chunkIndex) => chunkIndex * _maxChunkSize;
 
-  int _getChunkEnd(int chunkIndex) => min((chunkIndex + 1) * _maxChunkSize, _fileSize);
+  int _getChunkEnd(int chunkIndex) =>
+      min((chunkIndex + 1) * _maxChunkSize, _fileSize);
 
-  Map<String, dynamic> _getHeaders(int start, int end) => {'Content-Range': 'bytes $start-${end - 1}/$_fileSize'};
+  Map<String, dynamic> _getHeaders(int start, int end) =>
+      {'Content-Range': 'bytes $start-${end - 1}/$_fileSize'};
 
   int get _chunksCount => (_fileSize / _maxChunkSize).ceil();
-
-  Future<String> generateMd5(Stream<List<int>> stream) async {
-    return (await md5.bind(stream).first).toString();
-  }
 }

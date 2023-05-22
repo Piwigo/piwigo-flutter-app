@@ -1,0 +1,800 @@
+{
+    "tabBar_albums": "相册",
+    "tabBar_upload": "上传",
+    "tabBar_preferences": "设置",
+    "alertOkButton": "确定",
+    "alertDismissButton": "忽略",
+    "alertYesButton": "是",
+    "alertNoButton": "否",
+    "alertTryAgainButton": "重试",
+    "alertCancelButton": "取消",
+    "alertAddButton": "添加",
+    "alertRetryButton": "重试",
+    "alertNextButton": "下一张照片",
+    "alertTryButton": "尝试",
+    "alertClearButton": "清空",
+    "alertConfirmButton": "确认",
+    "alertRemoveButton": "移除",
+    "alertMoveButton": "移动",
+    "alertCopyButton": "复制",
+    "loadingHUD_label": "正在加载…",
+    "completeHUD_label": "完成",
+    "errorHUD_label": "出错",
+    "uploadRights_title": "需要上传权限",
+    "uploadRights_message": "您必须拥有上传权限才能上传照片或视频。",
+    "internetErrorGeneral_title": "连接出错",
+    "internetErrorGeneral_broken": "抱歉，网络连接断开，请尝试重新登录。",
+    "internetCancellingConnection_button": "正在取消连接…",
+    "internetCancelledConnection_button": "取消连接",
+    "internetCancelledConnection_title": "连接已取消",
+    "piwigoServer_wrongJSONobject": "无法解析 Piwigo 服务器传送的 JSON 对象。",
+    "piwigoServer_invalidJSONobject": "Piwigo 服务器没有返回有效的 JSON 对象。",
+    "piwigoServer_emptyJSONobject": "Piwigo 服务器返回了空的 JSON 对象。",
+    "coreDataStore_WarningTitle": "警告",
+    "coreDataStore_WarningMessage": "Piwigo 尝试读取数据缓存时出现严重错误。 因此将会创建新的缓存。",
+    "coreDataFetch_DigestError": "无法解析获取到的数据。",
+    "coreDataFetch_TagError": "获取标签时出现错误！",
+    "coreDataFetch_TagMissingData": "搜索并删除缺少有效代码或名称的标签。",
+    "coreDataFetch_TagCreateFailed": "无法创建新标签。",
+    "coreDataFetch_UploadCreateFailed": "无法创建新的上传对象",
+    "coreDataFetch_UploadMissingAsset": "无法获取图片。",
+    "login": "登录",
+    "login_serverPlaceholder": "example.com",
+    "login_userPlaceholder": "用户名(选填)",
+    "login_passwordPlaceholder": "密码(选填)",
+    "login_loggingIn": "登录中……",
+    "login_connecting": "正在连接",
+    "login_newSession": "正在打开会话",
+    "login_communityParameters": "社区参数",
+    "login_serverParameters": "Piwigo参数",
+    "login_connectionChanged": "连接已变更!",
+    "loginHTTP_title": "HTTP 证书",
+    "loginHTTP_message": "Piwigo服务器需要基本访问验证：",
+    "loginHTTPuser_placeholder": "用户名",
+    "loginHTTPpwd_placeholder": "密码",
+    "loginCertFailed_title": "非私密连接",
+    "loginCertFailed_message": "Piwigo警告网站证书无效。您仍然想要接受此证书吗？",
+    "loginHTTPSfailed_title": "安全连接失败",
+    "loginHTTPSfailed_message": "Piwigo无法建立安全连接。您想要建立不安全的连接吗？",
+    "serverURLerror_title": "错误的URL",
+    "serverURLerror_message": "请更正Piwigo网络服务器地址。",
+    "serverMethodsError_title": "未知方法",
+    "serverMethodsError_message": "无法获取服务器方法。Piwigo服务器有问题？",
+    "serverInvalidMethodError_message": "无法调用服务器方法。",
+    "serverMissingParamError_message": "无法以提供参数调用服务器方法",
+    "serverInvalidParamError_message": "执行服务器方法失败，缺少参数",
+    "serverUnknownError_message": "以提供的参数调用服务器方法时遇到意外错误",
+    "loginError_title": "登录失败",
+    "loginError_message": "用户名和密码在给定的网页地址不匹配",
+    "loginEmptyServer_title": "输入一个网址",
+    "loginEmptyServer_message": "请选择一项协议，并输入一个Piwigo Web地址，以便继续。",
+    "serverConnectionError_title": "连接失败",
+    "serverConnectionError_message": "无法建立安全的 HTTPS 连接。请检查地址或尝试未加密的 HTTP模式？",
+    "serverVersionNotCompatible_title": "服务器不兼容",
+    "serverVersionNotCompatible_message": "您的Piwigo服务器版本为 {version}. Piwigo Mobile仅支持高于2.8的版本。请更新您的服务器使用Piwigo Mobile。您仍然要继续吗？",
+    "@serverVersionNotCompatible_message": {
+        "placeholders": {
+            "version": {}
+        }
+    },
+    "sessionStatusError_title": "验证失败",
+    "sessionStatusError_message": "验证服务器失败。请尝试重新登录。",
+    "serverCommunityError_title": "通讯错误",
+    "serverCommunityError_message": "获取通讯扩展参数失败。请尝试再次登录。",
+    "logoutConfirmation_title": "注销",
+    "logoutConfirmation_message": "确定要退出账户吗？",
+    "logoutFail_title": "登出失败",
+    "albumCount": "{count, plural,=0{0 albums} =1{1 album} other{{count} sub-albums}}",
+    "@albumCount": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "subAlbumCount": "{count, plural,=0{0 sub-albums} =1{1 sub-album} other{{count} sub-albums}}",
+    "@subAlbumCount": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "showMore": "显示更多… ({count})",
+    "@showMore": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "showPhotos": "显示照片",
+    "categoryMainEmpty": "您的Piwigo没有相册。\n您可以尝试下拉刷新或重新登录。",
+    "categoryImageList_selectButton": "选择",
+    "categoryImageList_deselectButton": "取消选择",
+    "categoryImageList_noDataError": "错误：没有数据",
+    "categoryDiscover_title": "搜索",
+    "categoryDiscoverVisits_title": "访问最多",
+    "categoryDiscoverVisits_legend": "点击数",
+    "categoryDiscoverBest_title": "评分最高",
+    "categoryDiscoverRecent_title": "最近图片",
+    "categoryDiscoverFavorites_title": "您的收藏",
+    "categorySort_nameAscending": "照片标题，A → Z",
+    "categorySort_nameDescending": "照片标题，Z → A",
+    "categorySort_fileNameAscending": "文件名，A → Z",
+    "categorySort_fileNameDescending": "文件名，Z → A",
+    "categorySort_dateCreatedDescending": "创建日期，新 → 旧",
+    "categorySort_dateCreatedAscending": "创建日期，旧 → 新",
+    "categorySort_datePostedDescending": "发布日期，新 → 旧",
+    "categorySort_datePostedAscending": "发布日期，旧 → 新",
+    "categorySort_ratingScoreDescending": "评分分数，高 → 低",
+    "categorySort_ratingScoreAscending": "评分分数，低 → 高",
+    "categorySort_visitsDescending": "点击量，高 → 低",
+    "categorySort_visitsAscending": "点击量，低 → 高",
+    "categorySort_manual": "手动排序",
+    "categorySort_random": "随机顺序",
+    "categorySort_videosOnly": "仅视频",
+    "categorySort_imagesOnly": "仅图片",
+    "categorySelection_title": "相册",
+    "categorySelection_titleSub": "子相册",
+    "categorySelection_root": "根相册",
+    "categorySelection_root375pt": "根目录",
+    "categorySelection_action": "选择此相册的操作",
+    "categorySelectionHUD_label": "正在获取相册数据…",
+    "categorySelection_allAlbums": "所有相册",
+    "categoryUpload_noSubAlbum": "选择一个子相册以上传图像",
+    "categoryUpload_chooseAlbum": "选择一个子相册以上传图像",
+    "categoryUpload_LocalAlbums": "本地相册",
+    "categoryUpload_chooseLocalAlbum": "选择一个相册以获取图片",
+    "categoryUpload_sharedAlbums": "已分享的相册",
+    "categoryUpload_mediaTypes": "媒体类型",
+    "categoryUpload_otherAlbums": "其他相册",
+    "categoryUpload_pasteboard": "剪贴板",
+    "categoryUpload_loadSubCategories": "加载",
+    "categoryUpload_images": "上传图片",
+    "categoryUpload_videos": "上传视频",
+    "categoryUpload_takePhoto": "拍照",
+    "categoryUpload_takeVideo": "录制",
+    "uploadList_title": "Upload Status",
+    "uploadList_uploading": "Uploading",
+    "uploadList_history": "History",
+    "uploadList_empty": "Empty",
+    "setDefaultCategory_select": "请选择一个相册或子相册作为新的根相册",
+    "setDefaultCategory_title": "默认相册",
+    "setDefaultCategory_message": "您确定要设置相册 {album} 作为默认相册？",
+    "@setDefaultCategory_message": {
+        "placeholders": {
+            "album": {}
+        }
+    },
+    "createNewAlbum_title": "新建相册",
+    "createNewAlbum_message": "给这个相册取一个名字",
+    "createNewAlbum_placeholder": "相册名称",
+    "createNewAlbumDescription_placeholder": "说明",
+    "createNewAlbumDescription_noDescription": "没有描述",
+    "createNewAlbumHUD_label": "正在创建相册中...",
+    "createNewAlbumHUD_created": "创建的相册。",
+    "createAlbumError_title": "无法创建相册",
+    "createAlbumError_message": "无法创建新相册",
+    "categoryCellOption_rename": "重新命名",
+    "categoryCellOption_move": "移动",
+    "categoryCellOption_delete": "删除",
+    "renameCategory_title": "重命名相册",
+    "renameCategory_message": "给这个相册输入一个名字",
+    "renameCategory_button": "重新命名",
+    "renameCategoryHUD_label": "重命名相册",
+    "renameCategoryHUD_renamed": "相册重命名为",
+    "renameCategoryError_title": "重命名失败",
+    "renameCategoryError_message": "重命名相册失败",
+    "refreshCategoryHUD_label": "正在刷新代表图像...",
+    "refreshCategoryError_title": "刷新失败",
+    "refreshCategoryError_message": "无法刷新相册封面",
+    "deleteCategory_title": "删除相册",
+    "deleteCategory_message": "{count, plural, =0{是否确定删除相册 {album}} =1{是否确定删除相册 {album} AND ITS PHOTO} other{是否确定删除相册 {album} 和共计 {count} 张照片 ?}}",
+    "@deleteCategory_message": {
+        "placeholders": {
+            "count": {},
+            "album": {}
+        }
+    },
+    "deleteCategory_empty": "删除空相册",
+    "deleteCategory_noImages": "保留图像",
+    "deleteCategory_noImages_subtitle": "可能创建无主照片",
+    "deleteCategory_orphanedImages": "删除孤立图片",
+    "deleteCategory_orphanedImages_subtitle": "默认模式，仅删除没有链接到其他相册的照片",
+    "deleteCategory_allImages": "{count, plural, =0{删除照片} =1{删除照片} other{删除 {count} 张照片}}",
+    "@deleteCategory_allImages": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "deleteCategory_allImages_subtitle": "删除所有照片，包括与其他相册相关联的照片。",
+    "deleteCategoryConfirm_title": "您确定吗？",
+    "deleteCategoryConfirm_message": "请输入照片数量以删除此相册。照片数量： {count}",
+    "@deleteCategoryConfirm_message": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "deleteCategoryConfirm_deleteButton": "删除",
+    "deleteCategoryHUD_label": "正在删除相册…",
+    "deleteCategoryHUD_deleted": "相册已删除",
+    "deleteCategoryMatchError_title": "数字不匹配",
+    "deleteCategoryMatchError_message": "你所输入的数字与分类中已有的照片数目不同，请重试以删除该相册。",
+    "deleteCategoryError_title": "删除失败",
+    "deleteCategoryError_message": "删除相册失败",
+    "moveCategory": "移动相册",
+    "moveCategory_select": "将相册 {album} 移动到其他的相册或子相册中",
+    "@moveCategory_select": {
+        "placeholders": {
+            "album": {}
+        }
+    },
+    "moveCategory_message": "您确定要将 {album} 移动到相册 {parent} 吗？",
+    "@moveCategory_message": {
+        "placeholders": {
+            "album": {},
+            "parent": {}
+        }
+    },
+    "moveCategoryHUD_moving": "移动相册中...",
+    "moveCategoryHUD_moved": "相册已移动",
+    "moveCategoryError_title": "移动失败",
+    "moveCategoryError_message": "移动相册失败",
+    "categorySelection_setThumbnail": "请选择要使用照片 {photo} 作为缩略图的相册。",
+    "@categorySelection_setThumbnail": {
+        "placeholders": {
+            "photo": {}
+        }
+    },
+    "categorySelection_current": "为该照片选择相册",
+    "categorySelection_one": "选择包含该照片的相册",
+    "categorySelection_other": "或者为该照片选择另一个相册",
+    "categoryImageSet_title": "相册封面",
+    "categoryImageSet_message": "你确定要把该照片应用到相册 {album} 中吗？",
+    "@categoryImageSet_message": {
+        "placeholders": {
+            "album": {}
+        }
+    },
+    "categoryImageSetHUD_updating": "正在更新相册缩略图…",
+    "categoryImageSetError_title": "照片设置出错",
+    "categoryImageSetError_message": "设置相册封面失败",
+    "singleImage": "照片",
+    "imageCount": "{count, plural,=0{0 photos} =1{1 photo} other{{count} sub-albums}}",
+    "@imageCount": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "singleVideo": "视频",
+    "singleAudio": "音频",
+    "severalImages": "照片",
+    "all_Photos": "所有照片",
+    "severalVideos": "视频",
+    "noImages": "沒有照片",
+    "pullToRefresh": "刷新照片",
+    "andMore": " & 更多",
+    "months": "月",
+    "weeks": "周",
+    "days": "日",
+    "date": "日期",
+    "albumPhotoError_title": "无法获取相册中的照片",
+    "albumPhotoError_message": "无法获取相册中的照片(是否照片出现损坏？)",
+    "sortBy": "排序方式",
+    "imageSortTitle": "排序照片",
+    "imageSortMessage": "请选择您希望排序照片的方式",
+    "imageSortingHUD": "排序照片中...",
+    "imageSelectingHUD": "选择相片中...",
+    "imageDeselectingHUD": "反选相片中...",
+    "imageOptions_title": "照片选项",
+    "imageOptions_edit": "编辑",
+    "imageOptions_download": "下载",
+    "imageOptions_share": "分享",
+    "imageOptions_addFavorites": "Add to favorites",
+    "imageOptions_removeFavorites": "Remove from favorites",
+    "imageOptions_setAlbumImage": "设为相册缩略图",
+    "imageDetailsView_title": "属性",
+    "editImageDetails_title": "标题",
+    "editImageDetails_titlePlaceholder": "图片标题",
+    "editImageDetails_author": "作者",
+    "editImageDetails_tags": "标签",
+    "editImageDetails_privacyLevel": "哪些人可以看到这张照片？",
+    "editImageDetails_description": "描述",
+    "editImageDetails_descriptionPlaceholder": "图片描述",
+    "editImageDetails_comments": "评论",
+    "editImageDetails_dateCreation": "创建日期",
+    "editImageDetails_dateUnset": "未设定",
+    "editImageDetails_dateToday": "今天",
+    "editImageDetails_dateMonthInc": "+1 月",
+    "editImageDetails_dateMonthDec": "-1 月",
+    "editImageDetails_dateYearInc": "+1 年",
+    "editImageDetails_dateYearDec": "-1 年",
+    "editImageDetailsHUD_updating": "{count, plural, =1{更新照片中...} other{更新照片中...}}",
+    "@editImageDetailsHUD_updating": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "editImageDetailsError_title": "更新失败",
+    "editImageDetailsError_message": "无法在您的服务器上执行此更改，是否重试？",
+    "imageDetailsFetchError_title": "照片信息获取失败",
+    "imageDetailsFetchError_retryMessage": "无法获取照片信息，是否重试？",
+    "imageDetailsFetchError_continueMessage": "无法获取照片信息，是否继续？",
+    "privacyLevel": "隐私级别",
+    "privacyLevel_admin": "管理员",
+    "privacyLevel_adminFamily": "管理员，家庭",
+    "privacyLevel_adminsFamilyFriends": "管理员，家庭，朋友",
+    "privacyLevel_adminsFamilyFriendsContacts": "管理员、家庭、朋友、联系人",
+    "privacyLevel_everybody": "任何人",
+    "privacyLevel_unchanged": "未更改",
+    "none": "无",
+    "tag": "标签",
+    "tags": "标签",
+    "tagCount": "{count, plural, =0{0 个标签} =1{1 个标签} other{{count} 个标签}}",
+    "@tagCount": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "tagsTitle_selectOne": "选择一个标签",
+    "tagsHeader_selected": "已选中",
+    "tagsHeader_notSelected": "未选中",
+    "tagsHeader_all": "全部",
+    "tagsAdd_title": "添加标签",
+    "tagsAdd_message": "命名该标签",
+    "tagsAdd_placeholder": "新标签",
+    "tagsAddHUD_label": "创建标签中...",
+    "tagsAddHUD_created": "标签已创建",
+    "tagsAddError_message": "无法创建新标签",
+    "tagsAddError_title": "创建失败",
+    "selectImages": "选择图片",
+    "selectImageSelectedCount": "{count, plural, =0{0 个图片已被选择} =1{1 个图片已被选择} other{{count} 个图片已被选择}}",
+    "@selectImageSelectedCount": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "selectAll": "全选",
+    "selectLimit": "达到选择上限",
+    "renameImage_title": "原始文件",
+    "renameImage_message": "为照片“{file}”输入一个新的名字",
+    "@renameImage_message": {
+        "placeholders": {
+            "file": {}
+        }
+    },
+    "renameImageHUD_label": "重命名文件中...",
+    "renameImageHUD_renamed": "{count, plural, =0{没有文件已被重命名} =1{文件已被重命名} other{{count} 个文件已被重命名}}",
+    "@renameImageHUD_renamed": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "renameImageError_message": "重命名文件失败",
+    "deleteImage_delete": "删除",
+    "deleteImageProgress_title": "删除任务已完成 {progress} %",
+    "@deleteImageProgress_title": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "deleteImageCount_title": "{count, plural, =0{删除图片} =1{图片已删除} other{已删除 {count} 张图片}}",
+    "@deleteImageCount_title": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "deleteImageHUD_deleting": "{count, plural, =0{正在删除图片…} =1{正在删除图片…} other{正在删除图片…}}",
+    "@deleteImageHUD_deleting": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "removeSingleImage_title": "从相册中移除",
+    "removeSingleImage_subtitle": "一些照片已关联到其他相册",
+    "removeImageHUD_removing": "{count, plural, =0{正在移除图片…} =1{正在移除图片…} other{正在移除图片…}}",
+    "@removeImageHUD_removing": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "deleteImage_message": "{count, plural,=1{你确定要删除这张照片？此操作无法撤销！}other{你确定要删除选中的 {count} 张照片？此操作无法撤销！}}",
+    "@deleteImage_message": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "deleteImageFail_title": "删除失败",
+    "deleteImageFail_message": "无法删除该照片",
+    "deleteImageSuccess_message": "{count, plural,=0{成功删除了 0 张照片}=1{成功删除了 1 张照片}other{成功删除了 {count} 张照片}}",
+    "@deleteImageSuccess_message": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "removeSelectedImage_title": "删除选中的图片",
+    "removeSelectedImage_message": "你确定要从选择集中移除该照片？",
+    "downloadImage_title": "{count, plural,=0{下载照片}=1{下载照片}other{下载 {count} 张照片}}",
+    "@downloadImage_title": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "downloadImage_confirmation": "{count, plural, =1{您确定要下载选中的图片吗？} other{您确定要下载选中的 {count} 张图片吗？}}",
+    "@downloadImage_confirmation": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "downloadingImages": "{count, plural, =1{正在下载图片} other{正在下载图片}}",
+    "@downloadingImages": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "downloadingVideos": "{count, plural, =1{正在下载视频} other{正在下载视频}}",
+    "@downloadingVideos": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "downloadImageSuccess_title": "已下载的文件",
+    "downloadImageSuccess_message": "所有文件已成功下载",
+    "downloadImageFail_title": "下载失败",
+    "downloadImageFail_message": "无法下载照片！",
+    "downloadVideoFail_message": "无法下载视频！",
+    "downloadVideoFail_Photos": "视频格式不被图片接受！",
+    "imageSaveError_title": "保存照片失败",
+    "imageSaveError_message": "照片保存失败",
+    "videoSaveError_title": "视频保存失败",
+    "videoSaveError_message": "视频保存失败",
+    "videoLoadError_message": "视频加载失败",
+    "moveOrCopyImage_title": "{count, plural, =1{您想移动或复制这张照片吗？} other{您想移动或复制 {count} 张照片吗？}}",
+    "@moveOrCopyImage_title": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "moveImage_title": "移动到相册",
+    "moveImage_selectAlbum": "{count, plural, =1{请选择您想将图片 {photo} 移动到的的目标相册} other{请选择您想将图片移动到的目标相册。}}",
+    "@moveImage_selectAlbum": {
+        "placeholders": {
+            "count": {},
+            "photo": {}
+        }
+    },
+    "moveImage_message": "{count, plural, =1{您确定将图片 {photo} 移动到相册 {album} 吗？} other{您确定要将这些图片移动到相册 {album} 吗？}}",
+    "@moveImage_message": {
+        "placeholders": {
+            "count": {},
+            "photo": {},
+            "album": {}
+        }
+    },
+    "moveImageHUD_moving": "{count, plural, =1{正在移动图片…} other{正在移动图片…}}",
+    "@moveImageHUD_moving": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "moveImageHUD_moved": "{count, plural, =1{已移动图片} other{已移动图片}}",
+    "@moveImageHUD_moved": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "moveImageError_title": "移动失败",
+    "moveImageError_message": "{count, plural, =1{移动图片失败} other{移动图片失败}}",
+    "@moveImageError_message": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "copyImage_title": "复制到相册",
+    "copyImage_selectAlbum": "{count, plural, =1{请选择你想将图片 {photo} 复制到的目标相册} other{请选择你想将这些图片复制到的目标相册}}",
+    "@copyImage_selectAlbum": {
+        "placeholders": {
+            "count": {},
+            "photo": {}
+        }
+    },
+    "copyImage_message": "{count, plural, =1{您确定将图片 {photo} 复制到相册 {album} 吗？} other{您确定将这些图片复制到相册 {album} 吗？}}",
+    "@copyImage_message": {
+        "placeholders": {
+            "count": {},
+            "photo": {},
+            "album": {}
+        }
+    },
+    "copyImageHUD_copying": "{count, plural, =1{正在复制图片…} other{正在复制图片…}}",
+    "@copyImageHUD_copying": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "copyImageHUD_copied": "{count, plural, =1{照片已复制} other{照片已复制}}",
+    "@copyImageHUD_copied": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "copyImageError_title": "复制失败",
+    "copyImageError_message": "{count, plural, =1{复制图片失败} other{复制一些图片失败}}",
+    "@copyImageError_message": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "imageUploadHeader": "请指定需要上传的照片和视频的相册或子相册",
+    "imageUploadHeaderTitle_images": "图片参数",
+    "imageUploadHeaderText_images": "请配置所选择照片或视频的参数",
+    "imageUploadHeaderTitle_upload": "上传设置",
+    "imageUploadHeaderText_upload": "请配置所选择照片或视频的上传参数",
+    "imageUploadDetails_title": "标题:",
+    "imageUploadDetails_author": "作者:",
+    "imageUploadDetails_privacy": "隐私:",
+    "imageUploadDetails_tags": "标签:",
+    "imageUploadDetails_description": "描述:",
+    "imageUploadDetailsView_title": "照片",
+    "imageUploadDetailsButton_title": "上传",
+    "imageUploadDetailsEdit_title": "编辑要上传的照片",
+    "imageUploadDetailsUploading_title": "正在上传的照片",
+    "imageUploadDetailsCell_uploadComplete": "即将完成...",
+    "imageUploadRemove": "正在移除已上传的照片",
+    "imageUploadTableCell_waiting": "等待中...",
+    "imageUploadTableCell_preparing": "准备中...",
+    "imageUploadTableCell_prepared": "已准备好上传...",
+    "imageUploadTableCell_uploading": "上传中…",
+    "imageUploadTableCell_uploaded": "上传成功",
+    "imageUploadTableCell_finishing": "正在完成...",
+    "imageUploadClearFailed": "{count, plural, =1{清除失败的上传} other{清除 {count} 个失败的上传}}",
+    "@imageUploadClearFailed": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "imageUploadClearCompleted": "{count, plural, =1{清除已完成的上传} other{清除 {count} 个已完成的上传}}",
+    "@imageUploadClearCompleted": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "imageUploadResume": "{count, plural, =1{继续上传} other{继续 {count} 个上传}}",
+    "@imageUploadResume": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "imageUploadProgressBar_zero": "正在上传 0/0",
+    "imageUploadProgressBar_nonZero": "正在上传 {index}/{max}",
+    "@imageUploadProgressBar_nonZero": {
+        "placeholders": {
+            "index": {},
+            "max": {}
+        }
+    },
+    "imageUploadProgressBar_completed": "已完成",
+    "imageUploadCompleted_title": "上传完毕",
+    "imageUploadCompleted_message": "照片成功上传到你的 Piwigo 服务器",
+    "imageUploadCompleted_message1": "照片成功上传到你的Piwigo服务器",
+    "imageUploadCompleted_warning": "some of your photos could not be uploaded.",
+    "uploadError_title": "上传出错",
+    "uploadError_message": "无法上传你的照片",
+    "uploadCancelled_title": "上传已取消",
+    "uploadNoInternetNetwork": "没有网絡连接",
+    "uploadNoWiFiNetwork": "没有Wi-Fi连接",
+    "uploadLowPowerMode": "低电量模式已启用",
+    "uploadSection_impossible": "无法完成的上传任务",
+    "uploadSection_resumable": "可继续的上传任务",
+    "uploadSection_queue": "上传队列",
+    "imageUploadError_title": "照片上传出错",
+    "imageUploadError_format": "Piwigo服务器不支持该文件格式",
+    "imageUploadError_source": "无法创建照片源",
+    "imageUploadError_destination": "无法创建照片目标",
+    "imageUploadError_iCloud": "无法获取照片",
+    "audioUploadError_title": "音频上传出错",
+    "audioUploadError_format": "抱歉，Piwigo NG 尚不支持音频文件",
+    "videoUploadError_title": "视频上传出错",
+    "videoUploadError_format": "抱歉，Piwigo服务器不支持 .{extension} 后缀名的视频文件",
+    "@videoUploadError_format": {
+        "placeholders": {
+            "extension": {}
+        }
+    },
+    "videoUploadError_export": "抱歉，无法获取视频进行上传。",
+    "videoUploadError_unknown": "抱歉，视频上传失败，在MP4转换过程中发生未知错误。",
+    "videoUploadCancelled_message": "视频上传已被取消",
+    "localAlbums": "照片库",
+    "localAlbums_accessible": "可访问的照片",
+    "localAlbums_photosNotAuthorized_title": "无访问权限",
+    "localAlbums_photosNiltitle": "读取照片出错",
+    "localAlbums_photosNnil_msg": "读取本地照片库时出现问题",
+    "localAlbums_photosNotAuthorized_msg": "无法读取本地照片库，请在设备设置中为 Piwigo 授予相应权限",
+    "localImages_deleteTitle": "从相机相册中移除",
+    "localImages_deleteMessage": "您想要从相机卷中删除上传的照片或视频吗？ 已删除的照片或视频在被彻底删除前会在 iOS 照片回收站中保留 30 天",
+    "settingsHeader_server": "Piwigo 服务器 {version}",
+    "@settingsHeader_server": {
+        "placeholders": {
+            "version": {}
+        }
+    },
+    "settingsHeader_notSecure": "不安全的连接",
+    "settings_server": "地址",
+    "settings_username": "用户名",
+    "settings_notLoggedIn": " - 未登录 - ",
+    "settings_logout": "注销",
+    "settingsFooter_formats": "服务器接受以下文件类型: {types}",
+    "@settingsFooter_formats": {
+        "placeholders": {
+            "types": {}
+        }
+    },
+    "settingsHeader_general": "常规设置",
+    "settingsHeader_thumbnails": "缩略图",
+    "defaultImageSort": "分类",
+    "defaultImageSort320px": "默认排序",
+    "defaultImageSort414px": "默认照片排序",
+    "defaultAlbumThumbnailFile414px": "相册封面文件",
+    "defaultAlbumThumbnailSizeHeader": "请选择相册缩略图大小",
+    "maxNberOfRecentAlbums": "最近的",
+    "maxNberOfRecentAlbums320px": "最近相册",
+    "maxNberOfRecentAlbums414px": "最近相册数量",
+    "thumbnailSizeSquare": "方形",
+    "thumbnailSizeThumbnail": "缩略图",
+    "thumbnailSizeXXSmall": "极小",
+    "thumbnailSizeXSmall": "超小",
+    "thumbnailSizeSmall": "小",
+    "thumbnailSizeMedium": "中",
+    "thumbnailSizeLarge": "大",
+    "thumbnailSizeXLarge": "特大",
+    "thumbnailSizeXXLarge": "巨大",
+    "thumbnailSizexFullRes": "完整分辨率",
+    "settingsHeader_images": "图片",
+    "defaultThumbnailFile": "文件",
+    "defaultThumbnailFile320px": "缩略图文件",
+    "defaultThumbnailFile414px": "图片缩略图文件",
+    "defaultThumbnailSize": "尺寸",
+    "defaultThumbnailSize320px": "缩略图大小",
+    "defaultThumbnailSize414px": "缩略图默认大小",
+    "defaultNberOfThumbnailsShort": "每行数量",
+    "defaultNberOfThumbnails": "每行缩略图数量",
+    "defaultThumbnailSizeTitle": "默认大小",
+    "defaultThumbnailSizeHeader": "请选择图片缩略图大小",
+    "settings_displayTitles": "缩略图标题",
+    "settings_displayTitles320px": "在缩略图上显示标题",
+    "defaultPreviewFile": "预览",
+    "defaultPreviewFile320px": "预览文件",
+    "defaultPreviewFile414px": "预览图片文件",
+    "defaultImageSize": "图片",
+    "defaultImageSize320px": "图片大小",
+    "defaultImageSize414px": "默认图片大小",
+    "defaultImageSizeTitle": "默认大小",
+    "defaultImageSizeHeader": "请选择图片大小",
+    "defaultImageSize_recommended": " (推荐)",
+    "defaultSize_disabled": " （在服务器上禁用）",
+    "defaultSizeFooter": "灰色的尺寸不建议且不被Piwigo服务器支持",
+    "settings_shareGPSdata": "分享私密元数据",
+    "settings_shareGPSdata375px": "共享时包含私密元数据",
+    "imageSizeSquare": "方形",
+    "imageSizeThumbnail": "缩略图",
+    "imageSizeXXSmall": "极小",
+    "imageSizeXSmall": "特小",
+    "imageSizeSmall": "小",
+    "imageSizeMedium": "中",
+    "imageSizeLarge": "大",
+    "imageSizeXLarge": "特大",
+    "imageSizeXXLarge": "巨大",
+    "imageSizexFullRes": "完整分辨率",
+    "settingsHeader_upload": "默认上传设置",
+    "settings_defaultAuthor": "作者",
+    "settings_defaultAuthor320px": "作者姓名",
+    "settings_defaultAuthorPlaceholder": "作者姓名",
+    "settings_defaultPrivacy": "隐私政策",
+    "settings_defaultPrivacy414px": "请选择谁可以看到照片",
+    "settings_stripGPSdata": "去除私密元数据",
+    "settings_stripGPSdata375px": "上传前删除私密元数据",
+    "settings_photoResize": "上传前缩小大小",
+    "settings_photoSize": "尺寸",
+    "settings_placeholderSize": "输入5-100之间的照片大小",
+    "settings_photoCompress": "上传照片前压缩",
+    "settings_photoCompress375px": "上传照片前压缩",
+    "settings_photoQuality": "质量",
+    "settings_placeholderQuality": "输入照片质量（50~98）",
+    "settings_prefixFilename414px": "自动为上传的照片文件名增加前缀",
+    "settings_prefixFilename375px": "自动为上传的文件名增加前缀",
+    "settings_prefixFilename": "照片文件名前缀",
+    "settings_defaultPrefix": "前缀",
+    "settings_defaultPrefix320px": "文件名前缀",
+    "settings_defaultPrefixPlaceholder": "前缀",
+    "settings_deleteImage375px": "上传后删除照片",
+    "settings_wifiOnly": "仅 Wi-Fi",
+    "settings_deleteImage": "上传后删除照片",
+    "settings_uploadNotification": "上传通知",
+    "settings_downloadNotification": "下载通知",
+    "settings_downloadDestination": "下载目录",
+    "settings_autoUpload": "自动上传",
+    "settings_autoUpload414px": "自动上传照片",
+    "settings_autoUploadEnabled": "开启",
+    "settings_autoUploadEnabledInfo": "照片将被自动上传到您的 Piwigo",
+    "settings_autoUploadEnabledInfoAll": "照片和视频将被自动上传到您的 Piwigo",
+    "settings_autoUploadDisabled": "关闭",
+    "settings_autoUploadDisabledInfo": "照片将不会被自动上传到你的 Piwigo",
+    "settings_autoUploadSource": "来源",
+    "settings_autoUploadSourceInvalid": "无效的源相册",
+    "settings_autoUploadSourceInfo": "请选择相册或子相册，其中的照片和视频会被自动上传",
+    "settings_autoUploadDestination": "目标路径",
+    "settings_autoUploadDestinationInvalid": "无效的目标相册",
+    "settings_autoUploadDestinationInfo": "请选择相册或子相册，其中的照片和视频会被自动上传",
+    "settings_autoUploadDuplicateInfo": "Photos that are already in this Piwigo won't be uploaded.",
+    "settings_autoUploadFrequency": "Every",
+    "settings_autoUploadFrequencyMinutes": "{count, plural, =1{1 minute} other{{count} minutes}}",
+    "@settings_autoUploadFrequencyMinutes": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "settings_autoUploadFrequencyHours": "{count, plural, =1{1 hour} other{{count} hours}}",
+    "@settings_autoUploadFrequencyHours": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "settings_autoUploadFrequencyDays": "{count, plural, =1{1 day} other{{count} days}}",
+    "@settings_autoUploadFrequencyDays": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "autoUploadError_Disabled": "自动上传选项在应用设置中被禁用",
+    "autoUploadError_Failed": "由于出现多次传输失败，上传队列已暂停，请在应用程序中检查",
+    "uploadPhotoSize_title": "最大照片大小",
+    "uploadPhotoSize_header": "请选择要上传的照片的最大大小",
+    "uploadPhotoSize_resolution": "内置摄像头最大分辨率",
+    "uploadVideoSize_title": "最大视频大小",
+    "uploadVideoSize_header": "请选择要上传的视频的最大大小",
+    "uploadVideoSize_resolution": "内置摄像头最大规格",
+    "uploadPhotoSize_original": "不缩小大小",
+    "settingsHeader_cache": "缓存设置 (已使用/总共)",
+    "settings_cacheDisk": "存储",
+    "settings_cacheMemory": "内存",
+    "settings_cacheSize": "缓存大小",
+    "settings_cacheMegabytes": "MB",
+    "settings_cacheClear": "清除缓存",
+    "settings_cacheClearAll": "清除图片缓存",
+    "settings_cacheClearMsg": "您确定要清除照片缓存吗？这将使相册和照片花费一段时间再加载。",
+    "settingsHeader_appearance": "外观",
+    "settingsHeader_theme": "Dark Theme",
+    "settings_switchPalette": "自动",
+    "settings_brightness": "亮度",
+    "settings_brightnessHelp": "在环境亮度低的情况下，自动选项会使用暗色外观来使照片在黑暗背景下易于观看",
+    "userCount": "{count, plural, =0{0 个用户} =1{1 个用户} other{{count} 个用户}}",
+    "@userCount": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "groupCount": "{count, plural, =0{0 个组} =1{1 个组} other{{count} 个组}}",
+    "@groupCount": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "commentCount": "{count, plural, =0{0 个评论} =1{1 个评论} other{{count} 个评论}}",
+    "@commentCount": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "settings_appName": "Piwigo NG",
+    "settings_language": "选择语言",
+    "settingsHeader_about": "相关信息",
+    "settings_twitter": "@piwigo",
+    "settings_contactUs": "联系我们",
+    "settings_feedback": "反馈",
+    "settings_supportForum": "支持论坛",
+    "settings_releaseNotes": "更新日志",
+    "settings_rateInAppStore": "给 Piwigo NG 评分",
+    "settings_translateWithCrowdin": "协助翻译 Piwigo NG",
+    "settings_acknowledgements": "鸣谢",
+    "settings_privacy": "隐私政策",
+    "settings_unknownVersion": "未知版本",
+    "settings_privacyLocale": "&lang=en_EN",
+    "@settings_privacyLocale": {
+        "description": "The language and country code for the url to Piwigo Mobile apps privacy policy: https://piwigo.org/mobile-apps-privacy-policy&webview&lang=en_EN"
+    }
+}

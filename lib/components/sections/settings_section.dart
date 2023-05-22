@@ -1,3 +1,4 @@
+import 'package:extended_text/extended_text.dart';
 import 'package:flutter/material.dart';
 
 import '../fields/settings_field.dart';
@@ -68,6 +69,7 @@ class SettingsSectionItem extends StatelessWidget {
     this.color,
     this.disabled = false,
     this.expandedChild = false,
+    this.padding,
   }) : super(key: key);
 
   final Widget child;
@@ -75,11 +77,12 @@ class SettingsSectionItem extends StatelessWidget {
   final Color? color;
   final bool disabled;
   final bool expandedChild;
+  final EdgeInsetsGeometry? padding;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8),
+      padding: padding ?? const EdgeInsets.symmetric(horizontal: 8),
       decoration: BoxDecoration(
         color: color,
       ),
@@ -122,10 +125,12 @@ class SettingsSectionItemInfo extends StatelessWidget {
     Key? key,
     this.text,
     this.title,
+    this.child,
   }) : super(key: key);
 
   final String? title;
   final String? text;
+  final Widget? child;
 
   @override
   Widget build(BuildContext context) {
@@ -133,11 +138,16 @@ class SettingsSectionItemInfo extends StatelessWidget {
       title: title,
       child: Padding(
         padding: const EdgeInsets.only(right: 8.0),
-        child: Text(
-          text ?? "",
-          textAlign: TextAlign.end,
-          style: Theme.of(context).textTheme.bodySmall,
-        ),
+        child: Builder(builder: (context) {
+          if (child != null) {
+            return child!;
+          }
+          return Text(
+            text ?? "",
+            textAlign: TextAlign.end,
+            style: Theme.of(context).textTheme.bodySmall,
+          );
+        }),
       ),
     );
   }
@@ -166,13 +176,23 @@ class SettingsSectionItemButton extends StatelessWidget {
       child: SettingsSectionItem(
         title: title,
         disabled: disabled,
+        expandedChild: true,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            Text(
-              text ?? "",
-              textAlign: TextAlign.end,
-              style: Theme.of(context).textTheme.bodySmall,
+            Flexible(
+              child: ExtendedText(
+                text ?? '',
+                maxLines: 1,
+                overflowWidget: TextOverflowWidget(
+                  position: TextOverflowPosition.start,
+                  child: Text(
+                    "...",
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                ),
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
             ),
             Padding(
               padding: const EdgeInsets.only(left: 8.0),
@@ -277,58 +297,64 @@ class _SettingsSectionItemSliderState extends State<SettingsSectionItemSlider> {
     return SettingsSectionItem(
       title: widget.title,
       expandedChild: true,
-      child: Builder(builder: (context) {
-        if (_isEditing) {
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          minWidth: MediaQuery.of(context).size.width / 2,
+          maxWidth: MediaQuery.of(context).size.width * 2 / 3,
+        ),
+        child: Builder(builder: (context) {
+          if (_isEditing) {
+            return Row(
+              children: [
+                Expanded(
+                  child: SettingsField(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    controller: _controller,
+                    focusNode: _focusNode,
+                    hint: widget.hint,
+                    keyboardType: TextInputType.number,
+                    onFieldSubmitted: _onEditValue,
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () => _onEditValue(_controller.text),
+                  child: const Icon(Icons.check),
+                ),
+              ],
+            );
+          }
           return Row(
             children: [
               Expanded(
-                child: SettingsField(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                  controller: _controller,
-                  focusNode: _focusNode,
-                  hint: widget.hint,
-                  keyboardType: TextInputType.number,
-                  onFieldSubmitted: _onEditValue,
+                child: Slider(
+                  min: widget.min,
+                  max: widget.max,
+                  value: widget.value,
+                  onChanged: widget.onChanged,
+                  divisions:
+                      widget.divisions ?? (widget.max - widget.min).round(),
                 ),
               ),
-              GestureDetector(
-                onTap: () => _onEditValue(_controller.text),
-                child: const Icon(Icons.check),
-              ),
-            ],
-          );
-        }
-        return Row(
-          children: [
-            Expanded(
-              child: Slider(
-                min: widget.min,
-                max: widget.max,
-                value: widget.value,
-                onChanged: widget.onChanged,
-                divisions:
-                    widget.divisions ?? (widget.max - widget.min).round(),
-              ),
-            ),
-            if (widget.text != null)
-              GestureDetector(
-                onTap: _onOpenEditField,
-                child: Padding(
-                  padding: const EdgeInsets.only(right: 8.0),
-                  child: SizedBox(
-                    width: widget.textWidth ??
-                        widget.max.toString().length * 2 * 6,
-                    child: Text(
-                      widget.text!,
-                      textAlign: TextAlign.end,
-                      style: Theme.of(context).textTheme.bodySmall,
+              if (widget.text != null)
+                GestureDetector(
+                  onTap: _onOpenEditField,
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: SizedBox(
+                      width: widget.textWidth ??
+                          widget.max.toString().length * 2 * 6,
+                      child: Text(
+                        widget.text!,
+                        textAlign: TextAlign.end,
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
                     ),
                   ),
                 ),
-              ),
-          ],
-        );
-      }),
+            ],
+          );
+        }),
+      ),
     );
   }
 }
@@ -419,8 +445,10 @@ class SettingsSectionButton extends StatelessWidget {
     this.onPressed,
     this.child,
     this.color,
+    this.padding,
   }) : super(key: key);
 
+  final EdgeInsetsGeometry? padding;
   final Function()? onPressed;
   final Widget? child;
   final Color? color;
@@ -430,8 +458,57 @@ class SettingsSectionButton extends StatelessWidget {
     return GestureDetector(
       onTap: onPressed,
       child: SettingsSectionItem(
+        padding: padding,
         color: color,
         child: child ?? const SizedBox(),
+      ),
+    );
+  }
+}
+
+class SettingsSectionDropdown<T> extends StatelessWidget {
+  const SettingsSectionDropdown({
+    Key? key,
+    this.color,
+    this.padding,
+    required this.items,
+    required this.value,
+    required this.onChanged,
+    this.hint,
+    this.title,
+    this.selectedItemBuilder,
+  }) : super(key: key);
+
+  final EdgeInsetsGeometry? padding;
+  final Color? color;
+  final List<DropdownMenuItem<T>> items;
+  final List<Widget> Function(BuildContext)? selectedItemBuilder;
+  final T value;
+  final Function(T?) onChanged;
+  final String? hint;
+  final String? title;
+
+  @override
+  Widget build(BuildContext context) {
+    return SettingsSectionItem(
+      padding: padding,
+      color: color,
+      title: title,
+      child: DropdownButton<T>(
+        value: value,
+        hint: hint != null
+            ? Text(
+                "$hint",
+                style: Theme.of(context).textTheme.bodySmall,
+              )
+            : null,
+        iconEnabledColor: Theme.of(context).textTheme.bodySmall?.color,
+        underline: const SizedBox(),
+        alignment: Alignment.centerRight,
+        style: Theme.of(context).textTheme.bodySmall,
+        onChanged: onChanged,
+        selectedItemBuilder: selectedItemBuilder,
+        items: items,
       ),
     );
   }

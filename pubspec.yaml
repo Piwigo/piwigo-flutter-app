@@ -3,69 +3,74 @@ description: A Piwigo Android application
 
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
-version: 1.2.1+121
+version: 2.0.4+204
 
 environment:
-  sdk: ">=2.7.0 <3.0.0"
+  sdk: ">=2.17.6 <3.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
+
+  # Network
+  url_launcher: ^6.1.5 # Open links with device's applications
+  webview_flutter: ^3.0.4 # Show web page (CGU)
+  dio: ^4.0.6 # Requests to API
+  dio_cookie_manager: ^2.0.0 # Compatibility between dio and cookie_far
+  cookie_jar: ^3.0.1 # Handles cookies
+  connectivity_plus: ^3.0.2 # Check if Wifi is enabled
+
+  # UI
+  auto_size_text: ^3.0.0 # Text that auto-sizes (image thumbnail title)
+  cupertino_icons: ^1.0.2 # iOS style icons (might be useless)
+  font_awesome_flutter: ^10.1.0 # Font awesome icons (might be useless)
+  flutter_slidable: ^2.0.0 # Album card's sliding cations
+  drag_select_grid_view: ^0.6.1 # Drag to select image grid
+  rounded_loading_button: ^2.1.0 # Loading button animation
+  modal_bottom_sheet: ^3.0.0-pre # Custom modals (might be useless)
+  cached_network_image: ^3.2.2 # Better cache for images (used for album's thumbnail)
+  flutter_speed_dial: ^6.1.0+1 # Speed dial
+  pull_to_refresh: ^2.0.0 # Top and bottom refresh gestures
+  photo_view: ^0.14.0 # Zoom on fullscreen photos
+  extended_text: ^10.0.1 # Text overflow on left side
+
+  # Storage
+  package_info_plus: ^1.4.2 # Get project info (version)
+  path_provider: ^2.0.11 # Get application documents
+  shared_preferences: ^2.0.15 # Base local storage
+  flutter_secure_storage: ^6.0.0 # Local storage secured for logins
+  provider: ^6.0.3 # Notifiers for theme and language changes
+  image_picker: ^0.8.5+3 # Pick images from camera
+  file_picker: ^5.2.5 # Pick images and videos at a time for upload
+
+  # Device
+  device_info_plus: ^8.2.0 # Get device info (version)
+  flutter_local_notifications: ^12.0.2 # Throws notifications on download or upload
+  open_filex: ^4.3.2 # Open files with devices apps
+  workmanager: ^0.5.0 # Background processes (auto upload)
+
+  # Utils
+  mime_type: ^1.0.0 # Check mime type of files (differentiate photos from videos)
+  video_player: ^2.4.7 # Read video files in fullscreen mode
+  chewie: ^1.4.0 # Video player with options
+  flutter_image_compress: ^1.1.3 # Remove metadata
+  permission_handler: ^10.2.0 # Check and asks for permissions
+  share_plus: ^4.4.0 # Share files
+  flutter_cache_manager: ^3.3.0 # Handles network image cache
+  heic_to_jpg: ^0.1.3 # Converts heic files to jpg
+
+  # Translations
   flutter_localizations:
     sdk: flutter
-  intl:
-
-  # Icons :
-  font_awesome_flutter: ^9.2.0
-
-  # Requests :
-  dio: ^4.0.3
-  dio_cookie_manager: ^2.0.0
-  cookie_jar: ^3.0.1
-
-  # Upload and download :
-  chunked_uploader: ^0.1.0
-  flutter_absolute_path:
-    git:
-      url: https://github.com/canewsin/flutter_absolute_path.git
-  path_provider: ^2.0.7
-  permission_handler: ^8.3.0
-  external_path: ^1.0.1
-  flutter_local_notifications: ^9.1.2
-  flutter_image_compress: ^1.1.0
-  share_plus: ^4.4.0
-  # open_file: ^3.2.1
-
-  # File pickers :
-  image_picker: ^0.8.4+4
-  file_picker: ^4.2.4
-  provider: ^6.0.1
-
-  # Local storage :
-  shared_preferences: ^2.0.8
-  package_info_plus: ^1.3.0
-  flutter_secure_storage: ^5.0.2
-
-  # Widgets :
-  url_launcher: ^6.0.12
-  webview_flutter: ^2.3.1
-  flutter_speed_dial: ^4.6.6
-  icon_shadow: ^1.0.1
-  flutter_slidable: ^1.1.0
-  auto_size_text: ^3.0.0
-  sliding_up_panel: ^2.0.0+1
-
-  # Media :
-  photo_view: ^0.9.0
-  cached_network_image: ^3.0.0
-  better_player: ^0.0.79
-  wakelock: ^0.5.6
-  mime_type: ^1.0.0
+  intl: ^0.17.0 # Used for translations
+  html_unescape: ^2.0.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   dependency_validator: ^3.0.0
+
+  flutter_lints: ^2.0.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -79,6 +84,7 @@ flutter:
 
   assets:
     - assets/logo/piwigo_logo.png
+    - assets/
 
   # To add custom fonts to your application, add a fonts section here,
   # in this "flutter" section. Each entry in this list should have a

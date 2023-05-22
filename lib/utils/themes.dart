@@ -1,312 +1,333 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:piwigo_ng/utils/resources.dart';
 
-ThemeData lightTheme = ThemeData.light().copyWith(
-  primaryColor: const Color(0xffff7700),
-  primaryColorLight: const Color(0xffffffff),
-  primaryColorDark: const Color(0xff000000),
-  errorColor: const Color(0xffff0e00),
-  disabledColor: const Color(0xff9e9e9e),
-  backgroundColor: const Color(0xffeeeeee),
-  scaffoldBackgroundColor: const Color(0xffeeeeee),
-  dialogBackgroundColor: const Color(0xffeeeeee),
-  focusColor: const Color(0xffff7700),
-  splashColor: const Color(0x4dff7700),
-  cardColor: const Color(0xFFFFFFFF),
+final ThemeData lightTheme = ThemeData.light(useMaterial3: true).copyWith(
+  primaryColor: AppColors.accent,
+  primaryColorLight: AppColors.white,
+  primaryColorDark: AppColors.black,
+  disabledColor: AppColors.disabled,
+  scaffoldBackgroundColor: AppColors.backgroundLight,
+  dialogBackgroundColor: AppColors.backgroundLight,
+  focusColor: AppColors.accent,
+  splashColor: AppColors.accent.withOpacity(0.3),
+  cardColor: AppColors.cardLight,
+  shadowColor: Colors.black54,
+  chipTheme: ChipThemeData(
+    backgroundColor: AppColors.fieldLight,
+  ),
   colorScheme: const ColorScheme.highContrastLight(
-    primary: Color(0xFFFF7700),
-    secondary: Color(0xFFFF7700),
+    primary: AppColors.white,
+    secondary: AppColors.accent,
+    error: AppColors.error,
+    background: AppColors.backgroundLight,
+    outline: AppColors.fieldLight,
   ),
   progressIndicatorTheme: const ProgressIndicatorThemeData(
-    color: Color(0xffff7700),
+    color: AppColors.accent,
   ),
   appBarTheme: const AppBarTheme(
-    backgroundColor: Color(0xffeeeeee),
+    backgroundColor: AppColors.backgroundLight,
+    surfaceTintColor: AppColors.backgroundLight,
+    shadowColor: Colors.black54,
+    elevation: 0.0,
+    scrolledUnderElevation: 5.0,
     iconTheme: IconThemeData(
-      color: Color(0xffff7700),
+      color: AppColors.accent,
     ),
-    titleTextStyle: TextStyle(fontSize: 20.0, color: Color(0xff000000)),
+    actionsIconTheme: IconThemeData(
+      color: AppColors.accent,
+    ),
+    foregroundColor: AppColors.accent,
+    titleTextStyle: TextStyle(fontSize: 20.0, color: AppColors.black),
+  ),
+  tabBarTheme: TabBarTheme(
+    dividerColor: Colors.transparent,
+    labelStyle: TextStyle(
+      fontSize: 16,
+      color: AppColors.white,
+      fontWeight: FontWeight.bold,
+    ),
+  ),
+  bottomNavigationBarTheme: BottomNavigationBarThemeData(
+    selectedItemColor: AppColors.accent,
+    selectedLabelStyle: TextStyle(
+      fontSize: 14,
+      color: AppColors.accent,
+      fontWeight: FontWeight.w500,
+    ),
+    unselectedItemColor: AppColors.black,
+    unselectedLabelStyle: TextStyle(
+      fontSize: 14,
+      color: AppColors.black,
+      fontWeight: FontWeight.normal,
+    ),
   ),
   iconTheme: const IconThemeData(
-    color: Color(0xffff7700),
+    color: AppColors.accent,
   ),
   floatingActionButtonTheme: const FloatingActionButtonThemeData(
-    backgroundColor: Color(0xffff7000),
-    foregroundColor: Color(0xffffffff),
+    backgroundColor: AppColors.accent,
+    foregroundColor: AppColors.white,
   ),
   buttonTheme: const ButtonThemeData(
     colorScheme: ColorScheme.light(
-      primary: Color(0xffff7700),
+      primary: AppColors.accent,
     ),
-    buttonColor: Color(0xffff7700),
+    buttonColor: AppColors.accent,
   ),
   inputDecorationTheme: InputDecorationTheme(
-    prefixStyle: GoogleFonts.roboto(
+    prefixStyle: TextStyle(
       fontSize: 14,
       fontWeight: FontWeight.normal,
-      color: const Color(0xff2D2D2D),
+      color: AppColors.fieldDark,
     ),
-    prefixIconColor: const Color(0xff393939),
-    fillColor: const Color(0xffe0e0e0),
-    focusColor: const Color(0xffff7700),
-    hintStyle: GoogleFonts.roboto(
+    prefixIconColor: AppColors.prefix,
+    fillColor: AppColors.fieldLight,
+    focusColor: AppColors.accent,
+    hintStyle: TextStyle(
       fontSize: 14,
       fontStyle: FontStyle.italic,
       fontWeight: FontWeight.normal,
-      color: const Color(0xff9e9e9e),
-    ),
-    labelStyle: GoogleFonts.roboto(
-      fontSize: 14,
-      fontWeight: FontWeight.normal,
-      color: const Color(0xff282828),
+      color: AppColors.disabled,
     ),
   ),
-  textSelectionTheme: const TextSelectionThemeData(
-    cursorColor: Color(0xffff7700),
-    selectionColor: Color(0x4dff7700),
-    selectionHandleColor: Color(0xffff7700),
+  textSelectionTheme: TextSelectionThemeData(
+    cursorColor: AppColors.accent,
+    selectionColor: AppColors.accent.withOpacity(0.3),
+    selectionHandleColor: AppColors.accent,
   ),
   bottomSheetTheme: BottomSheetThemeData(
+    surfaceTintColor: Colors.black.withOpacity(0),
     backgroundColor: Colors.black.withOpacity(0),
   ),
   switchTheme: SwitchThemeData(
-    thumbColor: MaterialStateProperty.all(const Color(0xffeeeeee)),
+    thumbColor: MaterialStateProperty.all(AppColors.backgroundLight),
+    overlayColor: MaterialStateProperty.all(AppColors.backgroundLight),
     trackColor: MaterialStateProperty.resolveWith((states) {
       if (states.contains(MaterialState.selected)) {
-        return const Color(0xffff7700);
+        return AppColors.accent;
       } else if (states.contains(MaterialState.disabled)) {
-        return const Color(0xff9e9e9e);
+        return AppColors.disabled;
       }
-      return const Color(0xffe0e0e0);
+      return AppColors.fieldLight;
     }),
   ),
   sliderTheme: const SliderThemeData(
-    activeTrackColor: Color(0xffff7700),
-    inactiveTrackColor: Color(0xffe0e0e0),
-    thumbColor: Color(0xffeeeeee),
-    activeTickMarkColor: Color(0x00000000),
-    inactiveTickMarkColor: Color(0x00000000),
+    activeTrackColor: AppColors.accent,
+    inactiveTrackColor: AppColors.fieldLight,
+    thumbColor: AppColors.backgroundLight,
+    activeTickMarkColor: AppColors.transparent,
+    inactiveTickMarkColor: AppColors.transparent,
     overlayColor: Colors.transparent,
+  ),
+  dividerTheme: DividerThemeData(
+    color: AppColors.backgroundLight,
   ),
   splashFactory: NoSplash.splashFactory,
   textTheme: TextTheme(
-    labelSmall: GoogleFonts.roboto(
+    labelSmall: TextStyle(
       fontSize: 11,
-      color: const Color(0xFF000000),
+      color: AppColors.black,
       letterSpacing: 0,
     ),
-    bodySmall: GoogleFonts.roboto(
+    bodySmall: TextStyle(
       fontSize: 14,
       color: const Color(0x80000000),
     ),
-    bodyMedium: GoogleFonts.roboto(
+    bodyMedium: TextStyle(
       fontSize: 14,
-      color: const Color(0xFF000000),
+      color: AppColors.black,
       fontWeight: FontWeight.normal,
     ),
-    bodyLarge: GoogleFonts.roboto(
+    bodyLarge: TextStyle(
       fontSize: 14,
-      color: const Color(0xFF000000),
+      color: AppColors.black,
       fontWeight: FontWeight.w500,
     ),
-    titleMedium: GoogleFonts.roboto(
+    titleSmall: TextStyle(
       fontSize: 16,
-      color: const Color(0xFF000000),
+      color: AppColors.black,
+      fontWeight: FontWeight.normal,
+    ),
+    titleMedium: TextStyle(
+      fontSize: 16,
+      color: AppColors.black,
       fontWeight: FontWeight.w500,
     ),
-    titleLarge: GoogleFonts.roboto(
+    titleLarge: TextStyle(
       fontSize: 18,
-      color: const Color(0xffff7700),
+      color: AppColors.accent,
       fontWeight: FontWeight.w500,
     ),
-    displaySmall: GoogleFonts.roboto(
+    displaySmall: TextStyle(
       fontSize: 16,
-      color: const Color(0xffffffff),
-      fontWeight: FontWeight.w500,
+      color: AppColors.white,
+      fontWeight: FontWeight.bold,
+    ),
+    displayMedium: TextStyle(
+      fontSize: 20,
+      color: AppColors.black,
+      fontWeight: FontWeight.normal,
     ),
   ),
 );
 
-ThemeData darkTheme = ThemeData.dark().copyWith(
-  primaryColor: const Color(0xFFFF7700),
-  primaryColorLight: const Color(0xFFFFFFFF),
-  primaryColorDark: const Color(0xFF000000),
-  errorColor: const Color(0xFFFF0E00),
-  disabledColor: const Color(0xFF9E9E9E),
-  backgroundColor: const Color(0xFF232323),
-  scaffoldBackgroundColor: const Color(0xFF232323),
-  dialogBackgroundColor: const Color(0xFF232323),
-  focusColor: const Color(0xFFFF7700),
-  cardColor: const Color(0xFF333333),
+final ThemeData darkTheme = ThemeData.dark(useMaterial3: true).copyWith(
+  primaryColor: AppColors.accent,
+  primaryColorLight: AppColors.white,
+  primaryColorDark: AppColors.black,
+  disabledColor: AppColors.disabled,
+  scaffoldBackgroundColor: AppColors.backgroundDark,
+  dialogBackgroundColor: AppColors.backgroundDark,
+  focusColor: AppColors.accent,
+  splashColor: AppColors.accent.withOpacity(0.3),
+  cardColor: AppColors.cardDark,
+  shadowColor: Colors.black54,
+  chipTheme: ChipThemeData(
+    backgroundColor: AppColors.fieldDark,
+  ),
   colorScheme: const ColorScheme.highContrastDark(
-    primary: Color(0xFFFF7700),
-    secondary: Color(0xFFFF7700),
+    primary: AppColors.white,
+    secondary: AppColors.accent,
+    error: AppColors.error,
+    background: AppColors.backgroundDark,
+    outline: AppColors.fieldDark,
   ),
   progressIndicatorTheme: const ProgressIndicatorThemeData(
-    color: Color(0xFFFF7700),
+    color: AppColors.accent,
   ),
   appBarTheme: const AppBarTheme(
-    backgroundColor: Color(0xFF232323),
+    backgroundColor: AppColors.backgroundDark,
+    surfaceTintColor: AppColors.backgroundDark,
+    shadowColor: Colors.black54,
+    elevation: 0.0,
+    scrolledUnderElevation: 5.0,
     iconTheme: IconThemeData(
-      color: Color(0xFFFF7700),
+      color: AppColors.accent,
     ),
-    titleTextStyle: TextStyle(fontSize: 20.0, color: Color(0xFFFFFFFF)),
+    actionsIconTheme: IconThemeData(
+      color: AppColors.accent,
+    ),
+    foregroundColor: AppColors.accent,
+    titleTextStyle: TextStyle(fontSize: 20.0, color: AppColors.white),
+  ),
+  tabBarTheme: TabBarTheme(
+    dividerColor: Colors.transparent,
+    labelStyle: TextStyle(
+      fontSize: 16,
+      color: AppColors.white,
+      fontWeight: FontWeight.bold,
+    ),
+  ),
+  bottomNavigationBarTheme: BottomNavigationBarThemeData(
+    selectedItemColor: AppColors.accent,
+    selectedLabelStyle: TextStyle(
+      fontSize: 14,
+      color: AppColors.accent,
+      fontWeight: FontWeight.w500,
+    ),
+    unselectedItemColor: AppColors.white,
+    unselectedLabelStyle: TextStyle(
+      fontSize: 14,
+      color: AppColors.white,
+      fontWeight: FontWeight.normal,
+    ),
   ),
   iconTheme: const IconThemeData(
-    color: Color(0xFFFF7700),
+    color: AppColors.accent,
   ),
   floatingActionButtonTheme: const FloatingActionButtonThemeData(
-    backgroundColor: Color(0xFFFF7700),
-    foregroundColor: Color(0xFFFFFFFF),
+    backgroundColor: AppColors.accent,
+    foregroundColor: AppColors.white,
   ),
   buttonTheme: const ButtonThemeData(
     colorScheme: ColorScheme.dark(
-      primary: Color(0xFFFF7700),
+      primary: AppColors.accent,
     ),
-    buttonColor: Color(0xFFFF7700),
+    buttonColor: AppColors.accent,
   ),
   inputDecorationTheme: InputDecorationTheme(
-    prefixStyle: GoogleFonts.roboto(
+    prefixStyle: TextStyle(
       fontSize: 14,
       fontWeight: FontWeight.normal,
-      color: const Color(0xFFFFFFFF),
+      color: AppColors.white,
     ),
-    prefixIconColor: const Color(0xFFFFFFFF),
-    fillColor: const Color(0xFF2D2D2D),
-    focusColor: const Color(0xFFFF7700),
-    hintStyle: GoogleFonts.roboto(
+    prefixIconColor: AppColors.white,
+    fillColor: AppColors.fieldDark,
+    focusColor: AppColors.accent,
+    hintStyle: TextStyle(
       fontSize: 14,
       fontStyle: FontStyle.italic,
       fontWeight: FontWeight.normal,
-      color: const Color(0xFF9E9E9E),
-    ),
-    labelStyle: GoogleFonts.roboto(
-      fontSize: 14,
-      fontWeight: FontWeight.normal,
-      color: const Color(0xFFFFFFFF),
+      color: AppColors.disabled,
     ),
   ),
   textSelectionTheme: const TextSelectionThemeData(
-    cursorColor: Color(0xFFFF7700),
+    cursorColor: AppColors.accent,
     selectionColor: Color(0x4DFF7700),
-    selectionHandleColor: Color(0xFFFF7700),
+    selectionHandleColor: AppColors.accent,
   ),
   bottomSheetTheme: BottomSheetThemeData(
+    surfaceTintColor: Colors.black.withOpacity(0),
     backgroundColor: Colors.black.withOpacity(0),
   ),
   switchTheme: SwitchThemeData(
     thumbColor: MaterialStateProperty.all(const Color(0x80FFFFFF)),
     trackColor: MaterialStateProperty.resolveWith((states) {
       if (states.contains(MaterialState.selected)) {
-        return const Color(0xFFFF7700);
+        return AppColors.accent;
       } else if (states.contains(MaterialState.disabled)) {
-        return const Color(0xFF9E9E9E);
+        return AppColors.disabled;
       }
-      return const Color(0xFF232323);
+      return AppColors.backgroundDark;
     }),
   ),
   sliderTheme: const SliderThemeData(
-    activeTrackColor: Color(0xFFFF7700),
-    inactiveTrackColor: Color(0xFF2D2D2D),
+    activeTrackColor: AppColors.accent,
+    inactiveTrackColor: AppColors.fieldDark,
     thumbColor: Color(0xFF9E9E9E),
     activeTickMarkColor: Color(0x00000000),
     inactiveTickMarkColor: Color(0x00000000),
     overlayColor: Colors.transparent,
   ),
+  dividerTheme: DividerThemeData(
+    color: AppColors.backgroundDark,
+  ),
   splashFactory: NoSplash.splashFactory,
   textTheme: TextTheme(
-    labelSmall: GoogleFonts.roboto(
+    labelSmall: TextStyle(
       fontSize: 11,
-      color: const Color(0xFFFFFFFF),
+      color: AppColors.white,
       letterSpacing: 0,
     ),
-    bodySmall: GoogleFonts.roboto(
+    bodySmall: TextStyle(
       fontSize: 14,
       color: const Color(0x80FFFFFF),
     ),
-    bodyMedium: GoogleFonts.roboto(
+    bodyMedium: TextStyle(
       fontSize: 14,
-      color: const Color(0xFFFFFFFF),
+      color: AppColors.white,
       fontWeight: FontWeight.normal,
     ),
-    bodyLarge: GoogleFonts.roboto(
+    bodyLarge: TextStyle(
       fontSize: 14,
-      color: const Color(0xFFFFFFFF),
+      color: AppColors.white,
       fontWeight: FontWeight.w500,
     ),
-    titleMedium: GoogleFonts.roboto(
+    titleMedium: TextStyle(
       fontSize: 16,
-      color: const Color(0xFFFFFFFF),
+      color: AppColors.white,
       fontWeight: FontWeight.w500,
     ),
-    titleLarge: GoogleFonts.roboto(
+    titleLarge: TextStyle(
       fontSize: 18,
-      color: const Color(0xffff7700),
+      color: AppColors.accent,
       fontWeight: FontWeight.w500,
     ),
-    displaySmall: GoogleFonts.roboto(
+    displaySmall: TextStyle(
       fontSize: 16,
-      color: const Color(0xffffffff),
-      fontWeight: FontWeight.w500,
+      color: AppColors.white,
+      fontWeight: FontWeight.bold,
     ),
   ),
 );
-
-class AppTheme {
-  final AppThemeColors colors;
-  final AppThemeTextStyles textStyles;
-
-  AppTheme({required this.colors, required this.textStyles});
-}
-
-class AppThemeColors {
-  final Color primary;
-  final Color secondary;
-  final Color tertiary;
-  final Color error;
-  final Color success;
-  final Color warning;
-  final Color disabled;
-  final Color card;
-  final Color background;
-  final Color field;
-
-  AppThemeColors({
-    required this.primary,
-    required this.secondary,
-    required this.tertiary,
-    required this.error,
-    required this.success,
-    required this.warning,
-    required this.disabled,
-    required this.card,
-    required this.background,
-    required this.field,
-  });
-}
-
-class AppThemeTextStyles {
-  final TextStyle titlePrimary;
-  final TextStyle titleSecondary;
-  final TextStyle subtitle;
-  final TextStyle sectionTitle;
-  final TextStyle body;
-  final TextStyle bodySmall;
-  final TextStyle disabled;
-  final TextStyle hint;
-  final TextStyle buttonPrimary;
-  final TextStyle buttonSecondary;
-
-  const AppThemeTextStyles({
-    required this.titlePrimary,
-    required this.titleSecondary,
-    required this.subtitle,
-    required this.sectionTitle,
-    required this.body,
-    required this.bodySmall,
-    required this.disabled,
-    required this.hint,
-    required this.buttonPrimary,
-    required this.buttonSecondary,
-  });
-}

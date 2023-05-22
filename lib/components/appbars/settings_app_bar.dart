@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:piwigo_ng/utils/localizations.dart';
 
 class SettingsAppBar extends StatefulWidget {
   const SettingsAppBar({
@@ -44,19 +45,20 @@ class _SettingsAppBarState extends State<SettingsAppBar> {
   @override
   Widget build(BuildContext context) {
     return SliverAppBar(
-      leading: IconButton(
+      leading: BackButton(
         onPressed: () => Navigator.of(context).pop(),
-        icon: const Icon(Icons.arrow_back),
       ),
       pinned: true,
       expandedHeight: _expandedHeight,
+      elevation: 5.0,
+      scrolledUnderElevation: 5.0,
       flexibleSpace: FlexibleSpaceBar(
         titlePadding: EdgeInsets.symmetric(
           horizontal: _horizontalTitlePadding,
           vertical: 16,
         ),
         title: Text(
-          'Settings', // Todo: Use translations
+          appStrings.tabBar_preferences,
           textScaleFactor: 1,
           style: Theme.of(context).appBarTheme.titleTextStyle,
         ),
