@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:piwigo_ng/models/album_model.dart';
 import 'package:piwigo_ng/models/status_model.dart';
@@ -246,13 +247,17 @@ class AutoUploadPreferences {
   static const String destinationKey = 'AUTO_UPLOAD_DESTINATION';
 
   static AlbumModel? get getDestination {
-    String? albumJson = appPreferences.getString(destinationKey);
-    if (albumJson == null) return null;
-    return AlbumModel.fromJson(json.decode(albumJson));
+    try {
+      String? albumJson = appPreferences.getString(destinationKey);
+      if (albumJson == null) return null;
+      return AlbumModel.fromJson(json.decode(albumJson));
+    } on Error catch (e) {
+      debugPrint("$e\n${e.stackTrace}");
+      return null;
+    }
   }
 
   static Future<bool> setDestination(AlbumModel album) async {
-    print(json.encode(album.toJson()));
     return appPreferences.setString(
         destinationKey, json.encode(album.toJson()));
   }
@@ -266,7 +271,7 @@ class AutoUploadPreferences {
   }
 
   static Future<bool> setFrequency(Duration duration) async {
-    return appPreferences.setInt(destinationKey, duration.inHours);
+    return appPreferences.setInt(frequencyKey, duration.inHours);
   }
 
   static const String notificationKey = 'AUTO_UPLOAD_NOTIFICATION';
