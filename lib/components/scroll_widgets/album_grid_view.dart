@@ -26,12 +26,13 @@ class AlbumGridView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GridView.builder(
-      padding: padding ?? const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
+      padding:
+          padding ?? const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
       gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
         maxCrossAxisExtent: Settings.defaultAlbumGridSize,
         mainAxisSpacing: 8.0,
         crossAxisSpacing: 8.0,
-        childAspectRatio: AlbumCard.kAlbumRatio,
+        childAspectRatio: AlbumCard.ALBUM_RATIO,
       ),
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),

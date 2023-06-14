@@ -26,16 +26,16 @@ class AlbumCard extends StatelessWidget {
   final Function()? onMove;
   final bool showActions;
 
-  static const double kAlbumAnchorRadius = 8.0;
-  static const double kAlbumOuterRadius = 16.0;
-  static const double kAlbumRatio = 3;
+  static const double ALBUM_ANCHOR_RADIUS = 8.0;
+  static const double ALBUM_OUTER_RADIUS = 16.0;
+  static const double ALBUM_RATIO = 3.0;
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(kAlbumOuterRadius),
+        borderRadius: BorderRadius.circular(ALBUM_OUTER_RADIUS),
         child: Slidable(
           enabled: showActions,
           endActionPane: _actionPane(context),
@@ -93,12 +93,12 @@ class AlbumCard extends StatelessWidget {
             right: 0.0,
             top: 1.0,
             bottom: 1.0,
-            width: kAlbumAnchorRadius * 2.0,
+            width: ALBUM_ANCHOR_RADIUS * 2.0,
             child: OverflowBox(
               alignment: Alignment.centerLeft,
-              maxWidth: kAlbumAnchorRadius * 2.0 + 1.0,
+              maxWidth: ALBUM_ANCHOR_RADIUS * 2.0 + 1.0,
               child: Container(
-                width: kAlbumAnchorRadius * 2.0 + 1.0,
+                width: ALBUM_ANCHOR_RADIUS * 2.0 + 1.0,
                 decoration: BoxDecoration(
                   color: Theme.of(context).primaryColor,
                   border: Border.all(
@@ -109,8 +109,8 @@ class AlbumCard extends StatelessWidget {
           ),
           ClipShadowPath(
             clipper: const AlbumCardClipper(
-              anchorRadius: kAlbumAnchorRadius,
-              outerRadius: kAlbumOuterRadius,
+              anchorRadius: ALBUM_ANCHOR_RADIUS,
+              outerRadius: ALBUM_OUTER_RADIUS,
               isAdmin: true,
             ),
             shadow: Shadow(
@@ -139,8 +139,8 @@ class AlbumCard extends StatelessWidget {
     return Builder(builder: (context) {
       return ClipPath(
         clipper: const AlbumCardClipper(
-          anchorRadius: kAlbumAnchorRadius,
-          outerRadius: kAlbumOuterRadius,
+          anchorRadius: ALBUM_ANCHOR_RADIUS,
+          outerRadius: ALBUM_OUTER_RADIUS,
           isAdmin: false,
         ),
         child: Container(
@@ -172,7 +172,7 @@ class AlbumCardContent extends StatelessWidget {
       return Row(
         children: [
           _thumbnail,
-          const SizedBox(width: AlbumCard.kAlbumAnchorRadius * 2 + 16),
+          const SizedBox(width: AlbumCard.ALBUM_ANCHOR_RADIUS * 2 + 16.0),
           Expanded(
             child: _content,
           ),
@@ -190,7 +190,7 @@ class AlbumCardContent extends StatelessWidget {
               return FittedBox(
                 fit: BoxFit.cover,
                 child: Container(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(16.0),
                   decoration: BoxDecoration(
                     color: Theme.of(context).scaffoldBackgroundColor,
                   ),

@@ -17,9 +17,12 @@ class AlbumCardAction extends StatelessWidget {
   final bool autoClose;
   final Function()? onPressed;
 
+  static const double ICON_SIZE = 28.0;
+
   @override
   Widget build(BuildContext context) {
     return CustomSlidableAction(
+      padding: EdgeInsets.zero,
       backgroundColor: backgroundColor ?? Theme.of(context).cardColor,
       onPressed: (_) {
         if (onPressed != null) {
@@ -27,14 +30,10 @@ class AlbumCardAction extends StatelessWidget {
         }
       },
       autoClose: autoClose,
-      child: SizedBox.expand(
-        child: FittedBox(
-          fit: BoxFit.contain,
-          child: Icon(
-            icon,
-            color: foregroundColor ?? const Color(0xFFFFFFFF),
-          ),
-        ),
+      child: Icon(
+        icon,
+        size: ICON_SIZE,
+        color: foregroundColor ?? Colors.white,
       ),
     );
   }
