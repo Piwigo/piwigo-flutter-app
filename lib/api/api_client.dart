@@ -4,6 +4,7 @@ import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
+import 'package:piwigo_ng/services/preferences_service.dart';
 
 import 'api_interceptor.dart';
 
@@ -23,8 +24,10 @@ class ApiClient {
   }
 
   static bool piwigoSSLBypass(X509Certificate cert, String host, int port) {
-    // todo: accept certs
-    return true;
+    if (appPreferences.getBool(Preferences.enableSSLKey) ?? false) {
+      return true;
+    }
+    return false;
   }
 
   static Future<Response> get({

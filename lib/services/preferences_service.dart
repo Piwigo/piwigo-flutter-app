@@ -23,6 +23,11 @@ class Preferences {
   static const String accountUsernameKey = 'ACCOUNT_USERNAME';
   static const String userStatusKey = 'USER_STATUS';
 
+  static const String enableSSLKey = 'ENABLE_SSL';
+  static const String enableBasicAuthKey = 'ENABLE_BASIC_AUTH';
+  static const String basicUsernameKey = 'BASIC_USERNAME';
+  static const String basicPasswordKey = 'BASIC_PASSWORD';
+
   static String get getUserStatus {
     return appPreferences.getString(userStatusKey) ?? 'guest';
   }

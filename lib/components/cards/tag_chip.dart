@@ -41,29 +41,6 @@ class SelectTagChip extends StatelessWidget {
       selected: selected,
       onSelected: (_) => onTap?.call(),
     );
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(2.0),
-        decoration: ShapeDecoration(
-          shape: StadiumBorder(),
-          color: Theme.of(context).chipTheme.backgroundColor,
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: Text(
-                tag.name,
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-            ),
-            if (icon != null) icon!,
-          ],
-        ),
-      ),
-    );
   }
 }
 

@@ -28,7 +28,7 @@ class SettingsField extends StatelessWidget {
         controller: controller,
         focusNode: focusNode,
         keyboardType: keyboardType,
-        textAlign: TextAlign.end,
+        textAlign: TextAlign.start,
         onChanged: onChanged,
         onFieldSubmitted: onFieldSubmitted,
         style: Theme.of(context).textTheme.bodyMedium,

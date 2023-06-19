@@ -7,6 +7,7 @@ import 'package:piwigo_ng/components/buttons/animated_piwigo_button.dart';
 import 'package:piwigo_ng/components/snackbars.dart';
 import 'package:piwigo_ng/services/preferences_service.dart';
 import 'package:piwigo_ng/utils/localizations.dart';
+import 'package:piwigo_ng/views/authentication/login_settings_page.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 
 import '../../components/fields/app_field.dart';
@@ -265,6 +266,17 @@ class _LoginFormViewState extends State<LoginFormView> {
               style: Theme.of(context).textTheme.displaySmall,
             ),
           ),
+        ),
+        TextButton(
+          style: ButtonStyle(
+            foregroundColor: MaterialStateProperty.resolveWith(
+              (states) => Theme.of(context).colorScheme.secondary,
+            ),
+          ),
+          onPressed: () {
+            Navigator.of(context).pushNamed(LoginSettingsPage.routeName);
+          },
+          child: Text('Authentication Settings'), // todo : translate
         ),
       ],
     );

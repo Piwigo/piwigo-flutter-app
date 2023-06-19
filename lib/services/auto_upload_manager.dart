@@ -10,6 +10,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:piwigo_ng/api/api_client.dart';
 import 'package:piwigo_ng/api/api_error.dart';
+import 'package:piwigo_ng/api/api_interceptor.dart';
 import 'package:piwigo_ng/api/upload.dart';
 import 'package:piwigo_ng/models/album_model.dart';
 import 'package:piwigo_ng/models/status_model.dart';
@@ -28,6 +29,7 @@ class AutoUploadManager {
   static final CookieJar cookieJar = CookieJar();
   static final Dio dio = Dio(BaseOptions())
     ..interceptors.add(CookieManager(cookieJar))
+    ..interceptors.add(ApiInterceptor())
     ..httpClientAdapter = ApiClient.sslHttpClientAdapter;
 
   AutoUploadManager() {

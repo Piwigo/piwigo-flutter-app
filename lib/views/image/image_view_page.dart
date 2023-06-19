@@ -360,7 +360,6 @@ class _ImageViewPageState extends State<ImageViewPage> {
           itemCount: tags.length,
           itemBuilder: (context, index) {
             TagModel tag = tags[index];
-            int colorIndex = tag.id % AppColors.foregroundColors.length;
             return Text(
               "#${tag.name}",
               style: TextStyle(

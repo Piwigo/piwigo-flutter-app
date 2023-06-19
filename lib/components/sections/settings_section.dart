@@ -428,7 +428,7 @@ class _SettingsSectionItemFieldState extends State<SettingsSectionItemField> {
   @override
   Widget build(BuildContext context) {
     return SettingsSectionItem(
-      title: widget.title,
+      // title: widget.title,
       expandedChild: true,
       child: SettingsField(
         controller: _controller,

@@ -8,6 +8,7 @@ import 'package:piwigo_ng/utils/overscroll_behavior.dart';
 import 'package:piwigo_ng/utils/themes.dart';
 import 'package:piwigo_ng/views/album/album_view_page.dart';
 import 'package:piwigo_ng/views/album/root_album_view_page.dart';
+import 'package:piwigo_ng/views/authentication/login_settings_page.dart';
 import 'package:piwigo_ng/views/authentication/login_view_page.dart';
 import 'package:piwigo_ng/views/image/edit_image_page.dart';
 import 'package:piwigo_ng/views/image/image_favorites_page.dart';
@@ -100,6 +101,11 @@ Route<dynamic> generateRoute(RouteSettings settings) {
     case LoginViewPage.routeName:
       return MaterialPageRoute(
         builder: (_) => const LoginViewPage(),
+        settings: settings,
+      );
+    case LoginSettingsPage.routeName:
+      return MaterialPageRoute(
+        builder: (_) => LoginSettingsPage(),
         settings: settings,
       );
     case RootAlbumViewPage.routeName:
