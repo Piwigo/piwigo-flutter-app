@@ -9,16 +9,19 @@ import 'package:photo_view/photo_view_gallery.dart';
 import 'package:piwigo_ng/api/api_client.dart';
 import 'package:piwigo_ng/api/api_error.dart';
 import 'package:piwigo_ng/api/images.dart';
+import 'package:piwigo_ng/app.dart';
 import 'package:piwigo_ng/components/dialogs/image_comment_dialog.dart';
 import 'package:piwigo_ng/components/popup_list_item.dart';
 import 'package:piwigo_ng/models/album_model.dart';
 import 'package:piwigo_ng/models/image_model.dart';
 import 'package:piwigo_ng/models/tag_model.dart';
 import 'package:piwigo_ng/services/preferences_service.dart';
+import 'package:piwigo_ng/services/theme_provider.dart';
 import 'package:piwigo_ng/utils/image_actions.dart';
 import 'package:piwigo_ng/utils/localizations.dart';
 import 'package:piwigo_ng/utils/resources.dart';
 import 'package:piwigo_ng/views/image/video_player_page.dart';
+import 'package:provider/provider.dart';
 
 /// Media Full Screen page
 /// * Video player
@@ -85,7 +88,10 @@ class _ImageViewPageState extends State<ImageViewPage> {
       }
     }
     _pageController = PageController(initialPage: _page);
-
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light.copyWith(
+      systemNavigationBarColor: Colors.black.withOpacity(0.1),
+      statusBarColor: Colors.black.withOpacity(0.1),
+    ));
     _loadCookies();
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       _getImagesInfo(_imageList);
@@ -96,6 +102,14 @@ class _ImageViewPageState extends State<ImageViewPage> {
   @override
   void dispose() {
     _pageController.dispose();
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+      systemNavigationBarColor: Colors.black.withOpacity(0.001),
+      statusBarColor: Colors.black.withOpacity(0.001),
+      statusBarIconBrightness:
+          App.appKey.currentContext?.read<ThemeNotifier>().isDark ?? false
+              ? Brightness.light
+              : Brightness.dark,
+    ));
     super.dispose();
   }
 
@@ -233,26 +247,19 @@ class _ImageViewPageState extends State<ImageViewPage> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: _onWillPop,
-      child: AnnotatedRegion<SystemUiOverlayStyle>(
-        /// Changes System overlay colors to match black background
-        value: SystemUiOverlayStyle.light.copyWith(
-          systemNavigationBarColor: Colors.black.withOpacity(0.1),
-          statusBarColor: Colors.black.withOpacity(0.1),
-        ),
-        child: Scaffold(
-          backgroundColor: Colors.black,
-          resizeToAvoidBottomInset: true,
-          extendBodyBehindAppBar: true,
-          extendBody: true,
-          primary: false,
-          body: SafeArea(
-            child: Stack(
-              children: [
-                _content,
-                _top,
-                _bottom,
-              ],
-            ),
+      child: Scaffold(
+        backgroundColor: Colors.black,
+        resizeToAvoidBottomInset: true,
+        extendBodyBehindAppBar: true,
+        extendBody: true,
+        primary: false,
+        body: SafeArea(
+          child: Stack(
+            children: [
+              _content,
+              _top,
+              _bottom,
+            ],
           ),
         ),
       ),
