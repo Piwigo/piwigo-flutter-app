@@ -278,7 +278,7 @@ class _LoginFormViewState extends State<LoginFormView> {
           onPressed: () {
             Navigator.of(context).pushNamed(LoginSettingsPage.routeName);
           },
-          child: Text('Authentication Settings'), // todo : translate
+          child: Text(appStrings.login_advancedParameters),
         ),
       ],
     );

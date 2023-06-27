@@ -76,6 +76,7 @@
     "login_newSession": "Opening Session",
     "login_communityParameters": "Community Parameters",
     "login_serverParameters": "Piwigo Parameters",
+    "login_advancedParameters": "Authentication Settings",
     "login_connectionChanged": "Connection Changed!",
     "login_rememberCredentials": "Remember credentials",
     "loginHTTP_title": "HTTP Credentials",
