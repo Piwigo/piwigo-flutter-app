@@ -17,6 +17,7 @@ class _LoginSettingsPageState extends State<LoginSettingsPage> {
   late String _basicAuthPassword;
   late bool _sslEnabled;
   late bool _basiAuth;
+  late bool _rememberCredentials;
 
   @override
   void initState() {
@@ -24,8 +25,9 @@ class _LoginSettingsPageState extends State<LoginSettingsPage> {
         appPreferences.getString(Preferences.basicUsernameKey) ?? '';
     _basicAuthPassword =
         appPreferences.getString(Preferences.basicPasswordKey) ?? '';
-    _sslEnabled = appPreferences.getBool(Preferences.enableSSLKey) ?? false;
-    _basiAuth = appPreferences.getBool(Preferences.enableBasicAuthKey) ?? false;
+    _sslEnabled = Preferences.getEnableSSL;
+    _basiAuth = Preferences.getEnableBasicAuth;
+    _rememberCredentials = Preferences.getRememberCredentials;
     super.initState();
   }
 
@@ -45,6 +47,21 @@ class _LoginSettingsPageState extends State<LoginSettingsPage> {
           vertical: 8.0,
         ),
         children: [
+          SettingsSection(
+            children: [
+              SettingsSectionItemSwitch(
+                title: appStrings.login_rememberCredentials,
+                value: _rememberCredentials,
+                onChanged: (value) => setState(() {
+                  _rememberCredentials = value;
+                  appPreferences.setBool(
+                    Preferences.rememberCredentialsKey,
+                    value,
+                  );
+                }),
+              ),
+            ],
+          ),
           SettingsSection(
             title: appStrings.loginCert_title,
             children: [

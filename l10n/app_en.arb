@@ -77,6 +77,7 @@
     "login_communityParameters": "Community Parameters",
     "login_serverParameters": "Piwigo Parameters",
     "login_connectionChanged": "Connection Changed!",
+    "login_rememberCredentials": "Remember credentials",
     "loginHTTP_title": "HTTP Credentials",
     "loginHTTP_message": "Basic access authentification is required by the Piwigo server:",
     "loginHTTP_enable": "Enable HTTP Basic",

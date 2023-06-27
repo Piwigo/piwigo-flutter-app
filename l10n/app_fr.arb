@@ -48,6 +48,7 @@
     "login_communityParameters": "Paramètres Community",
     "login_serverParameters": "Paramètres Piwigo",
     "login_connectionChanged": "Connexion Modifiée !",
+    "login_rememberCredentials": "Mémoriser les identifiants",
     "loginHTTP_title": "Identification HTTP",
     "loginHTTP_message": "L'authentification HTTP est requise par le serveur Piwigo:",
     "loginHTTP_enable": "Activer HTTP Basic",

@@ -24,7 +24,7 @@ class ApiClient {
   }
 
   static bool piwigoSSLBypass(X509Certificate cert, String host, int port) {
-    if (appPreferences.getBool(Preferences.enableSSLKey) ?? false) {
+    if (Preferences.getEnableSSL) {
       return true;
     }
     return false;

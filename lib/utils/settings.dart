@@ -104,6 +104,9 @@ class Settings {
   static const bool defaultDeleteAfterUpload = false;
   static const bool defaultWifiUpload = true;
   static const bool defaultShowThumbnailTitle = false;
+  static const bool defaultRememberCredentials = true;
+  static const bool defaultEnableSSL = false;
+  static const bool defaultEnableHTTPBasic = false;
   static const int defaultImageRowCount = 4;
   static const int minImageRowCount = 1; // Settings slider min range
   static const int maxImageRowCount = 6; // Settings slider max range

@@ -55,11 +55,13 @@ class _LoginFormViewState extends State<LoginFormView> {
     List<String> urlFields = url.split('://');
     _isSecured = urlFields.first == 'https';
     _url = urlFields.last.substring(0, urlFields.last.lastIndexOf('/'));
-    _username = await storage.read(key: 'SERVER_USERNAME') ?? '';
-    _password = await storage.read(key: 'SERVER_PASSWORD') ?? '';
     _urlController.text = _url;
-    _usernameController.text = _username;
-    _passwordController.text = _password;
+    if (Preferences.getRememberCredentials) {
+      _username = await storage.read(key: 'SERVER_USERNAME') ?? '';
+      _password = await storage.read(key: 'SERVER_PASSWORD') ?? '';
+      _usernameController.text = _username;
+      _passwordController.text = _password;
+    }
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       if (mounted) {
         bool isError = !_urlValidator(url);

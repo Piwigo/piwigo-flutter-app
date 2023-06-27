@@ -23,8 +23,26 @@ class Preferences {
   static const String accountUsernameKey = 'ACCOUNT_USERNAME';
   static const String userStatusKey = 'USER_STATUS';
 
+  static const String rememberCredentialsKey = 'REMEMBER_CREDENTIALS';
+
+  static bool get getRememberCredentials {
+    return appPreferences.getBool(rememberCredentialsKey) ??
+        Settings.defaultRememberCredentials;
+  }
+
   static const String enableSSLKey = 'ENABLE_SSL';
+
+  static bool get getEnableSSL {
+    return appPreferences.getBool(enableSSLKey) ?? Settings.defaultEnableSSL;
+  }
+
   static const String enableBasicAuthKey = 'ENABLE_BASIC_AUTH';
+
+  static bool get getEnableBasicAuth {
+    return appPreferences.getBool(enableBasicAuthKey) ??
+        Settings.defaultEnableHTTPBasic;
+  }
+
   static const String basicUsernameKey = 'BASIC_USERNAME';
   static const String basicPasswordKey = 'BASIC_PASSWORD';
 
