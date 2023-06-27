@@ -46,10 +46,10 @@ class _LoginSettingsPageState extends State<LoginSettingsPage> {
         ),
         children: [
           SettingsSection(
-            title: 'Invalid Certificates', // todo : translate
+            title: appStrings.loginCert_title,
             children: [
               SettingsSectionItemSwitch(
-                title: 'Enable SSL', // todo : translate
+                title: appStrings.loginCert_enable,
                 value: _sslEnabled,
                 onChanged: (value) => setState(() {
                   _sslEnabled = value;
@@ -62,10 +62,10 @@ class _LoginSettingsPageState extends State<LoginSettingsPage> {
             ],
           ),
           SettingsSection(
-            title: 'HTTP Authorization', // todo : translate
+            title: appStrings.loginHTTP_title,
             children: [
               SettingsSectionItemSwitch(
-                title: 'Enable Basic Auth', // todo : translate
+                title: appStrings.loginHTTP_enable,
                 value: _basiAuth,
                 onChanged: (value) => setState(() {
                   _basiAuth = value;
@@ -83,7 +83,7 @@ class _LoginSettingsPageState extends State<LoginSettingsPage> {
                     return Column(
                       children: [
                         SettingsSectionItemField(
-                          hint: 'Username', // todo : translate
+                          hint: appStrings.loginHTTPuser_placeholder,
                           value: _basicAuthUsername,
                           onChanged: (value) => setState(() {
                             _basicAuthUsername = value;
@@ -98,8 +98,9 @@ class _LoginSettingsPageState extends State<LoginSettingsPage> {
                           thickness: 1,
                         ),
                         SettingsSectionItemField(
-                          hint: 'Password', // todo : translate
+                          hint: appStrings.loginHTTPpwd_placeholder,
                           value: _basicAuthPassword,
+                          isObscure: true,
                           onChanged: (value) => setState(() {
                             _basicAuthPassword = value;
                             appPreferences.setString(

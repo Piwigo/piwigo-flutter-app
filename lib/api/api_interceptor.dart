@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -44,6 +45,13 @@ class ApiInterceptor extends Interceptor {
     debugPrint(
         "[${err.response?.statusCode}] ${err.requestOptions.queryParameters['method']}");
     debugPrint('${err.error}\n${err.stackTrace}');
+    if (err.error is HandshakeException) {
+      HandshakeException handshakeError = err.error as HandshakeException;
+      String? message = handshakeError.osError?.message;
+      if (message != null && message.contains('CERTIFICATE_VERIFY_FAILED')) {
+        // Invalid SSL
+      }
+    }
     switch (err.response?.statusCode) {
       case null:
         App.scaffoldMessengerKey.currentState?.showSnackBar(

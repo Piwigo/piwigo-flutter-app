@@ -404,11 +404,13 @@ class SettingsSectionItemField extends StatefulWidget {
     required this.onChanged,
     this.hint,
     required this.value,
+    this.isObscure = false,
   }) : super(key: key);
 
   final String? title;
   final String? hint;
   final String value;
+  final bool isObscure;
   final Function(String) onChanged;
 
   @override
@@ -428,11 +430,11 @@ class _SettingsSectionItemFieldState extends State<SettingsSectionItemField> {
   @override
   Widget build(BuildContext context) {
     return SettingsSectionItem(
-      // title: widget.title,
       expandedChild: true,
       child: SettingsField(
         controller: _controller,
         hint: widget.hint,
+        isObscure: widget.isObscure,
         onChanged: widget.onChanged,
       ),
     );

@@ -10,12 +10,14 @@ class SettingsField extends StatelessWidget {
     this.keyboardType,
     this.padding,
     this.focusNode,
+    this.isObscure = false,
   }) : super(key: key);
 
   final TextEditingController? controller;
   final FocusNode? focusNode;
   final TextInputType? keyboardType;
   final String? hint;
+  final bool isObscure;
   final EdgeInsets? padding;
   final Function(String)? onChanged;
   final Function(String)? onFieldSubmitted;
@@ -32,6 +34,7 @@ class SettingsField extends StatelessWidget {
         onChanged: onChanged,
         onFieldSubmitted: onFieldSubmitted,
         style: Theme.of(context).textTheme.bodyMedium,
+        obscureText: isObscure,
         decoration: InputDecoration(
           border: InputBorder.none,
           hintText: hint,
