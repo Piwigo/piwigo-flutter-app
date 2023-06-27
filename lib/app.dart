@@ -23,6 +23,8 @@ import 'package:piwigo_ng/views/unknown_route_page.dart';
 import 'package:piwigo_ng/views/upload/upload_status_page.dart';
 import 'package:piwigo_ng/views/upload/upload_view_page.dart';
 
+import 'models/image_model.dart';
+
 class App extends StatelessWidget {
   const App({Key? key}) : super(key: key);
 
@@ -157,7 +159,7 @@ Route<dynamic> generateRoute(RouteSettings settings) {
         settings: settings,
       );
     case ImageViewPage.routeName:
-      return MaterialPageRoute(
+      return MaterialPageRoute<List<ImageModel>?>(
         builder: (_) => ImageViewPage(
           images: arguments['images'] ?? [],
           startId: arguments['startId'],

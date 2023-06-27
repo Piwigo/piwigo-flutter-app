@@ -16,6 +16,7 @@ import 'package:piwigo_ng/services/upload_notifier.dart';
 import 'package:piwigo_ng/utils/album_actions.dart';
 import 'package:piwigo_ng/utils/image_actions.dart';
 import 'package:piwigo_ng/utils/localizations.dart';
+import 'package:piwigo_ng/utils/settings.dart';
 import 'package:piwigo_ng/views/image/image_view_page.dart';
 import 'package:piwigo_ng/views/upload/upload_status_page.dart';
 import 'package:piwigo_ng/views/upload/upload_view_page.dart';
@@ -142,7 +143,14 @@ class _AlbumViewPageState extends State<AlbumViewPage>
           'startId': image.id,
           'album': _currentAlbum,
         },
-      ).whenComplete(() => _onRefresh());
+      ).then((images) {
+        if (images == null || images is! List<ImageModel>) return;
+        setState(() {
+          _imageList = images;
+          _page =
+              ((images.length - 1) / Settings.defaultElementPerPage).floor();
+        });
+      });
   void _onEditPhotos() => onEditPhotos(context, _selectedList).then((success) {
         if (success == true) {
           _selectedList.clear();

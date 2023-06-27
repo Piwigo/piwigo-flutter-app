@@ -20,6 +20,7 @@ import 'package:piwigo_ng/services/theme_provider.dart';
 import 'package:piwigo_ng/utils/image_actions.dart';
 import 'package:piwigo_ng/utils/localizations.dart';
 import 'package:piwigo_ng/utils/resources.dart';
+import 'package:piwigo_ng/utils/settings.dart';
 import 'package:piwigo_ng/views/image/video_player_page.dart';
 import 'package:provider/provider.dart';
 
@@ -79,6 +80,9 @@ class _ImageViewPageState extends State<ImageViewPage> {
   void initState() {
     _imageList = widget.images.sublist(0);
     _album = widget.album;
+    _imagePage =
+        ((_imageList.length - 1) / Settings.defaultElementPerPage).floor();
+
     final ImageModel? startImage =
         _imageList.firstWhere((image) => image.id == widget.startId);
     if (startImage != null) {
@@ -87,12 +91,15 @@ class _ImageViewPageState extends State<ImageViewPage> {
         _loadMoreImages();
       }
     }
+
     _pageController = PageController(initialPage: _page);
+
+    _loadCookies();
+
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light.copyWith(
       systemNavigationBarColor: Colors.black.withOpacity(0.1),
       statusBarColor: Colors.black.withOpacity(0.1),
     ));
-    _loadCookies();
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       _getImagesInfo(_imageList);
     });
@@ -166,7 +173,8 @@ class _ImageViewPageState extends State<ImageViewPage> {
       });
       return false;
     }
-    return true;
+    Navigator.of(context).pop(_imageList);
+    return false;
   }
 
   /// Toggle overlay action (orientation was necessary, *see comments*).
@@ -190,7 +198,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
   /// Handle when
   Future<void> _onRemoveImage(ImageModel image) async {
     if (_imageList.length == 1) {
-      Navigator.of(context).pop();
+      Navigator.of(context).pop([]);
     }
     if (_imageList.length - 1 == _page) {
       await _pageController.previousPage(
@@ -291,7 +299,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
             child: Row(
               children: [
                 IconButton(
-                  onPressed: () => Navigator.of(context).pop(),
+                  onPressed: () => Navigator.of(context).pop(_imageList),
                   icon: Icon(Icons.arrow_back),
                 ),
                 Expanded(
