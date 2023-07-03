@@ -21,7 +21,7 @@ class AppProviders extends StatelessWidget {
             builder: (context, localNotifier, child) {
               return Consumer<ThemeNotifier>(
                 builder: (context, themeNotifier, child) {
-                  return builder(localNotifier, themeNotifier);
+                  return builder.call(localNotifier, themeNotifier);
                 },
               );
             },

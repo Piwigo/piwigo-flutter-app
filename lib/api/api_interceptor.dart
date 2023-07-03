@@ -8,6 +8,7 @@ import 'package:piwigo_ng/app.dart';
 import 'package:piwigo_ng/components/snackbars.dart';
 import 'package:piwigo_ng/services/preferences_service.dart';
 import 'package:piwigo_ng/utils/localizations.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiInterceptor extends Interceptor {
   @override
@@ -15,17 +16,14 @@ class ApiInterceptor extends Interceptor {
     RequestOptions options,
     RequestInterceptorHandler handler,
   ) async {
-    print("[${options.method}] ${options.queryParameters['method']}");
+    debugPrint("[${options.method}] ${options.queryParameters['method']}");
     FlutterSecureStorage secureStorage = const FlutterSecureStorage();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
     options.baseUrl =
         (await secureStorage.read(key: Preferences.serverUrlKey))!;
     if (Preferences.getEnableBasicAuth) {
-      String? username =
-          appPreferences.getString(Preferences.basicUsernameKey) ??
-              await secureStorage.read(key: Preferences.usernameKey);
-      String? password =
-          appPreferences.getString(Preferences.basicPasswordKey) ??
-              await secureStorage.read(key: Preferences.passwordKey);
+      String? username = prefs.getString(Preferences.basicUsernameKey) ?? '';
+      String? password = prefs.getString(Preferences.basicPasswordKey) ?? '';
       String basicAuth =
           "Basic ${base64.encode(utf8.encode('$username:$password'))}";
       options.headers['authorization'] = basicAuth;

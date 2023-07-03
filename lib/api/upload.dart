@@ -12,6 +12,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:piwigo_ng/api/api_client.dart';
+import 'package:piwigo_ng/api/api_interceptor.dart';
 import 'package:piwigo_ng/api/authentication.dart';
 import 'package:piwigo_ng/app.dart';
 import 'package:piwigo_ng/components/dialogs/confirm_dialog.dart';
@@ -25,6 +26,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../services/chunked_uploader.dart';
 import '../services/notification_service.dart';
 
+/// Handle Android API 33 permissions
 Future<bool> askMediaPermission() async {
   bool storage = true;
   bool videos = true;
@@ -55,12 +57,13 @@ Future<bool> askMediaPermission() async {
   return false;
 }
 
+/// Prepare and upload with [uploadChunk] a list of files.
 Future<List<int>> uploadPhotos(
   List<XFile> photos,
   int albumId, {
   Map<String, dynamic> info = const {},
 }) async {
-  // Check if Wifi is enabled and working
+  // Check if Wifi is enabled and working before processing
   if (Preferences.getWifiUpload) {
     var connectivity = await Connectivity().checkConnectivity();
     if (connectivity != ConnectivityResult.wifi) {
@@ -75,6 +78,7 @@ Future<List<int>> uploadPhotos(
     }
   }
 
+  // Initialize variables
   List<int> result = [];
   List<UploadItem> items = [];
   FlutterSecureStorage storage = const FlutterSecureStorage();
@@ -88,26 +92,31 @@ Future<List<int>> uploadPhotos(
 
   // Creates Upload Item list for the upload notifier
   for (var photo in photos) {
-    File? compressedFile;
-    if (Preferences.getRemoveMetadata) {
-      compressedFile = await compressFile(photo);
-    } else {
-      compressedFile = File(photo.path);
+    File? uploadFile;
+
+    // Compress file
+    uploadFile = await compressFile(photo);
+    if (uploadFile == null) {
+      uploadFile = File(photo.path);
     }
+
     items.add(UploadItem(
-      file: compressedFile,
+      file: uploadFile,
       albumId: albumId,
     ));
   }
 
+  // Add items to the queue
   uploadNotifier.addItems(items);
 
+  // Closes the Upload Configuration page and opens the Upload Status page
   App.navigatorKey.currentState?.popAndPushNamed(UploadStatusPage.routeName);
 
+  // Iterate on each item
   await Future.wait(List<Future<void>>.generate(items.length, (index) async {
     UploadItem item = items[index];
     try {
-      // Make Request
+      // Upload image
       Response? response = await uploadChunk(
         photo: item.file,
         category: albumId,
@@ -131,7 +140,7 @@ Future<List<int>> uploadPhotos(
         var data = json.decode(response.data);
         result.add(data['result']['id']);
 
-        // Notify provider upload completed
+        // Notify provider the upload has completed.
         uploadNotifier.itemUploadCompleted(item);
         if (Preferences.getDeleteAfterUpload) {
           // todo: delete real file path, not the cached one.
@@ -143,18 +152,22 @@ Future<List<int>> uploadPhotos(
       uploadNotifier.itemUploadCompleted(item, error: true);
       nbError++;
     } catch (e) {
+      debugPrint("$e");
       if (e is Error) {
-        debugPrint("$e");
         debugPrint("${e.stackTrace}");
       }
-      debugPrint("$e");
       uploadNotifier.itemUploadCompleted(item, error: true);
       nbError++;
     }
   }));
 
+  // Send notifications
   showUploadNotification(nbError, result.length);
+
+  // If no image was successfully uploaded, no call for "uploadCompleted"
   if (result.isEmpty) return [];
+
+  // Empty Piwigo lounge
   try {
     await uploadCompleted(result, albumId);
     if (await methodExist('community.images.uploadCompleted')) {
@@ -167,6 +180,7 @@ Future<List<int>> uploadPhotos(
   return result;
 }
 
+/// Upload images as chunks using [ChunkedUploader]
 Future<Response?> uploadChunk({
   required File photo,
   required int category,
@@ -178,10 +192,14 @@ Future<Response?> uploadChunk({
   CancelToken? cancelToken,
 }) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
+
+  // Request query parameters
   Map<String, String> queries = {
     'format': 'json',
     'method': 'pwg.images.uploadAsync',
   };
+
+  // Initialize fields
   Map<String, dynamic> fields = {
     'username': username,
     'password': password,
@@ -189,6 +207,7 @@ Future<Response?> uploadChunk({
     'category': category,
   };
 
+  // Filter fields
   if (info['name'] != '' && info['name'] != null) fields['name'] = info['name'];
   if (info['comment'] != '' && info['comment'] != null)
     fields['comment'] = info['comment'];
@@ -196,12 +215,17 @@ Future<Response?> uploadChunk({
     fields['tag_ids'] = info['tag_ids'].join(',');
   if (info['level'] != -1) fields['level'] = info['level'];
 
-  ChunkedUploader chunkedUploader = ChunkedUploader(Dio(
+  // Create dio client
+  Dio dio = Dio(
     BaseOptions(
       baseUrl: url,
     ),
-  ));
+  )..interceptors.add(ApiInterceptor());
 
+  // Initialize chunk uploader service
+  ChunkedUploader chunkedUploader = ChunkedUploader(dio);
+
+  // Upload image as chunks
   return await chunkedUploader.upload(
     path: '/ws.php',
     filePath: photo.absolute.path,
@@ -217,25 +241,41 @@ Future<Response?> uploadChunk({
   );
 }
 
-Future<File> compressFile(XFile file) async {
+/// Compress before upload, enabled with [Preferences.getCompressUpload] parameter.
+Future<File?> compressFile(XFile file) async {
   try {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    // Get original file path
     final filePath = file.path;
+
+    // Directory output
     var dir = await getTemporaryDirectory();
+
+    // Extract file name and extension
     final String filename = filePath.split('/').last;
+
+    // Output file path
     final outPath = "${dir.absolute.path}/$filename";
 
+    // Get compress parameters
+    double quality = prefs.getDouble(Preferences.uploadQualityKey) ?? 1.0;
+    bool removeMetadata = prefs.getBool(Preferences.removeMetadataKey) ?? false;
+
+    // Compress with quality parameter and exif metadata
     var result = await FlutterImageCompress.compressAndGetFile(
       filePath,
       outPath,
-      quality: (Preferences.getUploadQuality * 100).round(),
-      keepExif: false,
+      quality: (quality * 100).round(),
+      keepExif: removeMetadata,
     );
+
     debugPrint("Upload Compress $result");
-    if (result != null) return result;
+    return result;
   } catch (e) {
     debugPrint(e.toString());
   }
-  return File(file.path);
+  return null;
 }
 
 Future<bool> uploadCompleted(List<int> imageId, int categoryId) async {

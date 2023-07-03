@@ -143,11 +143,16 @@ class AutoUploadManager {
 
     // Perform upload
     for (File file in newPhotos) {
-      print("Try upload ${file.path}");
-      if (prefs.getBool(Preferences.removeMetadataKey) ??
-          Settings.defaultRemoveMetadata) {
-        file = await compressFile(XFile(file.path));
+      debugPrint("Try upload ${file.path}");
+
+      File? uploadFile;
+
+      // Compress file
+      uploadFile = await compressFile(XFile(file.path));
+      if (uploadFile == null) {
+        uploadFile = file;
       }
+
       try {
         // Make Request
         Response? response = await uploadChunk(

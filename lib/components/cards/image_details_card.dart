@@ -2,6 +2,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:path/path.dart' as path;
+import 'package:piwigo_ng/components/app_image_display.dart';
 import 'package:piwigo_ng/models/image_model.dart';
 import 'package:piwigo_ng/services/locale_provider.dart';
 import 'package:piwigo_ng/services/preferences_service.dart';
@@ -48,24 +49,8 @@ class ImageDetailsCard extends StatelessWidget {
               final String? imageUrl = image
                   .getDerivativeFromString(Preferences.getImageThumbnailSize)
                   ?.url;
-              return Image.network(
-                imageUrl ?? '',
-                fit: BoxFit.cover,
-                errorBuilder: (context, o, s) {
-                  debugPrint("$o\n$s");
-                  return Center(child: Icon(Icons.image_not_supported));
-                },
-                loadingBuilder: (context, child, loadingProgress) {
-                  if (loadingProgress == null) return child;
-                  return Center(
-                    child: CircularProgressIndicator(
-                      value: loadingProgress.expectedTotalBytes != null
-                          ? loadingProgress.cumulativeBytesLoaded /
-                              loadingProgress.expectedTotalBytes!
-                          : null,
-                    ),
-                  );
-                },
+              return AppImageDisplay(
+                imageUrl: imageUrl,
               );
             }),
           ),

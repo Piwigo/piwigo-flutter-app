@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:piwigo_ng/components/app_image_display.dart';
 import 'package:piwigo_ng/components/clippers/album_card_clipper.dart';
 import 'package:piwigo_ng/components/clippers/clip_shadow_path.dart';
 import 'package:piwigo_ng/models/album_model.dart';
@@ -186,6 +187,9 @@ class AlbumCardContent extends StatelessWidget {
         child: ClipRRect(
           borderRadius: BorderRadius.circular(10.0),
           child: Builder(builder: (context) {
+            return AppImageDisplay(
+              imageUrl: album.urlRepresentative,
+            );
             if (album.urlRepresentative == null) {
               return FittedBox(
                 fit: BoxFit.cover,

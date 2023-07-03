@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -10,6 +11,7 @@ import 'package:piwigo_ng/api/api_client.dart';
 import 'package:piwigo_ng/api/api_error.dart';
 import 'package:piwigo_ng/api/images.dart';
 import 'package:piwigo_ng/app.dart';
+import 'package:piwigo_ng/components/app_image_display.dart';
 import 'package:piwigo_ng/components/dialogs/image_comment_dialog.dart';
 import 'package:piwigo_ng/components/popup_list_item.dart';
 import 'package:piwigo_ng/models/album_model.dart';
@@ -23,6 +25,7 @@ import 'package:piwigo_ng/utils/resources.dart';
 import 'package:piwigo_ng/utils/settings.dart';
 import 'package:piwigo_ng/views/image/video_player_page.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 /// Media Full Screen page
 /// * Video player
@@ -72,10 +75,9 @@ class _ImageViewPageState extends State<ImageViewPage> {
   /// API Image Pagination
   int _imagePage = 0;
 
-  /// Server Cookie String
-  String _serverCookie = '';
+  /// Image headers
+  late final Future<Map<String, String>> _headers;
 
-  /// Initialize [PageView]
   @override
   void initState() {
     _imageList = widget.images.sublist(0);
@@ -94,7 +96,9 @@ class _ImageViewPageState extends State<ImageViewPage> {
 
     _pageController = PageController(initialPage: _page);
 
-    _loadCookies();
+    // _loadHeaders();
+
+    _headers = _getHeaders();
 
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light.copyWith(
       systemNavigationBarColor: Colors.black.withOpacity(0.1),
@@ -135,17 +139,32 @@ class _ImageViewPageState extends State<ImageViewPage> {
     _getImagesInfo(_imageList);
   }
 
-  Future<void> _loadCookies() async {
+  Future<Map<String, String>> _getHeaders() async {
     FlutterSecureStorage secureStorage = const FlutterSecureStorage();
     String? serverUrl = await secureStorage.read(key: 'SERVER_URL');
-    List<Cookie> cookies =
-        await ApiClient.cookieJar.loadForRequest(Uri.parse(serverUrl!));
 
+    if (serverUrl == null) return {};
+
+    // Get server cookies
+    List<Cookie> cookies =
+        await ApiClient.cookieJar.loadForRequest(Uri.parse(serverUrl));
     String cookiesStr =
         cookies.map((cookie) => '${cookie.name}=${cookie.value}').join('; ');
-    setState(() {
-      _serverCookie = cookiesStr;
-    });
+
+    // Get HTTP Basic id
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? basicAuth;
+    // Fetch only if enabled
+    if (Preferences.getEnableBasicAuth) {
+      String? username = prefs.getString(Preferences.basicUsernameKey) ?? '';
+      String? password = prefs.getString(Preferences.basicPasswordKey) ?? '';
+      basicAuth = "Basic ${base64.encode(utf8.encode('$username:$password'))}";
+    }
+
+    return {
+      HttpHeaders.cookieHeader: cookiesStr,
+      if (basicAuth != null) 'Authorization': basicAuth,
+    };
   }
 
   Future<void> _getImagesInfo(List<ImageModel> images) async {
@@ -390,6 +409,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
     );
   }
 
+  /// Fetch headers
   /// Page content
   ///
   /// Show video or image
@@ -398,113 +418,112 @@ class _ImageViewPageState extends State<ImageViewPage> {
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: () => _onToggleOverlay(MediaQuery.of(context).orientation),
-        child: Builder(builder: (context) {
-          if (_serverCookie.isEmpty) return const SizedBox();
-          return PhotoViewGallery.builder(
-            // Compatibility with PageView and PhotoView
-            pageController: _pageController,
-            onPageChanged: (page) => setState(() {
-              _page = page;
-              if (page == _imageList.length - 1) {
-                _loadMoreImages();
+        child: FutureBuilder<Map<String, String>>(
+            future: _headers,
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                // Fetch headers
+                Map<String, String> headers = snapshot.data!;
+
+                // Compatibility with PageView and PhotoView
+                return _imagePageView(headers);
               }
-            }),
-            itemCount: _imageList.length,
-            builder: (context, index) {
-              final ImageModel image = _imageList[index];
-
-              String imageUrl = '';
-              if (Preferences.getImageFullScreenSize == 'full') {
-                imageUrl = image.elementUrl;
-                imageUrl = HtmlUnescape().convert(imageUrl);
-              } else {
-                imageUrl = image
-                        .getDerivativeFromString(
-                            Preferences.getImageFullScreenSize)
-                        ?.url ??
-                    '';
-              }
-
-              ApiClient.cookieJar.loadForRequest(Uri.parse(imageUrl));
-
-              // Check mime type of file (multiple test to ensure it is not null)
-              if (image.isVideo) {
-                // Returns video player
-                return PhotoViewGalleryPageOptions.customChild(
-                  disableGestures: true,
-                  child: Stack(
-                    children: [
-                      Positioned.fill(
-                        child: Image.network(
-                          image.derivatives.medium.url,
-                          fit: BoxFit.contain,
-                          errorBuilder: (context, o, s) {
-                            debugPrint("$o\n$s");
-                            return Center(
-                              child: Icon(Icons.image_not_supported),
-                            );
-                          },
-                        ),
-                      ),
-                      Center(
-                        child: IconButton(
-                          color: Colors.white,
-                          style: ButtonStyle(
-                            backgroundColor: MaterialStateProperty.resolveWith(
-                                (states) => Colors.black.withOpacity(0.5)),
-                            shape: MaterialStateProperty.resolveWith(
-                                (states) => CircleBorder()),
-                          ),
-                          onPressed: () {
-                            Navigator.of(context).pushNamed(
-                              VideoPlayerPage.routeName,
-                              arguments: {
-                                'videoUrl': image.elementUrl,
-                                'thumbnailUrl': imageUrl,
-                              },
-                            );
-                          },
-                          icon: Icon(
-                            Icons.play_arrow,
-                            size: 32,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  // child: VideoPlayerView(
-                  //   videoUrl: image.elementUrl,
-                  //   thumbnailUrl: image.derivatives.medium.url,
-                  //   showOverlay: _showOverlay,
-                  //   screenPadding: const EdgeInsets.only(bottom: 56.0),
-                  //   onToggleOverlay: (value) => _onToggleOverlay(
-                  //       MediaQuery.of(context).orientation, value),
-                  // ),
-                );
-              }
-
-              // Default behavior: Zoomable image
-              return PhotoViewGalleryPageOptions(
-                heroAttributes: PhotoViewHeroAttributes(
-                  tag: image.id == _currentImage.id
-                      ? "<hero image ${image.id}-${_album.id}>"
-                      : "<no tag ${image.id}-${DateTime.now()}>",
-                ),
-                imageProvider: NetworkImage(
-                  imageUrl,
-                  headers: {HttpHeaders.cookieHeader: _serverCookie},
-                ),
-                maxScale: 2.0,
-                minScale: PhotoViewComputedScale.contained,
-                errorBuilder: (context, o, s) {
-                  debugPrint("$o\n$s");
-                  return SizedBox();
-                },
+              return Center(
+                child: CircularProgressIndicator(),
               );
-            },
-          );
-        }),
+            }),
       ),
+    );
+  }
+
+  /// Display zoom images and videos
+  Widget _imagePageView(Map<String, String> headers) {
+    return PhotoViewGallery.builder(
+      pageController: _pageController,
+      onPageChanged: (page) => setState(() {
+        _page = page;
+        if (page == _imageList.length - 1) {
+          _loadMoreImages();
+        }
+      }),
+      itemCount: _imageList.length,
+      builder: (context, index) {
+        final ImageModel image = _imageList[index];
+
+        String imageUrl = '';
+        if (Preferences.getImageFullScreenSize == 'full') {
+          imageUrl = image.elementUrl;
+          imageUrl = HtmlUnescape().convert(imageUrl);
+        } else {
+          imageUrl = image
+                  .getDerivativeFromString(Preferences.getImageFullScreenSize)
+                  ?.url ??
+              '';
+        }
+
+        // ApiClient.cookieJar.loadForRequest(Uri.parse(imageUrl));
+
+        // Check mime type of file
+        if (image.isVideo) {
+          // Returns video player
+          return PhotoViewGalleryPageOptions.customChild(
+            disableGestures: true,
+            child: Stack(
+              children: [
+                Positioned.fill(
+                  child: AppImageDisplay(
+                    imageUrl: image.derivatives.medium.url,
+                    fit: BoxFit.contain,
+                  ),
+                ),
+                Center(
+                  child: IconButton(
+                    color: Colors.white,
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.resolveWith(
+                          (states) => Colors.black.withOpacity(0.5)),
+                      shape: MaterialStateProperty.resolveWith(
+                          (states) => CircleBorder()),
+                    ),
+                    onPressed: () {
+                      Navigator.of(context).pushNamed(
+                        VideoPlayerPage.routeName,
+                        arguments: {
+                          'videoUrl': image.elementUrl,
+                          'thumbnailUrl': imageUrl,
+                        },
+                      );
+                    },
+                    icon: Icon(
+                      Icons.play_arrow,
+                      size: 32,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
+
+        // Default behavior: Zoomable image
+        return PhotoViewGalleryPageOptions(
+          heroAttributes: PhotoViewHeroAttributes(
+            tag: image.id == _currentImage.id
+                ? "<hero image ${image.id}-${_album.id}>"
+                : "<no tag ${image.id}-${DateTime.now()}>",
+          ),
+          imageProvider: NetworkImage(
+            imageUrl,
+            headers: headers,
+          ),
+          maxScale: 2.0,
+          minScale: PhotoViewComputedScale.contained,
+          errorBuilder: (context, o, s) {
+            debugPrint("$o\n$s");
+            return const Icon(Icons.broken_image_outlined);
+          },
+        );
+      },
     );
   }
 

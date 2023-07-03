@@ -1,6 +1,7 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:piwigo_ng/components/app_image_display.dart';
 import 'package:piwigo_ng/models/image_model.dart';
 import 'package:piwigo_ng/services/preferences_service.dart';
 import 'package:piwigo_ng/utils/resources.dart';
@@ -102,6 +103,9 @@ class ImageCard extends StatelessWidget {
   Widget _buildThumbnail(context) {
     final String? imageUrl =
         image.getDerivativeFromString(Preferences.getImageThumbnailSize)?.url;
+    return AppImageDisplay(
+      imageUrl: imageUrl,
+    );
     return CachedNetworkImage(
       imageUrl: imageUrl ?? '',
       fadeInDuration: const Duration(milliseconds: 300),
