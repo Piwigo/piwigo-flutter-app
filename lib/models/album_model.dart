@@ -57,7 +57,10 @@ class AlbumModel {
         nbImages = json['nb_images'] ?? 0,
         nbTotalImages = json['total_nb_images'] ?? 0,
         nbCategories = json['nb_categories'] ?? 0,
-        children = json['sub_categories']?.map<AlbumModel>((a) => AlbumModel.fromJson(a)).toList() ?? [],
+        children = json['sub_categories']
+                ?.map<AlbumModel>((a) => AlbumModel.fromJson(a))
+                .toList() ??
+            [],
         idRepresentative = json['representative_picture_id'],
         dateLast = json['date_last'],
         dateLastMax = json['max_date_last'],
@@ -78,7 +81,8 @@ class AlbumModel {
         'nb_images': nbImages,
         'total_nb_images': nbTotalImages,
         'nb_categories': nbCategories,
-        'sub_categories': List.generate(children.length, (i) => children[i].toJson()),
+        'sub_categories':
+            List.generate(children.length, (i) => children[i].toJson()),
         'representative_picture_id': idRepresentative,
         'date_last': dateLast,
         'max_date_last': dateLastMax,

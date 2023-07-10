@@ -9,6 +9,7 @@ import 'package:piwigo_ng/services/preferences_service.dart';
 import 'package:piwigo_ng/utils/localizations.dart';
 import 'package:piwigo_ng/views/authentication/login_settings_page.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../components/fields/app_field.dart';
 import '../album/root_album_view_page.dart';
@@ -50,15 +51,16 @@ class _LoginFormViewState extends State<LoginFormView> {
 
   Future<void> _initFields() async {
     FlutterSecureStorage storage = const FlutterSecureStorage();
-    String? url = await storage.read(key: 'SERVER_URL');
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? url = prefs.getString(Preferences.serverUrlKey);
     if (url == null || url.isEmpty) return;
     List<String> urlFields = url.split('://');
     _isSecured = urlFields.first == 'https';
     _url = urlFields.last.substring(0, urlFields.last.lastIndexOf('/'));
     _urlController.text = _url;
     if (Preferences.getRememberCredentials) {
-      _username = await storage.read(key: 'SERVER_USERNAME') ?? '';
-      _password = await storage.read(key: 'SERVER_PASSWORD') ?? '';
+      _username = await storage.read(key: Preferences.usernameKey) ?? '';
+      _password = await storage.read(key: Preferences.passwordKey) ?? '';
       _usernameController.text = _username;
       _passwordController.text = _password;
     }

@@ -2,8 +2,9 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:extended_text/extended_text.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as path;
@@ -21,7 +22,9 @@ import 'package:share_plus/share_plus.dart';
 import 'albums.dart';
 import 'api_client.dart';
 
-Future<ApiResult<ImageModel>> getImage(int imageId) async {
+Future<ApiResult<ImageModel>> getImage(
+  int imageId,
+) async {
   Map<String, dynamic> queries = {
     'format': 'json',
     'method': 'pwg.images.getInfo',
@@ -48,8 +51,10 @@ Future<ApiResult<ImageModel>> getImage(int imageId) async {
   return ApiResult(error: ApiErrors.error);
 }
 
-Future<ApiResult<List<ImageModel>>> fetchImages(int albumID,
-    [int page = 0]) async {
+Future<ApiResult<List<ImageModel>>> fetchImages(
+  int albumID, [
+  int page = 0,
+]) async {
   Map<String, dynamic> queries = {
     'format': 'json',
     'method': 'pwg.categories.getImages',
@@ -78,7 +83,10 @@ Future<ApiResult<List<ImageModel>>> fetchImages(int albumID,
   return ApiResult(error: ApiErrors.fetchImagesError);
 }
 
-Future<ApiResult<Map>> searchImages(String searchQuery, [int page = 0]) async {
+Future<ApiResult<Map>> searchImages(
+  String searchQuery, [
+  int page = 0,
+]) async {
   Map<String, dynamic> query = {
     'format': 'json',
     'method': 'pwg.images.search',
@@ -116,7 +124,9 @@ Future<ApiResult<Map>> searchImages(String searchQuery, [int page = 0]) async {
   return ApiResult(error: ApiErrors.searchImagesError);
 }
 
-Future<ApiResult<Map>> fetchFavorites([int page = 0]) async {
+Future<ApiResult<Map>> fetchFavorites([
+  int page = 0,
+]) async {
   Map<String, dynamic> query = {
     'format': 'json',
     'method': 'pwg.users.favorites.getList',
@@ -160,8 +170,10 @@ Future<String?> pickDirectoryPath() async {
   return await FilePicker.platform.getDirectoryPath();
 }
 
-Future<void> _showDownloadNotification(
-    {bool success = true, String? payload}) async {
+Future<void> _showDownloadNotification({
+  bool success = true,
+  String? payload,
+}) async {
   if (!Preferences.getDownloadNotification) return;
   final android = AndroidNotificationDetails(
     'piwigo-ng-download',
@@ -183,7 +195,9 @@ Future<void> _showDownloadNotification(
   );
 }
 
-Future<bool> share(List<ImageModel> images) async {
+Future<bool> share(
+  List<ImageModel> images,
+) async {
   List<XFile>? filesPath = await downloadImages(
     images,
     showNotification: false,
@@ -233,7 +247,10 @@ Future<List<XFile>?> downloadImages(
   return files;
 }
 
-Future<XFile?> downloadImage(String dirPath, ImageModel image) async {
+Future<XFile?> downloadImage(
+  String dirPath,
+  ImageModel image,
+) async {
   String localPath = path.join(dirPath, image.file);
   try {
     await ApiClient.download(
@@ -276,7 +293,9 @@ Future<int> deleteImages(
   return nbSuccess;
 }
 
-Future<bool> deleteImage(ImageModel image) async {
+Future<bool> deleteImage(
+  ImageModel image,
+) async {
   Map<String, String> queries = {
     'format': 'json',
     'method': 'pwg.images.delete',
@@ -302,7 +321,10 @@ Future<bool> deleteImage(ImageModel image) async {
   return false;
 }
 
-Future<int> removeImages(List<ImageModel> images, int albumId) async {
+Future<int> removeImages(
+  List<ImageModel> images,
+  int albumId,
+) async {
   int nbSuccess = 0;
   for (ImageModel image in images) {
     bool response = await removeImage(image, albumId);
@@ -313,7 +335,10 @@ Future<int> removeImages(List<ImageModel> images, int albumId) async {
   return nbSuccess;
 }
 
-Future<bool> removeImage(ImageModel image, int albumId) async {
+Future<bool> removeImage(
+  ImageModel image,
+  int albumId,
+) async {
   final List<int> albums =
       image.categories.map<int>((album) => album['id']).toList();
   albums.removeWhere((album) => album == albumId);
@@ -348,7 +373,10 @@ Future<bool> removeImage(ImageModel image, int albumId) async {
 }
 
 Future<int> moveImages(
-    List<ImageModel> images, int oldAlbumId, int newAlbumId) async {
+  List<ImageModel> images,
+  int oldAlbumId,
+  int newAlbumId,
+) async {
   int nbMoved = 0;
   for (var image in images) {
     bool response = await moveImage(image, oldAlbumId, newAlbumId);
@@ -359,7 +387,11 @@ Future<int> moveImages(
   return nbMoved;
 }
 
-Future<bool> moveImage(ImageModel image, int oldAlbumId, int newAlbumId) async {
+Future<bool> moveImage(
+  ImageModel image,
+  int oldAlbumId,
+  int newAlbumId,
+) async {
   final List<int> albums =
       image.categories.map<int>((album) => album['id']).toList();
   albums.removeWhere((id) => id == oldAlbumId);
@@ -390,7 +422,10 @@ Future<bool> moveImage(ImageModel image, int oldAlbumId, int newAlbumId) async {
   return false;
 }
 
-Future<int> assignImages(List<ImageModel> images, int albumId) async {
+Future<int> assignImages(
+  List<ImageModel> images,
+  int albumId,
+) async {
   int nbAssigned = 0;
   for (ImageModel image in images) {
     final List<int> categories =
@@ -404,7 +439,10 @@ Future<int> assignImages(List<ImageModel> images, int albumId) async {
   return nbAssigned;
 }
 
-Future<bool> assignImage(int imageId, List<int> categories) async {
+Future<bool> assignImage(
+  int imageId,
+  List<int> categories,
+) async {
   final Map<String, dynamic> queries = {
     'format': 'json',
     'method': 'pwg.images.setInfo',
@@ -491,8 +529,10 @@ Future<bool> editImage(
 }
 
 /// Return a list of files that are not in the server
-Future<List<File>> checkImagesNotExist(List<File> files,
-    {bool returnExistFiles = false}) async {
+Future<List<File>> checkImagesNotExist(
+  List<File> files, {
+  bool returnExistFiles = false,
+}) async {
   Map<String, File> md5sumList = {};
 
   for (File file in files) {
@@ -527,4 +567,123 @@ Future<List<File>> checkImagesNotExist(List<File> files,
     debugPrint('Edit images: ${e.stackTrace}');
   }
   return [];
+}
+
+String? removeUrlProtocol(String? url) {
+  if (url == null) return null;
+  url = url.replaceFirst('http://', '');
+  url = url.replaceFirst('https://', '');
+  return url;
+}
+
+String? cleanImageUrl(String? originalUrl) {
+  if (originalUrl == null) return null;
+  final String okUrl = originalUrl;
+
+  // TEMPORARY PATCH for case where $conf['original_url_protection'] = 'images';
+  /// See https://github.com/Piwigo/Piwigo-Mobile/issues/503
+  String patchedUrl = okUrl.replaceAll('&amp;part=', '&part=');
+
+  // Servers may return incorrect URLs
+  /// See https://tools.ietf.org/html/rfc3986#section-2
+  Uri? serverUrl = Uri.tryParse(patchedUrl);
+
+  print("$patchedUrl");
+
+  if (serverUrl == null) {
+    // URL not RFC compliant!
+    String leftUrl = patchedUrl;
+
+    // Remove protocol header
+    leftUrl = removeUrlProtocol(patchedUrl) ?? leftUrl;
+
+    // Retrieve authority
+    int endAuthority = leftUrl.indexOf('/');
+    // No path, incomplete URL —> return image.jpg but should never happen
+    if (endAuthority == -1) return null;
+    leftUrl = leftUrl.substring(endAuthority);
+
+    // The Piwigo server may not be in the root e.g. example.com/piwigo/…
+    // So we remove the path to avoid a duplicate if necessary
+    String? loginUrl = appPreferences.getString(Preferences.serverUrlKey);
+    loginUrl = removeUrlProtocol(loginUrl);
+    if (loginUrl != null &&
+        loginUrl.isNotEmpty &&
+        leftUrl.startsWith(loginUrl)) {
+      leftUrl = leftUrl.substring(loginUrl.length);
+    }
+
+    // Retrieve path
+    int endQuery = leftUrl.indexOf('?');
+    if (endQuery != -1) {
+      String query = leftUrl.substring(0, endQuery);
+      query.replaceAll('??', '?');
+      String encodedQuery = Uri.encodeComponent(query);
+      leftUrl.substring(0, query.length);
+      String encodedPath = Uri.encodeComponent(leftUrl);
+      serverUrl = Uri.tryParse("$loginUrl$encodedQuery$encodedPath");
+    } else {
+      // No query -> remaining string is a path
+      String encodedPath = Uri.encodeComponent(leftUrl);
+      serverUrl = Uri.tryParse("$loginUrl$encodedPath");
+    }
+
+    // Last check
+    if (serverUrl == null) {
+      // Could not apply percent encoding —> return nil
+      return null;
+    }
+  }
+
+  // Servers may return image URLs different from those used to login (e.g. wrong server settings)
+  // We only keep the path+query because we only accept to download images from the same server.
+  String cleanPath = serverUrl.path;
+  // todo : parameterString
+  String query = serverUrl.query;
+  if (query.isNotEmpty) {
+    cleanPath.joinChar("?$query");
+  }
+  String fragment = serverUrl.fragment;
+  if (fragment.isNotEmpty) {
+    cleanPath.joinChar("#$fragment");
+  }
+
+  // The Piwigo server may not be in the root e.g. example.com/piwigo/…
+  // and images may not be in the same path
+  String? loginPath = appPreferences.getString(Preferences.serverUrlKey);
+  loginPath = removeUrlProtocol(loginPath);
+  if (loginPath != null && loginPath.isNotEmpty) {
+    if (cleanPath.startsWith(loginPath)) {
+      cleanPath = cleanPath.substring(loginPath.length);
+    } else if (cleanPath.endsWith(loginPath)) {
+      cleanPath = cleanPath.substring(0, cleanPath.length - loginPath.length);
+    }
+  }
+
+  // Remove the .php?, i? prefixes if any
+  String prefix = '';
+  int pos = cleanPath.indexOf('?');
+  if (pos != -1) {
+    prefix = cleanPath.substring(0, pos);
+  }
+
+  // Path may not be encoded
+  String decodedPath = Uri.decodeComponent(cleanPath);
+  if (cleanPath == decodedPath) {
+    String test = Uri.encodeComponent(cleanPath);
+    cleanPath = test;
+  }
+
+  // Compile final URL using the one provided at login
+  String encodedImageUrl = "${serverUrl.scheme}://$loginPath$prefix$cleanPath";
+  if (kDebugMode) {
+    if (encodedImageUrl != originalUrl) {
+      print("=> originalURL:$originalUrl");
+      print("   encodedURL:$encodedImageUrl");
+      print(
+          "   path=${serverUrl.path}, parameterString=${serverUrl.data}, query:${serverUrl.query}, fragment:${serverUrl.fragment}");
+    }
+  }
+
+  return encodedImageUrl;
 }

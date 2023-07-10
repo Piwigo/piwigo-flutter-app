@@ -3,7 +3,6 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
@@ -183,17 +182,9 @@ class _SettingsViewPageState extends State<SettingsViewPage> {
         children: [
           SettingsSectionItemInfo(
             title: appStrings.settings_server,
-            child: FutureBuilder<String?>(
-              future: FlutterSecureStorage().read(key: 'SERVER_URL'),
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  return Text(
-                    "${snapshot.data ?? appStrings.serverURLerror_title}",
-                    style: Theme.of(context).textTheme.bodySmall,
-                  );
-                }
-                return Center(child: CircularProgressIndicator());
-              },
+            child: Text(
+              "${appPreferences.getString(Preferences.serverUrlKey) ?? appStrings.serverURLerror_title}",
+              style: Theme.of(context).textTheme.bodySmall,
             ),
           ),
           SettingsSectionItemInfo(

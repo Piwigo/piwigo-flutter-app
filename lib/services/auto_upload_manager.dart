@@ -109,7 +109,7 @@ class AutoUploadManager {
     FlutterSecureStorage storage = const FlutterSecureStorage();
 
     // Get server url
-    String? url = await storage.read(key: Preferences.serverUrlKey);
+    String? url = prefs.getString(Preferences.serverUrlKey);
     if (url == null) return;
 
     // Initialize auto upload Dio

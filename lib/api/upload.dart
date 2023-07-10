@@ -81,11 +81,12 @@ Future<List<int>> uploadPhotos(
   // Initialize variables
   List<int> result = [];
   List<UploadItem> items = [];
+  SharedPreferences prefs = await SharedPreferences.getInstance();
   FlutterSecureStorage storage = const FlutterSecureStorage();
-  String? url = await storage.read(key: 'SERVER_URL');
+  String? url = prefs.getString(Preferences.serverUrlKey);
   if (url == null) return [];
-  String? username = await storage.read(key: 'SERVER_USERNAME');
-  String? password = await storage.read(key: 'SERVER_PASSWORD');
+  String? username = await storage.read(key: Preferences.usernameKey);
+  String? password = await storage.read(key: Preferences.passwordKey);
   UploadNotifier uploadNotifier =
       App.appKey.currentContext!.read<UploadNotifier>();
   int nbError = 0;

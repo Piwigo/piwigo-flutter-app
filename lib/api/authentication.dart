@@ -2,12 +2,12 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:piwigo_ng/api/api_error.dart';
 import 'package:piwigo_ng/api/upload.dart';
 import 'package:piwigo_ng/models/info_model.dart';
 import 'package:piwigo_ng/models/status_model.dart';
 import 'package:piwigo_ng/services/preferences_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'api_client.dart';
 
@@ -44,8 +44,8 @@ Future<ApiResult<bool>> loginUser(
   }
 
   ApiClient.cookieJar.deleteAll();
-  FlutterSecureStorage secureStorage = const FlutterSecureStorage();
-  await secureStorage.write(key: Preferences.serverUrlKey, value: url);
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  await prefs.setString(Preferences.serverUrlKey, url);
 
   if (username.isEmpty && password.isEmpty) {
     ApiResult<StatusModel> status = await sessionStatus();

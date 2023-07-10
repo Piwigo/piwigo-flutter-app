@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:html_unescape/html_unescape.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
@@ -140,8 +139,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
   }
 
   Future<Map<String, String>> _getHeaders() async {
-    FlutterSecureStorage secureStorage = const FlutterSecureStorage();
-    String? serverUrl = await secureStorage.read(key: 'SERVER_URL');
+    String? serverUrl = appPreferences.getString(Preferences.serverUrlKey);
 
     if (serverUrl == null) return {};
 

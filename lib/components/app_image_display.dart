@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:piwigo_ng/api/api_client.dart';
 import 'package:piwigo_ng/services/preferences_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -32,8 +31,7 @@ class _AppImageDisplayState extends State<AppImageDisplay> {
   }
 
   Future<Map<String, String>> _getHeaders() async {
-    FlutterSecureStorage secureStorage = const FlutterSecureStorage();
-    String? serverUrl = await secureStorage.read(key: 'SERVER_URL');
+    String? serverUrl = appPreferences.getString(Preferences.serverUrlKey);
 
     if (serverUrl == null) return {};
 

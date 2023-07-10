@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:piwigo_ng/app.dart';
 import 'package:piwigo_ng/components/snackbars.dart';
 import 'package:piwigo_ng/services/preferences_service.dart';
@@ -17,10 +16,8 @@ class ApiInterceptor extends Interceptor {
     RequestInterceptorHandler handler,
   ) async {
     debugPrint("[${options.method}] ${options.queryParameters['method']}");
-    FlutterSecureStorage secureStorage = const FlutterSecureStorage();
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    options.baseUrl =
-        (await secureStorage.read(key: Preferences.serverUrlKey))!;
+    options.baseUrl = (prefs.getString(Preferences.serverUrlKey))!;
     if (Preferences.getEnableBasicAuth) {
       String? username = prefs.getString(Preferences.basicUsernameKey) ?? '';
       String? password = prefs.getString(Preferences.basicPasswordKey) ?? '';

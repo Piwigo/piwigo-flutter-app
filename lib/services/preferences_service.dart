@@ -243,9 +243,10 @@ class AutoUploadPreferences {
     String? password,
   }) async {
     FlutterSecureStorage secureStorage = const FlutterSecureStorage();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
     await secureStorage.write(
       key: urlKey,
-      value: url ?? await secureStorage.read(key: 'SERVER_URL'),
+      value: url ?? prefs.getString(Preferences.serverUrlKey),
     );
     await secureStorage.write(
       key: usernameKey,
