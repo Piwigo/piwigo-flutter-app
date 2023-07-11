@@ -99,11 +99,10 @@ class AutoUploadManager {
     // Convert .heic files to .jpg
     for (File file in files) {
       if (file.path.endsWith('.heic')) {
-        debugPrint("${file.path} is Heic !");
+        debugPrint("${file.path} is Heic ! Converting to jpg... ");
         String? jpgPath = await HeicToJpg.convert(
           file.path,
         );
-        debugPrint("From ${file.path}...\nto $jpgPath");
         if (jpgPath != null) {
           files.remove(file);
           files.add(File(jpgPath));

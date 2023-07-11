@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:image_picker/image_picker.dart';
@@ -63,9 +64,14 @@ class App extends StatelessWidget {
           darkTheme: darkTheme,
           theme: lightTheme,
           builder: (context, child) {
+            EasyLoading.instance
+              ..loadingStyle = EasyLoadingStyle.custom
+              ..backgroundColor = Theme.of(context).scaffoldBackgroundColor
+              ..indicatorColor = Theme.of(context).textTheme.bodyMedium?.color
+              ..textColor = Theme.of(context).textTheme.bodyMedium?.color;
             return ScrollConfiguration(
               behavior: OverscrollBehavior(),
-              child: child!,
+              child: EasyLoading.init().call(context, child),
             );
           },
           onGenerateRoute: generateRoute,

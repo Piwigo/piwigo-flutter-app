@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mime_type/mime_type.dart';
 import 'package:piwigo_ng/components/buttons/animated_piwigo_button.dart';
@@ -84,6 +85,7 @@ class _UploadGalleryViewPage extends State<UploadViewPage>
       _imageList.map((e) => File(e.path)).toList(),
       returnExistFiles: true,
     );
+    if (!mounted) return;
     setState(() {
       _imageExistList = files.map((e) => e.path).toList();
     });
@@ -125,7 +127,16 @@ class _UploadGalleryViewPage extends State<UploadViewPage>
   }
 
   Future<void> _addFiles() async {
+    EasyLoading.show(
+      status: appStrings.loadingHUD_label,
+      indicator: CircularProgressIndicator(),
+      maskType: EasyLoadingMaskType.black,
+      dismissOnTap: true,
+    );
+    if (!EasyLoading.isShow) return;
+    EasyLoading.dismiss();
     List<XFile>? images = await onPickImages();
+    if (!mounted) return;
     if (images != null && images.isNotEmpty) {
       setState(() {
         _imageList.addAll(images);
@@ -136,6 +147,7 @@ class _UploadGalleryViewPage extends State<UploadViewPage>
 
   Future<void> _takePhoto() async {
     XFile? image = await onTakePhoto(context);
+    if (!mounted) return;
     if (image == null) return;
     setState(() {
       _imageList.add(image);
@@ -442,14 +454,13 @@ class _UploadGalleryViewPage extends State<UploadViewPage>
                     double? cacheHeight = constraints.maxHeight.isInfinite
                         ? constraints.maxHeight
                         : null;
-                    return Image.memory(
-                      file.readAsBytesSync(),
+                    return Image.file(
+                      file,
                       fit: BoxFit.cover,
                       cacheWidth: cacheWidth?.floor(),
                       cacheHeight: cacheHeight?.floor(),
                       width: cacheWidth,
                       height: cacheHeight,
-                      gaplessPlayback: true,
                       filterQuality: FilterQuality.low,
                       errorBuilder: (context, object, stacktrace) => Center(
                         child: Icon(Icons.image_not_supported),

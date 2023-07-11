@@ -1,9 +1,9 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:piwigo_ng/components/loading_overlay.dart';
 import 'package:piwigo_ng/components/popup_list_item.dart';
 import 'package:piwigo_ng/components/scroll_widgets/album_grid_view.dart';
 import 'package:piwigo_ng/components/scroll_widgets/image_grid_view.dart';
@@ -167,11 +167,15 @@ class _AlbumViewPageState extends State<AlbumViewPage>
       });
 
   Future<void> _onPickImages() async {
-    OverlayEntry overlayEntry =
-        OverlayEntry(builder: (context) => LoadingOverlay());
-    Overlay.of(context).insert(overlayEntry);
+    EasyLoading.show(
+      status: appStrings.loadingHUD_label,
+      indicator: CircularProgressIndicator(),
+      maskType: EasyLoadingMaskType.black,
+      dismissOnTap: true,
+    );
     List<XFile>? images = await onPickImages();
-    overlayEntry.remove();
+    if (!EasyLoading.isShow) return;
+    EasyLoading.dismiss();
     if (images == null || images.isEmpty) return;
     Navigator.of(context).pushNamed(UploadViewPage.routeName, arguments: {
       'images': images,
