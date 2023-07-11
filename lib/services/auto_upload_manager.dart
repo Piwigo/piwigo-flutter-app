@@ -7,6 +7,7 @@ import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:heic_to_jpg/heic_to_jpg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:piwigo_ng/models/album_model.dart';
 import 'package:piwigo_ng/models/status_model.dart';
@@ -71,22 +72,44 @@ class AutoUploadManager {
 
   Future<bool> autoUpload() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    // Check upload on WiFi only setting
     if (prefs.getBool(Preferences.wifiUploadKey) ?? false) {
-      print('Check wifi only');
+      debugPrint('Check wifi only');
       var connectivity = await Connectivity().checkConnectivity();
       if (connectivity != ConnectivityResult.wifi) {
-        print('No wifi');
+        debugPrint('No wifi');
         return false;
       }
-      print('Has wifi');
+      debugPrint('Has wifi');
     }
+
     final Directory? appDocDir = await getUploadDirectory();
     if (appDocDir == null) return false;
-    List<FileSystemEntity> dirFiles = appDocDir.listSync();
+
+    // Get source folder content
+    List<FileSystemEntity> dirFiles = appDocDir.listSync(recursive: true);
+
+    // Remove folders and links
     List<File> files = dirFiles
         .where((file) => file is File)
         .map<File>((e) => e as File)
         .toList();
+
+    // Convert .heic files to .jpg
+    for (File file in files) {
+      if (file.path.endsWith('.heic')) {
+        debugPrint("${file.path} is Heic !");
+        String? jpgPath = await HeicToJpg.convert(
+          file.path,
+        );
+        debugPrint("From ${file.path}...\nto $jpgPath");
+        if (jpgPath != null) {
+          files.remove(file);
+          files.add(File(jpgPath));
+        }
+      }
+    }
     debugPrint("List files: ${files.toString()}");
     await autoUploadPhotos(files);
     return true;
@@ -192,10 +215,8 @@ class AutoUploadManager {
     // If no changes, end task iteration
     if (result.isEmpty) return;
 
-    // Send notifications
     await showAutoUploadNotification(nbError, result.length);
 
-    // Empty lunge
     await _emptyLunge(result, destination.id);
   }
 

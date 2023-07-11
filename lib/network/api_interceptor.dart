@@ -18,7 +18,7 @@ class ApiInterceptor extends Interceptor {
     debugPrint("[${options.method}] ${options.queryParameters['method']}");
     SharedPreferences prefs = await SharedPreferences.getInstance();
     options.baseUrl = (prefs.getString(Preferences.serverUrlKey))!;
-    if (Preferences.getEnableBasicAuth) {
+    if (prefs.getBool(Preferences.enableBasicAuthKey) ?? false) {
       String? username = prefs.getString(Preferences.basicUsernameKey) ?? '';
       String? password = prefs.getString(Preferences.basicPasswordKey) ?? '';
       String basicAuth =
