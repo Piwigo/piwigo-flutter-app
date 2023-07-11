@@ -1,25 +1,24 @@
 import 'dart:io';
 
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mime_type/mime_type.dart';
-import 'package:piwigo_ng/api/images.dart';
 import 'package:piwigo_ng/components/buttons/animated_piwigo_button.dart';
 import 'package:piwigo_ng/components/cards/tag_chip.dart';
 import 'package:piwigo_ng/components/fields/app_field.dart';
 import 'package:piwigo_ng/components/modals/add_tags_modal.dart';
 import 'package:piwigo_ng/components/modals/piwigo_modal.dart';
 import 'package:piwigo_ng/components/sections/form_section.dart';
+import 'package:piwigo_ng/models/tag_model.dart';
+import 'package:piwigo_ng/network/images.dart';
+import 'package:piwigo_ng/network/upload.dart';
 import 'package:piwigo_ng/services/preferences_service.dart';
+import 'package:piwigo_ng/utils/image_actions.dart';
+import 'package:piwigo_ng/utils/localizations.dart';
 import 'package:piwigo_ng/utils/resources.dart';
 import 'package:piwigo_ng/utils/settings.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 import 'package:video_player/video_player.dart';
-
-import '../../api/upload.dart';
-import '../../models/tag_model.dart';
-import '../../utils/localizations.dart';
 
 class UploadViewPage extends StatefulWidget {
   const UploadViewPage(
@@ -126,48 +125,21 @@ class _UploadGalleryViewPage extends State<UploadViewPage>
   }
 
   Future<void> _addFiles() async {
-    try {
-      final FilePickerResult? result = await FilePicker.platform.pickFiles(
-        allowMultiple: true,
-        type: FileType.media,
-      );
-      if (result == null) return;
-      final List<XFile> images = result.files.map<XFile>((e) {
-        return XFile(e.path!, name: e.name, bytes: e.bytes);
-      }).toList();
-      if (images.isNotEmpty) {
-        setState(() {
-          _imageList.addAll(images);
-        });
-        checkImageExist();
-      }
-    } catch (e) {
-      debugPrint(e.toString());
+    List<XFile>? images = await onPickImages();
+    if (images != null && images.isNotEmpty) {
+      setState(() {
+        _imageList.addAll(images);
+      });
+      checkImageExist();
     }
   }
 
   Future<void> _takePhoto() async {
-    try {
-      final XFile? image = await _picker.pickImage(source: ImageSource.camera);
-      if (image == null) return;
-      setState(() {
-        _imageList.add(image);
-      });
-    } catch (e) {
-      debugPrint('Pick image error ${e.toString()}');
-    }
-  }
-
-  Future<void> _takeVideo() async {
-    try {
-      final XFile? image = await _picker.pickVideo(source: ImageSource.camera);
-      if (image == null) return;
-      setState(() {
-        _imageList.add(image);
-      });
-    } catch (e) {
-      debugPrint('Pick image error ${e.toString()}');
-    }
+    XFile? image = await onTakePhoto(context);
+    if (image == null) return;
+    setState(() {
+      _imageList.add(image);
+    });
   }
 
   Future<void> _onRemoveFile(int index) async {
@@ -205,6 +177,14 @@ class _UploadGalleryViewPage extends State<UploadViewPage>
       _btnController.success();
       await Future.delayed(const Duration(milliseconds: 300));
       Navigator.of(context).pop();
+    }
+  }
+
+  void _checkMemory() {
+    ImageCache imageCache = PaintingBinding.instance.imageCache;
+    if (imageCache.liveImageCount >= Settings.maxCacheLiveImages) {
+      imageCache.clear();
+      imageCache.clearLiveImages();
     }
   }
 
@@ -416,14 +396,6 @@ class _UploadGalleryViewPage extends State<UploadViewPage>
                 child: Icon(Icons.photo_camera_rounded),
               ),
             ),
-            GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onTap: _takeVideo,
-              child: Padding(
-                padding: const EdgeInsets.all(8),
-                child: Icon(Icons.video_camera_back),
-              ),
-            ),
           ],
           child: GridView.builder(
             padding: EdgeInsets.zero,
@@ -437,73 +409,85 @@ class _UploadGalleryViewPage extends State<UploadViewPage>
             itemCount: _imageList.length,
             itemBuilder: (context, index) {
               File file = File(_imageList[index].path);
-              return Stack(
-                children: [
-                  Positioned(
-                    top: 4.0,
-                    right: 4.0,
-                    left: 4.0,
-                    bottom: 4.0,
-                    child: ClipRRect(
-                      borderRadius: _imageGridBorder(index),
-                      child: Stack(
-                        fit: StackFit.expand,
-                        children: [
-                          Builder(builder: (context) {
-                            List<String>? mimeType =
-                                mime(file.path.split('/').last)?.split('/');
-                            if (mimeType?.first == 'image') {
-                              return Image.file(
-                                file,
-                                fit: BoxFit.cover,
-                                scale: 7,
-                                gaplessPlayback: true,
-                                filterQuality: FilterQuality.low,
-                                errorBuilder: (context, object, stacktrace) =>
-                                    Center(
-                                  child: Icon(Icons.image_not_supported),
-                                ),
-                              );
-                            }
-                            if (mimeType?.first == 'video') {
-                              return VideoUploadItem(
-                                path: file.path,
-                              );
-                            }
-                            return const Center(
-                              child: Icon(Icons.image_not_supported),
-                            );
-                          }),
-                          if (_imageExistList.contains(file.path))
-                            Container(
-                              decoration: BoxDecoration(
-                                color: Colors.black45,
-                              ),
-                              child: Icon(Icons.file_copy),
-                            ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    top: 0,
-                    right: 0,
-                    child: GestureDetector(
-                      behavior: HitTestBehavior.opaque,
-                      onTap: () => _onRemoveFile(index),
-                      child: CircleAvatar(
-                        backgroundColor:
-                            Theme.of(context).scaffoldBackgroundColor,
-                        radius: 12,
-                        child: Icon(Icons.remove_circle_outline,
-                            size: 20,
-                            color: Theme.of(context).colorScheme.error),
-                      ),
-                    ),
-                  ),
-                ],
-              );
+              // File file = File(_imageList.first.path);
+              return _buildImageCard(file, index);
             },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildImageCard(File file, int index) {
+    _checkMemory();
+    return Stack(
+      children: [
+        Positioned(
+          top: 4.0,
+          right: 4.0,
+          left: 4.0,
+          bottom: 4.0,
+          child: ClipRRect(
+            borderRadius: _imageGridBorder(index),
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                LayoutBuilder(builder: (context, constraints) {
+                  List<String>? mimeType =
+                      mime(file.path.split('/').last)?.split('/');
+                  if (mimeType?.first == 'image') {
+                    double? cacheWidth = constraints.maxWidth.isInfinite
+                        ? constraints.maxWidth
+                        : null;
+                    double? cacheHeight = constraints.maxHeight.isInfinite
+                        ? constraints.maxHeight
+                        : null;
+                    return Image.memory(
+                      file.readAsBytesSync(),
+                      fit: BoxFit.cover,
+                      cacheWidth: cacheWidth?.floor(),
+                      cacheHeight: cacheHeight?.floor(),
+                      width: cacheWidth,
+                      height: cacheHeight,
+                      gaplessPlayback: true,
+                      filterQuality: FilterQuality.low,
+                      errorBuilder: (context, object, stacktrace) => Center(
+                        child: Icon(Icons.image_not_supported),
+                      ),
+                    );
+                  }
+                  if (mimeType?.first == 'video') {
+                    return VideoUploadItem(
+                      path: file.path,
+                    );
+                  }
+                  return const Center(
+                    child: Icon(Icons.image_not_supported),
+                  );
+                }),
+                if (_imageExistList.contains(file.path))
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.black45,
+                    ),
+                    child: Icon(Icons.file_copy),
+                  ),
+              ],
+            ),
+          ),
+        ),
+        Positioned(
+          top: 0,
+          right: 0,
+          child: GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: () => _onRemoveFile(index),
+            child: CircleAvatar(
+              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+              radius: 12,
+              child: Icon(Icons.remove_circle_outline,
+                  size: 20, color: Theme.of(context).colorScheme.error),
+            ),
           ),
         ),
       ],

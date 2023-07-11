@@ -103,7 +103,7 @@ class ImageCard extends StatelessWidget {
   Widget _buildThumbnail(context) {
     final String? imageUrl =
         image.getDerivativeFromString(Preferences.getImageThumbnailSize)?.url;
-    return AppImageDisplay(
+    return ImageNetworkDisplay(
       imageUrl: imageUrl,
     );
     return CachedNetworkImage(

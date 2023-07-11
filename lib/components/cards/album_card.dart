@@ -187,7 +187,7 @@ class AlbumCardContent extends StatelessWidget {
         child: ClipRRect(
           borderRadius: BorderRadius.circular(10.0),
           child: Builder(builder: (context) {
-            return AppImageDisplay(
+            return ImageNetworkDisplay(
               imageUrl: album.urlRepresentative,
             );
             if (album.urlRepresentative == null) {

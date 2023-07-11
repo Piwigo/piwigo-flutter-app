@@ -2,9 +2,9 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:piwigo_ng/api/api_client.dart';
-import 'package:piwigo_ng/api/api_error.dart';
 import 'package:piwigo_ng/models/image_model.dart';
+import 'package:piwigo_ng/network/api_client.dart';
+import 'package:piwigo_ng/network/api_error.dart';
 
 Future<ApiResult<List<ImageModel>>> fetchFavorites(int page) async {
   Map<String, dynamic> queries = {

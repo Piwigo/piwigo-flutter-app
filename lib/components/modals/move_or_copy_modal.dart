@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
-import 'package:piwigo_ng/api/albums.dart';
-import 'package:piwigo_ng/api/api_error.dart';
 import 'package:piwigo_ng/models/album_model.dart';
+import 'package:piwigo_ng/network/albums.dart';
+import 'package:piwigo_ng/network/api_error.dart';
 import 'package:piwigo_ng/utils/localizations.dart';
 
 class MoveOrCopyModal extends StatefulWidget {

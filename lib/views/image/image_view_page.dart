@@ -6,9 +6,6 @@ import 'package:flutter/services.dart';
 import 'package:html_unescape/html_unescape.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
-import 'package:piwigo_ng/api/api_client.dart';
-import 'package:piwigo_ng/api/api_error.dart';
-import 'package:piwigo_ng/api/images.dart';
 import 'package:piwigo_ng/app.dart';
 import 'package:piwigo_ng/components/app_image_display.dart';
 import 'package:piwigo_ng/components/dialogs/image_comment_dialog.dart';
@@ -16,6 +13,9 @@ import 'package:piwigo_ng/components/popup_list_item.dart';
 import 'package:piwigo_ng/models/album_model.dart';
 import 'package:piwigo_ng/models/image_model.dart';
 import 'package:piwigo_ng/models/tag_model.dart';
+import 'package:piwigo_ng/network/api_client.dart';
+import 'package:piwigo_ng/network/api_error.dart';
+import 'package:piwigo_ng/network/images.dart';
 import 'package:piwigo_ng/services/preferences_service.dart';
 import 'package:piwigo_ng/services/theme_provider.dart';
 import 'package:piwigo_ng/utils/image_actions.dart';
@@ -469,7 +469,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
             child: Stack(
               children: [
                 Positioned.fill(
-                  child: AppImageDisplay(
+                  child: ImageNetworkDisplay(
                     imageUrl: image.derivatives.medium.url,
                     fit: BoxFit.contain,
                   ),

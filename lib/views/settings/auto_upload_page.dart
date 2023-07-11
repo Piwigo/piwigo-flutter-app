@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:piwigo_ng/api/images.dart';
 import 'package:piwigo_ng/components/modals/move_or_copy_modal.dart';
 import 'package:piwigo_ng/components/modals/piwigo_modal.dart';
 import 'package:piwigo_ng/components/sections/settings_section.dart';
 import 'package:piwigo_ng/models/album_model.dart';
+import 'package:piwigo_ng/network/images.dart';
 import 'package:piwigo_ng/services/auto_upload_manager.dart';
 import 'package:piwigo_ng/services/preferences_service.dart';
 import 'package:piwigo_ng/utils/localizations.dart';

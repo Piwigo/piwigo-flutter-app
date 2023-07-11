@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
-import 'package:piwigo_ng/api/api_error.dart';
-import 'package:piwigo_ng/api/tags.dart';
 import 'package:piwigo_ng/components/buttons/piwigo_button.dart';
 import 'package:piwigo_ng/components/cards/tag_chip.dart';
 import 'package:piwigo_ng/components/modals/create_tag_modal.dart';
 import 'package:piwigo_ng/components/modals/piwigo_modal.dart';
 import 'package:piwigo_ng/models/tag_model.dart';
+import 'package:piwigo_ng/network/api_error.dart';
+import 'package:piwigo_ng/network/tags.dart';
 import 'package:piwigo_ng/utils/localizations.dart';
 
 class AddTagsModal extends StatefulWidget {

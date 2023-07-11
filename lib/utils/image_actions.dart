@@ -1,10 +1,11 @@
+import 'dart:io';
+
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
+import 'package:heic_to_jpg/heic_to_jpg.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:piwigo_ng/api/albums.dart';
-import 'package:piwigo_ng/api/images.dart';
-import 'package:piwigo_ng/api/upload.dart';
-import 'package:piwigo_ng/api/users.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:piwigo_ng/components/dialogs/confirm_dialog.dart';
 import 'package:piwigo_ng/components/modals/choose_camera_picker_modal.dart';
 import 'package:piwigo_ng/components/modals/choose_move_option_modal.dart';
@@ -14,24 +15,102 @@ import 'package:piwigo_ng/components/modals/piwigo_modal.dart';
 import 'package:piwigo_ng/components/snackbars.dart';
 import 'package:piwigo_ng/models/album_model.dart';
 import 'package:piwigo_ng/models/image_model.dart';
+import 'package:piwigo_ng/network/albums.dart';
+import 'package:piwigo_ng/network/images.dart';
+import 'package:piwigo_ng/network/upload.dart';
+import 'package:piwigo_ng/network/users.dart';
 import 'package:piwigo_ng/services/preferences_service.dart';
 import 'package:piwigo_ng/utils/localizations.dart';
 import 'package:piwigo_ng/views/image/edit_image_page.dart';
 
 final ImagePicker _picker = ImagePicker();
 
-Future<List<XFile>?> onPickImages() async {
+Future<File> compressImage(File file,
+    [int? cacheWidth, int? cacheHeight]) async {
+  debugPrint("Compress image ${file.path}");
   try {
+    // Get original file path
+    final filePath = file.path;
+
+    // Directory output
+    var dir = await getTemporaryDirectory();
+
+    // Extract file name and extension
+    final String filename = filePath.split('/').last;
+
+    // Output file path
+    final outPath = "${dir.absolute.path}/display_cached-$filename";
+
+    // Compress with quality parameter and exif metadata
+    var result = await FlutterImageCompress.compressAndGetFile(
+      filePath,
+      outPath,
+      minWidth: cacheWidth ?? 100,
+      minHeight: cacheHeight ?? 100,
+      format: CompressFormat.jpeg,
+    );
+
+    debugPrint("Upload Compress $result");
+    return result ?? file;
+  } catch (e) {
+    debugPrint(e.toString());
+  }
+  return file;
+}
+
+Future<List<XFile>?> onPickFiles() async {
+  try {
+    FilePicker.platform.clearTemporaryFiles();
     if (!await askMediaPermission()) return null;
+    final Directory cacheDir = await getTemporaryDirectory();
+    if (cacheDir.existsSync()) {
+      cacheDir.deleteSync(recursive: true);
+    }
+
     final FilePickerResult? result = await FilePicker.platform.pickFiles(
       allowedExtensions: appPreferences.getString('FILE_TYPES')?.split(','),
       allowMultiple: true,
+      withData: false,
+      withReadStream: false,
       type: FileType.custom,
+      onFileLoading: (status) {
+        debugPrint("File picker status ${status.name}");
+      },
     );
     if (result == null) return null;
-    return result.files
-        .map<XFile>((e) => XFile(e.path!, name: e.name, bytes: e.bytes))
-        .toList();
+    List<XFile> uploadFiles = [];
+    for (PlatformFile file in result.files) {
+      String? filePath = file.path;
+      if (file.extension == 'heic' && filePath != null) {
+        debugPrint("$filePath is Heic !");
+        File oldFile = File(file.path!);
+        filePath = await HeicToJpg.convert(
+          file.path!,
+        );
+        oldFile.delete();
+      }
+      if (filePath != null) {
+        uploadFiles.add(XFile(
+          filePath,
+          name: file.name,
+          bytes: file.bytes,
+        ));
+      }
+    }
+    return uploadFiles;
+  } catch (e) {
+    debugPrint('${e.toString()}');
+  }
+  return null;
+}
+
+Future<List<XFile>?> onPickImages() async {
+  try {
+    List<XFile> files = await _picker.pickMultipleMedia(
+      imageQuality: (Preferences.getUploadQuality * 100).round(),
+      requestFullMetadata: Preferences.getRemoveMetadata,
+    );
+    return files;
   } catch (e) {
     debugPrint('${e.toString()}');
   }

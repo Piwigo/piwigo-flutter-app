@@ -3,12 +3,13 @@ import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:piwigo_ng/api/api_client.dart';
+import 'package:piwigo_ng/network/api_client.dart';
 import 'package:piwigo_ng/services/preferences_service.dart';
+import 'package:piwigo_ng/utils/settings.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class AppImageDisplay extends StatefulWidget {
-  const AppImageDisplay({
+class ImageNetworkDisplay extends StatefulWidget {
+  const ImageNetworkDisplay({
     Key? key,
     this.imageUrl,
     this.fit,
@@ -18,10 +19,10 @@ class AppImageDisplay extends StatefulWidget {
   final BoxFit? fit;
 
   @override
-  State<AppImageDisplay> createState() => _AppImageDisplayState();
+  State<ImageNetworkDisplay> createState() => _ImageNetworkDisplayState();
 }
 
-class _AppImageDisplayState extends State<AppImageDisplay> {
+class _ImageNetworkDisplayState extends State<ImageNetworkDisplay> {
   late final Future<Map<String, String>> _headers;
 
   @override
@@ -57,32 +58,49 @@ class _AppImageDisplayState extends State<AppImageDisplay> {
     };
   }
 
+  void _checkMemory() {
+    ImageCache imageCache = PaintingBinding.instance.imageCache;
+    if (imageCache.liveImageCount >= Settings.maxCacheLiveImages) {
+      imageCache.clear();
+      imageCache.clearLiveImages();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     if (widget.imageUrl == null) {
       return _buildNoImageWidget(context);
     }
-
+    _checkMemory();
     return FutureBuilder<Map<String, String>>(
         future: _headers,
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            return CachedNetworkImage(
-              imageUrl: widget.imageUrl!,
-              fadeInDuration: const Duration(milliseconds: 300),
-              fit: widget.fit ?? BoxFit.cover,
-              httpHeaders: snapshot.data!,
-              imageBuilder: (context, provider) => Image(
-                image: provider,
+            return LayoutBuilder(builder: (context, constraints) {
+              double? cacheWidth =
+                  constraints.maxWidth.isInfinite ? constraints.maxWidth : null;
+              double? cacheHeight = constraints.maxHeight.isInfinite
+                  ? constraints.maxHeight
+                  : null;
+              return CachedNetworkImage(
+                imageUrl: widget.imageUrl!,
+                fadeInDuration: const Duration(milliseconds: 300),
                 fit: widget.fit ?? BoxFit.cover,
-                errorBuilder: (context, o, s) {
-                  debugPrint("$o\n$s");
-                  return _buildErrorWidget(context, widget.imageUrl, o);
-                },
-              ),
-              progressIndicatorBuilder: _buildProgressIndicator,
-              errorWidget: _buildErrorWidget,
-            );
+                httpHeaders: snapshot.data!,
+                memCacheWidth: cacheWidth?.floor(),
+                memCacheHeight: cacheHeight?.floor(),
+                imageBuilder: (context, provider) => Image(
+                  image: provider,
+                  fit: widget.fit ?? BoxFit.cover,
+                  errorBuilder: (context, o, s) {
+                    debugPrint("$o\n$s");
+                    return _buildErrorWidget(context, widget.imageUrl, o);
+                  },
+                ),
+                progressIndicatorBuilder: _buildProgressIndicator,
+                errorWidget: _buildErrorWidget,
+              );
+            });
           }
           if (snapshot.hasError) {
             return _buildErrorWidget(context);
@@ -94,7 +112,10 @@ class _AppImageDisplayState extends State<AppImageDisplay> {
   }
 
   Widget _buildProgressIndicator(
-      BuildContext context, String url, DownloadProgress download) {
+    BuildContext context,
+    String url,
+    DownloadProgress download,
+  ) {
     if (download.downloaded >= (download.totalSize ?? 0)) {
       return const SizedBox();
     }
@@ -105,7 +126,11 @@ class _AppImageDisplayState extends State<AppImageDisplay> {
     );
   }
 
-  Widget _buildErrorWidget(BuildContext context, [String? url, dynamic error]) {
+  Widget _buildErrorWidget(
+    BuildContext context, [
+    String? url,
+    dynamic error,
+  ]) {
     debugPrint("[$url!] $error");
     return FittedBox(
       fit: BoxFit.cover,

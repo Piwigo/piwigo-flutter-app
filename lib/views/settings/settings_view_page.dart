@@ -6,12 +6,12 @@ import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:piwigo_ng/api/api_error.dart';
-import 'package:piwigo_ng/api/authentication.dart';
 import 'package:piwigo_ng/app.dart';
 import 'package:piwigo_ng/components/appbars/settings_app_bar.dart';
 import 'package:piwigo_ng/components/sections/settings_section.dart';
 import 'package:piwigo_ng/models/info_model.dart';
+import 'package:piwigo_ng/network/api_error.dart';
+import 'package:piwigo_ng/network/authentication.dart';
 import 'package:piwigo_ng/services/preferences_service.dart';
 import 'package:piwigo_ng/utils/localizations.dart';
 import 'package:piwigo_ng/utils/settings.dart';
@@ -92,6 +92,7 @@ class _SettingsViewPageState extends State<SettingsViewPage> {
   Future<double?> _getCacheSize() async {
     int? totalSize = 0;
     final cacheDir = await getTemporaryDirectory();
+    final ImageCache imageCache = ImageCache();
 
     try {
       if (cacheDir.existsSync()) {
@@ -102,8 +103,9 @@ class _SettingsViewPageState extends State<SettingsViewPage> {
             totalSize = totalSize! + entity.lengthSync();
           }
         });
-        return (totalSize! / pow(10, 6));
       }
+      totalSize = totalSize! + imageCache.currentSizeBytes;
+      return (totalSize! / pow(10, 6));
     } catch (e) {
       debugPrint(e.toString());
     }
@@ -112,13 +114,16 @@ class _SettingsViewPageState extends State<SettingsViewPage> {
   }
 
   Future<void> _clearCache() async {
-    final cacheDir = await getTemporaryDirectory();
-    final imageCache = DefaultCacheManager();
+    final Directory cacheDir = await getTemporaryDirectory();
+    final DefaultCacheManager cache = DefaultCacheManager();
+    final ImageCache imageCache = ImageCache();
 
     if (cacheDir.existsSync()) {
       cacheDir.deleteSync(recursive: true);
     }
-    await imageCache.emptyCache();
+    imageCache.clear();
+    imageCache.clearLiveImages();
+    await cache.emptyCache();
 
     setState(() {});
   }

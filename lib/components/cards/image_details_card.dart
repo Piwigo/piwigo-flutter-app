@@ -49,7 +49,7 @@ class ImageDetailsCard extends StatelessWidget {
               final String? imageUrl = image
                   .getDerivativeFromString(Preferences.getImageThumbnailSize)
                   ?.url;
-              return AppImageDisplay(
+              return ImageNetworkDisplay(
                 imageUrl: imageUrl,
               );
             }),

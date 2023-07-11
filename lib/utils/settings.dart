@@ -111,6 +111,7 @@ class Settings {
   static const int minImageRowCount = 1; // Settings slider min range
   static const int maxImageRowCount = 6; // Settings slider max range
   static const int defaultElementPerPage = 100; // API requests
+  static const int maxCacheLiveImages = 100;
   static const double defaultAlbumGridSize = 448.0;
   static const double defaultUploadQuality = 1.0;
   static const double modalMaxWidth = 600.0;

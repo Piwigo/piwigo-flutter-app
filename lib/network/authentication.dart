@@ -2,10 +2,10 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:piwigo_ng/api/api_error.dart';
-import 'package:piwigo_ng/api/upload.dart';
 import 'package:piwigo_ng/models/info_model.dart';
 import 'package:piwigo_ng/models/status_model.dart';
+import 'package:piwigo_ng/network/api_error.dart';
+import 'package:piwigo_ng/network/upload.dart';
 import 'package:piwigo_ng/services/preferences_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

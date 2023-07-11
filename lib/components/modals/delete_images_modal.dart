@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:piwigo_ng/api/albums.dart';
 import 'package:piwigo_ng/components/modals/piwigo_modal.dart';
 import 'package:piwigo_ng/models/album_model.dart';
 import 'package:piwigo_ng/models/image_model.dart';
+import 'package:piwigo_ng/network/albums.dart';
 import 'package:piwigo_ng/utils/localizations.dart';
 
 class DeleteImagesModal extends StatelessWidget {

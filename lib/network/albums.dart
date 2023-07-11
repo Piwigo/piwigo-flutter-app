@@ -2,8 +2,8 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:piwigo_ng/api/api_error.dart';
 import 'package:piwigo_ng/models/album_model.dart';
+import 'package:piwigo_ng/network/api_error.dart';
 import 'package:piwigo_ng/services/preferences_service.dart';
 
 import 'api_client.dart';

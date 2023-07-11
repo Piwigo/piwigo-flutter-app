@@ -2,8 +2,8 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:piwigo_ng/api/api_error.dart';
 import 'package:piwigo_ng/models/tag_model.dart';
+import 'package:piwigo_ng/network/api_error.dart';
 
 import 'api_client.dart';
 
@@ -21,7 +21,9 @@ Future<ApiResult<List<TagModel>>> getTags() async {
       if (data['stat'] == 'fail') {
         return ApiResult(error: ApiErrors.error);
       }
-      List<TagModel> tags = data['result']['tags'].map<TagModel>((tag) => TagModel.fromJson(tag)).toList();
+      List<TagModel> tags = data['result']['tags']
+          .map<TagModel>((tag) => TagModel.fromJson(tag))
+          .toList();
       return ApiResult(data: tags);
     }
   } on DioError catch (e) {

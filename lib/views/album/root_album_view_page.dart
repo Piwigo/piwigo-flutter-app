@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:piwigo_ng/api/albums.dart';
-import 'package:piwigo_ng/api/api_error.dart';
 import 'package:piwigo_ng/components/scroll_widgets/album_grid_view.dart';
 import 'package:piwigo_ng/models/album_model.dart';
+import 'package:piwigo_ng/network/albums.dart';
+import 'package:piwigo_ng/network/api_error.dart';
 import 'package:piwigo_ng/utils/album_actions.dart';
 import 'package:piwigo_ng/utils/localizations.dart';
 
@@ -43,7 +43,8 @@ class _RootAlbumViewPageState extends State<RootAlbumViewPage> {
   }
 
   Future<void> _onRefresh() async {
-    final ApiResult<List<AlbumModel>> result = await fetchAlbums(widget.albumId);
+    final ApiResult<List<AlbumModel>> result =
+        await fetchAlbums(widget.albumId);
     if (!result.hasData) {
       return;
     }
@@ -53,11 +54,16 @@ class _RootAlbumViewPageState extends State<RootAlbumViewPage> {
     });
   }
 
-  void _onAddAlbum() => onAddAlbum(context, widget.albumId).whenComplete(() => _onRefresh());
-  void _onTapAlbum(AlbumModel album) => onOpenAlbum(context, album).whenComplete(() => _onRefresh());
-  void _onEditAlbum(AlbumModel album) => onEditAlbum(context, album).whenComplete(() => _onRefresh());
-  void _onMoveAlbum(AlbumModel album) => onMoveAlbum(context, album).whenComplete(() => _onRefresh());
-  void _onDeleteAlbum(AlbumModel album) => onDeleteAlbum(context, album).then((success) {
+  void _onAddAlbum() =>
+      onAddAlbum(context, widget.albumId).whenComplete(() => _onRefresh());
+  void _onTapAlbum(AlbumModel album) =>
+      onOpenAlbum(context, album).whenComplete(() => _onRefresh());
+  void _onEditAlbum(AlbumModel album) =>
+      onEditAlbum(context, album).whenComplete(() => _onRefresh());
+  void _onMoveAlbum(AlbumModel album) =>
+      onMoveAlbum(context, album).whenComplete(() => _onRefresh());
+  void _onDeleteAlbum(AlbumModel album) =>
+      onDeleteAlbum(context, album).then((success) {
         if (success) _onRefresh();
       });
 
@@ -76,7 +82,8 @@ class _RootAlbumViewPageState extends State<RootAlbumViewPage> {
               RootSearchAppBar(
                 scrollController: _scrollController,
                 onSearch: () {
-                  Navigator.of(context).pushNamed(ImageSearchViewPage.routeName);
+                  Navigator.of(context)
+                      .pushNamed(ImageSearchViewPage.routeName);
                 },
               ),
               SliverToBoxAdapter(
@@ -98,7 +105,8 @@ class _RootAlbumViewPageState extends State<RootAlbumViewPage> {
           ApiResult<List<AlbumModel>> result = snapshot.data!;
           if (!result.hasData) {
             return Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
               child: Text(
                 appStrings.categoryImageList_noDataError,
                 textAlign: TextAlign.center,
@@ -108,7 +116,8 @@ class _RootAlbumViewPageState extends State<RootAlbumViewPage> {
           if (_albumList.isEmpty) {
             if (result.data!.isEmpty) {
               return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                 child: Text(
                   appStrings.categoryMainEmpty,
                   textAlign: TextAlign.center,
@@ -118,7 +127,9 @@ class _RootAlbumViewPageState extends State<RootAlbumViewPage> {
             _albumList = result.data!;
           }
           return Padding(
-            padding: widget.isAdmin ? const EdgeInsets.only(bottom: 72.0) : EdgeInsets.zero,
+            padding: widget.isAdmin
+                ? const EdgeInsets.only(bottom: 72.0)
+                : EdgeInsets.zero,
             child: AlbumGridView(
               isAdmin: widget.isAdmin,
               albumList: _albumList,
@@ -143,7 +154,8 @@ class _RootAlbumViewPageState extends State<RootAlbumViewPage> {
     if (!widget.isAdmin) return null;
     return FloatingActionButton(
       onPressed: _onAddAlbum,
-      child: Icon(Icons.create_new_folder, color: Theme.of(context).primaryColorLight),
+      child: Icon(Icons.create_new_folder,
+          color: Theme.of(context).primaryColorLight),
     );
   }
 }

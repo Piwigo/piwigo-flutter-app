@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:piwigo_ng/api/albums.dart';
-import 'package:piwigo_ng/api/api_error.dart';
 import 'package:piwigo_ng/components/buttons/animated_piwigo_button.dart';
 import 'package:piwigo_ng/components/fields/app_field.dart';
 import 'package:piwigo_ng/components/modals/piwigo_modal.dart';
 import 'package:piwigo_ng/components/snackbars.dart';
 import 'package:piwigo_ng/models/album_model.dart';
+import 'package:piwigo_ng/network/albums.dart';
+import 'package:piwigo_ng/network/api_error.dart';
 import 'package:piwigo_ng/utils/localizations.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 
@@ -19,7 +19,8 @@ class EditAlbumModal extends StatefulWidget {
 }
 
 class _EditAlbumModalState extends State<EditAlbumModal> {
-  final RoundedLoadingButtonController _btnController = RoundedLoadingButtonController();
+  final RoundedLoadingButtonController _btnController =
+      RoundedLoadingButtonController();
   late final TextEditingController _nameController;
   late final TextEditingController _descriptionController;
 
@@ -35,7 +36,8 @@ class _EditAlbumModalState extends State<EditAlbumModal> {
 
   Future<void> _onEditAlbum() async {
     if (_name.isEmpty) return;
-    if (_name == widget.album.name && _descriptionController.text == widget.album.comment) {
+    if (_name == widget.album.name &&
+        _descriptionController.text == widget.album.comment) {
       Navigator.of(context).pop();
     }
     _btnController.start();
