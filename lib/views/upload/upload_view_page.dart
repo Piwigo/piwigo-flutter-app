@@ -1,10 +1,12 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mime_type/mime_type.dart';
 import 'package:piwigo_ng/components/buttons/animated_piwigo_button.dart';
+import 'package:piwigo_ng/components/cards/image_details_card.dart';
 import 'package:piwigo_ng/components/cards/tag_chip.dart';
 import 'package:piwigo_ng/components/fields/app_field.dart';
 import 'package:piwigo_ng/components/modals/add_tags_modal.dart';
@@ -17,7 +19,6 @@ import 'package:piwigo_ng/services/preferences_service.dart';
 import 'package:piwigo_ng/utils/image_actions.dart';
 import 'package:piwigo_ng/utils/localizations.dart';
 import 'package:piwigo_ng/utils/resources.dart';
-import 'package:piwigo_ng/utils/settings.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 import 'package:video_player/video_player.dart';
 
@@ -36,8 +37,8 @@ class UploadViewPage extends StatefulWidget {
 
 class _UploadGalleryViewPage extends State<UploadViewPage>
     with SingleTickerProviderStateMixin {
-  final ImagePicker _picker = ImagePicker();
-  late final TabController _tabController;
+  static const double maxCarouselElementWidth = 300.0;
+  static const double carouselHeight = 128.0;
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   late final TextEditingController _authorController;
@@ -55,8 +56,6 @@ class _UploadGalleryViewPage extends State<UploadViewPage>
     _imageList = List.from(widget.imageList);
     _authorController =
         TextEditingController(text: Preferences.getUploadAuthor);
-    _tabController = TabController(length: 2, vsync: this);
-    _tabController.addListener(_handleTabSelection);
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       setState(() {
@@ -72,12 +71,6 @@ class _UploadGalleryViewPage extends State<UploadViewPage>
       });
       checkImageExist();
     });
-  }
-
-  _handleTabSelection() {
-    if (_tabController.indexIsChanging) {
-      setState(() {});
-    }
   }
 
   Future<void> checkImageExist() async {
@@ -96,34 +89,7 @@ class _UploadGalleryViewPage extends State<UploadViewPage>
     _titleController.dispose();
     _descriptionController.dispose();
     _authorController.dispose();
-    _tabController.dispose();
     super.dispose();
-  }
-
-  BorderRadiusGeometry _imageGridBorder(int index) {
-    Radius topLeft = Radius.circular(index == 0 ? 10.0 : 5.0);
-    Radius topRight = Radius.circular(
-        _imageList.length < Settings.getImageCrossAxisCount(context)
-            ? 10.0
-            : 5.0);
-    Radius bottomRight =
-        Radius.circular(index == _imageList.length - 1 ? 10.0 : 5.0);
-    Radius bottomLeft = Radius.circular(index ==
-            _imageList.length -
-                (_imageList.length % Settings.getImageCrossAxisCount(context) ==
-                        0
-                    ? Settings.getImageCrossAxisCount(context)
-                    : _imageList.length %
-                        Settings.getImageCrossAxisCount(context))
-        ? 10.0
-        : 5.0);
-
-    return BorderRadius.circular(5.0).copyWith(
-      topLeft: topLeft,
-      topRight: topRight,
-      bottomRight: bottomRight,
-      bottomLeft: bottomLeft,
-    );
   }
 
   Future<void> _addFiles() async {
@@ -192,14 +158,6 @@ class _UploadGalleryViewPage extends State<UploadViewPage>
     }
   }
 
-  void _checkMemory() {
-    ImageCache imageCache = PaintingBinding.instance.imageCache;
-    if (imageCache.liveImageCount >= Settings.maxCacheLiveImages) {
-      imageCache.clear();
-      imageCache.clearLiveImages();
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -213,7 +171,7 @@ class _UploadGalleryViewPage extends State<UploadViewPage>
             AnimatedSize(
               duration: const Duration(milliseconds: 300),
               child: Builder(builder: (context) {
-                if (_imageExistList.length != _imageList.length) {
+                if (_imageExistList.isNotEmpty) {
                   return Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Row(
@@ -233,31 +191,25 @@ class _UploadGalleryViewPage extends State<UploadViewPage>
                 return SizedBox(width: double.infinity);
               }),
             ),
-            Container(
-              margin: const EdgeInsets.symmetric(
-                horizontal: 24.0,
+            FormSection(
+              title: appStrings.imageUploadDetailsView_title,
+              child: _carousel,
+              titlePadding: const EdgeInsets.symmetric(
                 vertical: 8.0,
+                horizontal: 24.0,
               ),
-              decoration: ShapeDecoration(
-                shape: StadiumBorder(),
-                color: Theme.of(context).inputDecorationTheme.fillColor,
-              ),
-              child: TabBar(
-                controller: _tabController,
-                indicatorSize: TabBarIndicatorSize.tab,
-                indicatorWeight: 0.0,
-                indicator: ShapeDecoration(
-                  shape: StadiumBorder(),
-                  color: Theme.of(context).colorScheme.secondary,
+              actions: [
+                IconButton(
+                  onPressed: _takePhoto,
+                  icon: Icon(Icons.add_a_photo),
                 ),
-                dividerColor: Colors.transparent,
-                tabs: [
-                  Tab(text: appStrings.imageUploadDetailsButton_title),
-                  Tab(text: appStrings.imageUploadDetailsView_title),
-                ],
-              ),
+                IconButton(
+                  onPressed: _addFiles,
+                  icon: Icon(Icons.add_photo_alternate),
+                ),
+              ],
             ),
-            [_form, _imageGrid][_tabController.index],
+            _form,
             Padding(
               padding: const EdgeInsets.symmetric(
                 horizontal: 16.0,
@@ -380,128 +332,46 @@ class _UploadGalleryViewPage extends State<UploadViewPage>
     );
   }
 
-  Widget get _imageGrid {
-    return ListView(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 16.0,
-        vertical: 8.0,
-      ),
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      children: [
-        FormSection(
-          title: appStrings.imageCount(_imageList.length),
-          actions: [
-            GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onTap: _addFiles,
-              child: Padding(
-                padding: const EdgeInsets.all(8),
-                child: Icon(Icons.add_photo_alternate),
-              ),
+  Widget get _carousel {
+    return SizedBox(
+      height: carouselHeight,
+      child: OrientationBuilder(builder: (context, orientation) {
+        return PageView.builder(
+          controller: PageController(
+            viewportFraction: min(
+              maxCarouselElementWidth / MediaQuery.of(context).size.width,
+              0.9,
             ),
-            GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onTap: _takePhoto,
-              child: Padding(
-                padding: const EdgeInsets.all(8),
-                child: Icon(Icons.photo_camera_rounded),
-              ),
-            ),
-          ],
-          child: GridView.builder(
-            padding: EdgeInsets.zero,
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: Settings.getImageCrossAxisCount(context),
-            ),
-            physics: const NeverScrollableScrollPhysics(),
-            shrinkWrap: true,
-            addAutomaticKeepAlives: false,
-            cacheExtent: 0,
-            itemCount: _imageList.length,
-            itemBuilder: (context, index) {
-              File file = File(_imageList[index].path);
-              // File file = File(_imageList.first.path);
-              return _buildImageCard(file, index);
-            },
           ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildImageCard(File file, int index) {
-    _checkMemory();
-    return Stack(
-      children: [
-        Positioned(
-          top: 4.0,
-          right: 4.0,
-          left: 4.0,
-          bottom: 4.0,
-          child: ClipRRect(
-            borderRadius: _imageGridBorder(index),
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                LayoutBuilder(builder: (context, constraints) {
-                  List<String>? mimeType =
-                      mime(file.path.split('/').last)?.split('/');
-                  if (mimeType?.first == 'image') {
-                    double? cacheWidth = constraints.maxWidth.isInfinite
-                        ? constraints.maxWidth
-                        : null;
-                    double? cacheHeight = constraints.maxHeight.isInfinite
-                        ? constraints.maxHeight
-                        : null;
-                    return Image.file(
-                      file,
-                      fit: BoxFit.cover,
-                      cacheWidth: cacheWidth?.floor(),
-                      cacheHeight: cacheHeight?.floor(),
-                      width: cacheWidth,
-                      height: cacheHeight,
-                      filterQuality: FilterQuality.low,
-                      errorBuilder: (context, object, stacktrace) => Center(
-                        child: Icon(Icons.image_not_supported),
-                      ),
-                    );
-                  }
-                  if (mimeType?.first == 'video') {
-                    return VideoUploadItem(
-                      path: file.path,
-                    );
-                  }
-                  return const Center(
-                    child: Icon(Icons.image_not_supported),
+          padEnds: false,
+          itemCount: _imageList.length,
+          itemBuilder: (context, index) {
+            XFile file = _imageList[index];
+            return Padding(
+              padding: EdgeInsets.only(
+                left: index == 0 ? 8.0 : 0.0,
+                right: index == _imageList.length - 1 ? 8.0 : 0.0,
+              ),
+              child: Builder(builder: (context) {
+                List<String>? mimeType =
+                    mime(file.path.split('/').last)?.split('/');
+                if (mimeType?.first == 'video') {
+                  return LocalVideoDetailsCard(
+                    video: File(file.path),
+                    onRemove: () => _onRemoveFile(index),
+                    isDuplicate: _imageExistList.contains(file.path),
                   );
-                }),
-                if (_imageExistList.contains(file.path))
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.black45,
-                    ),
-                    child: Icon(Icons.file_copy),
-                  ),
-              ],
-            ),
-          ),
-        ),
-        Positioned(
-          top: 0,
-          right: 0,
-          child: GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTap: () => _onRemoveFile(index),
-            child: CircleAvatar(
-              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-              radius: 12,
-              child: Icon(Icons.remove_circle_outline,
-                  size: 20, color: Theme.of(context).colorScheme.error),
-            ),
-          ),
-        ),
-      ],
+                }
+                return LocalImageDetailsCard(
+                  image: File(file.path),
+                  onRemove: () => _onRemoveFile(index),
+                  isDuplicate: _imageExistList.contains(file.path),
+                );
+              }),
+            );
+          },
+        );
+      }),
     );
   }
 }

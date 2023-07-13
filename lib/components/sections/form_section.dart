@@ -10,6 +10,7 @@ class FormSection extends StatelessWidget {
     this.actions = const [],
     this.onTapTitle,
     this.expanded,
+    this.titlePadding,
   }) : super(key: key);
 
   final String? title;
@@ -17,6 +18,7 @@ class FormSection extends StatelessWidget {
   final List<Widget> actions;
   final EdgeInsets? margin;
   final EdgeInsets? padding;
+  final EdgeInsets? titlePadding;
   final Function()? onTapTitle;
   final bool? expanded;
 
@@ -35,7 +37,7 @@ class FormSection extends StatelessWidget {
                 children: [
                   Expanded(
                     child: Padding(
-                      padding: const EdgeInsets.all(8.0),
+                      padding: titlePadding ?? const EdgeInsets.all(8.0),
                       child: Row(
                         children: [
                           Flexible(
