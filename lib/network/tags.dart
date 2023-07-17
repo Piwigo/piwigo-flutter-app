@@ -7,7 +7,7 @@ import 'package:piwigo_ng/network/api_error.dart';
 
 import 'api_client.dart';
 
-Future<ApiResult<List<TagModel>>> getTags() async {
+Future<ApiResponse<List<TagModel>>> getTags() async {
   Map<String, String> queries = {
     'format': 'json',
     'method': 'pwg.tags.getAdminList',
@@ -19,22 +19,22 @@ Future<ApiResult<List<TagModel>>> getTags() async {
     if (response.statusCode == 200) {
       var data = json.decode(response.data);
       if (data['stat'] == 'fail') {
-        return ApiResult(error: ApiErrors.error);
+        return ApiResponse(error: ApiErrors.error);
       }
       List<TagModel> tags = data['result']['tags']
           .map<TagModel>((tag) => TagModel.fromJson(tag))
           .toList();
-      return ApiResult(data: tags);
+      return ApiResponse(data: tags);
     }
   } on DioError catch (e) {
     debugPrint('Get tags: ${e.message}');
   } on Error catch (e) {
     debugPrint('Get tags: $e\n${e.stackTrace}');
   }
-  return ApiResult(error: ApiErrors.error);
+  return ApiResponse(error: ApiErrors.error);
 }
 
-Future<ApiResult<TagModel>> createTag(String name) async {
+Future<ApiResponse<TagModel>> createTag(String name) async {
   Map<String, String> queries = {
     'format': 'json',
     'method': 'pwg.tags.add',
@@ -47,9 +47,9 @@ Future<ApiResult<TagModel>> createTag(String name) async {
       var data = json.decode(response.data);
       print(data);
       if (data['stat'] == 'fail') {
-        return ApiResult(error: ApiErrors.error);
+        return ApiResponse(error: ApiErrors.error);
       }
-      return ApiResult(
+      return ApiResponse(
         data: TagModel.fromJson(data['result']),
       );
     }
@@ -58,5 +58,5 @@ Future<ApiResult<TagModel>> createTag(String name) async {
   } on Error catch (e) {
     debugPrint('Fetch tags: $e\n${e.stackTrace}');
   }
-  return ApiResult(error: ApiErrors.error);
+  return ApiResponse(error: ApiErrors.error);
 }

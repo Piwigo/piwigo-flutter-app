@@ -10,11 +10,12 @@ import 'package:piwigo_ng/models/album_model.dart';
 import 'package:piwigo_ng/network/albums.dart';
 import 'package:piwigo_ng/network/api_error.dart';
 import 'package:piwigo_ng/utils/localizations.dart';
+import 'package:piwigo_ng/views/album/album_privacy_page.dart';
 import 'package:piwigo_ng/views/album/album_view_page.dart';
 
 Future<void> onOpenAlbum(BuildContext context, AlbumModel album) async {
   Navigator.of(context).pushNamed(
-    AlbumViewPage.routeName,
+    AlbumPage.routeName,
     arguments: {
       'album': album,
     },
@@ -55,7 +56,7 @@ Future<void> onMoveAlbum(BuildContext context, AlbumModel album) async {
             selectedAlbum.name,
           ),
         )) return false;
-        ApiResult<bool> result = await moveAlbum(
+        ApiResponse<bool> result = await moveAlbum(
           album.id,
           selectedAlbum.id,
         );
@@ -84,7 +85,7 @@ Future<bool> onDeleteAlbum(BuildContext context, AlbumModel album) async {
     confirm: appStrings.deleteCategoryConfirm_deleteButton,
     confirmColor: Theme.of(context).colorScheme.error,
   )) return false;
-  final ApiResult result = await deleteAlbum(
+  final ApiResponse result = await deleteAlbum(
     album.id,
     deletionMode: mode,
   );
@@ -98,4 +99,12 @@ Future<bool> onDeleteAlbum(BuildContext context, AlbumModel album) async {
     errorSnackBar(message: appStrings.deleteCategoryError_title),
   );
   return false;
+}
+
+Future<void> onEditAlbumPrivacy(BuildContext context, AlbumModel album) async {
+  await Navigator.of(context).pushNamed(
+    AlbumPrivacyPage.routeName,
+    arguments: {'album': album},
+  );
+  return;
 }

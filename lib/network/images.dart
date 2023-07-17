@@ -22,7 +22,7 @@ import 'package:share_plus/share_plus.dart';
 import 'albums.dart';
 import 'api_client.dart';
 
-Future<ApiResult<ImageModel>> getImage(
+Future<ApiResponse<ImageModel>> getImage(
   int imageId,
 ) async {
   Map<String, dynamic> queries = {
@@ -37,21 +37,21 @@ Future<ApiResult<ImageModel>> getImage(
     if (response.statusCode == 200) {
       var data = json.decode(response.data);
       if (data['stat'] == 'fail') {
-        return ApiResult(error: ApiErrors.error);
+        return ApiResponse(error: ApiErrors.error);
       }
       var jsonImage = data['result'];
       ImageModel image = ImageModel.fromJson(jsonImage);
-      return ApiResult<ImageModel>(data: image);
+      return ApiResponse<ImageModel>(data: image);
     }
   } on DioError catch (e) {
     debugPrint('Fetch images: ${e.message}');
   } on Error catch (e) {
     debugPrint('Fetch images: $e\n${e.stackTrace}');
   }
-  return ApiResult(error: ApiErrors.error);
+  return ApiResponse(error: ApiErrors.error);
 }
 
-Future<ApiResult<List<ImageModel>>> fetchImages(
+Future<ApiResponse<List<ImageModel>>> fetchImages(
   int albumID, [
   int page = 0,
 ]) async {
@@ -73,17 +73,17 @@ Future<ApiResult<List<ImageModel>>> fetchImages(
         jsonImages.map((image) => ImageModel.fromJson(image)),
       );
 
-      return ApiResult<List<ImageModel>>(data: images);
+      return ApiResponse<List<ImageModel>>(data: images);
     }
   } on DioError catch (e) {
     debugPrint('Fetch images: ${e.message}');
   } on Error catch (e) {
     debugPrint('Fetch images: ${e.stackTrace}');
   }
-  return ApiResult(error: ApiErrors.fetchImagesError);
+  return ApiResponse(error: ApiErrors.fetchImagesError);
 }
 
-Future<ApiResult<Map>> searchImages(
+Future<ApiResponse<Map>> searchImages(
   String searchQuery, [
   int page = 0,
 ]) async {
@@ -102,7 +102,7 @@ Future<ApiResult<Map>> searchImages(
     if (response.statusCode == 200) {
       final Map<String, dynamic> result = json.decode(response.data);
       if (result['err'] == 1002) {
-        return ApiResult<Map>(data: {
+        return ApiResponse<Map>(data: {
           'total_count': 0,
           'images': [],
         });
@@ -111,7 +111,7 @@ Future<ApiResult<Map>> searchImages(
       List<ImageModel> images = List<ImageModel>.from(
         jsonImages.map((image) => ImageModel.fromJson(image)),
       );
-      return ApiResult<Map>(data: {
+      return ApiResponse<Map>(data: {
         'total_count': result['result']['paging']['total_count'],
         'images': images,
       });
@@ -121,10 +121,10 @@ Future<ApiResult<Map>> searchImages(
   } on Error catch (e) {
     debugPrint('Search images: ${e.stackTrace}');
   }
-  return ApiResult(error: ApiErrors.searchImagesError);
+  return ApiResponse(error: ApiErrors.searchImagesError);
 }
 
-Future<ApiResult<Map>> fetchFavorites([
+Future<ApiResponse<Map>> fetchFavorites([
   int page = 0,
 ]) async {
   Map<String, dynamic> query = {
@@ -141,7 +141,7 @@ Future<ApiResult<Map>> fetchFavorites([
     if (response.statusCode == 200) {
       final Map<String, dynamic> result = json.decode(response.data);
       if (result['stat'] == 'fail') {
-        return ApiResult<Map>(data: {
+        return ApiResponse<Map>(data: {
           'total_count': 0,
           'images': [],
         });
@@ -153,7 +153,7 @@ Future<ApiResult<Map>> fetchFavorites([
           return ImageModel.fromJson(image);
         }),
       );
-      return ApiResult<Map>(data: {
+      return ApiResponse<Map>(data: {
         'total_count': result['result']['paging']['count'],
         'images': images,
       });
@@ -163,7 +163,7 @@ Future<ApiResult<Map>> fetchFavorites([
   } on Error catch (e) {
     debugPrint('Fetch favorites: ${e.stackTrace}');
   }
-  return ApiResult(error: ApiErrors.error);
+  return ApiResponse(error: ApiErrors.error);
 }
 
 Future<String?> pickDirectoryPath() async {

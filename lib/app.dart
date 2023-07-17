@@ -7,22 +7,23 @@ import 'package:piwigo_ng/services/app_providers.dart';
 import 'package:piwigo_ng/services/preferences_service.dart';
 import 'package:piwigo_ng/utils/overscroll_behavior.dart';
 import 'package:piwigo_ng/utils/themes.dart';
+import 'package:piwigo_ng/views/album/album_privacy_page.dart';
 import 'package:piwigo_ng/views/album/album_view_page.dart';
-import 'package:piwigo_ng/views/album/root_album_view_page.dart';
+import 'package:piwigo_ng/views/album/root_album_page.dart';
+import 'package:piwigo_ng/views/authentication/login_page.dart';
 import 'package:piwigo_ng/views/authentication/login_settings_page.dart';
-import 'package:piwigo_ng/views/authentication/login_view_page.dart';
 import 'package:piwigo_ng/views/image/edit_image_page.dart';
 import 'package:piwigo_ng/views/image/image_favorites_page.dart';
-import 'package:piwigo_ng/views/image/image_search_view_page.dart';
-import 'package:piwigo_ng/views/image/image_view_page.dart';
+import 'package:piwigo_ng/views/image/image_page.dart';
+import 'package:piwigo_ng/views/image/image_search_page.dart';
 import 'package:piwigo_ng/views/image/video_player_page.dart';
 import 'package:piwigo_ng/views/settings/auto_upload_page.dart';
-import 'package:piwigo_ng/views/settings/privacy_policy_view_page.dart';
-import 'package:piwigo_ng/views/settings/select_language_view_page.dart';
-import 'package:piwigo_ng/views/settings/settings_view_page.dart';
+import 'package:piwigo_ng/views/settings/privacy_policy_page.dart';
+import 'package:piwigo_ng/views/settings/select_language_page.dart';
+import 'package:piwigo_ng/views/settings/settings_page.dart';
 import 'package:piwigo_ng/views/unknown_route_page.dart';
+import 'package:piwigo_ng/views/upload/upload_page.dart';
 import 'package:piwigo_ng/views/upload/upload_status_page.dart';
-import 'package:piwigo_ng/views/upload/upload_view_page.dart';
 
 import 'models/image_model.dart';
 
@@ -78,7 +79,7 @@ class App extends StatelessWidget {
           onGenerateInitialRoutes: (String route) {
             return [
               MaterialPageRoute(
-                builder: (_) => const LoginViewPage(autoLogin: true),
+                builder: (_) => const LoginPage(autoLogin: true),
               ),
             ];
           },
@@ -106,9 +107,9 @@ Route<dynamic> generateRoute(RouteSettings settings) {
   }
 
   switch (settings.name) {
-    case LoginViewPage.routeName:
+    case LoginPage.routeName:
       return MaterialPageRoute(
-        builder: (_) => const LoginViewPage(),
+        builder: (_) => const LoginPage(),
         settings: settings,
       );
     case LoginSettingsPage.routeName:
@@ -116,25 +117,32 @@ Route<dynamic> generateRoute(RouteSettings settings) {
         builder: (_) => LoginSettingsPage(),
         settings: settings,
       );
-    case RootAlbumViewPage.routeName:
+    case RootAlbumPage.routeName:
       return MaterialPageRoute(
-        builder: (_) => RootAlbumViewPage(
+        builder: (_) => RootAlbumPage(
           albumId: arguments['albumId'] ?? 0,
           isAdmin: arguments['isAdmin'] ?? isAdmin,
         ),
         settings: settings,
       );
-    case AlbumViewPage.routeName:
+    case AlbumPage.routeName:
       return MaterialPageRoute(
-        builder: (_) => AlbumViewPage(
+        builder: (_) => AlbumPage(
           album: arguments['album'],
           isAdmin: arguments['isAdmin'] ?? isAdmin,
         ),
         settings: settings,
       );
-    case ImageSearchViewPage.routeName:
+    case AlbumPrivacyPage.routeName:
       return MaterialPageRoute(
-        builder: (_) => ImageSearchViewPage(
+        builder: (_) => AlbumPrivacyPage(
+          album: arguments['album']!,
+        ),
+        settings: settings,
+      );
+    case ImageSearchPage.routeName:
+      return MaterialPageRoute(
+        builder: (_) => ImageSearchPage(
           isAdmin: arguments['isAdmin'] ?? isAdmin,
         ),
         settings: settings,
@@ -146,9 +154,9 @@ Route<dynamic> generateRoute(RouteSettings settings) {
         ),
         settings: settings,
       );
-    case UploadViewPage.routeName:
+    case UploadPage.routeName:
       return MaterialPageRoute(
-        builder: (_) => UploadViewPage(
+        builder: (_) => UploadPage(
           imageList: arguments["images"] ?? <XFile>[],
           albumId: arguments["category"],
         ),
@@ -164,9 +172,9 @@ Route<dynamic> generateRoute(RouteSettings settings) {
         builder: (_) => AutoUploadPage(),
         settings: settings,
       );
-    case ImageViewPage.routeName:
+    case ImagePage.routeName:
       return MaterialPageRoute<List<ImageModel>?>(
-        builder: (_) => ImageViewPage(
+        builder: (_) => ImagePage(
           images: arguments['images'] ?? [],
           startId: arguments['startId'],
           album: arguments['album'],
@@ -189,19 +197,19 @@ Route<dynamic> generateRoute(RouteSettings settings) {
         ),
         settings: settings,
       );
-    case SettingsViewPage.routeName:
+    case SettingsPage.routeName:
       return MaterialPageRoute(
-        builder: (_) => SettingsViewPage(),
+        builder: (_) => SettingsPage(),
         settings: settings,
       );
-    case PrivacyPolicyViewPage.routeName:
+    case PrivacyPolicyPage.routeName:
       return MaterialPageRoute(
-        builder: (_) => const PrivacyPolicyViewPage(),
+        builder: (_) => const PrivacyPolicyPage(),
         settings: settings,
       );
-    case SelectLanguageViewPage.routeName:
+    case SelectLanguagePage.routeName:
       return MaterialPageRoute(
-        builder: (_) => const SelectLanguageViewPage(),
+        builder: (_) => const SelectLanguagePage(),
         settings: settings,
       );
     default:

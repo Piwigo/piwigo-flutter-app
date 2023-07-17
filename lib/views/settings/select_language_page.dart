@@ -4,16 +4,16 @@ import 'package:piwigo_ng/services/locale_provider.dart';
 import 'package:piwigo_ng/utils/localizations.dart';
 import 'package:provider/provider.dart';
 
-class SelectLanguageViewPage extends StatefulWidget {
-  const SelectLanguageViewPage({Key? key}) : super(key: key);
+class SelectLanguagePage extends StatefulWidget {
+  const SelectLanguagePage({Key? key}) : super(key: key);
 
   static const String routeName = '';
 
   @override
-  State<SelectLanguageViewPage> createState() => _SelectLanguageViewPageState();
+  State<SelectLanguagePage> createState() => _SelectLanguagePageState();
 }
 
-class _SelectLanguageViewPageState extends State<SelectLanguageViewPage> {
+class _SelectLanguagePageState extends State<SelectLanguagePage> {
   late final List<Locale> _locales;
 
   @override
@@ -36,7 +36,8 @@ class _SelectLanguageViewPageState extends State<SelectLanguageViewPage> {
           return ListTile(
             title: Text(getLanguageFromCode(locale.languageCode)),
             onTap: () {
-              final localeProvider = Provider.of<LocaleNotifier>(context, listen: false);
+              final localeProvider =
+                  Provider.of<LocaleNotifier>(context, listen: false);
               localeProvider.changeLocale(locale);
               Navigator.of(context).pop();
             },

@@ -9,7 +9,7 @@ import 'package:piwigo_ng/services/preferences_service.dart';
 import 'package:piwigo_ng/utils/image_actions.dart';
 import 'package:piwigo_ng/utils/localizations.dart';
 import 'package:piwigo_ng/utils/settings.dart';
-import 'package:piwigo_ng/views/image/image_view_page.dart';
+import 'package:piwigo_ng/views/image/image_page.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 class ImageFavoritesPage extends StatefulWidget {
@@ -28,7 +28,7 @@ class _ImageFavoritesPageState extends State<ImageFavoritesPage> {
       RefreshController(initialRefresh: false);
   final ScrollController _scrollController = ScrollController();
 
-  late final Future<ApiResult<Map>> _imageFuture;
+  late final Future<ApiResponse<Map>> _imageFuture;
   List<ImageModel>? _imageList;
   List<ImageModel> _selectedList = [];
 
@@ -62,7 +62,7 @@ class _ImageFavoritesPageState extends State<ImageFavoritesPage> {
   }
 
   Future<void> _onRefresh() async {
-    final ApiResult<Map> result = await fetchFavorites();
+    final ApiResponse<Map> result = await fetchFavorites();
     if (!result.hasData) {
       _refreshController.refreshFailed();
       await Future.delayed(const Duration(milliseconds: 500));
@@ -82,7 +82,7 @@ class _ImageFavoritesPageState extends State<ImageFavoritesPage> {
 
   Future<void> _loadMoreImages() async {
     if (_imageList == null || _nbImages <= _imageList!.length) return;
-    ApiResult<Map> result = await fetchFavorites(_page + 1);
+    ApiResponse<Map> result = await fetchFavorites(_page + 1);
     if (result.hasError || !result.hasData) {
       _refreshController.loadFailed();
       await Future.delayed(const Duration(milliseconds: 500));
@@ -99,7 +99,7 @@ class _ImageFavoritesPageState extends State<ImageFavoritesPage> {
   }
 
   void _onTapPhoto(ImageModel image) => Navigator.of(context).pushNamed(
-        ImageViewPage.routeName,
+        ImagePage.routeName,
         arguments: {
           'images': _imageList,
           'startId': image.id,
@@ -145,6 +145,13 @@ class _ImageFavoritesPageState extends State<ImageFavoritesPage> {
             header: MaterialClassicHeader(
               backgroundColor: Theme.of(context).cardColor,
               color: Theme.of(context).colorScheme.secondary,
+            ),
+            footer: ClassicFooter(
+              loadingText: appStrings.loadingHUD_label,
+              noDataText: appStrings.categoryImageList_noDataError,
+              failedText: appStrings.errorHUD_label,
+              idleText: '',
+              canLoadingText: appStrings.loadMoreHUD_label,
             ),
             child: CustomScrollView(
               controller: _scrollController,
@@ -232,7 +239,7 @@ class _ImageFavoritesPageState extends State<ImageFavoritesPage> {
   }
 
   Widget get _favoriteGrid {
-    return FutureBuilder<ApiResult<Map>>(
+    return FutureBuilder<ApiResponse<Map>>(
       future: _imageFuture,
       builder: (context, snapshot) {
         if (snapshot.hasData) {
@@ -252,7 +259,7 @@ class _ImageFavoritesPageState extends State<ImageFavoritesPage> {
   }
 
   Widget _buildImageGrid(AsyncSnapshot snapshot) {
-    final ApiResult<Map> result = snapshot.data!;
+    final ApiResponse<Map> result = snapshot.data!;
     if (_imageList == null) {
       _nbImages = result.data!['total_count'];
       _imageList = result.data!['images'].cast<ImageModel>() ?? [];

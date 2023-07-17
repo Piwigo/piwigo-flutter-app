@@ -3,16 +3,16 @@ import 'package:piwigo_ng/utils/localizations.dart';
 import 'package:piwigo_ng/utils/settings.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
-class PrivacyPolicyViewPage extends StatefulWidget {
-  const PrivacyPolicyViewPage({Key? key}) : super(key: key);
+class PrivacyPolicyPage extends StatefulWidget {
+  const PrivacyPolicyPage({Key? key}) : super(key: key);
 
   static const String routeName = '/settings/privacy';
 
   @override
-  State<PrivacyPolicyViewPage> createState() => _PrivacyPolicyViewPageState();
+  State<PrivacyPolicyPage> createState() => _PrivacyPolicyPageState();
 }
 
-class _PrivacyPolicyViewPageState extends State<PrivacyPolicyViewPage> {
+class _PrivacyPolicyPageState extends State<PrivacyPolicyPage> {
   late final String _url;
 
   @override

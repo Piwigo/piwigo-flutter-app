@@ -98,6 +98,7 @@ class Settings {
   static const String defaultAlbumThumbnailSize = 'medium';
   static const String defaultImageThumbnailSize = 'medium';
   static const String defaultImageFullScreenSize = 'medium';
+  static const String defaultGroupSort = 'name';
   static const SortMethods defaultImageSort = SortMethods.custom;
   static const bool defaultRemoveMetadata = false;
   static const bool defaultCompress = false;

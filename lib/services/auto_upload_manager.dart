@@ -150,7 +150,7 @@ class AutoUploadManager {
     AlbumModel destination = AlbumModel.fromJson(json.decode(albumJson));
 
     // Perform login
-    ApiResult<bool> success = await _login(dio);
+    ApiResponse<bool> success = await _login(dio);
     if (!(success.data ?? false)) {
       debugPrint('login error');
       return;
@@ -219,12 +219,12 @@ class AutoUploadManager {
     await _emptyLunge(result, destination.id);
   }
 
-  Future<ApiResult<bool>> _login(Dio dio) async {
+  Future<ApiResponse<bool>> _login(Dio dio) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     FlutterSecureStorage secureStorage = const FlutterSecureStorage();
     String? url = await secureStorage.read(key: AutoUploadPreferences.urlKey);
     if (url == null || url.isEmpty) {
-      return ApiResult<bool>(
+      return ApiResponse<bool>(
         data: false,
         error: ApiErrors.wrongServerUrl,
       );
@@ -237,7 +237,7 @@ class AutoUploadManager {
 
     if ((username == null || username.isEmpty) &&
         (password == null || password.isEmpty)) {
-      return ApiResult<bool>(
+      return ApiResponse<bool>(
         data: false,
         error: ApiErrors.wrongServerUrl,
       );
@@ -263,12 +263,12 @@ class AutoUploadManager {
       if (response.statusCode == 200) {
         var data = json.decode(response.data);
         if (data['stat'] == 'fail') {
-          return ApiResult<bool>(
+          return ApiResponse<bool>(
             data: false,
             error: ApiErrors.wrongLoginId,
           );
         }
-        ApiResult<StatusModel> status = await _sessionStatus();
+        ApiResponse<StatusModel> status = await _sessionStatus();
         if (status.hasData) {
           secureStorage.write(
             key: AutoUploadPreferences.tokenKey,
@@ -279,11 +279,11 @@ class AutoUploadManager {
             status.data!.pwgToken,
           );
         }
-        return ApiResult<bool>(
+        return ApiResponse<bool>(
           data: true,
         );
       }
-      return ApiResult<bool>(
+      return ApiResponse<bool>(
         data: false,
         error: ApiErrors.wrongLoginId,
       );
@@ -292,13 +292,13 @@ class AutoUploadManager {
     } catch (e) {
       debugPrint('Error $e');
     }
-    return ApiResult<bool>(
+    return ApiResponse<bool>(
       data: false,
       error: ApiErrors.wrongServerUrl,
     );
   }
 
-  Future<ApiResult<StatusModel>> _sessionStatus() async {
+  Future<ApiResponse<StatusModel>> _sessionStatus() async {
     Map<String, String> queries = {
       'format': 'json',
       'method': 'pwg.session.getStatus'
@@ -313,7 +313,7 @@ class AutoUploadManager {
           String? community = await _communityStatus();
           data['result']['real_user_status'] = community;
         }
-        return ApiResult<StatusModel>(
+        return ApiResponse<StatusModel>(
           data: StatusModel.fromJson(data['result']),
         );
       }
@@ -322,7 +322,7 @@ class AutoUploadManager {
     } catch (e) {
       debugPrint('Error $e');
     }
-    return ApiResult(
+    return ApiResponse(
       error: ApiErrors.getStatusError,
     );
   }
@@ -400,7 +400,7 @@ class AutoUploadManager {
     }
   }
 
-  Future<ApiResult<List<String>>> _getMethods() async {
+  Future<ApiResponse<List<String>>> _getMethods() async {
     Map<String, String> queries = {
       'format': 'json',
       'method': 'reflection.getMethodList'
@@ -414,13 +414,13 @@ class AutoUploadManager {
       Map<String, dynamic> data = json.decode(response.data);
       final List<String> methods =
           data['result']['methods'].map<String>((e) => e.toString()).toList();
-      return ApiResult<List<String>>(data: methods);
+      return ApiResponse<List<String>>(data: methods);
     } on DioError catch (e) {
       debugPrint(e.message);
     } catch (e) {
       debugPrint('Error $e');
     }
-    return ApiResult<List<String>>(error: ApiErrors.getMethodsError);
+    return ApiResponse<List<String>>(error: ApiErrors.getMethodsError);
   }
 
   Future<bool> autoUploadCompleted(

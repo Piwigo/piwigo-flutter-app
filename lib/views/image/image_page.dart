@@ -29,8 +29,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// Media Full Screen page
 /// * Video player
 /// * Zoomable photos
-class ImageViewPage extends StatefulWidget {
-  const ImageViewPage({
+class ImagePage extends StatefulWidget {
+  const ImagePage({
     Key? key,
     this.images = const [],
     this.startId,
@@ -46,10 +46,10 @@ class ImageViewPage extends StatefulWidget {
   final bool isAdmin;
 
   @override
-  State<ImageViewPage> createState() => _ImageViewPageState();
+  State<ImagePage> createState() => _ImagePageState();
 }
 
-class _ImageViewPageState extends State<ImageViewPage> {
+class _ImagePageState extends State<ImagePage> {
   /// Duration of overlay animation
   final Duration _overlayAnimationDuration = const Duration(milliseconds: 300);
 
@@ -128,7 +128,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
   Future<void> _loadMoreImages() async {
     if (_album.id == -1) return;
     if (_album.nbImages <= _imageList.length) return;
-    ApiResult<List<ImageModel>> result =
+    ApiResponse<List<ImageModel>> result =
         await fetchImages(_album.id, _imagePage + 1);
     if (result.hasError || !result.hasData) return;
     setState(() {
@@ -167,7 +167,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
 
   Future<void> _getImagesInfo(List<ImageModel> images) async {
     for (ImageModel image in images) {
-      ApiResult<ImageModel>? result = await getImage(image.id);
+      ApiResponse<ImageModel>? result = await getImage(image.id);
       if (result.hasData) {
         int index = _imageList.indexWhere((i) => i.id == image.id);
         setState(() {

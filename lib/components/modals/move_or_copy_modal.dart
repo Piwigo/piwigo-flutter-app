@@ -27,7 +27,7 @@ class MoveOrCopyModal extends StatefulWidget {
 
 class _MoveOrCopyModalState extends State<MoveOrCopyModal> {
   final ScrollController _scrollController = ScrollController();
-  late final Future<ApiResult<List<AlbumModel>>> _albumFuture;
+  late final Future<ApiResponse<List<AlbumModel>>> _albumFuture;
   late final List<int> _disabledAlbums;
 
   List<AlbumModel> _albums = [];
@@ -110,7 +110,7 @@ class _MoveOrCopyModalState extends State<MoveOrCopyModal> {
         child: _rootAlbum,
       );
 
-  Widget get _rootAlbum => FutureBuilder<ApiResult<List<AlbumModel>>>(
+  Widget get _rootAlbum => FutureBuilder<ApiResponse<List<AlbumModel>>>(
         future: _albumFuture,
         builder: (context, snapshot) {
           if (snapshot.hasData) {

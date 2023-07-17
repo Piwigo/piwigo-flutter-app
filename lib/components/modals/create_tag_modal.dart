@@ -37,7 +37,7 @@ class _CreateTagModalState extends State<CreateTagModal> {
   Future<void> _onCreateTag() async {
     if (_name.isEmpty) return;
     _btnController.start();
-    ApiResult result = await createTag(_name);
+    ApiResponse result = await createTag(_name);
     if (result.hasError) {
       _btnController.error();
       ScaffoldMessenger.of(context).showSnackBar(

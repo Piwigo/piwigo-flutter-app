@@ -12,7 +12,7 @@ import 'package:rounded_loading_button/rounded_loading_button.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../components/fields/app_field.dart';
-import '../album/root_album_view_page.dart';
+import '../album/root_album_page.dart';
 
 class LoginFormView extends StatefulWidget {
   const LoginFormView({
@@ -87,7 +87,7 @@ class _LoginFormViewState extends State<LoginFormView> {
     return true;
   }
 
-  void _onLoginError(ApiResult result) {
+  void _onLoginError(ApiResponse result) {
     _btnController.error();
     setState(() {
       switch (result.error) {
@@ -119,13 +119,13 @@ class _LoginFormViewState extends State<LoginFormView> {
     });
   }
 
-  Future<void> _onLoginSuccess(ApiResult result) async {
+  Future<void> _onLoginSuccess(ApiResponse result) async {
     _btnController.success();
     await Future.delayed(const Duration(milliseconds: 300));
     if (!mounted) return;
     debugPrint("is admin: ${appPreferences.getBool('IS_USER_ADMIN')}");
     Navigator.of(context).pushReplacementNamed(
-      RootAlbumViewPage.routeName,
+      RootAlbumPage.routeName,
       arguments: {'isAdmin': appPreferences.getBool('IS_USER_ADMIN')},
     );
   }

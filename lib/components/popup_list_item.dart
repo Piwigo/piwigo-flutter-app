@@ -18,7 +18,7 @@ class PopupListItem extends StatelessWidget {
       iconColor: color ?? Theme.of(context).iconTheme.color,
       textColor: color,
       contentPadding: EdgeInsets.zero,
-      horizontalTitleGap: 0,
+      horizontalTitleGap: 8.0,
       leading: Icon(icon),
       title: Text(
         text ?? '',

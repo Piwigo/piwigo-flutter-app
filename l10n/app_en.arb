@@ -1,15 +1,4 @@
 {
-    "nWombats": "{count, plural, =0{no wombats} =1{1 wombat} other{{count} wombats}}",
-    "@nWombats": {
-        "description": "A plural message",
-        "placeholders": {
-            "count": {
-                "type": "num",
-                "format": "compact"
-            }
-        }
-    },
-
     "tabBar_albums": "Albums",
     "tabBar_upload": "Upload",
     "tabBar_preferences": "Settings",
@@ -33,6 +22,7 @@
     "loadingHUD_label": "Loading…",
     "completeHUD_label": "Complete",
     "errorHUD_label": "Error",
+    "loadMoreHUD_label": "Release to load more",
 
     "uploadRights_title": "Upload Rights Needed",
     "uploadRights_message": "You must have upload rights to be able to upload photos or videos.",
@@ -324,6 +314,28 @@
     "moveCategoryError_message": "Failed to move your album",
 
 
+    "categoryPrivacy": "Album Privacy",
+    "categoryPrivacy_subtitle": "Manage access permissions of {album_name} album",
+    "@categoryPrivacy_subtitle" : {
+        "placeholders": {
+            "album_name": {}
+        }
+    },
+    "categoryPrivacyMode_public": "Public",
+    "categoryPrivacyMode_publicMessage": "Every user can see this album",
+    "categoryPrivacyMode_private": "Private",
+    "categoryPrivacyMode_privateMessage": "Visitors must log in and have the necessary permissions to see this album",
+    "categoryPrivacyGroups": "Group permissions",
+    "categoryPrivacyGroups_add": "Authorize groups",
+    "categoryPrivacyUsers": "User permissions",
+    "categoryPrivacyUsers_message": "{user_count} users automatically have permissions on this album because they are administrators :",
+    "@categoryPrivacyUsers_message" : {
+        "placeholders": {
+            "user_count": {}
+        }
+    },
+
+
     "categorySelection_setThumbnail": "Please select the album which will use the photo {photo} as a thumbnail.",
     "@categorySelection_setThumbnail" : {
         "placeholders": {
@@ -449,6 +461,18 @@
     "tagsAdd_placeholder": "New tag",
     "tagsAddHUD_label": "Creating Tag…",
     "tagsAddHUD_created": "Tag Created",
+
+    "group" : "Group",
+    "groups": "Groups",
+    "groupsTitle_selectOne": "Select a Group",
+    "groupsHeader_selected": "Selected",
+    "groupsHeader_notSelected": "Not Selected",
+    "groupsHeader_all": "All",
+    "groupsAdd_title": "Add Group",
+    "groupsAdd_message": "Enter a name for this new group",
+    "groupsAdd_placeholder": "New group",
+    "groupsAddHUD_label": "Creating Group…",
+    "groupsAddHUD_created": "Group Created",
 
 
     "tagsAddError_message": "Failed to create new tag",

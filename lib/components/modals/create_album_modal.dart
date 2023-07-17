@@ -27,7 +27,7 @@ class _CreateAlbumModalState extends State<CreateAlbumModal> {
   Future<void> _onCreateAlbum() async {
     if (_name.isEmpty) return;
     _btnController.start();
-    ApiResult result = await addAlbum(
+    ApiResponse result = await addAlbum(
       parentId: widget.albumId,
       name: _name,
       description: _descriptionController.text,

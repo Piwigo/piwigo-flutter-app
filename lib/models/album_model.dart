@@ -1,3 +1,22 @@
+enum AlbumStatus { public, private }
+
+extension AlbumStatusSerialization on AlbumStatus {
+  String toJson() {
+    return this.name;
+  }
+
+  static AlbumStatus fromJson(String? json) {
+    switch (json) {
+      case 'public':
+        return AlbumStatus.public;
+      case 'private':
+        return AlbumStatus.private;
+      default:
+        return AlbumStatus.public;
+    }
+  }
+}
+
 class AlbumModel {
   int id;
   String name;
@@ -6,7 +25,7 @@ class AlbumModel {
   String url;
   String? urlRepresentative;
   String? permalink;
-  String? status;
+  AlbumStatus status;
   String upperCategories;
   String? idUpperCategory;
   String globalRank;
@@ -27,7 +46,7 @@ class AlbumModel {
     this.url = '',
     this.urlRepresentative,
     this.permalink,
-    this.status,
+    this.status = AlbumStatus.public,
     this.upperCategories = '',
     this.idUpperCategory,
     this.globalRank = '',
@@ -50,7 +69,7 @@ class AlbumModel {
         url = json['url'],
         urlRepresentative = json['tn_url'],
         permalink = json['permalink'],
-        status = json['status'],
+        status = AlbumStatusSerialization.fromJson(json['status']),
         upperCategories = json['uppercats'] ?? '',
         idUpperCategory = json['id_uppercat'],
         globalRank = json['global_rank'] ?? '',
@@ -74,7 +93,7 @@ class AlbumModel {
         'url': url,
         'tn_url': urlRepresentative,
         'permalink': permalink,
-        'status': status,
+        'status': status.toJson(),
         'uppercats': upperCategories,
         'id_uppercat': idUpperCategory,
         'global_rank': globalRank,

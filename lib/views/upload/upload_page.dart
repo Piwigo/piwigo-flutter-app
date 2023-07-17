@@ -7,10 +7,10 @@ import 'package:image_picker/image_picker.dart';
 import 'package:mime_type/mime_type.dart';
 import 'package:piwigo_ng/components/buttons/animated_piwigo_button.dart';
 import 'package:piwigo_ng/components/cards/image_details_card.dart';
-import 'package:piwigo_ng/components/cards/tag_chip.dart';
+import 'package:piwigo_ng/components/cards/piwigo_chip.dart';
 import 'package:piwigo_ng/components/fields/app_field.dart';
-import 'package:piwigo_ng/components/modals/add_tags_modal.dart';
 import 'package:piwigo_ng/components/modals/piwigo_modal.dart';
+import 'package:piwigo_ng/components/modals/select_tags_modal.dart';
 import 'package:piwigo_ng/components/sections/form_section.dart';
 import 'package:piwigo_ng/models/tag_model.dart';
 import 'package:piwigo_ng/network/images.dart';
@@ -22,9 +22,8 @@ import 'package:piwigo_ng/utils/resources.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 import 'package:video_player/video_player.dart';
 
-class UploadViewPage extends StatefulWidget {
-  const UploadViewPage(
-      {Key? key, required this.imageList, required this.albumId})
+class UploadPage extends StatefulWidget {
+  const UploadPage({Key? key, required this.imageList, required this.albumId})
       : super(key: key);
 
   static const String routeName = '/upload';
@@ -32,10 +31,10 @@ class UploadViewPage extends StatefulWidget {
   final int albumId;
 
   @override
-  State<UploadViewPage> createState() => _UploadGalleryViewPage();
+  State<UploadPage> createState() => _UploadGalleryViewPage();
 }
 
-class _UploadGalleryViewPage extends State<UploadViewPage>
+class _UploadGalleryViewPage extends State<UploadPage>
     with SingleTickerProviderStateMixin {
   static const double maxCarouselElementWidth = 300.0;
   static const double carouselHeight = 128.0;
@@ -299,7 +298,7 @@ class _UploadGalleryViewPage extends State<UploadViewPage>
           onTapTitle: () {
             showPiwigoModal<List<TagModel>>(
               context: context,
-              builder: (_) => AddTagsModal(
+              builder: (_) => SelectTagsModal(
                 selectedTags: _tags,
               ),
             ).then((value) {
@@ -317,13 +316,9 @@ class _UploadGalleryViewPage extends State<UploadViewPage>
             runSpacing: 8.0,
             children: List.generate(_tags.length, (index) {
               TagModel tag = _tags[index];
-              return TagChip(
-                tag: tag,
-                icon: Icon(
-                  Icons.close,
-                  color: Theme.of(context).colorScheme.error,
-                ),
-                onTap: () => _onDeselectTag(tag),
+              return PiwigoChip(
+                label: tag.name,
+                onRemove: () => _onDeselectTag(tag),
               );
             }),
           ),

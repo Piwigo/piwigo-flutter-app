@@ -3,30 +3,31 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:piwigo_ng/app.dart';
 import 'package:piwigo_ng/utils/localizations.dart';
 import 'package:piwigo_ng/utils/settings.dart';
-import 'package:piwigo_ng/views/settings/privacy_policy_view_page.dart';
+import 'package:piwigo_ng/views/settings/privacy_policy_page.dart';
 
 import '../../components/buttons/app_text_button.dart';
 import 'login_form_view.dart';
 
-class LoginViewPage extends StatefulWidget {
-  const LoginViewPage({Key? key, this.autoLogin = false}) : super(key: key);
+class LoginPage extends StatefulWidget {
+  const LoginPage({Key? key, this.autoLogin = false}) : super(key: key);
 
   static const String routeName = '/login';
 
   final bool autoLogin;
 
   @override
-  State<LoginViewPage> createState() => _LoginViewPageState();
+  State<LoginPage> createState() => _LoginPageState();
 }
 
-class _LoginViewPageState extends State<LoginViewPage> {
+class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: true,
       body: SafeArea(
         child: Center(
-          child: LayoutBuilder(builder: (BuildContext context, BoxConstraints constraints) {
+          child: LayoutBuilder(
+              builder: (BuildContext context, BoxConstraints constraints) {
             return SingleChildScrollView(
               child: Container(
                 padding: const EdgeInsets.symmetric(
@@ -68,7 +69,7 @@ class _LoginViewPageState extends State<LoginViewPage> {
                         text: appStrings.settings_privacy,
                         onPressed: () {
                           App.navigatorKey.currentState?.pushNamed(
-                            PrivacyPolicyViewPage.routeName,
+                            PrivacyPolicyPage.routeName,
                           );
                         },
                       ),

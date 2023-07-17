@@ -11,7 +11,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'api_client.dart';
 
-Future<ApiResult<String>> pingAPI() async {
+Future<ApiResponse<String>> pingAPI() async {
   Map<String, String> queries = {
     'format': 'json',
     'method': 'pwg.getVersion',
@@ -21,23 +21,23 @@ Future<ApiResult<String>> pingAPI() async {
     Response response = await ApiClient.get(queryParameters: queries);
     var data = json.decode(response.data);
     if (data['stat'] == 'ok') {
-      return ApiResult<String>(data: data['result']);
+      return ApiResponse<String>(data: data['result']);
     }
   } on DioError catch (e) {
     debugPrint(e.message);
   } catch (e) {
     debugPrint('Error $e');
   }
-  return ApiResult(error: ApiErrors.error);
+  return ApiResponse(error: ApiErrors.error);
 }
 
-Future<ApiResult<bool>> loginUser(
+Future<ApiResponse<bool>> loginUser(
   String url, {
   String username = '',
   String password = '',
 }) async {
   if (url.isEmpty) {
-    return ApiResult<bool>(
+    return ApiResponse<bool>(
       data: false,
       error: ApiErrors.wrongServerUrl,
     );
@@ -48,15 +48,15 @@ Future<ApiResult<bool>> loginUser(
   await prefs.setString(Preferences.serverUrlKey, url);
 
   if (username.isEmpty && password.isEmpty) {
-    ApiResult<StatusModel> status = await sessionStatus();
+    ApiResponse<StatusModel> status = await sessionStatus();
     if (!status.hasError && status.hasData) {
       Preferences.saveId(status.data!, username: username, password: password);
-      return ApiResult<bool>(
+      return ApiResponse<bool>(
         data: true,
       );
     }
     askMediaPermission();
-    return ApiResult<bool>(
+    return ApiResponse<bool>(
       data: false,
       // error: ApiErrors.wrongServerUrl,
     );
@@ -81,18 +81,18 @@ Future<ApiResult<bool>> loginUser(
     if (response.statusCode == 200) {
       var data = json.decode(response.data);
       if (data['stat'] == 'fail') {
-        return ApiResult<bool>(
+        return ApiResponse<bool>(
           data: false,
           error: ApiErrors.wrongLoginId,
         );
       }
-      ApiResult<StatusModel> status = await sessionStatus();
+      ApiResponse<StatusModel> status = await sessionStatus();
       if (status.hasData) {
         Preferences.saveId(status.data!,
             username: username, password: password);
       }
       askMediaPermission();
-      return ApiResult<bool>(
+      return ApiResponse<bool>(
         data: true,
       );
     }
@@ -101,13 +101,13 @@ Future<ApiResult<bool>> loginUser(
   } catch (e) {
     debugPrint('Error $e');
   }
-  return ApiResult<bool>(
+  return ApiResponse<bool>(
     data: false,
     // error: ApiErrors.wrongServerUrl,
   );
 }
 
-Future<ApiResult<StatusModel>> sessionStatus() async {
+Future<ApiResponse<StatusModel>> sessionStatus() async {
   Map<String, String> queries = {
     'format': 'json',
     'method': 'pwg.session.getStatus'
@@ -121,7 +121,7 @@ Future<ApiResult<StatusModel>> sessionStatus() async {
         String? community = await communityStatus();
         data['result']['real_user_status'] = community;
       }
-      return ApiResult<StatusModel>(
+      return ApiResponse<StatusModel>(
         data: StatusModel.fromJson(data['result']),
       );
     }
@@ -130,7 +130,7 @@ Future<ApiResult<StatusModel>> sessionStatus() async {
   } catch (e) {
     debugPrint('Error $e');
   }
-  return ApiResult(
+  return ApiResponse(
     error: ApiErrors.getStatusError,
   );
 }
@@ -155,14 +155,14 @@ Future<String?> communityStatus() async {
   return null;
 }
 
-Future<ApiResult<InfoModel>> getInfo() async {
+Future<ApiResponse<InfoModel>> getInfo() async {
   Map<String, String> queries = {'format': 'json', 'method': 'pwg.getInfos'};
 
   try {
     Response response = await ApiClient.get(queryParameters: queries);
     var data = json.decode(response.data);
     if (data['stat'] == 'ok') {
-      return ApiResult<InfoModel>(
+      return ApiResponse<InfoModel>(
         data: InfoModel.fromJson(data['result']),
       );
     }
@@ -171,12 +171,12 @@ Future<ApiResult<InfoModel>> getInfo() async {
   } catch (e) {
     debugPrint('Error $e');
   }
-  return ApiResult(
+  return ApiResponse(
     error: ApiErrors.getInfoError,
   );
 }
 
-Future<ApiResult<List<String>>> getMethods() async {
+Future<ApiResponse<List<String>>> getMethods() async {
   Map<String, String> queries = {
     'format': 'json',
     'method': 'reflection.getMethodList'
@@ -187,13 +187,13 @@ Future<ApiResult<List<String>>> getMethods() async {
     Map<String, dynamic> data = json.decode(response.data);
     final List<String> methods =
         data['result']['methods'].map<String>((e) => e.toString()).toList();
-    return ApiResult<List<String>>(data: methods);
+    return ApiResponse<List<String>>(data: methods);
   } on DioError catch (e) {
     debugPrint(e.message);
   } catch (e) {
     debugPrint('Error $e');
   }
-  return ApiResult<List<String>>(error: ApiErrors.getMethodsError);
+  return ApiResponse<List<String>>(error: ApiErrors.getMethodsError);
 }
 
 Future<bool> methodExist(String method) async {

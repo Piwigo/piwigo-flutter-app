@@ -11,30 +11,30 @@ import 'package:piwigo_ng/utils/image_actions.dart';
 import 'package:piwigo_ng/utils/localizations.dart';
 import 'package:piwigo_ng/utils/page_routes.dart';
 import 'package:piwigo_ng/utils/settings.dart';
-import 'package:piwigo_ng/views/image/image_view_page.dart';
+import 'package:piwigo_ng/views/image/image_page.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import '../../components/fields/app_field.dart';
 
-class ImageSearchViewPage extends StatefulWidget {
-  const ImageSearchViewPage({Key? key, this.isAdmin = false}) : super(key: key);
+class ImageSearchPage extends StatefulWidget {
+  const ImageSearchPage({Key? key, this.isAdmin = false}) : super(key: key);
 
   static const String routeName = '/images/search';
 
   final bool isAdmin;
 
   @override
-  State<ImageSearchViewPage> createState() => _ImageSearchViewPageState();
+  State<ImageSearchPage> createState() => _ImageSearchPageState();
 }
 
-class _ImageSearchViewPageState extends State<ImageSearchViewPage> {
+class _ImageSearchPageState extends State<ImageSearchPage> {
   final TextEditingController _searchController = TextEditingController();
   final RefreshController _refreshController =
       RefreshController(initialRefresh: false);
   final ScrollController _scrollController = ScrollController();
   final FocusNode _focusNode = FocusNode();
 
-  late final Future<ApiResult<Map>> _imageFuture;
+  late final Future<ApiResponse<Map>> _imageFuture;
   List<ImageModel>? _searchList;
   List<ImageModel> _selectedList = [];
 
@@ -77,7 +77,7 @@ class _ImageSearchViewPageState extends State<ImageSearchViewPage> {
 
   Future<void> _onRefresh() async {
     final String oldSearch = _searchText;
-    final ApiResult<Map> result = await searchImages(_searchText);
+    final ApiResponse<Map> result = await searchImages(_searchText);
     if (!result.hasData) {
       _refreshController.refreshFailed();
       await Future.delayed(const Duration(milliseconds: 500));
@@ -99,7 +99,7 @@ class _ImageSearchViewPageState extends State<ImageSearchViewPage> {
 
   Future<void> _loadMoreImages() async {
     if (_searchList == null && _nbImages <= _searchList!.length) return;
-    ApiResult<Map> result = await searchImages(_searchText, _page + 1);
+    ApiResponse<Map> result = await searchImages(_searchText, _page + 1);
     if (result.hasError || !result.hasData) {
       _refreshController.loadFailed();
       await Future.delayed(const Duration(milliseconds: 500));
@@ -117,7 +117,7 @@ class _ImageSearchViewPageState extends State<ImageSearchViewPage> {
   }
 
   void _onTapPhoto(ImageModel image) => Navigator.of(context).pushNamed(
-        ImageViewPage.routeName,
+        ImagePage.routeName,
         arguments: {
           'images': _searchList,
           'startId': image.id,
@@ -168,6 +168,13 @@ class _ImageSearchViewPageState extends State<ImageSearchViewPage> {
             header: MaterialClassicHeader(
               backgroundColor: Theme.of(context).cardColor,
               color: Theme.of(context).colorScheme.secondary,
+            ),
+            footer: ClassicFooter(
+              loadingText: appStrings.loadingHUD_label,
+              noDataText: appStrings.categoryImageList_noDataError,
+              failedText: appStrings.errorHUD_label,
+              idleText: '',
+              canLoadingText: appStrings.loadMoreHUD_label,
             ),
             child: CustomScrollView(
               controller: _scrollController,
@@ -281,12 +288,12 @@ class _ImageSearchViewPageState extends State<ImageSearchViewPage> {
   }
 
   Widget get _searchGrid {
-    return FutureBuilder<ApiResult<Map>>(
+    return FutureBuilder<ApiResponse<Map>>(
       future: _imageFuture,
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           if (_searchList == null) {
-            final ApiResult<Map> result = snapshot.data!;
+            final ApiResponse<Map> result = snapshot.data!;
             if (!snapshot.data!.hasData) {
               return Center(
                 child: Padding(

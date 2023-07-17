@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:piwigo_ng/components/buttons/animated_piwigo_button.dart';
 import 'package:piwigo_ng/components/cards/image_details_card.dart';
-import 'package:piwigo_ng/components/cards/tag_chip.dart';
+import 'package:piwigo_ng/components/cards/piwigo_chip.dart';
 import 'package:piwigo_ng/components/dialogs/confirm_dialog.dart';
 import 'package:piwigo_ng/components/fields/app_field.dart';
-import 'package:piwigo_ng/components/modals/add_tags_modal.dart';
+import 'package:piwigo_ng/components/modals/select_tags_modal.dart';
 import 'package:piwigo_ng/components/sections/form_section.dart';
 import 'package:piwigo_ng/models/image_model.dart';
 import 'package:piwigo_ng/models/tag_model.dart';
@@ -68,7 +68,7 @@ class _EditImagePageState extends State<EditImagePage> {
         ));
       });
       if (_imageList.length == 1) {
-        ApiResult<ImageModel>? result = await getImage(_imageList.first.id);
+        ApiResponse<ImageModel>? result = await getImage(_imageList.first.id);
         if (result.hasData) {
           setState(() {
             _imageList[0] = result.data!;
@@ -200,7 +200,7 @@ class _EditImagePageState extends State<EditImagePage> {
               showMaterialModalBottomSheet<List<TagModel>>(
                 context: context,
                 backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-                builder: (context) => AddTagsModal(
+                builder: (context) => SelectTagsModal(
                   selectedTags: _tags,
                 ),
               ).then((value) {
@@ -220,13 +220,9 @@ class _EditImagePageState extends State<EditImagePage> {
                 runSpacing: 8.0,
                 children: List.generate(_tags.length, (index) {
                   TagModel tag = _tags[index];
-                  return TagChip(
-                    tag: tag,
-                    icon: Icon(
-                      Icons.close,
-                      color: Theme.of(context).colorScheme.error,
-                    ),
-                    onTap: () => _onDeselectTag(tag),
+                  return PiwigoChip(
+                    label: tag.name,
+                    onRemove: () => _onDeselectTag(tag),
                   );
                 }),
               ),

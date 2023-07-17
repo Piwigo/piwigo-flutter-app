@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:piwigo_ng/components/buttons/piwigo_button.dart';
-import 'package:piwigo_ng/components/cards/tag_chip.dart';
+import 'package:piwigo_ng/components/cards/piwigo_chip.dart';
 import 'package:piwigo_ng/components/modals/create_tag_modal.dart';
 import 'package:piwigo_ng/components/modals/piwigo_modal.dart';
 import 'package:piwigo_ng/models/tag_model.dart';
@@ -9,8 +9,8 @@ import 'package:piwigo_ng/network/api_error.dart';
 import 'package:piwigo_ng/network/tags.dart';
 import 'package:piwigo_ng/utils/localizations.dart';
 
-class AddTagsModal extends StatefulWidget {
-  const AddTagsModal({
+class SelectTagsModal extends StatefulWidget {
+  const SelectTagsModal({
     Key? key,
     this.selectedTags,
   }) : super(key: key);
@@ -18,12 +18,12 @@ class AddTagsModal extends StatefulWidget {
   final List<TagModel>? selectedTags;
 
   @override
-  _AddTagsModalState createState() => _AddTagsModalState();
+  _SelectTagsModalState createState() => _SelectTagsModalState();
 }
 
-class _AddTagsModalState extends State<AddTagsModal> {
+class _SelectTagsModalState extends State<SelectTagsModal> {
   final ScrollController _scrollController = ScrollController();
-  late final Future<ApiResult<List<TagModel>>> _tagsFuture;
+  late final Future<ApiResponse<List<TagModel>>> _tagsFuture;
 
   List<TagModel> _selectedTagList = [];
   List<TagModel> _tagList = [];
@@ -42,7 +42,7 @@ class _AddTagsModalState extends State<AddTagsModal> {
   }
 
   Future<void> _onRefresh() async {
-    final ApiResult<List<TagModel>> result = await getTags();
+    final ApiResponse<List<TagModel>> result = await getTags();
     if (!result.hasData) return;
     setState(() {
       _tagList = result.data!;
@@ -110,7 +110,7 @@ class _AddTagsModalState extends State<AddTagsModal> {
       body: Column(
         children: [
           Expanded(
-            child: FutureBuilder<ApiResult<List<TagModel>>>(
+            child: FutureBuilder<ApiResponse<List<TagModel>>>(
               future: _tagsFuture,
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
@@ -182,8 +182,8 @@ class TagWrap extends StatelessWidget {
       runSpacing: 8.0,
       children: List.generate(tags.length, (index) {
         TagModel tag = tags[index];
-        return SelectTagChip(
-          tag: tag,
+        return SelectChip(
+          label: tag.name,
           selected: isSelected?.call(tag) ?? false,
           onTap: () => onTap?.call(tag),
         );

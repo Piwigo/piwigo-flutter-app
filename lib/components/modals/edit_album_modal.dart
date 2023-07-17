@@ -41,7 +41,7 @@ class _EditAlbumModalState extends State<EditAlbumModal> {
       Navigator.of(context).pop();
     }
     _btnController.start();
-    ApiResult result = await editAlbum(
+    ApiResponse result = await editAlbum(
       albumId: widget.album.id,
       name: _name,
       description: _descriptionController.text,

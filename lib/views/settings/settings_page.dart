@@ -15,27 +15,27 @@ import 'package:piwigo_ng/network/authentication.dart';
 import 'package:piwigo_ng/services/preferences_service.dart';
 import 'package:piwigo_ng/utils/localizations.dart';
 import 'package:piwigo_ng/utils/settings.dart';
-import 'package:piwigo_ng/views/authentication/login_view_page.dart';
+import 'package:piwigo_ng/views/authentication/login_page.dart';
 import 'package:piwigo_ng/views/settings/auto_upload_page.dart';
-import 'package:piwigo_ng/views/settings/privacy_policy_view_page.dart';
-import 'package:piwigo_ng/views/settings/select_language_view_page.dart';
+import 'package:piwigo_ng/views/settings/privacy_policy_page.dart';
+import 'package:piwigo_ng/views/settings/select_language_page.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../services/theme_provider.dart';
 
-class SettingsViewPage extends StatefulWidget {
-  const SettingsViewPage({Key? key}) : super(key: key);
+class SettingsPage extends StatefulWidget {
+  const SettingsPage({Key? key}) : super(key: key);
 
   static const String routeName = '/settings';
 
   @override
-  State<SettingsViewPage> createState() => _SettingsViewPageState();
+  State<SettingsPage> createState() => _SettingsPageState();
 }
 
-class _SettingsViewPageState extends State<SettingsViewPage> {
+class _SettingsPageState extends State<SettingsPage> {
   final ScrollController _scrollController = ScrollController();
-  late final Future<ApiResult<InfoModel>> _infoFuture;
+  late final Future<ApiResponse<InfoModel>> _infoFuture;
 
   late final List<String> _availableSizes;
   late final List<String> _availablePreviewSizes;
@@ -205,7 +205,7 @@ class _SettingsViewPageState extends State<SettingsViewPage> {
             color: Theme.of(context).primaryColor,
             onPressed: () {
               App.navigatorKey.currentState?.pushNamedAndRemoveUntil(
-                LoginViewPage.routeName,
+                LoginPage.routeName,
                 (route) => false,
               );
             },
@@ -610,8 +610,8 @@ class _SettingsViewPageState extends State<SettingsViewPage> {
           SettingsSectionItemButton(
             title: appStrings.settings_language,
             icon: const Icon(Icons.language),
-            onPressed: () => Navigator.of(context)
-                .pushNamed(SelectLanguageViewPage.routeName),
+            onPressed: () =>
+                Navigator.of(context).pushNamed(SelectLanguagePage.routeName),
           ),
           SettingsSectionItemButton(
             title: appStrings.settings_translateWithCrowdin,
@@ -627,7 +627,7 @@ class _SettingsViewPageState extends State<SettingsViewPage> {
             icon: const Icon(Icons.privacy_tip),
             onPressed: () {
               Navigator.of(context).pushNamed(
-                PrivacyPolicyViewPage.routeName,
+                PrivacyPolicyPage.routeName,
               );
             },
           ),
@@ -650,7 +650,7 @@ class _SettingsViewPageState extends State<SettingsViewPage> {
         color: Colors.transparent,
         children: [
           SettingsSectionItem(
-            child: FutureBuilder<ApiResult<InfoModel>>(
+            child: FutureBuilder<ApiResponse<InfoModel>>(
               future: _infoFuture,
               builder: (context, snapshot) {
                 if (snapshot.hasData) {

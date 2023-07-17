@@ -7,10 +7,10 @@ import 'package:piwigo_ng/utils/album_actions.dart';
 import 'package:piwigo_ng/utils/localizations.dart';
 
 import '../../components/appbars/root_search_app_bar.dart';
-import '../image/image_search_view_page.dart';
+import '../image/image_search_page.dart';
 
-class RootAlbumViewPage extends StatefulWidget {
-  const RootAlbumViewPage({
+class RootAlbumPage extends StatefulWidget {
+  const RootAlbumPage({
     Key? key,
     this.albumId = 0,
     this.isAdmin = false,
@@ -21,13 +21,13 @@ class RootAlbumViewPage extends StatefulWidget {
   final bool isAdmin;
 
   @override
-  State<RootAlbumViewPage> createState() => _RootAlbumViewPageState();
+  State<RootAlbumPage> createState() => _RootAlbumPageState();
 }
 
-class _RootAlbumViewPageState extends State<RootAlbumViewPage> {
+class _RootAlbumPageState extends State<RootAlbumPage> {
   final ScrollController _scrollController = ScrollController();
 
-  late final Future<ApiResult<List<AlbumModel>>> _albumsFuture;
+  late final Future<ApiResponse<List<AlbumModel>>> _albumsFuture;
   List<AlbumModel> _albumList = [];
 
   @override
@@ -43,7 +43,7 @@ class _RootAlbumViewPageState extends State<RootAlbumViewPage> {
   }
 
   Future<void> _onRefresh() async {
-    final ApiResult<List<AlbumModel>> result =
+    final ApiResponse<List<AlbumModel>> result =
         await fetchAlbums(widget.albumId);
     if (!result.hasData) {
       return;
@@ -82,8 +82,7 @@ class _RootAlbumViewPageState extends State<RootAlbumViewPage> {
               RootSearchAppBar(
                 scrollController: _scrollController,
                 onSearch: () {
-                  Navigator.of(context)
-                      .pushNamed(ImageSearchViewPage.routeName);
+                  Navigator.of(context).pushNamed(ImageSearchPage.routeName);
                 },
               ),
               SliverToBoxAdapter(
@@ -98,11 +97,11 @@ class _RootAlbumViewPageState extends State<RootAlbumViewPage> {
   }
 
   Widget get _albumGrid {
-    return FutureBuilder<ApiResult<List<AlbumModel>>>(
+    return FutureBuilder<ApiResponse<List<AlbumModel>>>(
       future: _albumsFuture,
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          ApiResult<List<AlbumModel>> result = snapshot.data!;
+          ApiResponse<List<AlbumModel>> result = snapshot.data!;
           if (!result.hasData) {
             return Padding(
               padding:

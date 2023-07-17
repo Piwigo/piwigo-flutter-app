@@ -22,7 +22,7 @@ Map<String, dynamic> tryParseJson(String data) {
   }
 }
 
-Future<ApiResult<List<AlbumModel>>> fetchAlbums(int albumID) async {
+Future<ApiResponse<List<AlbumModel>>> fetchAlbums(int albumID) async {
   final Map<String, dynamic> queries = {
     'format': 'json',
     'method': 'pwg.categories.getList',
@@ -34,7 +34,7 @@ Future<ApiResult<List<AlbumModel>>> fetchAlbums(int albumID) async {
     List<String> uploadCategoryIdList = [];
     if (await methodExist('community.categories.getList')) {
       queries['faked_by_community'] = false;
-      ApiResult communityResult = await fetchCommunityAlbums(albumID);
+      ApiResponse communityResult = await fetchCommunityAlbums(albumID);
       if (communityResult.hasData) {
         uploadCategoryIdList = communityResult.data.map<String>(
           (cat) {
@@ -62,7 +62,7 @@ Future<ApiResult<List<AlbumModel>>> fetchAlbums(int albumID) async {
           return AlbumModel.fromJson(album);
         },
       ));
-      return ApiResult<List<AlbumModel>>(
+      return ApiResponse<List<AlbumModel>>(
         data: albums,
       );
     }
@@ -71,10 +71,10 @@ Future<ApiResult<List<AlbumModel>>> fetchAlbums(int albumID) async {
   } catch (e) {
     debugPrint("$e");
   }
-  return ApiResult(error: ApiErrors.fetchAlbumsError);
+  return ApiResponse(error: ApiErrors.fetchAlbumsError);
 }
 
-Future<ApiResult<List<AlbumModel>>> fetchCommunityAlbums(int albumID) async {
+Future<ApiResponse<List<AlbumModel>>> fetchCommunityAlbums(int albumID) async {
   final Map<String, dynamic> queries = {
     'format': 'json',
     'method': 'community.categories.getList',
@@ -93,7 +93,7 @@ Future<ApiResult<List<AlbumModel>>> fetchCommunityAlbums(int albumID) async {
         (album) => AlbumModel.fromJson(album),
       ));
 
-      return ApiResult<List<AlbumModel>>(
+      return ApiResponse<List<AlbumModel>>(
         data: albums,
       );
     }
@@ -102,10 +102,10 @@ Future<ApiResult<List<AlbumModel>>> fetchCommunityAlbums(int albumID) async {
   } catch (e) {
     debugPrint("$e");
   }
-  return ApiResult(error: ApiErrors.fetchAlbumsError);
+  return ApiResponse(error: ApiErrors.fetchAlbumsError);
 }
 
-Future<ApiResult<List<AlbumModel>>> getAlbumTree([int? startId]) async {
+Future<ApiResponse<List<AlbumModel>>> getAlbumTree([int? startId]) async {
   final Map<String, dynamic> queries = {
     'format': 'json',
     'method': 'pwg.categories.getList',
@@ -126,7 +126,7 @@ Future<ApiResult<List<AlbumModel>>> getAlbumTree([int? startId]) async {
         (album) => AlbumModel.fromJson(album),
       ));
 
-      return ApiResult<List<AlbumModel>>(
+      return ApiResponse<List<AlbumModel>>(
         data: albums,
       );
     }
@@ -136,10 +136,10 @@ Future<ApiResult<List<AlbumModel>>> getAlbumTree([int? startId]) async {
     debugPrint("$e");
     debugPrint("${(e as Error).stackTrace}");
   }
-  return ApiResult(error: ApiErrors.fetchAlbumListError);
+  return ApiResponse(error: ApiErrors.fetchAlbumListError);
 }
 
-Future<ApiResult<bool>> addAlbum({
+Future<ApiResponse<bool>> addAlbum({
   required String name,
   required int parentId,
   String description = '',
@@ -161,19 +161,19 @@ Future<ApiResult<bool>> addAlbum({
       final Map<String, dynamic> data = json.decode(response.data);
       if (data['stat'] == 'fail') {
         debugPrint("$data");
-        return ApiResult(error: ApiErrors.createAlbumError);
+        return ApiResponse(error: ApiErrors.createAlbumError);
       }
-      return ApiResult(data: true);
+      return ApiResponse(data: true);
     }
   } on DioError catch (e) {
     debugPrint(e.message);
   } catch (e) {
     debugPrint("$e");
   }
-  return ApiResult(error: ApiErrors.createAlbumError);
+  return ApiResponse(error: ApiErrors.createAlbumError);
 }
 
-Future<ApiResult<bool>> moveAlbum(int catId, int parentCatId) async {
+Future<ApiResponse<bool>> moveAlbum(int catId, int parentCatId) async {
   final Map<String, String> queries = {
     'format': 'json',
     'method': 'pwg.categories.move',
@@ -194,19 +194,19 @@ Future<ApiResult<bool>> moveAlbum(int catId, int parentCatId) async {
     if (response.statusCode == 200) {
       final Map<String, dynamic> data = json.decode(response.data);
       if (data['stat'] == 'fail') {
-        return ApiResult(error: ApiErrors.moveAlbumError);
+        return ApiResponse(error: ApiErrors.moveAlbumError);
       }
-      return ApiResult(data: true);
+      return ApiResponse(data: true);
     }
   } on DioError catch (e) {
     debugPrint("${e.message}");
   } catch (e) {
     debugPrint("$e");
   }
-  return ApiResult(error: ApiErrors.moveAlbumError);
+  return ApiResponse(error: ApiErrors.moveAlbumError);
 }
 
-Future<ApiResult<bool>> editAlbum(
+Future<ApiResponse<bool>> editAlbum(
     {required String name,
     required int albumId,
     String description = ''}) async {
@@ -230,19 +230,19 @@ Future<ApiResult<bool>> editAlbum(
       final Map<String, dynamic> data = json.decode(response.data);
       if (data['stat'] == 'fail') {
         debugPrint("$data");
-        return ApiResult(error: ApiErrors.editAlbumError);
+        return ApiResponse(error: ApiErrors.editAlbumError);
       }
-      return ApiResult(data: true);
+      return ApiResponse(data: true);
     }
   } on DioError catch (e) {
     debugPrint("${e.message}");
   } catch (e) {
     debugPrint("$e");
   }
-  return ApiResult(error: ApiErrors.editAlbumError);
+  return ApiResponse(error: ApiErrors.editAlbumError);
 }
 
-Future<ApiResult<bool>> deleteAlbum(
+Future<ApiResponse<bool>> deleteAlbum(
   int catId, {
   DeleteAlbumModes deletionMode = DeleteAlbumModes.deleteOrphans,
 }) async {
@@ -267,16 +267,16 @@ Future<ApiResult<bool>> deleteAlbum(
       final Map<String, dynamic> data = json.decode(response.data);
       if (data['stat'] == 'fail') {
         debugPrint("$data");
-        return ApiResult(error: ApiErrors.deleteAlbumError);
+        return ApiResponse(error: ApiErrors.deleteAlbumError);
       }
-      return ApiResult(data: true);
+      return ApiResponse(data: true);
     }
   } on DioError catch (e) {
     debugPrint("${e.message}");
   } catch (e) {
     debugPrint("$e");
   }
-  return ApiResult(error: ApiErrors.deleteAlbumError);
+  return ApiResponse(error: ApiErrors.deleteAlbumError);
 }
 
 enum DeleteAlbumModes {
