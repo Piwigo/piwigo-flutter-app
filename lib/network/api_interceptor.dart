@@ -45,16 +45,50 @@ class ApiInterceptor extends Interceptor {
   ) async {
     debugPrint(
         "[${err.response?.statusCode}] ${err.requestOptions.queryParameters['method']}");
-    debugPrint('${err.error}\n${err.stackTrace}');
-    if (err.error is HandshakeException) {
-      HandshakeException handshakeError = err.error as HandshakeException;
-      String? message = handshakeError.osError?.message;
-      if (message != null && message.contains('CERTIFICATE_VERIFY_FAILED')) {
-        // Invalid SSL
-      }
-    }
+    debugPrint('${err.error}\n${err.response?.data}\n${err.stackTrace}');
+
     switch (err.response?.statusCode) {
+      case 403:
+        App.scaffoldMessengerKey.currentState?.showSnackBar(
+          errorSnackBar(
+            message: appStrings.sessionStatusError_title,
+            icon: Icons.block,
+          ),
+        );
+        break;
       case null:
+        // Handle invalid SSL
+        if (err.error is HandshakeException) {
+          HandshakeException handshakeError = err.error as HandshakeException;
+          String? message = handshakeError.osError?.message;
+          if (message != null &&
+              message.contains('CERTIFICATE_VERIFY_FAILED')) {
+            App.scaffoldMessengerKey.currentState?.showSnackBar(
+              errorSnackBar(
+                message: appStrings.loginCertFailed_title,
+                icon: Icons.bookmark_outlined,
+              ),
+            );
+            break;
+          }
+        }
+
+        // Handle invalid URL
+        if (err.error is SocketException) {
+          SocketException socketError = err.error as SocketException;
+          int? code = socketError.osError?.errorCode;
+          if (code == 7) {
+            App.scaffoldMessengerKey.currentState?.showSnackBar(
+              errorSnackBar(
+                message: appStrings.serverURLerror_title,
+                icon: Icons.public_off,
+              ),
+            );
+            break;
+          }
+        }
+
+        // Unknown server error
         App.scaffoldMessengerKey.currentState?.showSnackBar(
           errorSnackBar(
             message: appStrings.internetErrorGeneral_title,

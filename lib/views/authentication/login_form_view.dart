@@ -110,11 +110,11 @@ class _LoginFormViewState extends State<LoginFormView> {
           _urlError = true;
           break;
         default:
-          ScaffoldMessenger.of(context).showSnackBar(
-            errorSnackBar(
-              message: appStrings.serverUnknownError_message,
-            ),
-          );
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //   errorSnackBar(
+        //     message: appStrings.serverUnknownError_message,
+        //   ),
+        // );
       }
     });
   }

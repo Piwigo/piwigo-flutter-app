@@ -58,7 +58,7 @@ Future<ApiResult<bool>> loginUser(
     askMediaPermission();
     return ApiResult<bool>(
       data: false,
-      error: ApiErrors.wrongServerUrl,
+      // error: ApiErrors.wrongServerUrl,
     );
   }
 
@@ -103,7 +103,7 @@ Future<ApiResult<bool>> loginUser(
   }
   return ApiResult<bool>(
     data: false,
-    error: ApiErrors.wrongServerUrl,
+    // error: ApiErrors.wrongServerUrl,
   );
 }
 
