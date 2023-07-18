@@ -4,9 +4,12 @@ import 'package:piwigo_ng/components/cards/piwigo_chip.dart';
 import 'package:piwigo_ng/components/modals/select_groups_modal.dart';
 import 'package:piwigo_ng/components/sections/form_section.dart';
 import 'package:piwigo_ng/models/album_model.dart';
+import 'package:piwigo_ng/models/album_permission_model.dart';
 import 'package:piwigo_ng/models/group_model.dart';
 import 'package:piwigo_ng/models/user_model.dart';
 import 'package:piwigo_ng/network/api_error.dart';
+import 'package:piwigo_ng/network/groups.dart';
+import 'package:piwigo_ng/network/permissions.dart';
 import 'package:piwigo_ng/network/users.dart';
 import 'package:piwigo_ng/utils/localizations.dart';
 
@@ -22,9 +25,11 @@ class AlbumPrivacyPage extends StatefulWidget {
 }
 
 class _AlbumPrivacyPageState extends State<AlbumPrivacyPage> {
-  late final Future<ApiResponse> _adminsFuture;
+  late final Future<void> _adminsFuture;
+  late final Future<void> _permissionsFuture;
   late AlbumStatus _selectedMode;
 
+  List<GroupModel> _allowedGroups = [];
   List<UserModel>? _admins;
   List<GroupModel> _groups = [];
 
@@ -32,18 +37,39 @@ class _AlbumPrivacyPageState extends State<AlbumPrivacyPage> {
   void initState() {
     _selectedMode = widget.album.status;
     _adminsFuture = _getAdmins();
-    // todo: is private, get album groups
+    _permissionsFuture = _getPermissions();
     super.initState();
   }
 
-  Future<ApiResponse> _getAdmins() async {
+  Future<void> _getAdmins() async {
     ApiResponse response = await getAllAdmins();
     if (response.hasError) {
       _admins = null;
-      return response;
+      return;
     }
     _admins = response.data;
-    return response;
+    print(_admins);
+  }
+
+  Future<void> _getPermissions() async {
+    AlbumPermissionModel? permissions = await getAlbumPermissions(
+      widget.album.id,
+    );
+    if (permissions == null) {
+      _allowedGroups = [];
+      return;
+    }
+
+    List<GroupModel>? groups = await getAllGroups(
+      groups: permissions.groups,
+    );
+    if (groups == null) {
+      _allowedGroups = [];
+      return;
+    }
+
+    _allowedGroups = groups;
+    _groups = [..._groups, ..._allowedGroups].toSet().toList();
   }
 
   void _onChangeMode(AlbumStatus? mode) {
@@ -150,52 +176,68 @@ class _AlbumPrivacyPageState extends State<AlbumPrivacyPage> {
                 icon: Icon(Icons.add_circle),
               ),
             ],
-            child: Wrap(
-              spacing: 8.0,
-              runSpacing: .0,
-              children: List.generate(_groups.length, (index) {
-                GroupModel group = _groups[index];
-                return PiwigoChip(
-                  onRemove: () => _onRemoveGroup(index),
-                  label: group.name,
+            child: FutureBuilder(
+              future: _permissionsFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.done) {
+                  return Wrap(
+                    spacing: 8.0,
+                    runSpacing: .0,
+                    children: List.generate(_groups.length, (index) {
+                      GroupModel group = _groups[index];
+                      return PiwigoChip(
+                        onRemove: () => _onRemoveGroup(index),
+                        label: group.name,
+                      );
+                    }),
+                  );
+                }
+                return Center(
+                  child: CircularProgressIndicator(),
                 );
-              }),
+              },
             ),
           ),
           FormSection(
             title: appStrings.categoryPrivacyUsers,
-            child: FutureBuilder<ApiResponse>(
-                future: _adminsFuture,
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    if (_admins == null) {
-                      return Text(appStrings.none);
-                    }
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(appStrings
-                            .categoryPrivacyUsers_message(_admins!.length)),
-                        Builder(builder: (context) {
-                          if (_admins!.length > 5) {
-                            String admins = _admins!
-                                .sublist(0, 5)
-                                .map((e) => e.name)
-                                .join(', ');
-                            Text("$admins, ...");
-                          }
-                          String admins =
-                              _admins!.map((e) => e.name).join(', ');
-                          return Text("$admins.");
-                        }),
-                      ],
+            child: FutureBuilder(
+              future: _adminsFuture,
+              builder: (context, snapshot) {
+                switch (snapshot.connectionState) {
+                  case ConnectionState.done:
+                    return _buildUserPermissions;
+                  case ConnectionState.waiting:
+                  default:
+                    return Center(
+                      child: CircularProgressIndicator(),
                     );
-                  }
-                  return LinearProgressIndicator();
-                }),
+                }
+              },
+            ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget get _buildUserPermissions {
+    if (_admins == null) {
+      return Text(appStrings.none);
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(appStrings.categoryPrivacyUsers_message(_admins!.length)),
+        Builder(builder: (context) {
+          if (_admins!.length > 5) {
+            String admins =
+                _admins!.sublist(0, 5).map((e) => e.name).join(', ');
+            Text("$admins, ...");
+          }
+          String admins = _admins!.map((e) => e.name).join(', ');
+          return Text("$admins.");
+        }),
+      ],
     );
   }
 }

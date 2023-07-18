@@ -44,16 +44,16 @@ Future<ApiResponse<List<UserModel>>> getAllAdmins() async {
   bool reachedEnd = false;
   List<UserModel> users = [];
 
+  Map<String, dynamic> queries = {
+    'format': 'json',
+    'method': 'pwg.users.getList',
+    'status[]': ['admin', 'webmaster'],
+    'per_page': Settings.defaultElementPerPage,
+    'page': page,
+  };
+
   try {
     while (!reachedEnd) {
-      Map<String, dynamic> queries = {
-        'format': 'json',
-        'method': 'pwg.users.getList',
-        'status[]': ['admin', 'webmaster'],
-        'per_page': Settings.defaultElementPerPage,
-        'page': page,
-      };
-
       Response response = await ApiClient.get(queryParameters: queries);
       if (response.statusCode == 200) {
         Map<String, dynamic> data = json.decode(response.data);
@@ -63,11 +63,13 @@ Future<ApiResponse<List<UserModel>>> getAllAdmins() async {
           jsonUsers.map((user) => UserModel.fromJson(user)),
         );
 
-        if (pageUsers.isEmpty) {
+        users.addAll(pageUsers);
+
+        if (pageUsers.length < Settings.defaultElementPerPage) {
           reachedEnd = true;
         } else {
-          users.addAll(pageUsers);
           page++;
+          queries['page'] = page;
         }
       } else {
         if (users.isEmpty) {
