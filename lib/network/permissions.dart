@@ -79,24 +79,25 @@ Future<bool> addPermission({
     'method': 'pwg.permissions.add',
   };
 
-  Map<String, dynamic> body = {
+  Map<String, dynamic> data = {
     'cat_id': albumId,
     'pwg_token': prefs.getString(Preferences.tokenKey),
   };
 
-  if (users != null) body['user_id'] = users;
-  if (groups != null) body['group_id'] = groups;
-  if (recursive != null) body['recursive'] = recursive;
+  if (users != null) data['user_id'] = users;
+  if (groups != null) data['group_id'] = groups;
+  if (recursive != null) data['recursive'] = recursive;
+
+  final FormData formData = FormData.fromMap(data);
 
   try {
     Response response = await ApiClient.post(
       queryParameters: queries,
-      data: body,
+      data: formData,
     );
 
     if (response.statusCode == 200) {
       Map<String, dynamic> data = json.decode(response.data);
-      print(data);
       return true;
     }
   } on DioError catch (e) {
@@ -119,23 +120,24 @@ Future<bool> removePermission({
     'method': 'pwg.permissions.remove',
   };
 
-  Map<String, dynamic> body = {
+  Map<String, dynamic> data = {
     'cat_id': albumId,
     'pwg_token': prefs.getString(Preferences.tokenKey),
   };
 
-  if (users != null) body['user_id'] = users;
-  if (groups != null) body['group_id'] = groups;
+  if (users != null) data['user_id'] = users;
+  if (groups != null) data['group_id'] = groups;
+
+  final FormData formData = FormData.fromMap(data);
 
   try {
     Response response = await ApiClient.post(
       queryParameters: queries,
-      data: body,
+      data: formData,
     );
 
     if (response.statusCode == 200) {
       Map<String, dynamic> data = json.decode(response.data);
-      print(data);
       return true;
     }
   } on DioError catch (e) {

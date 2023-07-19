@@ -7,6 +7,7 @@ import 'package:piwigo_ng/models/album_model.dart';
 import 'package:piwigo_ng/models/album_permission_model.dart';
 import 'package:piwigo_ng/models/group_model.dart';
 import 'package:piwigo_ng/models/user_model.dart';
+import 'package:piwigo_ng/network/albums.dart';
 import 'package:piwigo_ng/network/api_error.dart';
 import 'package:piwigo_ng/network/groups.dart';
 import 'package:piwigo_ng/network/permissions.dart';
@@ -48,7 +49,6 @@ class _AlbumPrivacyPageState extends State<AlbumPrivacyPage> {
       return;
     }
     _admins = response.data;
-    print(_admins);
   }
 
   Future<void> _getPermissions() async {
@@ -70,6 +70,33 @@ class _AlbumPrivacyPageState extends State<AlbumPrivacyPage> {
 
     _allowedGroups = groups;
     _groups = [..._groups, ..._allowedGroups].toSet().toList();
+  }
+
+  Future<void> _onConfirmPermissions() async {
+    ApiResponse editResult = await editAlbum(
+      albumId: widget.album.id,
+      status: _selectedMode,
+    );
+    if (!editResult.hasData || !editResult.data) return;
+
+    if (_selectedMode == AlbumStatus.private) {
+      List<GroupModel> newGroups =
+          _groups.where((e) => !_allowedGroups.contains(e)).toList();
+      List<GroupModel> removedGroups =
+          _allowedGroups.where((e) => !_groups.contains(e)).toList();
+
+      bool addSuccess = await addPermission(
+        albumId: widget.album.id,
+        groups: newGroups.map((group) => group.id).toList(),
+      );
+
+      bool removeSuccess = await removePermission(
+        albumId: widget.album.id,
+        groups: removedGroups.map((group) => group.id).toList(),
+      );
+    }
+
+    Navigator.of(context).pop();
   }
 
   void _onChangeMode(AlbumStatus? mode) {
@@ -102,56 +129,67 @@ class _AlbumPrivacyPageState extends State<AlbumPrivacyPage> {
       appBar: AppBar(
         title: Text(appStrings.categoryPrivacy),
       ),
-      body: ListView(
-        padding: const EdgeInsets.symmetric(
-          vertical: 16.0,
-        ),
+      body: Column(
         children: [
-          Text(
-            appStrings.categoryPrivacy_subtitle(widget.album.name),
-            textAlign: TextAlign.center,
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(
-              vertical: 8.0,
-            ),
-            child: Column(
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.symmetric(
+                vertical: 16.0,
+              ),
               children: [
-                RadioListTile<AlbumStatus>(
-                  value: AlbumStatus.public,
-                  groupValue: _selectedMode,
-                  activeColor: Theme.of(context).colorScheme.secondary,
-                  title: Text(appStrings.categoryPrivacyMode_public),
-                  subtitle: Text(appStrings.categoryPrivacyMode_publicMessage),
-                  onChanged: _onChangeMode,
+                Text(
+                  appStrings.categoryPrivacy_subtitle(widget.album.name),
+                  textAlign: TextAlign.center,
                 ),
-                RadioListTile(
-                  value: AlbumStatus.private,
-                  groupValue: _selectedMode,
-                  activeColor: Theme.of(context).colorScheme.secondary,
-                  title: Text(appStrings.categoryPrivacyMode_private),
-                  subtitle: Text(appStrings.categoryPrivacyMode_privateMessage),
-                  onChanged: _onChangeMode,
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 8.0,
+                  ),
+                  child: Column(
+                    children: [
+                      RadioListTile<AlbumStatus>(
+                        value: AlbumStatus.public,
+                        groupValue: _selectedMode,
+                        activeColor: Theme.of(context).colorScheme.secondary,
+                        title: Text(appStrings.categoryPrivacyMode_public),
+                        subtitle:
+                            Text(appStrings.categoryPrivacyMode_publicMessage),
+                        onChanged: _onChangeMode,
+                      ),
+                      RadioListTile(
+                        value: AlbumStatus.private,
+                        groupValue: _selectedMode,
+                        activeColor: Theme.of(context).colorScheme.secondary,
+                        title: Text(appStrings.categoryPrivacyMode_private),
+                        subtitle:
+                            Text(appStrings.categoryPrivacyMode_privateMessage),
+                        onChanged: _onChangeMode,
+                      ),
+                    ],
+                  ),
+                ),
+                AnimatedSize(
+                  duration: const Duration(milliseconds: 300),
+                  reverseDuration: const Duration(milliseconds: 150),
+                  curve: Curves.ease,
+                  alignment: Alignment.topCenter,
+                  child: SizedBox(
+                    height: _selectedMode == AlbumStatus.public ? .0 : null,
+                    child: _privateSection,
+                  ),
                 ),
               ],
             ),
           ),
-          AnimatedSize(
-            duration: const Duration(milliseconds: 300),
-            reverseDuration: const Duration(milliseconds: 150),
-            curve: Curves.ease,
-            alignment: Alignment.topCenter,
-            child: SizedBox(
-              height: _selectedMode == AlbumStatus.public ? .0 : null,
-              child: _privateSection,
-            ),
-          ),
-          PiwigoButton(
-            margin: const EdgeInsets.symmetric(
+          Padding(
+            padding: const EdgeInsets.symmetric(
               horizontal: 24.0,
               vertical: 16.0,
             ),
-            text: appStrings.alertConfirmButton,
+            child: PiwigoButton(
+              onPressed: _onConfirmPermissions,
+              text: appStrings.alertConfirmButton,
+            ),
           ),
         ],
       ),
@@ -179,22 +217,14 @@ class _AlbumPrivacyPageState extends State<AlbumPrivacyPage> {
             child: FutureBuilder(
               future: _permissionsFuture,
               builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.done) {
-                  return Wrap(
-                    spacing: 8.0,
-                    runSpacing: .0,
-                    children: List.generate(_groups.length, (index) {
-                      GroupModel group = _groups[index];
-                      return PiwigoChip(
-                        onRemove: () => _onRemoveGroup(index),
-                        label: group.name,
-                      );
-                    }),
-                  );
+                switch (snapshot.connectionState) {
+                  case ConnectionState.done:
+                    return _buildGroupPermissions;
+                  default:
+                    return Center(
+                      child: CircularProgressIndicator(),
+                    );
                 }
-                return Center(
-                  child: CircularProgressIndicator(),
-                );
               },
             ),
           ),
@@ -206,7 +236,6 @@ class _AlbumPrivacyPageState extends State<AlbumPrivacyPage> {
                 switch (snapshot.connectionState) {
                   case ConnectionState.done:
                     return _buildUserPermissions;
-                  case ConnectionState.waiting:
                   default:
                     return Center(
                       child: CircularProgressIndicator(),
@@ -217,6 +246,20 @@ class _AlbumPrivacyPageState extends State<AlbumPrivacyPage> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget get _buildGroupPermissions {
+    return Wrap(
+      spacing: 8.0,
+      runSpacing: .0,
+      children: List.generate(_groups.length, (index) {
+        GroupModel group = _groups[index];
+        return PiwigoChip(
+          onRemove: () => _onRemoveGroup(index),
+          label: group.name,
+        );
+      }),
     );
   }
 

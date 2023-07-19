@@ -206,24 +206,29 @@ Future<ApiResponse<bool>> moveAlbum(int catId, int parentCatId) async {
   return ApiResponse(error: ApiErrors.moveAlbumError);
 }
 
-Future<ApiResponse<bool>> editAlbum(
-    {required String name,
-    required int albumId,
-    String description = ''}) async {
+Future<ApiResponse<bool>> editAlbum({
+  required int albumId,
+  String? name,
+  String? description,
+  AlbumStatus? status,
+}) async {
   Map<String, String> queries = {
     'format': 'json',
     'method': 'pwg.categories.setInfo',
   };
-  FormData formData = FormData.fromMap({
+  Map<String, dynamic> data = {
     'category_id': albumId,
-    'name': name,
-    'comment': description,
-  });
+  };
+  if (name != null) data['name'] = name;
+  if (description != null) data['comment'] = description;
+  if (status != null) data['status'] = status.toJson();
+
+  final FormData formData = FormData.fromMap(data);
 
   try {
     Response response = await ApiClient.post(
-      data: formData,
       queryParameters: queries,
+      data: formData,
     );
 
     if (response.statusCode == 200) {
@@ -232,6 +237,7 @@ Future<ApiResponse<bool>> editAlbum(
         debugPrint("$data");
         return ApiResponse(error: ApiErrors.editAlbumError);
       }
+      print(data);
       return ApiResponse(data: true);
     }
   } on DioError catch (e) {

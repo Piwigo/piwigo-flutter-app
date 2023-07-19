@@ -24,7 +24,7 @@ Future<List<GroupModel>?> getAllGroups({
     'page': page,
   };
 
-  if (groups != null) queries['groups[]'] = groups;
+  if (groups != null) queries['group_id[]'] = groups;
   if (name != null) queries['name'] = "$name%";
 
   try {
