@@ -128,7 +128,10 @@ Future<ApiResponse<StatusModel>> sessionStatus() async {
   } on DioError catch (e) {
     debugPrint(e.message);
   } catch (e) {
-    debugPrint('Error $e');
+    debugPrint('Session Status Error: $e');
+    if (e is Error) {
+      debugPrint('${e.stackTrace}');
+    }
   }
   return ApiResponse(
     error: ApiErrors.getStatusError,
