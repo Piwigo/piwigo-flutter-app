@@ -217,7 +217,7 @@ class _EditImagePageState extends State<EditImagePage> {
               borderRadius: BorderRadius.circular(10),
               child: Wrap(
                 spacing: 8.0,
-                runSpacing: 8.0,
+                runSpacing: .0,
                 children: List.generate(_tags.length, (index) {
                   TagModel tag = _tags[index];
                   return PiwigoChip(

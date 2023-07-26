@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:piwigo_ng/components/lists/image_grid_view.dart';
 import 'package:piwigo_ng/components/popup_list_item.dart';
-import 'package:piwigo_ng/components/scroll_widgets/image_grid_view.dart';
 import 'package:piwigo_ng/models/album_model.dart';
 import 'package:piwigo_ng/models/image_model.dart';
 import 'package:piwigo_ng/network/api_error.dart';

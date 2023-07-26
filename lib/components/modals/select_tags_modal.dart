@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:piwigo_ng/components/buttons/piwigo_button.dart';
-import 'package:piwigo_ng/components/cards/piwigo_chip.dart';
+import 'package:piwigo_ng/components/lists/select_model_list.dart';
 import 'package:piwigo_ng/components/modals/create_tag_modal.dart';
 import 'package:piwigo_ng/components/modals/piwigo_modal.dart';
 import 'package:piwigo_ng/models/tag_model.dart';
@@ -12,10 +12,10 @@ import 'package:piwigo_ng/utils/localizations.dart';
 class SelectTagsModal extends StatefulWidget {
   const SelectTagsModal({
     Key? key,
-    this.selectedTags,
+    this.selectedTags = const [],
   }) : super(key: key);
 
-  final List<TagModel>? selectedTags;
+  final List<TagModel> selectedTags;
 
   @override
   _SelectTagsModalState createState() => _SelectTagsModalState();
@@ -23,16 +23,16 @@ class SelectTagsModal extends StatefulWidget {
 
 class _SelectTagsModalState extends State<SelectTagsModal> {
   final ScrollController _scrollController = ScrollController();
-  late final Future<ApiResponse<List<TagModel>>> _tagsFuture;
+  late final Future _tagsFuture;
 
   List<TagModel> _selectedTagList = [];
-  List<TagModel> _tagList = [];
+  List<TagModel>? _tagList = [];
 
   @override
   void initState() {
-    _selectedTagList = widget.selectedTags ?? [];
+    _selectedTagList = List.from(widget.selectedTags);
     super.initState();
-    _tagsFuture = getTags();
+    _tagsFuture = _onRefresh();
   }
 
   @override
@@ -41,11 +41,15 @@ class _SelectTagsModalState extends State<SelectTagsModal> {
     super.dispose();
   }
 
+  List<TagModel> get _unselectedTagList =>
+      _tagList!.where((t) => !_selectedTagList.contains(t)).toList();
+
   Future<void> _onRefresh() async {
     final ApiResponse<List<TagModel>> result = await getTags();
     if (!result.hasData) return;
     setState(() {
       _tagList = result.data!;
+      _sortLists();
     });
   }
 
@@ -56,30 +60,38 @@ class _SelectTagsModalState extends State<SelectTagsModal> {
     );
     if (addedTag == null) return;
     await _onRefresh();
+    if (_tagList == null) return;
     try {
       setState(() {
-        _selectedTagList
-            .add(_tagList.where((tag) => tag.id == addedTag.id).first);
+        _selectedTagList.add(
+          _tagList!.where((tag) => tag.id == addedTag.id).first,
+        );
+        _sortLists();
       });
     } on StateError catch (_) {
       debugPrint('Can\'t fetch new tag');
     }
   }
 
-  void _onSelectTag(TagModel tag) {
-    if (_selectedTagList.contains(tag)) {
-      _onDeselectTag(tag);
-    } else {
-      setState(() {
-        _selectedTagList.add(tag);
-      });
-    }
+  int _onSelectTag(TagModel tag) {
+    setState(() {
+      _selectedTagList.add(tag);
+      _sortLists();
+    });
+    return _selectedTagList.indexOf(tag);
   }
 
-  void _onDeselectTag(TagModel tag) {
+  int _onDeselectTag(TagModel tag) {
     setState(() {
       _selectedTagList.remove(tag);
+      _sortLists();
     });
+    return _unselectedTagList.indexOf(tag);
+  }
+
+  void _sortLists() {
+    _selectedTagList.sort((a, b) => a.name.compareTo(b.name));
+    _tagList?.sort((a, b) => a.name.compareTo(b.name));
   }
 
   @override
@@ -110,30 +122,25 @@ class _SelectTagsModalState extends State<SelectTagsModal> {
       body: Column(
         children: [
           Expanded(
-            child: FutureBuilder<ApiResponse<List<TagModel>>>(
+            child: FutureBuilder(
               future: _tagsFuture,
               builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  if (!snapshot.data!.hasData) {
+                switch (snapshot.connectionState) {
+                  case ConnectionState.done:
+                    return _tagLists;
+                  default:
                     return Center(
-                      child: Text(appStrings.errorHUD_label),
+                      child: CircularProgressIndicator(),
                     );
-                  }
-                  if (_tagList.isEmpty) {
-                    _tagList = snapshot.data!.data ?? [];
-                  }
-                  return _tagLists;
-                } else {
-                  return Center(
-                    child: CircularProgressIndicator(),
-                  );
                 }
               },
             ),
           ),
           Padding(
-            padding:
-                const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
+            padding: const EdgeInsets.symmetric(
+              vertical: 16.0,
+              horizontal: 16.0,
+            ),
             child: PiwigoButton(
               color: Theme.of(context).primaryColor,
               onPressed: () => Navigator.of(context).pop(_selectedTagList),
@@ -146,48 +153,24 @@ class _SelectTagsModalState extends State<SelectTagsModal> {
   }
 
   Widget get _tagLists {
-    // List<TagModel> unselectedTags =
-    //     _tagList.where((tag) => !_selectedTagList.contains(tag)).toList();
+    if (_tagList == null) {
+      return Center(
+        child: Text(appStrings.errorHUD_label),
+      );
+    }
     return ListView(
       controller: ModalScrollController.of(context),
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       physics: const AlwaysScrollableScrollPhysics(),
       children: [
-        TagWrap(
-          tags: _tagList,
-          onTap: _onSelectTag,
-          isSelected: (tag) => _selectedTagList.contains(tag),
+        SelectModelList<TagModel>(
+          selected: _selectedTagList,
+          unselected: _unselectedTagList,
+          itemBuilder: (group) => Text(group.name),
+          onSelect: _onSelectTag,
+          onDeselect: _onDeselectTag,
         ),
       ],
-    );
-  }
-}
-
-class TagWrap extends StatelessWidget {
-  const TagWrap({
-    Key? key,
-    this.tags = const [],
-    this.onTap,
-    this.isSelected,
-  }) : super(key: key);
-
-  final List<TagModel> tags;
-  final Function(TagModel)? onTap;
-  final bool Function(TagModel)? isSelected;
-
-  @override
-  Widget build(BuildContext context) {
-    return Wrap(
-      spacing: 8.0,
-      runSpacing: 8.0,
-      children: List.generate(tags.length, (index) {
-        TagModel tag = tags[index];
-        return SelectChip(
-          label: tag.name,
-          selected: isSelected?.call(tag) ?? false,
-          onTap: () => onTap?.call(tag),
-        );
-      }),
     );
   }
 }

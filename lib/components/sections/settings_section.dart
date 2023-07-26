@@ -33,7 +33,7 @@ class SettingsSection extends StatelessWidget {
               ),
             ),
           ClipRRect(
-            borderRadius: BorderRadius.circular(16.0),
+            borderRadius: BorderRadius.circular(15.0),
             child: Container(
               decoration: BoxDecoration(
                 color: color ?? Theme.of(context).cardColor,

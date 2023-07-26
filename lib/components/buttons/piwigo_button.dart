@@ -23,6 +23,8 @@ class PiwigoButton extends StatelessWidget {
   final bool loading;
   final String text;
 
+  static const double buttonHeight = 56.0;
+
   @override
   Widget build(BuildContext context) {
     final Color backgroundColor = disabled
@@ -35,9 +37,9 @@ class PiwigoButton extends StatelessWidget {
         duration: const Duration(milliseconds: 300),
         margin: margin,
         padding: padding,
-        height: 56.0,
+        height: buttonHeight,
         constraints: const BoxConstraints(
-          minWidth: 56.0,
+          minWidth: buttonHeight,
           maxWidth: Settings.modalMaxWidth,
         ),
         decoration: BoxDecoration(

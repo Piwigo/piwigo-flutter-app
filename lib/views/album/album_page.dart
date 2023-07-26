@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:piwigo_ng/components/lists/album_grid_view.dart';
+import 'package:piwigo_ng/components/lists/image_grid_view.dart';
 import 'package:piwigo_ng/components/popup_list_item.dart';
-import 'package:piwigo_ng/components/scroll_widgets/album_grid_view.dart';
-import 'package:piwigo_ng/components/scroll_widgets/image_grid_view.dart';
 import 'package:piwigo_ng/models/album_model.dart';
 import 'package:piwigo_ng/models/image_model.dart';
 import 'package:piwigo_ng/network/albums.dart';
@@ -39,8 +39,7 @@ class AlbumPage extends StatefulWidget {
   State<AlbumPage> createState() => _AlbumPageState();
 }
 
-class _AlbumPageState extends State<AlbumPage>
-    with AutomaticKeepAliveClientMixin<AlbumPage> {
+class _AlbumPageState extends State<AlbumPage> {
   final RefreshController _refreshController =
       RefreshController(initialRefresh: false);
   final ScrollController _scrollController = ScrollController();
@@ -209,7 +208,6 @@ class _AlbumPageState extends State<AlbumPage>
 
   @override
   Widget build(BuildContext context) {
-    super.build(context);
     return Scaffold(
       body: SafeArea(
         child: SmartRefresher(
@@ -621,7 +619,4 @@ class _AlbumPageState extends State<AlbumPage>
 
     return widget.isAdmin ? adminActions : userActions;
   }
-
-  @override
-  bool get wantKeepAlive => true;
 }

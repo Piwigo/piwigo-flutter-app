@@ -10,8 +10,8 @@ import 'package:piwigo_ng/models/album_model.dart';
 import 'package:piwigo_ng/network/albums.dart';
 import 'package:piwigo_ng/network/api_error.dart';
 import 'package:piwigo_ng/utils/localizations.dart';
+import 'package:piwigo_ng/views/album/album_page.dart';
 import 'package:piwigo_ng/views/album/album_privacy_page.dart';
-import 'package:piwigo_ng/views/album/album_view_page.dart';
 
 Future<void> onOpenAlbum(BuildContext context, AlbumModel album) async {
   Navigator.of(context).pushNamed(

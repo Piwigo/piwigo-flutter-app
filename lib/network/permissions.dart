@@ -84,8 +84,8 @@ Future<bool> addPermission({
     'pwg_token': prefs.getString(Preferences.tokenKey),
   };
 
-  if (users != null) data['user_id'] = users;
-  if (groups != null) data['group_id'] = groups;
+  if (users != null) data['user_id[]'] = users;
+  if (groups != null) data['group_id[]'] = groups;
   if (recursive != null) data['recursive'] = recursive;
 
   final FormData formData = FormData.fromMap(data);
@@ -98,7 +98,10 @@ Future<bool> addPermission({
 
     if (response.statusCode == 200) {
       Map<String, dynamic> data = json.decode(response.data);
-      return true;
+      if (data['stat'] == 'ok') {
+        return true;
+      }
+      return false;
     }
   } on DioError catch (e) {
     debugPrint('Add permission: ${e.message}');
@@ -125,8 +128,8 @@ Future<bool> removePermission({
     'pwg_token': prefs.getString(Preferences.tokenKey),
   };
 
-  if (users != null) data['user_id'] = users;
-  if (groups != null) data['group_id'] = groups;
+  if (users != null) data['user_id[]'] = users;
+  if (groups != null) data['group_id[]'] = groups;
 
   final FormData formData = FormData.fromMap(data);
 
@@ -138,7 +141,10 @@ Future<bool> removePermission({
 
     if (response.statusCode == 200) {
       Map<String, dynamic> data = json.decode(response.data);
-      return true;
+      if (data['stat'] == 'ok') {
+        return true;
+      }
+      return false;
     }
   } on DioError catch (e) {
     debugPrint('Add permission: ${e.message}');

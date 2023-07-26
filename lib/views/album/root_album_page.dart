@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:piwigo_ng/components/scroll_widgets/album_grid_view.dart';
+import 'package:piwigo_ng/components/lists/album_grid_view.dart';
 import 'package:piwigo_ng/models/album_model.dart';
 import 'package:piwigo_ng/network/albums.dart';
 import 'package:piwigo_ng/network/api_error.dart';

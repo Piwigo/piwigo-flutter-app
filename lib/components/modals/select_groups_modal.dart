@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:piwigo_ng/components/buttons/piwigo_button.dart';
-import 'package:piwigo_ng/components/cards/piwigo_chip.dart';
+import 'package:piwigo_ng/components/lists/select_model_list.dart';
 import 'package:piwigo_ng/models/group_model.dart';
 import 'package:piwigo_ng/network/api_error.dart';
 import 'package:piwigo_ng/network/groups.dart';
@@ -24,7 +24,7 @@ class _SelectGroupsModalState extends State<SelectGroupsModal> {
   final ScrollController _scrollController = ScrollController();
   final RefreshController _refreshController =
       RefreshController(initialRefresh: false);
-  late final Future<ApiResponse> _groupsFuture;
+  late final Future _groupsFuture;
 
   PagingModel _paging = PagingModel();
 
@@ -44,64 +44,33 @@ class _SelectGroupsModalState extends State<SelectGroupsModal> {
     super.dispose();
   }
 
-  Future<ApiResponse> _getData() async {
-    ApiResponse response = await getGroups();
-    if (response.hasError) {
-      _groupList = null;
-      return response;
-    }
-    if (response.paging != null) {
-      _paging = response.paging!;
-    }
-    _groupList = response.data;
-    _sortList();
-    return response;
+  List<GroupModel> get _unselectedGroupList =>
+      _groupList!.where((g) => !_selectedGroupList.contains(g)).toList();
+
+  Future _getData() async {
+    List<GroupModel>? data = await getAllGroups();
+    _groupList = data;
   }
 
-  Future<void> _loadMoreGroups() async {
-    if (_groupList == null) return;
-    ApiResponse response = await getGroups(_paging.page + 1);
-    if (response.hasError) {
-      _refreshController.loadFailed();
-      await Future.delayed(const Duration(milliseconds: 500));
-      return _refreshController.loadComplete();
-    }
+  int _onSelectGroup(GroupModel group) {
     setState(() {
-      if (response.paging != null) {
-        _paging = response.paging!;
-      }
-      _groupList!.addAll(response.data);
-      _sortList();
+      _selectedGroupList.add(group);
+      _sortLists();
     });
-    _refreshController.loadComplete();
+    return _selectedGroupList.indexOf(group);
   }
 
-  void _onSelectGroup(GroupModel group) {
-    if (_selectedGroupList.contains(group)) {
-      _onDeselectGroup(group);
-    } else {
-      setState(() {
-        _selectedGroupList.add(group);
-        _sortList();
-      });
-    }
-  }
-
-  void _onDeselectGroup(GroupModel group) {
+  int _onDeselectGroup(GroupModel group) {
     setState(() {
       _selectedGroupList.remove(group);
-      _sortList();
+      _sortLists();
     });
+    return _unselectedGroupList.indexOf(group);
   }
 
-  void _sortList() {
-    _groupList?.sort((a, b) {
-      bool selectedA = _selectedGroupList.contains(a);
-      bool selectedB = _selectedGroupList.contains(b);
-      if (selectedA && !selectedB) return -1;
-      if (!selectedA && selectedB) return 1;
-      return a.compareTo(b);
-    });
+  void _sortLists() {
+    _selectedGroupList.sort((a, b) => a.name.compareTo(b.name));
+    _groupList?.sort((a, b) => a.name.compareTo(b.name));
   }
 
   @override
@@ -120,20 +89,21 @@ class _SelectGroupsModalState extends State<SelectGroupsModal> {
           icon: Icon(Icons.close),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: Text(appStrings.groupsTitle_selectOne),
+        title: Text(appStrings.groups),
       ),
       body: Column(
         children: [
           Expanded(
-            child: FutureBuilder<ApiResponse>(
+            child: FutureBuilder(
               future: _groupsFuture,
               builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  return _groupLists;
-                } else {
-                  return Center(
-                    child: CircularProgressIndicator(),
-                  );
+                switch (snapshot.connectionState) {
+                  case ConnectionState.done:
+                    return _groupLists;
+                  default:
+                    return Center(
+                      child: CircularProgressIndicator(),
+                    );
                 }
               },
             ),
@@ -153,45 +123,24 @@ class _SelectGroupsModalState extends State<SelectGroupsModal> {
   }
 
   Widget get _groupLists {
-    // List<GroupModel> unselectedGroups =
-    //     _groupList.where((group) => !_selectedGroupList.contains(group)).toList();
     if (_groupList == null) {
       return Center(
         child: Text(appStrings.errorHUD_label),
       );
     }
-    return SmartRefresher(
-      controller: _refreshController,
-      scrollController: ModalScrollController.of(context),
-      enablePullDown: false,
-      enablePullUp: _paging.nbTotal == _paging.nbPerPage,
-      onLoading: _loadMoreGroups,
-      footer: ClassicFooter(
-        loadingText: appStrings.loadingHUD_label,
-        noDataText: appStrings.categoryImageList_noDataError,
-        failedText: appStrings.errorHUD_label,
-        idleText: '',
-        canLoadingText: appStrings.loadMoreHUD_label,
-      ),
-      child: ListView(
-        controller: ModalScrollController.of(context),
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-        physics: const AlwaysScrollableScrollPhysics(),
-        children: [
-          Wrap(
-            spacing: 8.0,
-            runSpacing: .0,
-            children: List.generate(_groupList!.length, (index) {
-              GroupModel group = _groupList![index];
-              return SelectChip(
-                selected: _selectedGroupList.contains(group),
-                onTap: () => _onSelectGroup(group),
-                label: group.name,
-              );
-            }),
-          ),
-        ],
-      ),
+    return ListView(
+      controller: ModalScrollController.of(context),
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      physics: const AlwaysScrollableScrollPhysics(),
+      children: [
+        SelectModelList<GroupModel>(
+          selected: _selectedGroupList,
+          unselected: _unselectedGroupList,
+          itemBuilder: (group) => Text(group.name),
+          onSelect: _onSelectGroup,
+          onDeselect: _onDeselectGroup,
+        ),
+      ],
     );
   }
 }

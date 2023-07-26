@@ -27,10 +27,25 @@ class SelectChip extends StatelessWidget {
             : Theme.of(context).textTheme.bodyMedium!.color,
       ),
       backgroundColor: Theme.of(context).chipTheme.backgroundColor,
-      checkmarkColor: AppColors.white,
+      // checkmarkColor: AppColors.white,
       selected: selected,
+      showCheckmark: false,
       onSelected: (_) => onTap?.call(),
-      label: Text(label),
+      label: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(label),
+          const SizedBox(width: 8.0),
+          AnimatedRotation(
+            duration: const Duration(milliseconds: 150),
+            turns: selected ? 1 / 8 : .0,
+            child: Icon(
+              Icons.add,
+              color: selected ? AppColors.white : Colors.green,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -54,14 +69,15 @@ class PiwigoChip extends StatelessWidget {
     return Chip(
       elevation: .0,
       side: BorderSide.none,
-      backgroundColor: Theme.of(context).colorScheme.secondary,
-      deleteIconColor: AppColors.white,
+      backgroundColor:
+          backgroundColor ?? Theme.of(context).colorScheme.secondary,
+      deleteIconColor: foregroundColor ?? AppColors.white,
       label: Text(label),
       labelStyle: TextStyle(
         fontSize: 14,
-        color: AppColors.white,
+        color: foregroundColor ?? AppColors.white,
       ),
-      onDeleted: () => onRemove?.call(),
+      onDeleted: onRemove,
     );
   }
 }

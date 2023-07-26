@@ -8,10 +8,69 @@ import 'package:piwigo_ng/network/api_client.dart';
 import 'package:piwigo_ng/network/api_error.dart';
 import 'package:piwigo_ng/utils/settings.dart';
 
+Future<List<UserModel>?> getAllUsers({
+  int page = 0,
+  List<int>? users,
+}) async {
+  int page = 0;
+  bool reachedEnd = false;
+  List<UserModel> usersResponse = [];
+
+  Map<String, dynamic> queries = {
+    'format': 'json',
+    'method': 'pwg.users.getList',
+    // 'order': Settings.defaultGroupSort,
+    'per_page': Settings.defaultElementPerPage,
+    'page': page,
+  };
+
+  print(users);
+
+  if (users != null) queries['user_id[]'] = users;
+
+  try {
+    while (!reachedEnd) {
+      Response response = await ApiClient.get(queryParameters: queries);
+
+      if (response.statusCode == 200) {
+        Map<String, dynamic> data = json.decode(response.data);
+
+        var jsonUsers = data['result']['users'];
+
+        List<UserModel> pageUsers = List<UserModel>.from(
+          jsonUsers.map((user) => UserModel.fromJson(user)),
+        );
+
+        usersResponse.addAll(pageUsers);
+
+        if (pageUsers.length < Settings.defaultElementPerPage) {
+          reachedEnd = true;
+        } else {
+          page++;
+          queries['page'] = page;
+        }
+      } else {
+        if (usersResponse.isEmpty) {
+          return null;
+        }
+        reachedEnd = true;
+      }
+    }
+
+    return usersResponse;
+  } on DioError catch (e) {
+    debugPrint('Fetch all users: ${e.message}');
+  } on Error catch (e) {
+    debugPrint('Fetch all users: ${e.stackTrace}');
+  }
+  return null;
+}
+
 Future<ApiResponse<List<UserModel>>> getUsers([int page = 0]) async {
   Map<String, dynamic> queries = {
     'format': 'json',
     'method': 'pwg.users.getList',
+    'order': Settings.defaultGroupSort,
     'per_page': Settings.defaultElementPerPage,
     'page': page,
   };

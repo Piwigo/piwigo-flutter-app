@@ -26,29 +26,19 @@ class AlbumPrivacyPage extends StatefulWidget {
 }
 
 class _AlbumPrivacyPageState extends State<AlbumPrivacyPage> {
-  late final Future<void> _adminsFuture;
   late final Future<void> _permissionsFuture;
   late AlbumStatus _selectedMode;
+  bool _recursive = false;
 
   List<GroupModel> _allowedGroups = [];
-  List<UserModel>? _admins;
+  List<UserModel> _allowedUsers = [];
   List<GroupModel> _groups = [];
 
   @override
   void initState() {
     _selectedMode = widget.album.status;
-    _adminsFuture = _getAdmins();
     _permissionsFuture = _getPermissions();
     super.initState();
-  }
-
-  Future<void> _getAdmins() async {
-    ApiResponse response = await getAllAdmins();
-    if (response.hasError) {
-      _admins = null;
-      return;
-    }
-    _admins = response.data;
   }
 
   Future<void> _getPermissions() async {
@@ -57,19 +47,30 @@ class _AlbumPrivacyPageState extends State<AlbumPrivacyPage> {
     );
     if (permissions == null) {
       _allowedGroups = [];
+      _allowedUsers = [];
       return;
     }
 
-    List<GroupModel>? groups = await getAllGroups(
-      groups: permissions.groups,
-    );
-    if (groups == null) {
-      _allowedGroups = [];
-      return;
+    if (permissions.users.isNotEmpty) {
+      List<UserModel>? users = await getAllUsers(
+        users: permissions.users,
+      );
+
+      _allowedUsers = users ?? [];
     }
 
-    _allowedGroups = groups;
-    _groups = [..._groups, ..._allowedGroups].toSet().toList();
+    if (permissions.groups.isNotEmpty) {
+      List<GroupModel>? groups = await getAllGroups(
+        groups: permissions.groups,
+      );
+      if (groups == null) {
+        _allowedGroups = [];
+        return;
+      }
+
+      _allowedGroups = groups;
+      _groups = [..._groups, ..._allowedGroups].toSet().toList();
+    }
   }
 
   Future<void> _onConfirmPermissions() async {
@@ -88,6 +89,7 @@ class _AlbumPrivacyPageState extends State<AlbumPrivacyPage> {
       bool addSuccess = await addPermission(
         albumId: widget.album.id,
         groups: newGroups.map((group) => group.id).toList(),
+        recursive: _recursive,
       );
 
       bool removeSuccess = await removePermission(
@@ -137,9 +139,14 @@ class _AlbumPrivacyPageState extends State<AlbumPrivacyPage> {
                 vertical: 16.0,
               ),
               children: [
-                Text(
-                  appStrings.categoryPrivacy_subtitle(widget.album.name),
-                  textAlign: TextAlign.center,
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16.0,
+                  ),
+                  child: Text(
+                    appStrings.categoryPrivacy_subtitle(widget.album.name),
+                    textAlign: TextAlign.center,
+                  ),
                 ),
                 Padding(
                   padding: const EdgeInsets.symmetric(
@@ -199,7 +206,7 @@ class _AlbumPrivacyPageState extends State<AlbumPrivacyPage> {
   Widget get _privateSection {
     return Padding(
       padding: const EdgeInsets.symmetric(
-        horizontal: 24.0,
+        horizontal: 16.0,
         vertical: 8.0,
       ),
       child: Column(
@@ -231,7 +238,7 @@ class _AlbumPrivacyPageState extends State<AlbumPrivacyPage> {
           FormSection(
             title: appStrings.categoryPrivacyUsers,
             child: FutureBuilder(
-              future: _adminsFuture,
+              future: _permissionsFuture,
               builder: (context, snapshot) {
                 switch (snapshot.connectionState) {
                   case ConnectionState.done:
@@ -242,6 +249,17 @@ class _AlbumPrivacyPageState extends State<AlbumPrivacyPage> {
                     );
                 }
               },
+            ),
+          ),
+          FormSection(
+            title: appStrings.categoryPrivacyRecursive,
+            child: SwitchListTile(
+              contentPadding: EdgeInsets.zero,
+              value: _recursive,
+              onChanged: (value) => setState(() {
+                _recursive = value;
+              }),
+              subtitle: Text(appStrings.categoryPrivacyRecursive_message),
             ),
           ),
         ],
@@ -264,22 +282,28 @@ class _AlbumPrivacyPageState extends State<AlbumPrivacyPage> {
   }
 
   Widget get _buildUserPermissions {
-    if (_admins == null) {
+    if (_allowedUsers.isEmpty) {
       return Text(appStrings.none);
     }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(appStrings.categoryPrivacyUsers_message(_admins!.length)),
-        Builder(builder: (context) {
-          if (_admins!.length > 5) {
-            String admins =
-                _admins!.sublist(0, 5).map((e) => e.name).join(', ');
-            Text("$admins, ...");
-          }
-          String admins = _admins!.map((e) => e.name).join(', ');
-          return Text("$admins.");
-        }),
+        Text(
+          appStrings.categoryPrivacyUsers_message,
+          style: Theme.of(context).textTheme.bodySmall,
+        ),
+        Wrap(
+          spacing: 8.0,
+          runSpacing: .0,
+          children: List.generate(_allowedUsers.length, (index) {
+            UserModel user = _allowedUsers[index];
+            return PiwigoChip(
+              label: user.name,
+              backgroundColor: Theme.of(context).chipTheme.backgroundColor,
+              foregroundColor: Theme.of(context).textTheme.bodyMedium?.color,
+            );
+          }),
+        ),
       ],
     );
   }

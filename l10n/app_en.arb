@@ -314,26 +314,23 @@
     "moveCategoryError_message": "Failed to move your album",
 
 
-    "categoryPrivacy": "Album Privacy",
-    "categoryPrivacy_subtitle": "Manage access permissions of {album_name} album",
+    "categoryPrivacy": "Manage Permissions",
+    "categoryPrivacy_subtitle": "Manage access permissions of \"{album_name}\".",
     "@categoryPrivacy_subtitle" : {
         "placeholders": {
             "album_name": {}
         }
     },
     "categoryPrivacyMode_public": "Public",
-    "categoryPrivacyMode_publicMessage": "Every user can see this album",
+    "categoryPrivacyMode_publicMessage": "Every user can see this album.",
     "categoryPrivacyMode_private": "Private",
-    "categoryPrivacyMode_privateMessage": "Visitors must log in and have the necessary permissions to see this album",
+    "categoryPrivacyMode_privateMessage": "Visitors must log in and have the necessary permissions to see this album.",
     "categoryPrivacyGroups": "Group permissions",
     "categoryPrivacyGroups_add": "Authorize groups",
     "categoryPrivacyUsers": "User permissions",
-    "categoryPrivacyUsers_message": "{user_count} users automatically have permissions on this album because they are administrators :",
-    "@categoryPrivacyUsers_message" : {
-        "placeholders": {
-            "user_count": {}
-        }
-    },
+    "categoryPrivacyUsers_message": "To manage use permissions, go to your web administration.",
+    "categoryPrivacyRecursive": "Apply to sub-albums",
+    "categoryPrivacyRecursive_message": "After confirmation, all modifications will be applied to sub-albums.",
 
 
     "categorySelection_setThumbnail": "Please select the album which will use the photo {photo} as a thumbnail.",
