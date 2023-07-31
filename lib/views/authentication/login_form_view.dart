@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:piwigo_ng/app.dart';
 import 'package:piwigo_ng/components/buttons/animated_piwigo_button.dart';
@@ -131,7 +132,7 @@ class _LoginFormViewState extends State<LoginFormView> {
   }
 
   void _onLogin() async {
-    if (_urlError) return;
+    // if (_urlError) return;
     App.scaffoldMessengerKey.currentState?.clearSnackBars();
     _btnController.start();
     try {
@@ -143,6 +144,7 @@ class _LoginFormViewState extends State<LoginFormView> {
       if (result.data == false || result.error != null) {
         _onLoginError(result);
       } else {
+        TextInput.finishAutofillContext();
         await _onLoginSuccess(result);
       }
     } on Error catch (e) {
@@ -160,129 +162,137 @@ class _LoginFormViewState extends State<LoginFormView> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        AppField(
-          key: _urlKey,
-          margin: const EdgeInsets.symmetric(vertical: 4.0),
-          padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 8.0),
-          controller: _urlController,
-          onChanged: (value) {
-            bool isError = !_urlValidator(value);
-            if (_urlError != isError) {
-              _urlError = isError;
-            }
-            setState(() {
-              _url = value;
-            });
-          },
-          textInputAction: TextInputAction.next,
-          prefix: _securedPrefix,
-          hint: 'example.piwigo.com',
-          error: _urlError,
-        ),
-        AppField(
-          margin: const EdgeInsets.symmetric(vertical: 4.0),
-          padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 8.0),
-          controller: _usernameController,
-          onChanged: (value) {
-            if (_idError) {
-              _idError = false;
-            }
-            setState(() {
-              _username = value;
-            });
-          },
-          textInputAction: TextInputAction.next,
-          hint: "username",
-          error: _idError,
-          prefix: const Icon(Icons.person),
-          suffix: _username.isNotEmpty
-              ? GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onTap: () => setState(() {
-                    _usernameController.clear();
-                    _username = '';
-                  }),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Icon(
-                      Icons.clear,
-                      color: Theme.of(context).colorScheme.secondary,
-                    ),
-                  ),
-                )
-              : null,
-        ),
-        AppField(
-          margin: const EdgeInsets.symmetric(vertical: 4.0),
-          padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 8.0),
-          controller: _passwordController,
-          onFieldSubmitted: (String value) {
-            FocusScope.of(context).unfocus();
-            _onLogin();
-          },
-          onChanged: (value) {
-            if (_idError) {
-              _idError = false;
-            }
-            setState(() {
-              _password = value;
-            });
-          },
-          textInputAction: TextInputAction.done,
-          obscureText: !_showPassword,
-          hint: "password",
-          error: _idError,
-          prefix: GestureDetector(
-            onTap: () => setState(() {
-              _showPassword = !_showPassword;
-            }),
-            child: Icon(_showPassword ? Icons.lock_open : Icons.lock),
+    return AutofillGroup(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          AppField(
+            key: _urlKey,
+            margin: const EdgeInsets.symmetric(vertical: 4.0),
+            padding:
+                const EdgeInsets.symmetric(vertical: 16.0, horizontal: 8.0),
+            controller: _urlController,
+            onChanged: (value) {
+              bool isError = !_urlValidator(value);
+              if (_urlError != isError) {
+                _urlError = isError;
+              }
+              setState(() {
+                _url = value;
+              });
+            },
+            textInputAction: TextInputAction.next,
+            autofillHints: [AutofillHints.url],
+            prefix: _securedPrefix,
+            hint: 'example.piwigo.com',
+            error: _urlError,
           ),
-          suffix: _password.isNotEmpty
-              ? GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onTap: () => setState(() {
-                    _passwordController.clear();
-                    _password = '';
-                  }),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Icon(
-                      Icons.clear,
-                      color: Theme.of(context).colorScheme.secondary,
+          AppField(
+            margin: const EdgeInsets.symmetric(vertical: 4.0),
+            padding:
+                const EdgeInsets.symmetric(vertical: 16.0, horizontal: 8.0),
+            controller: _usernameController,
+            onChanged: (value) {
+              if (_idError) {
+                _idError = false;
+              }
+              setState(() {
+                _username = value;
+              });
+            },
+            textInputAction: TextInputAction.next,
+            autofillHints: [AutofillHints.username],
+            hint: appStrings.login_userPlaceholder,
+            error: _idError,
+            prefix: const Icon(Icons.person),
+            suffix: _username.isNotEmpty
+                ? GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () => setState(() {
+                      _usernameController.clear();
+                      _username = '';
+                    }),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Icon(
+                        Icons.clear,
+                        color: Theme.of(context).colorScheme.secondary,
+                      ),
                     ),
-                  ),
-                )
-              : null,
-        ),
-        Padding(
-          padding: const EdgeInsets.only(top: 12.0),
-          child: AnimatedPiwigoButton(
-            controller: _btnController,
-            // disabled: _urlError,
-            color: Theme.of(context).primaryColor,
-            onPressed: _onLogin,
-            child: Text(
-              appStrings.login,
-              style: Theme.of(context).textTheme.displaySmall,
+                  )
+                : null,
+          ),
+          AppField(
+            margin: const EdgeInsets.symmetric(vertical: 4.0),
+            padding:
+                const EdgeInsets.symmetric(vertical: 16.0, horizontal: 8.0),
+            controller: _passwordController,
+            onFieldSubmitted: (String value) {
+              FocusScope.of(context).unfocus();
+              _onLogin();
+            },
+            onChanged: (value) {
+              if (_idError) {
+                _idError = false;
+              }
+              setState(() {
+                _password = value;
+              });
+            },
+            textInputAction: TextInputAction.done,
+            autofillHints: [AutofillHints.password],
+            obscureText: !_showPassword,
+            hint: appStrings.login_passwordPlaceholder,
+            error: _idError,
+            prefix: GestureDetector(
+              onTap: () => setState(() {
+                _showPassword = !_showPassword;
+              }),
+              child: Icon(_showPassword ? Icons.lock_open : Icons.lock),
+            ),
+            suffix: _password.isNotEmpty
+                ? GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () => setState(() {
+                      _passwordController.clear();
+                      _password = '';
+                    }),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Icon(
+                        Icons.clear,
+                        color: Theme.of(context).colorScheme.secondary,
+                      ),
+                    ),
+                  )
+                : null,
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 12.0),
+            child: AnimatedPiwigoButton(
+              controller: _btnController,
+              // disabled: _urlError,
+              color: Theme.of(context).primaryColor,
+              onPressed: _onLogin,
+              child: Text(
+                appStrings.login,
+                style: Theme.of(context).textTheme.displaySmall,
+              ),
             ),
           ),
-        ),
-        TextButton(
-          style: ButtonStyle(
-            foregroundColor: MaterialStateProperty.resolveWith(
-              (states) => Theme.of(context).colorScheme.secondary,
+          TextButton(
+            style: ButtonStyle(
+              foregroundColor: MaterialStateProperty.resolveWith(
+                (states) => Theme.of(context).colorScheme.secondary,
+              ),
             ),
+            onPressed: () {
+              Navigator.of(context).pushNamed(LoginSettingsPage.routeName);
+            },
+            child: Text(appStrings.login_advancedParameters),
           ),
-          onPressed: () {
-            Navigator.of(context).pushNamed(LoginSettingsPage.routeName);
-          },
-          child: Text(appStrings.login_advancedParameters),
-        ),
-      ],
+        ],
+      ),
     );
   }
 

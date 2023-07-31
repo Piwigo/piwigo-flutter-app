@@ -20,6 +20,7 @@ class AppField extends StatelessWidget {
     this.minLines,
     this.maxLines = 1,
     this.label,
+    this.autofillHints,
   }) : super(key: key);
 
   final Widget? prefix;
@@ -39,15 +40,12 @@ class AppField extends StatelessWidget {
   final Color? color;
   final Function(String)? onFieldSubmitted;
   final Function(String)? onChanged;
+  final Iterable<String>? autofillHints;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: margin,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10.0),
-        color: color ?? Theme.of(context).inputDecorationTheme.fillColor,
-      ),
+    return Padding(
+      padding: margin ?? EdgeInsets.zero,
       child: TextFormField(
         controller: controller,
         focusNode: focusNode,
@@ -58,6 +56,7 @@ class AppField extends StatelessWidget {
         obscureText: obscureText,
         minLines: minLines,
         maxLines: maxLines,
+        autofillHints: autofillHints,
         style: Theme.of(context).textTheme.bodyMedium,
         decoration: InputDecoration(
           contentPadding: padding ?? const EdgeInsets.all(16.0),
@@ -73,6 +72,8 @@ class AppField extends StatelessWidget {
           ),
           prefixIcon: prefix,
           suffixIcon: suffix,
+          fillColor: color ?? Theme.of(context).inputDecorationTheme.fillColor,
+          filled: true,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10.0),
             borderSide: BorderSide(
