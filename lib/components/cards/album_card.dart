@@ -1,4 +1,4 @@
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:piwigo_ng/components/app_image_display.dart';
@@ -167,6 +167,28 @@ class AlbumCardContent extends StatelessWidget {
 
   final AlbumModel album;
 
+  bool isCommentValid(String? input) {
+    if (input == null) return false;
+
+    // Define a regular expression pattern to match common CSS attributes and selectors
+    final RegExp cssPattern = RegExp(
+      r"(^|\s)(color|font-size|margin|padding|background|border|position|display|opacity|animation|@media|@keyframes)(:|\s)",
+      caseSensitive: false,
+    );
+
+    // Check if the input string contains the CSS pattern
+    if (cssPattern.hasMatch(input)) return true;
+
+    // Define a regular expression pattern to match common HTML tags and attributes
+    final RegExp htmlPattern = RegExp(
+      r"(^|<\s*)(div|span|p|a|h1|h2|h3|h4|h5|h6|img|ul|ol|li|br|strong|em|blockquote)(\s|>)",
+      caseSensitive: false,
+    );
+
+    // Check if the input string contains the HTML pattern
+    return htmlPattern.hasMatch(input);
+  }
+
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, constraints) {
@@ -189,46 +211,6 @@ class AlbumCardContent extends StatelessWidget {
           child: Builder(builder: (context) {
             return ImageNetworkDisplay(
               imageUrl: album.urlRepresentative,
-            );
-            if (album.urlRepresentative == null) {
-              return FittedBox(
-                fit: BoxFit.cover,
-                child: Container(
-                  padding: const EdgeInsets.all(16.0),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                  ),
-                  child: const Icon(Icons.image_not_supported_outlined),
-                ),
-              );
-            }
-            return CachedNetworkImage(
-              imageUrl: album.urlRepresentative!,
-              fit: BoxFit.cover,
-              fadeInDuration: const Duration(milliseconds: 300),
-              progressIndicatorBuilder: (context, url, download) {
-                if (download.downloaded >= (download.totalSize ?? 0)) {
-                  return const SizedBox();
-                }
-                return Center(
-                  child: CircularProgressIndicator(
-                    value: download.progress,
-                  ),
-                );
-              },
-              errorWidget: (context, url, error) {
-                debugPrint("[$url] $error");
-                return FittedBox(
-                  fit: BoxFit.cover,
-                  child: Container(
-                    padding: const EdgeInsets.all(16.0),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).scaffoldBackgroundColor,
-                    ),
-                    child: const Icon(Icons.broken_image_outlined),
-                  ),
-                );
-              },
             );
           }),
         ),
@@ -253,12 +235,18 @@ class AlbumCardContent extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(vertical: 4.0),
                     child: Align(
                       alignment: Alignment.bottomCenter,
-                      child: Text(
-                        album.comment ?? '',
-                        softWrap: true,
-                        overflow: TextOverflow.ellipsis,
-                        style: Theme.of(context).textTheme.bodySmall,
-                      ),
+                      child: Builder(builder: (context) {
+                        if (isCommentValid(album.comment)) {
+                          return const SizedBox();
+                        }
+                        return AutoSizeText(
+                          album.comment ?? '',
+                          softWrap: true,
+                          maxLines: 10,
+                          overflow: TextOverflow.ellipsis,
+                          style: Theme.of(context).textTheme.bodySmall,
+                        );
+                      }),
                     ),
                   ),
                 ),

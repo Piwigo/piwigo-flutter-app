@@ -34,7 +34,6 @@ dependencies:
   photo_view: ^0.14.0 # Zoom on fullscreen photos
   extended_text: ^11.0.0 # Text overflow on left side
   flutter_easyloading: ^3.0.5 # Show loading dialog
-  flutter_html: ^3.0.0-beta.2 # Parse and display HTML elements
 
   # Storage
   package_info_plus: ^3.1.2 # Get project info (version)
