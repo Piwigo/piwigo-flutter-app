@@ -9,7 +9,6 @@ import 'package:piwigo_ng/components/buttons/animated_piwigo_button.dart';
 import 'package:piwigo_ng/components/cards/image_details_card.dart';
 import 'package:piwigo_ng/components/cards/piwigo_chip.dart';
 import 'package:piwigo_ng/components/fields/app_field.dart';
-import 'package:piwigo_ng/components/modals/piwigo_modal.dart';
 import 'package:piwigo_ng/components/modals/select_tags_modal.dart';
 import 'package:piwigo_ng/components/sections/form_section.dart';
 import 'package:piwigo_ng/models/tag_model.dart';
@@ -296,12 +295,7 @@ class _UploadGalleryViewPage extends State<UploadPage>
         FormSection(
           title: appStrings.tagsAdd_title,
           onTapTitle: () {
-            showPiwigoModal<List<TagModel>>(
-              context: context,
-              builder: (_) => SelectTagsModal(
-                selectedTags: _tags,
-              ),
-            ).then((value) {
+            showSelectTagsModal(context, _tags).then((value) {
               if (value is! List<TagModel>) return;
               setState(() {
                 _tags = value;
@@ -309,7 +303,7 @@ class _UploadGalleryViewPage extends State<UploadPage>
             });
           },
           actions: [
-            const Icon(Icons.add_circle),
+            const Icon(Icons.edit),
           ],
           child: Wrap(
             spacing: 8.0,
@@ -318,7 +312,8 @@ class _UploadGalleryViewPage extends State<UploadPage>
               TagModel tag = _tags[index];
               return PiwigoChip(
                 label: tag.name,
-                onRemove: () => _onDeselectTag(tag),
+                backgroundColor: Theme.of(context).chipTheme.backgroundColor,
+                foregroundColor: Theme.of(context).textTheme.bodyMedium?.color,
               );
             }),
           ),

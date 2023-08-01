@@ -1,7 +1,6 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:piwigo_ng/components/buttons/animated_piwigo_button.dart';
 import 'package:piwigo_ng/components/cards/image_details_card.dart';
 import 'package:piwigo_ng/components/cards/piwigo_chip.dart';
@@ -197,13 +196,7 @@ class _EditImagePageState extends State<EditImagePage> {
             margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
             title: appStrings.tagsAdd_title,
             onTapTitle: () {
-              showMaterialModalBottomSheet<List<TagModel>>(
-                context: context,
-                backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-                builder: (context) => SelectTagsModal(
-                  selectedTags: _tags,
-                ),
-              ).then((value) {
+              showSelectTagsModal(context, _tags).then((value) {
                 if (value is! List<TagModel>) return;
                 setState(() {
                   _tags = value;
@@ -211,7 +204,7 @@ class _EditImagePageState extends State<EditImagePage> {
               });
             },
             actions: [
-              const Icon(Icons.add_circle),
+              const Icon(Icons.edit),
             ],
             child: ClipRRect(
               borderRadius: BorderRadius.circular(10),
@@ -222,7 +215,10 @@ class _EditImagePageState extends State<EditImagePage> {
                   TagModel tag = _tags[index];
                   return PiwigoChip(
                     label: tag.name,
-                    onRemove: () => _onDeselectTag(tag),
+                    backgroundColor:
+                        Theme.of(context).chipTheme.backgroundColor,
+                    foregroundColor:
+                        Theme.of(context).textTheme.bodyMedium?.color,
                   );
                 }),
               ),

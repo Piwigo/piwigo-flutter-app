@@ -3,10 +3,8 @@ import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:piwigo_ng/components/buttons/piwigo_button.dart';
 import 'package:piwigo_ng/components/lists/select_model_list.dart';
 import 'package:piwigo_ng/models/group_model.dart';
-import 'package:piwigo_ng/network/api_error.dart';
 import 'package:piwigo_ng/network/groups.dart';
 import 'package:piwigo_ng/utils/localizations.dart';
-import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 class SelectGroupsModal extends StatefulWidget {
   const SelectGroupsModal({
@@ -22,11 +20,7 @@ class SelectGroupsModal extends StatefulWidget {
 
 class _SelectGroupsModalState extends State<SelectGroupsModal> {
   final ScrollController _scrollController = ScrollController();
-  final RefreshController _refreshController =
-      RefreshController(initialRefresh: false);
   late final Future _groupsFuture;
-
-  PagingModel _paging = PagingModel();
 
   List<GroupModel> _selectedGroupList = [];
   List<GroupModel>? _groupList = [];
@@ -151,6 +145,9 @@ Future<List<GroupModel>?> showSelectGroupModal(
 ]) async {
   return showMaterialModalBottomSheet<List<GroupModel>>(
     context: context,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(30.0)),
+    ),
     backgroundColor: Theme.of(context).scaffoldBackgroundColor,
     builder: (context) => SelectGroupsModal(
       selectedGroups: selectedGroups,

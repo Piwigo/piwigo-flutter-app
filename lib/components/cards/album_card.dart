@@ -222,11 +222,13 @@ class AlbumCardContent extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text(
+                AutoSizeText(
                   album.name,
+                  maxLines: 1,
                   textAlign: TextAlign.center,
-                  softWrap: true,
-                  maxLines: 2,
+                  maxFontSize:
+                      Theme.of(context).textTheme.titleLarge!.fontSize!,
+                  minFontSize: 10.0,
                   overflow: TextOverflow.ellipsis,
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
@@ -236,26 +238,27 @@ class AlbumCardContent extends StatelessWidget {
                     child: Align(
                       alignment: Alignment.bottomCenter,
                       child: Builder(builder: (context) {
-                        if (isCommentValid(album.comment)) {
-                          return const SizedBox();
-                        }
                         return AutoSizeText(
                           album.comment ?? '',
-                          softWrap: true,
-                          maxLines: 10,
-                          overflow: TextOverflow.ellipsis,
+                          maxFontSize:
+                              Theme.of(context).textTheme.bodySmall!.fontSize!,
+                          minFontSize: 10.0,
+                          overflow: TextOverflow.fade,
                           style: Theme.of(context).textTheme.bodySmall,
                         );
                       }),
                     ),
                   ),
                 ),
-                FittedBox(
-                  fit: BoxFit.fitWidth,
-                  child: Text(
-                    appStrings.imageCount(album.nbTotalImages),
-                    style: Theme.of(context).textTheme.labelSmall,
-                  ),
+                AutoSizeText(
+                  appStrings.imageCount(album.nbTotalImages),
+                  maxLines: 1,
+                  textAlign: TextAlign.center,
+                  maxFontSize:
+                      Theme.of(context).textTheme.labelSmall!.fontSize!,
+                  minFontSize: 8.0,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.labelSmall,
                 ),
               ],
             ),

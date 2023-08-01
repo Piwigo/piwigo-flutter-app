@@ -188,10 +188,21 @@ class _AlbumPrivacyPageState extends State<AlbumPrivacyPage> {
               ],
             ),
           ),
+          Divider(
+            color: Theme.of(context).disabledColor,
+          ),
+          SwitchListTile(
+            value: _recursive,
+            onChanged: (value) => setState(() {
+              _recursive = value;
+            }),
+            title: Text(appStrings.categoryPrivacyRecursive),
+            subtitle: Text(appStrings.categoryPrivacyRecursive_message),
+          ),
           Padding(
             padding: const EdgeInsets.symmetric(
-              horizontal: 24.0,
               vertical: 16.0,
+              horizontal: 24.0,
             ),
             child: PiwigoButton(
               onPressed: _onConfirmPermissions,
@@ -218,7 +229,7 @@ class _AlbumPrivacyPageState extends State<AlbumPrivacyPage> {
               IconButton(
                 tooltip: appStrings.categoryPrivacyGroups_add,
                 onPressed: _onSelectGroups,
-                icon: Icon(Icons.add_circle),
+                icon: Icon(Icons.edit),
               ),
             ],
             child: FutureBuilder(
@@ -251,17 +262,6 @@ class _AlbumPrivacyPageState extends State<AlbumPrivacyPage> {
               },
             ),
           ),
-          FormSection(
-            title: appStrings.categoryPrivacyRecursive,
-            child: SwitchListTile(
-              contentPadding: EdgeInsets.zero,
-              value: _recursive,
-              onChanged: (value) => setState(() {
-                _recursive = value;
-              }),
-              subtitle: Text(appStrings.categoryPrivacyRecursive_message),
-            ),
-          ),
         ],
       ),
     );
@@ -274,17 +274,15 @@ class _AlbumPrivacyPageState extends State<AlbumPrivacyPage> {
       children: List.generate(_groups.length, (index) {
         GroupModel group = _groups[index];
         return PiwigoChip(
-          onRemove: () => _onRemoveGroup(index),
           label: group.name,
+          backgroundColor: Theme.of(context).chipTheme.backgroundColor,
+          foregroundColor: Theme.of(context).textTheme.bodyMedium?.color,
         );
       }),
     );
   }
 
   Widget get _buildUserPermissions {
-    if (_allowedUsers.isEmpty) {
-      return Text(appStrings.none);
-    }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

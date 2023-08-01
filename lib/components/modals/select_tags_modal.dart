@@ -12,10 +12,10 @@ import 'package:piwigo_ng/utils/localizations.dart';
 class SelectTagsModal extends StatefulWidget {
   const SelectTagsModal({
     Key? key,
-    this.selectedTags = const [],
+    this.selectedTags,
   }) : super(key: key);
 
-  final List<TagModel> selectedTags;
+  final List<TagModel>? selectedTags;
 
   @override
   _SelectTagsModalState createState() => _SelectTagsModalState();
@@ -30,7 +30,7 @@ class _SelectTagsModalState extends State<SelectTagsModal> {
 
   @override
   void initState() {
-    _selectedTagList = List.from(widget.selectedTags);
+    _selectedTagList = List.from(widget.selectedTags ?? []);
     super.initState();
     _tagsFuture = _onRefresh();
   }
@@ -173,4 +173,20 @@ class _SelectTagsModalState extends State<SelectTagsModal> {
       ],
     );
   }
+}
+
+Future<List<TagModel>?> showSelectTagsModal(
+  BuildContext context, [
+  List<TagModel>? selectedTags,
+]) async {
+  return showMaterialModalBottomSheet<List<TagModel>>(
+    context: context,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(30.0)),
+    ),
+    backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+    builder: (context) => SelectTagsModal(
+      selectedTags: selectedTags,
+    ),
+  );
 }

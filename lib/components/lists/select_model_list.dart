@@ -23,44 +23,54 @@ class SelectModelList<T> extends StatefulWidget {
 }
 
 class _SelectModelListState<T> extends State<SelectModelList<T>> {
+  static const Duration kAnimationDuration = Duration(milliseconds: 300);
   final GlobalKey<AnimatedListState> _selectedListKey =
       GlobalKey<AnimatedListState>();
   final GlobalKey<AnimatedListState> _unselectedListKey =
       GlobalKey<AnimatedListState>();
 
-  void _onTapItem(T item) {
-    if (widget.selected.contains(item)) {
+  void _onTapItem(T item, bool selected) {
+    if (selected) {
+      if (widget.unselected.contains(item)) return;
       _onDeselect(item);
     } else {
+      if (widget.selected.contains(item)) return;
       _onSelect(item);
     }
   }
 
   void _onSelect(T item) async {
     int oldIndex = widget.unselected.indexOf(item);
+    int? newIndex = widget.onSelect?.call(item);
+
     _unselectedListKey.currentState?.removeItem(
       oldIndex,
       (_, animation) => _buildItem(item, animation, false),
-      duration: const Duration(milliseconds: 150),
+      duration: kAnimationDuration,
     );
 
-    int? newIndex = widget.onSelect?.call(item);
     newIndex ??= widget.selected.indexOf(item);
-    _selectedListKey.currentState?.insertItem(newIndex);
+    _selectedListKey.currentState?.insertItem(
+      newIndex,
+      duration: kAnimationDuration,
+    );
   }
 
   void _onDeselect(T item) async {
     int oldIndex = widget.selected.indexOf(item);
+    int? newIndex = widget.onDeselect?.call(item);
+
     _selectedListKey.currentState?.removeItem(
       oldIndex,
       (_, animation) => _buildItem(item, animation, true),
-      duration: const Duration(milliseconds: 150),
+      duration: kAnimationDuration,
     );
-
-    int? newIndex = widget.onDeselect?.call(item);
-    await Future.delayed(const Duration(milliseconds: 100));
+    // await Future.delayed(const Duration(milliseconds: 10));
     newIndex ??= widget.unselected.indexOf(item);
-    _unselectedListKey.currentState?.insertItem(newIndex);
+    _unselectedListKey.currentState?.insertItem(
+      newIndex,
+      duration: kAnimationDuration,
+    );
   }
 
   @override
@@ -117,9 +127,14 @@ class _SelectModelListState<T> extends State<SelectModelList<T>> {
     );
   }
 
-  _buildItem(T item, Animation<double> animation, bool selected) {
+  Widget _buildItem(
+    T item,
+    Animation<double> animation,
+    bool selected,
+  ) {
     return SizeTransition(
-      sizeFactor: animation,
+      sizeFactor: animation.drive(
+          Tween(begin: .0, end: 1.0).chain(CurveTween(curve: Curves.ease))),
       child: ListTile(
         key: ObjectKey(item),
         visualDensity: VisualDensity.compact,
@@ -130,7 +145,7 @@ class _SelectModelListState<T> extends State<SelectModelList<T>> {
         trailing: selected
             ? Icon(Icons.remove_circle_outline, color: Colors.red)
             : Icon(Icons.add_circle_outline, color: Colors.green),
-        onTap: () => _onTapItem(item),
+        onTap: () => _onTapItem(item, selected),
       ),
     );
   }
