@@ -293,7 +293,7 @@ class _UploadGalleryViewPage extends State<UploadPage>
           ),
         ), // privacy
         FormSection(
-          title: appStrings.tagsAdd_title,
+          title: appStrings.tags,
           onTapTitle: () {
             showSelectTagsModal(context, _tags).then((value) {
               if (value is! List<TagModel>) return;

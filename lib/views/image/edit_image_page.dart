@@ -194,7 +194,7 @@ class _EditImagePageState extends State<EditImagePage> {
           ), // privacy
           FormSection(
             margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-            title: appStrings.tagsAdd_title,
+            title: appStrings.tags,
             onTapTitle: () {
               showSelectTagsModal(context, _tags).then((value) {
                 if (value is! List<TagModel>) return;
