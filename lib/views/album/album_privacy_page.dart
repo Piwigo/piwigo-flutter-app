@@ -108,12 +108,6 @@ class _AlbumPrivacyPageState extends State<AlbumPrivacyPage> {
     });
   }
 
-  void _onRemoveGroup(int index) {
-    setState(() {
-      _groups.removeAt(index);
-    });
-  }
-
   Future<void> _onSelectGroups() async {
     List<GroupModel>? selectedGroups = await showSelectGroupModal(
       context,
@@ -188,16 +182,30 @@ class _AlbumPrivacyPageState extends State<AlbumPrivacyPage> {
               ],
             ),
           ),
-          Divider(
-            color: Theme.of(context).disabledColor,
+          AnimatedOpacity(
+            duration: const Duration(milliseconds: 150),
+            curve: Curves.ease,
+            opacity: _selectedMode == AlbumStatus.public ? .0 : 1.0,
+            child: Divider(
+              color: Theme.of(context).disabledColor,
+            ),
           ),
-          SwitchListTile(
-            value: _recursive,
-            onChanged: (value) => setState(() {
-              _recursive = value;
-            }),
-            title: Text(appStrings.categoryPrivacyRecursive),
-            subtitle: Text(appStrings.categoryPrivacyRecursive_message),
+          AnimatedSize(
+            duration: const Duration(milliseconds: 300),
+            reverseDuration: const Duration(milliseconds: 150),
+            curve: Curves.ease,
+            alignment: Alignment.bottomCenter,
+            child: SizedBox(
+              height: _selectedMode == AlbumStatus.public ? .0 : null,
+              child: SwitchListTile(
+                value: _recursive,
+                onChanged: (value) => setState(() {
+                  _recursive = value;
+                }),
+                title: Text(appStrings.categoryPrivacyRecursive),
+                subtitle: Text(appStrings.categoryPrivacyRecursive_message),
+              ),
+            ),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(

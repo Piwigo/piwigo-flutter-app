@@ -145,6 +145,7 @@ Future<List<GroupModel>?> showSelectGroupModal(
 ]) async {
   return showMaterialModalBottomSheet<List<GroupModel>>(
     context: context,
+    enableDrag: false,
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(30.0)),
     ),

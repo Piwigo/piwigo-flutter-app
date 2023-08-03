@@ -181,6 +181,7 @@ Future<List<TagModel>?> showSelectTagsModal(
 ]) async {
   return showMaterialModalBottomSheet<List<TagModel>>(
     context: context,
+    enableDrag: false,
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(30.0)),
     ),
