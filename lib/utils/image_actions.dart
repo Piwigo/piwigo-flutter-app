@@ -58,6 +58,7 @@ Future<File> compressImage(File file,
   return file;
 }
 
+// Deprecated
 Future<List<XFile>?> onPickFiles() async {
   try {
     FilePicker.platform.clearTemporaryFiles();
@@ -110,6 +111,14 @@ Future<List<XFile>?> onPickImages() async {
       imageQuality: (Preferences.getUploadQuality * 100).round(),
       requestFullMetadata: !Preferences.getRemoveMetadata,
     );
+    for (var file in files) {
+      if (file.name.endsWith('.heic')) {
+        String? jpgPath = await HeicToJpg.convert(file.path);
+        if (jpgPath != null) {
+          files[files.indexWhere((f) => f == file)] = XFile(jpgPath);
+        }
+      }
+    }
     return files;
   } catch (e) {
     debugPrint('${e.toString()}');
@@ -132,6 +141,12 @@ Future<XFile?> onTakePhoto(BuildContext context) async {
           imageQuality: (Preferences.getUploadQuality * 100).round(),
           requestFullMetadata: !Preferences.getRemoveMetadata,
         );
+        if (image != null) {
+          String? jpgPath = await HeicToJpg.convert(image.path);
+          if (jpgPath != null) {
+            image = XFile(jpgPath);
+          }
+        }
         break;
       case 1:
         image = await _picker.pickVideo(source: ImageSource.camera);
