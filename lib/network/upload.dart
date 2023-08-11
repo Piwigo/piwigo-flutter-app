@@ -6,10 +6,8 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:piwigo_ng/app.dart';
 import 'package:piwigo_ng/components/dialogs/confirm_dialog.dart';
@@ -93,13 +91,7 @@ Future<List<int>> uploadPhotos(
 
   // Creates Upload Item list for the upload notifier
   for (var photo in photos) {
-    File? uploadFile;
-
-    // Compress file
-    uploadFile = await compressFile(photo);
-    if (uploadFile == null) {
-      uploadFile = File(photo.path);
-    }
+    File? uploadFile = File(photo.path);
 
     items.add(UploadItem(
       file: uploadFile,
@@ -240,43 +232,6 @@ Future<Response?> uploadChunk({
       if (onProgress != null) onProgress(value);
     },
   );
-}
-
-/// Compress before upload, enabled with [Preferences.getCompressUpload] parameter.
-Future<File?> compressFile(XFile file) async {
-  try {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-
-    // Get original file path
-    final filePath = file.path;
-
-    // Directory output
-    var dir = await getTemporaryDirectory();
-
-    // Extract file name and extension
-    final String filename = filePath.split('/').last;
-
-    // Output file path
-    final outPath = "${dir.absolute.path}/$filename";
-
-    // Get compress parameters
-    double quality = prefs.getDouble(Preferences.uploadQualityKey) ?? 1.0;
-    bool removeMetadata = prefs.getBool(Preferences.removeMetadataKey) ?? false;
-
-    // Compress with quality parameter and exif metadata
-    var result = await FlutterImageCompress.compressAndGetFile(
-      filePath,
-      outPath,
-      quality: (quality * 100).round(),
-      keepExif: removeMetadata,
-    );
-
-    debugPrint("Upload Compress $result");
-    return result;
-  } catch (e) {
-    debugPrint(e.toString());
-  }
-  return null;
 }
 
 Future<bool> uploadCompleted(List<int> imageId, int categoryId) async {

@@ -8,7 +8,6 @@ import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:heic_to_jpg/heic_to_jpg.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:piwigo_ng/models/album_model.dart';
 import 'package:piwigo_ng/models/status_model.dart';
 import 'package:piwigo_ng/network/api_client.dart';
@@ -166,14 +165,6 @@ class AutoUploadManager {
     // Perform upload
     for (File file in newPhotos) {
       debugPrint("Try upload ${file.path}");
-
-      File? uploadFile;
-
-      // Compress file
-      uploadFile = await compressFile(XFile(file.path));
-      if (uploadFile == null) {
-        uploadFile = file;
-      }
 
       try {
         // Make Request

@@ -108,7 +108,7 @@ Future<List<XFile>?> onPickImages() async {
   try {
     List<XFile> files = await _picker.pickMultipleMedia(
       imageQuality: (Preferences.getUploadQuality * 100).round(),
-      requestFullMetadata: Preferences.getRemoveMetadata,
+      requestFullMetadata: !Preferences.getRemoveMetadata,
     );
     return files;
   } catch (e) {
