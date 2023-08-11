@@ -75,8 +75,20 @@ class _SettingsPageState extends State<SettingsPage> {
     _uploadNotification = Preferences.getUploadNotification;
     _autoUploadEnabled = AutoUploadPreferences.getEnabled;
 
+    // Add 'full' size if missing
     if (!_availablePreviewSizes.contains('full')) {
       _availablePreviewSizes.add('full');
+    }
+
+    // Reset sizes if they are not available
+    if (!_availableSizes.contains(_albumThumbnailSize)) {
+      _albumThumbnailSize = Settings.defaultAlbumThumbnailSize;
+    }
+    if (!_availableSizes.contains(_imageThumbnailSize)) {
+      _imageThumbnailSize = Settings.defaultImageThumbnailSize;
+    }
+    if (!_availablePreviewSizes.contains(_imageFullScreenSize)) {
+      _imageFullScreenSize = Settings.defaultImageFullScreenSize;
     }
 
     super.initState();
