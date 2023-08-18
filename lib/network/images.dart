@@ -588,8 +588,6 @@ String? cleanImageUrl(String? originalUrl) {
   /// See https://tools.ietf.org/html/rfc3986#section-2
   Uri? serverUrl = Uri.tryParse(patchedUrl);
 
-  print("$patchedUrl");
-
   if (serverUrl == null) {
     // URL not RFC compliant!
     String leftUrl = patchedUrl;
