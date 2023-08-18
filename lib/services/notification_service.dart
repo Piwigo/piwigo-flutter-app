@@ -13,7 +13,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 final FlutterLocalNotificationsPlugin localNotification =
     FlutterLocalNotificationsPlugin();
 
-void initLocalNotifications() {
+Future<void> initLocalNotifications() async {
   const AndroidInitializationSettings initializationSettingsAndroid =
       AndroidInitializationSettings(
     '@mipmap/ic_launcher',
@@ -24,6 +24,7 @@ void initLocalNotifications() {
     initSettings,
     onDidReceiveNotificationResponse: onSelectNotification,
   );
+  await askNotificationPermissions();
 }
 
 Future<void> onSelectNotification(NotificationResponse response) async {

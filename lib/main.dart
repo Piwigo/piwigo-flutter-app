@@ -13,7 +13,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
   _setUITheme();
   HttpOverrides.global = SSLHttpOverrides();
   appPreferences = await SharedPreferences.getInstance();

@@ -1,5 +1,4 @@
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:piwigo_ng/components/app_image_display.dart';
 import 'package:piwigo_ng/models/image_model.dart';
@@ -106,32 +105,6 @@ class ImageCard extends StatelessWidget {
     return ImageNetworkDisplay(
       imageUrl: imageUrl,
     );
-    return CachedNetworkImage(
-      imageUrl: imageUrl ?? '',
-      fadeInDuration: const Duration(milliseconds: 300),
-      imageBuilder: (context, provider) => Image(
-        image: provider,
-        fit: BoxFit.cover,
-        errorBuilder: (context, o, s) {
-          debugPrint("$o\n$s");
-          return _buildErrorWidget(context);
-        },
-      ),
-      progressIndicatorBuilder: (context, url, download) {
-        if (download.downloaded >= (download.totalSize ?? 0)) {
-          return const SizedBox();
-        }
-        return Center(
-          child: CircularProgressIndicator(
-            value: download.progress,
-          ),
-        );
-      },
-      errorWidget: (context, url, error) {
-        debugPrint("[$url] $error");
-        return _buildErrorWidget(context);
-      },
-    );
   }
 
   List<Widget> _buildSelectOverlay(context) {
@@ -184,18 +157,5 @@ class ImageCard extends StatelessWidget {
         ),
       ),
     ];
-  }
-
-  Widget _buildErrorWidget(BuildContext context) {
-    return FittedBox(
-      fit: BoxFit.cover,
-      child: Container(
-        padding: const EdgeInsets.all(16.0),
-        decoration: BoxDecoration(
-          color: Theme.of(context).scaffoldBackgroundColor,
-        ),
-        child: const Icon(Icons.broken_image_outlined),
-      ),
-    );
   }
 }
