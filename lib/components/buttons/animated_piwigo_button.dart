@@ -23,31 +23,22 @@ class AnimatedPiwigoButton extends StatelessWidget {
     return AnimatedOpacity(
       duration: const Duration(milliseconds: 150),
       opacity: disabled ? 0.5 : 1,
-      child: Container(
+      child: RoundedLoadingButton(
+        controller: controller,
+        duration: const Duration(milliseconds: 500),
+        completionDuration: const Duration(milliseconds: 300),
+        // resetDuration: const Duration(seconds: 1),
+        resetAfterDuration: false,
+        animateOnTap: false,
+        color: color,
+        elevation: 0.0,
+        borderRadius: 10.0,
         height: 56.0,
-        constraints: BoxConstraints(
-          maxWidth: Settings.modalMaxWidth,
-        ),
-        child: LayoutBuilder(builder: (context, constraints) {
-          return RoundedLoadingButton(
-            controller: controller,
-            duration: const Duration(milliseconds: 500),
-            completionDuration: const Duration(milliseconds: 300),
-            // resetDuration: const Duration(seconds: 1),
-            resetAfterDuration: false,
-            animateOnTap: false,
-            color: color,
-            elevation: 0.0,
-            borderRadius: 10.0,
-            height: 56.0,
-            width: constraints.maxWidth,
-            onPressed:
-                controller.currentState == ButtonState.loading || disabled
-                    ? () {}
-                    : onPressed,
-            child: child ?? const SizedBox(),
-          );
-        }),
+        width: Settings.modalMaxWidth,
+        onPressed: controller.currentState == ButtonState.loading || disabled
+            ? () {}
+            : onPressed,
+        child: child ?? const SizedBox(),
       ),
     );
   }
