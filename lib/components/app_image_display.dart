@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:piwigo_ng/network/api_client.dart';
-import 'package:piwigo_ng/network/images.dart';
 import 'package:piwigo_ng/services/preferences_service.dart';
 import 'package:piwigo_ng/utils/settings.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -25,13 +24,11 @@ class ImageNetworkDisplay extends StatefulWidget {
 
 class _ImageNetworkDisplayState extends State<ImageNetworkDisplay> {
   late final Future<Map<String, String>> _headers;
-  late final String? _cleanUrl;
 
   @override
   initState() {
     super.initState();
     _headers = _getHeaders();
-    _cleanUrl = cleanImageUrl(widget.imageUrl) ?? widget.imageUrl;
   }
 
   Future<Map<String, String>> _getHeaders() async {
@@ -71,7 +68,7 @@ class _ImageNetworkDisplayState extends State<ImageNetworkDisplay> {
 
   @override
   Widget build(BuildContext context) {
-    if (_cleanUrl == null) {
+    if (widget.imageUrl == null) {
       return _buildNoImageWidget(context);
     }
     _checkMemory();
@@ -86,7 +83,7 @@ class _ImageNetworkDisplayState extends State<ImageNetworkDisplay> {
                   ? constraints.maxHeight
                   : null;
               return CachedNetworkImage(
-                imageUrl: _cleanUrl!,
+                imageUrl: widget.imageUrl!,
                 fadeInDuration: const Duration(milliseconds: 300),
                 fit: widget.fit ?? BoxFit.cover,
                 httpHeaders: snapshot.data!,
