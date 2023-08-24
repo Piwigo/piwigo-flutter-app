@@ -9,19 +9,6 @@ import 'package:piwigo_ng/services/preferences_service.dart';
 import 'api_client.dart';
 import 'authentication.dart';
 
-Map<String, dynamic> tryParseJson(String data) {
-  try {
-    return json.decode(data);
-  } on FormatException catch (_) {
-    debugPrint('Invalid json data');
-    debugPrint(data);
-    int start = data.indexOf('{');
-    int end = data.lastIndexOf('}');
-    String parsedData = data.substring(start, end + 1);
-    return json.decode(parsedData);
-  }
-}
-
 Future<ApiResponse<List<AlbumModel>>> fetchAlbums(int albumID) async {
   final Map<String, dynamic> queries = {
     'format': 'json',
@@ -31,17 +18,8 @@ Future<ApiResponse<List<AlbumModel>>> fetchAlbums(int albumID) async {
   };
 
   try {
-    List<String> uploadCategoryIdList = [];
     if (await methodExist('community.categories.getList')) {
       queries['faked_by_community'] = false;
-      ApiResponse communityResult = await fetchCommunityAlbums(albumID);
-      if (communityResult.hasData) {
-        uploadCategoryIdList = communityResult.data.map<String>(
-          (cat) {
-            return cat.id.toString();
-          },
-        ).toList();
-      }
     }
 
     Response response = await ApiClient.get(
@@ -53,15 +31,36 @@ Future<ApiResponse<List<AlbumModel>>> fetchAlbums(int albumID) async {
           tryParseJson(response.data)['result']['categories'];
       List<AlbumModel> albums = List<AlbumModel>.from(jsonAlbums.map(
         (album) {
-          bool canUpload = false;
-          if ((appPreferences.getBool(Preferences.isAdminKey) ?? false) ||
-              uploadCategoryIdList.contains(album['id'].toString())) {
-            canUpload = true;
-          }
+          bool canUpload =
+              appPreferences.getBool(Preferences.isAdminKey) ?? false;
           album['can_upload'] = canUpload;
           return AlbumModel.fromJson(album);
         },
       ));
+
+      if (await methodExist('community.categories.getList')) {
+        ApiResponse communityResult = await fetchCommunityAlbums(albumID);
+        if (!communityResult.hasData || communityResult.data!.isEmpty) {
+          return ApiResponse<List<AlbumModel>>(
+            data: albums,
+          );
+        }
+        if (communityResult.hasData) {
+          for (AlbumModel communityAlbum in communityResult.data) {
+            int index =
+                albums.indexWhere((album) => album.id == communityAlbum.id);
+            if (index >= 0) {
+              AlbumModel newAlbum = albums.elementAt(index);
+              newAlbum.canUpload = true;
+              albums[index] = newAlbum;
+            } else {
+              communityAlbum.canUpload = true;
+              albums.add(communityAlbum);
+            }
+          }
+        }
+      }
+
       return ApiResponse<List<AlbumModel>>(
         data: albums,
       );

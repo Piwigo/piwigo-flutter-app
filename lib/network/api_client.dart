@@ -1,9 +1,11 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
+import 'package:flutter/foundation.dart';
 import 'package:piwigo_ng/services/preferences_service.dart';
 
 import 'api_interceptor.dart';
@@ -138,5 +140,21 @@ class SSLHttpOverrides extends HttpOverrides {
   HttpClient createHttpClient(SecurityContext? context) {
     return super.createHttpClient(context)
       ..badCertificateCallback = ApiClient.piwigoSSLBypass;
+  }
+}
+
+Map<String, dynamic> tryParseJson(String data) {
+  try {
+    return json.decode(data);
+  } on FormatException catch (_) {
+    if (kDebugMode) {
+      print('Invalid json data');
+      print(data);
+    }
+    int start = data.indexOf('{');
+    int end = data.lastIndexOf('}');
+    String parsedData = data.substring(start, end + 1);
+    if (kDebugMode) print("Parsed : $parsedData");
+    return json.decode(parsedData);
   }
 }

@@ -68,7 +68,7 @@ Future<ApiResponse<List<ImageModel>>> fetchImages(
     Response response = await ApiClient.get(queryParameters: queries);
 
     if (response.statusCode == 200) {
-      var jsonImages = json.decode(response.data)['result']['images'];
+      var jsonImages = tryParseJson(response.data)['result']['images'];
       List<ImageModel> images = List<ImageModel>.from(
         jsonImages.map((image) => ImageModel.fromJson(image)),
       );
@@ -77,8 +77,8 @@ Future<ApiResponse<List<ImageModel>>> fetchImages(
     }
   } on DioError catch (e) {
     debugPrint('Fetch images: ${e.message}');
-  } on Error catch (e) {
-    debugPrint('Fetch images: ${e.stackTrace}');
+  } catch (e) {
+    debugPrint('Fetch images: $e');
   }
   return ApiResponse(error: ApiErrors.fetchImagesError);
 }

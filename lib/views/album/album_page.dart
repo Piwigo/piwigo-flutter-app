@@ -313,7 +313,7 @@ class _AlbumPageState extends State<AlbumPage> {
           ),
         if (orientation == Orientation.landscape && _selectedList.isNotEmpty)
           ..._imageActions,
-        if (widget.isAdmin)
+        if (widget.isAdmin || _currentAlbum.canUpload)
           PopupMenuButton(
             tooltip: appStrings.imageOptions_title,
             position: PopupMenuPosition.under,
@@ -617,6 +617,8 @@ class _AlbumPageState extends State<AlbumPage> {
       ),
     ];
 
-    return widget.isAdmin ? adminActions : userActions;
+    return widget.isAdmin || _currentAlbum.canUpload
+        ? adminActions
+        : userActions;
   }
 }
