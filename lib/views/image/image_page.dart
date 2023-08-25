@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:html_unescape/html_unescape.dart';
@@ -268,6 +269,20 @@ class _ImagePageState extends State<ImagePage> {
     });
   }
 
+  void _onPreviousPage() {
+    _pageController.previousPage(
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.ease,
+    );
+  }
+
+  void _onNextPage() {
+    _pageController.nextPage(
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.ease,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -311,66 +326,82 @@ class _ImagePageState extends State<ImagePage> {
           curve: _overlayAnimationCurve,
           opacity: _showOverlay ? 1 : 0,
           child: Container(
-            height: 56.0,
-            decoration: BoxDecoration(color: Colors.black.withOpacity(0.5)),
-            child: Row(
+            decoration: BoxDecoration(
+              color: Colors.black.withOpacity(0.5),
+            ),
+            child: Column(
               children: [
-                IconButton(
-                  onPressed: () => Navigator.of(context).pop(_imageList),
-                  icon: Icon(Icons.arrow_back),
-                ),
-                Expanded(
-                  child: Text(
-                    '${_currentImage.name}',
-                    softWrap: true,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(fontSize: 16, color: Colors.white),
-                  ),
-                ),
-                if (MediaQuery.of(context).orientation == Orientation.landscape)
-                  ..._actions,
-                if (widget.isAdmin)
-                  PopupMenuButton(
-                    position: PopupMenuPosition.under,
-                    itemBuilder: (context) => [
-                      PopupMenuItem(
-                        onTap: () => Future.delayed(
-                          const Duration(seconds: 0),
-                          () => share([_currentImage]),
-                        ),
-                        child: PopupListItem(
-                          icon: Icons.share,
-                          text: appStrings.imageOptions_share,
+                SizedBox(
+                  height: 56.0,
+                  child: Row(
+                    children: [
+                      IconButton(
+                        onPressed: () => Navigator.of(context).pop(_imageList),
+                        icon: Icon(Icons.arrow_back),
+                      ),
+                      Expanded(
+                        child: AutoSizeText(
+                          '${_currentImage.name}',
+                          softWrap: true,
+                          maxLines: 1,
+                          maxFontSize: 16.0,
+                          minFontSize: 10.0,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(fontSize: 16.0, color: Colors.white),
                         ),
                       ),
-                      if (Preferences.getUserStatus != 'guest')
-                        PopupMenuItem(
-                          onTap: () => Future.delayed(
-                            const Duration(seconds: 0),
-                            _onLike,
-                          ),
-                          child: PopupListItem(
-                            icon: !_currentImage.favorite
-                                ? Icons.favorite_border
-                                : Icons.favorite,
-                            text: !_currentImage.favorite
-                                ? appStrings.imageOptions_addFavorites
-                                : appStrings.imageOptions_removeFavorites,
-                          ),
+                      if (MediaQuery.of(context).orientation ==
+                          Orientation.landscape)
+                        ..._actions,
+                      if (widget.isAdmin)
+                        PopupMenuButton(
+                          position: PopupMenuPosition.under,
+                          itemBuilder: (context) => [
+                            PopupMenuItem(
+                              onTap: () => Future.delayed(
+                                const Duration(seconds: 0),
+                                () => share([_currentImage]),
+                              ),
+                              child: PopupListItem(
+                                icon: Icons.share,
+                                text: appStrings.imageOptions_share,
+                              ),
+                            ),
+                            if (Preferences.getUserStatus != 'guest')
+                              PopupMenuItem(
+                                onTap: () => Future.delayed(
+                                  const Duration(seconds: 0),
+                                  _onLike,
+                                ),
+                                child: PopupListItem(
+                                  icon: !_currentImage.favorite
+                                      ? Icons.favorite_border
+                                      : Icons.favorite,
+                                  text: !_currentImage.favorite
+                                      ? appStrings.imageOptions_addFavorites
+                                      : appStrings.imageOptions_removeFavorites,
+                                ),
+                              ),
+                            PopupMenuItem(
+                              onTap: () => Future.delayed(
+                                const Duration(seconds: 0),
+                                () => downloadImages([_currentImage]),
+                              ),
+                              child: PopupListItem(
+                                icon: Icons.download,
+                                text: appStrings.downloadImage_title(1),
+                              ),
+                            ),
+                          ],
                         ),
-                      PopupMenuItem(
-                        onTap: () => Future.delayed(
-                          const Duration(seconds: 0),
-                          () => downloadImages([_currentImage]),
-                        ),
-                        child: PopupListItem(
-                          icon: Icons.download,
-                          text: appStrings.downloadImage_title(1),
-                        ),
-                      ),
                     ],
                   ),
+                ),
+                AnimatedSize(
+                  duration: _overlayAnimationDuration,
+                  curve: _overlayAnimationCurve,
+                  child: _tags,
+                ),
               ],
             ),
           ),
@@ -382,7 +413,7 @@ class _ImagePageState extends State<ImagePage> {
   /// Image tags
   Widget get _tags {
     List<TagModel> tags = _currentImage.tags;
-    if (tags.isEmpty) return const SizedBox();
+    if (tags.isEmpty) return const SizedBox(width: double.infinity);
     return SizedBox(
       height: 36.0,
       child: Center(
@@ -544,36 +575,69 @@ class _ImagePageState extends State<ImagePage> {
           duration: _overlayAnimationDuration,
           curve: _overlayAnimationCurve,
           opacity: _showOverlay ? 1 : 0,
-          child: OrientationBuilder(builder: (context, orientation) {
-            return Column(
-              children: [
-                _comment,
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.5),
-                  ),
-                  child: AnimatedSize(
-                    duration: _overlayAnimationDuration,
-                    curve: _overlayAnimationCurve,
-                    child: _tags,
-                  ),
+          child: Column(
+            children: [
+              _comment,
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.5),
                 ),
-                if (MediaQuery.of(context).orientation == Orientation.portrait)
-                  Container(
-                    height: 56.0,
-                    decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.5),
-                    ),
-                    child: Row(
-                      children: _actions
-                          .map((action) => Expanded(child: action))
-                          .toList(),
-                    ),
-                  ),
-              ],
-            );
-          }),
+                child: AnimatedSize(
+                  duration: _overlayAnimationDuration,
+                  curve: _overlayAnimationCurve,
+                  child: OrientationBuilder(builder: (context, orientation) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        _pagination,
+                        if (MediaQuery.of(context).orientation ==
+                            Orientation.portrait)
+                          SizedBox(
+                            height: 56.0,
+                            child: Row(
+                              children: _actions
+                                  .map((action) => Expanded(child: action))
+                                  .toList(),
+                            ),
+                          ),
+                      ],
+                    );
+                  }),
+                ),
+              ),
+            ],
+          ),
         ),
+      ),
+    );
+  }
+
+  Widget get _pagination {
+    return CallbackShortcuts(
+      bindings: <ShortcutActivator, VoidCallback>{
+        const SingleActivator(LogicalKeyboardKey.arrowLeft): _onPreviousPage,
+        const SingleActivator(LogicalKeyboardKey.arrowRight): _onNextPage,
+      },
+      child: Row(
+        children: [
+          IconButton(
+            onPressed: _onPreviousPage,
+            icon: Icon(Icons.chevron_left),
+          ),
+          Expanded(
+            child: Text(
+              "${_page + 1}/${_album.nbImages}",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: AppColors.white,
+              ),
+            ),
+          ),
+          IconButton(
+            onPressed: _onNextPage,
+            icon: Icon(Icons.chevron_right),
+          ),
+        ],
       ),
     );
   }
