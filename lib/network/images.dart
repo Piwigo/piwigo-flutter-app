@@ -6,6 +6,7 @@ import 'package:extended_text/extended_text.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
@@ -256,6 +257,10 @@ Future<XFile?> downloadImage(
     await ApiClient.download(
       path: image.elementUrl,
       outputPath: localPath,
+    );
+    await ImageGallerySaver.saveFile(
+      localPath,
+      name: image.name,
     );
     return XFile(localPath);
   } on DioError catch (e) {
