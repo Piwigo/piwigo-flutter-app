@@ -95,12 +95,6 @@ class _EditImagePageState extends State<EditImagePage> {
     });
   }
 
-  void _onDeselectTag(TagModel tag) {
-    setState(() {
-      _tags.remove(tag);
-    });
-  }
-
   Future<void> _onEdit() async {
     _btnController.start();
     Iterable<int> tagIds = _tags.map<int>((tag) => tag.id);

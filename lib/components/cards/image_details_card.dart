@@ -26,19 +26,22 @@ class ImageDetailsCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Stack(
+      fit: StackFit.loose,
       children: [
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Row(
-            children: [
-              _imageThumbnail(context),
-              Expanded(
-                child: _imageDetails(context),
-              ),
-            ],
+        Positioned.fill(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              children: [
+                _imageThumbnail(context),
+                Expanded(
+                  child: _imageDetails(context),
+                ),
+              ],
+            ),
           ),
         ),
-        _removeButton(context),
+        if (onRemove != null) _removeButton(context),
       ],
     );
   }

@@ -339,6 +339,26 @@
     "imageDetailsFetchError_title": "Échec de la récupération des propriétés",
     "imageDetailsFetchError_retryMessage": "La récupération des données de la photo a échoué. Ré-essayer ?",
     "imageDetailsFetchError_continueMessage": "La récupération des données de la photo a échoué. Continuer ?",
+    "imageDetails_dateCreated": "Créée le {date} à {time}",
+    "@imageDetails_dateCreated": {
+        "placeholders": {
+            "date": {},
+            "time": {}
+        }
+    },
+    "imageDetails_dateAvailable": "Disponible le {date} à {time}",
+    "@imageDetails_dateAvailable": {
+        "placeholders": {
+            "date": {},
+            "time": {}
+        }
+    },
+    "imageDetails_nbAlbums": "{count, plural, =0{Orpheline} =1{Appartient à 1 album} other{Appartient à {count} albums}}",
+    "@imageDetails_nbAlbums" : {
+        "placeholders": {
+            "count": {}
+        }
+    },
     "privacyLevel": "Niveau de Confidentialité",
     "privacyLevel_admin": "Admins",
     "privacyLevel_adminFamily": "Admins, Famille",

@@ -430,6 +430,27 @@
     "imageDetailsFetchError_retryMessage": "Fetching the photo data failed. Try again?",
     "imageDetailsFetchError_continueMessage": "Fetching the photo data failed. Continue?",
 
+    "imageDetails_dateCreated": "Created on {date} at {time}",
+    "@imageDetails_dateCreated": {
+        "placeholders": {
+            "date": {},
+            "time": {}
+        }
+    },
+    "imageDetails_dateAvailable": "Available on {date} at {time}",
+    "@imageDetails_dateAvailable": {
+        "placeholders": {
+            "date": {},
+            "time": {}
+        }
+    },
+    "imageDetails_nbAlbums": "{count, plural, =0{Orphan} =1{Belongs to 1 album} other{Belongs to {count} albums}}",
+    "@imageDetails_nbAlbums" : {
+        "placeholders": {
+            "count": {}
+        }
+    },
+
 
     "privacyLevel": "Privacy Level",
     "privacyLevel_admin": "Admins",

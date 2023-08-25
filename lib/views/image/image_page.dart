@@ -9,7 +9,7 @@ import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
 import 'package:piwigo_ng/app.dart';
 import 'package:piwigo_ng/components/app_image_display.dart';
-import 'package:piwigo_ng/components/dialogs/image_comment_dialog.dart';
+import 'package:piwigo_ng/components/modals/image_info_modal.dart';
 import 'package:piwigo_ng/components/popup_list_item.dart';
 import 'package:piwigo_ng/models/album_model.dart';
 import 'package:piwigo_ng/models/image_model.dart';
@@ -283,6 +283,10 @@ class _ImagePageState extends State<ImagePage> {
     );
   }
 
+  Future<void> _showImageDetails() async {
+    return showImageDetailsModal(context, _currentImage);
+  }
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -357,6 +361,13 @@ class _ImagePageState extends State<ImagePage> {
                         PopupMenuButton(
                           position: PopupMenuPosition.under,
                           itemBuilder: (context) => [
+                            PopupMenuItem(
+                              onTap: _showImageDetails,
+                              child: PopupListItem(
+                                icon: Icons.text_snippet,
+                                text: appStrings.imageDetailsView_title,
+                              ),
+                            ),
                             PopupMenuItem(
                               onTap: () => Future.delayed(
                                 const Duration(seconds: 0),
@@ -660,15 +671,7 @@ class _ImagePageState extends State<ImagePage> {
               return const SizedBox();
             return GestureDetector(
               behavior: HitTestBehavior.opaque,
-              onTap: () {
-                showDialog(
-                  barrierColor: Colors.black.withOpacity(0.6),
-                  context: context,
-                  builder: (context) {
-                    return ImageCommentDialog(image: _currentImage);
-                  },
-                );
-              },
+              onTap: _showImageDetails,
               child: Padding(
                 padding: const EdgeInsets.symmetric(
                   vertical: 8.0,
@@ -704,6 +707,10 @@ class _ImagePageState extends State<ImagePage> {
       ),
     ];
     List<Widget> userActions = [
+      IconButton(
+        onPressed: _showImageDetails,
+        icon: Icon(Icons.text_snippet),
+      ),
       IconButton(
         onPressed: () => share([_currentImage]),
         icon: Icon(Icons.share),
