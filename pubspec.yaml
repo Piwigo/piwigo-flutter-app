@@ -3,7 +3,7 @@ description: A Piwigo Android application
 
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
-version: 2.2.2+222
+version: 2.2.3+223
 
 environment:
   sdk: ">=2.17.6 <3.0.0"
