@@ -62,6 +62,9 @@ class Preferences {
   static const String isAdminKey = 'IS_USER_ADMIN';
   static const String uploadChunkSizeKey = 'UPLOAD_FORM_CHUNK_SIZE';
   static const String fileTypesKey = 'FILE_TYPES';
+  static List<String> get getAvailableFileTypes {
+    return appPreferences.getString(fileTypesKey)?.split(',') ?? [];
+  }
 
   // ------------ Settings ------------
 

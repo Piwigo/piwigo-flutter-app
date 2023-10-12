@@ -107,15 +107,19 @@ Future<List<XFile>?> onPickFiles() async {
 
 Future<List<XFile>?> onPickImages() async {
   try {
-    List<XFile> files = await _picker.pickMultipleMedia(
+    List<XFile> pickedFiles = await _picker.pickMultipleMedia(
       imageQuality: (Preferences.getUploadQuality * 100).round(),
       requestFullMetadata: !Preferences.getRemoveMetadata,
     );
-    for (var file in files) {
-      if (file.name.endsWith('.heic')) {
+    List<XFile> files = [];
+    for (var file in pickedFiles) {
+      if (Preferences.getAvailableFileTypes
+          .contains(file.name.split('.').last)) {
+        files.add(file);
+      } else if (file.name.endsWith('.heic')) {
         String? jpgPath = await HeicToJpg.convert(file.path);
         if (jpgPath != null) {
-          files[files.indexWhere((f) => f == file)] = XFile(jpgPath);
+          files.add(XFile(jpgPath));
         }
       }
     }

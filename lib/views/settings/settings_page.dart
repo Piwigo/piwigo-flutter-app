@@ -230,8 +230,7 @@ class _SettingsPageState extends State<SettingsPage> {
         ],
       );
   Widget get _supportedFilesSection {
-    String fileTypes =
-        appPreferences.getString('FILE_TYPES')?.replaceAll(',', ', ') ?? '';
+    String fileTypes = Preferences.getAvailableFileTypes.join(', ') ?? '';
     return SettingsSection(
       color: Colors.transparent,
       children: [
