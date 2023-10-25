@@ -8,7 +8,7 @@ class ImageModel {
   int hit;
   bool favorite;
   String file;
-  String name;
+  String? name;
   String? comment;
   String? dateCreation;
   String? dateAvailable;
@@ -25,7 +25,7 @@ class ImageModel {
     this.hit = 0,
     this.favorite = false,
     this.file = '',
-    required this.name,
+    this.name,
     this.comment,
     this.dateCreation,
     this.dateAvailable,
@@ -43,7 +43,7 @@ class ImageModel {
         hit = int.tryParse(json['hit'].toString()) ?? 0,
         favorite = json['is_favorite'] ?? false,
         file = json['file'].toString(),
-        name = json['name'].toString(),
+        name = json['name']?.toString(),
         comment = json['comment'],
         dateCreation = json['date_creation'],
         dateAvailable = json['date_available'],
