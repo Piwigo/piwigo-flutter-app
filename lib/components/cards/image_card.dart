@@ -80,7 +80,7 @@ class ImageCard extends StatelessWidget {
                             end: Alignment.topCenter),
                       ),
                       child: AutoSizeText(
-                        image.name,
+                        image.name ?? "",
                         maxLines: 1,
                         maxFontSize: 14,
                         minFontSize: 8,

@@ -59,7 +59,7 @@ class _ImageCommentDialogState extends State<ImageCommentDialog> {
             curve: Curves.ease,
             opacity: isNameHidden ? 1.0 : 0.0,
             child: Text(
-              widget.image.name,
+              widget.image.name ?? "",
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: Theme.of(context).textTheme.titleMedium,
@@ -78,7 +78,7 @@ class _ImageCommentDialogState extends State<ImageCommentDialog> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
-                widget.image.name,
+                widget.image.name ?? "",
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.titleMedium,
               ),

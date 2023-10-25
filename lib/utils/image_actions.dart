@@ -188,7 +188,7 @@ Future<dynamic> onMovePhotos(BuildContext context, List<ImageModel> images,
       title: appStrings.moveImage_title,
       subtitle: appStrings.moveImage_selectAlbum(
         images.length,
-        images.first.name,
+        images.first.name ?? "",
       ),
       isImage: true,
       album: origin,
