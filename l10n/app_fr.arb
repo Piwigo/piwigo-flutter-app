@@ -1,0 +1,855 @@
+{
+    "tabBar_albums": "Albums",
+    "tabBar_upload": "Envoyer",
+    "tabBar_preferences": "Réglages",
+    "alertOkButton": "OK",
+    "alertDismissButton": "Annuler",
+    "alertYesButton": "Oui",
+    "alertNoButton": "Non",
+    "alertTryAgainButton": "Réessayez",
+    "alertCancelButton": "Annuler",
+    "alertAddButton": "Ajouter",
+    "alertRetryButton": "Réessayer",
+    "alertNextButton": "Photo suivante",
+    "alertTryButton": "Essayer",
+    "alertClearButton": "Vider",
+    "alertConfirmButton": "Confirmer",
+    "alertRemoveButton": "Retirer",
+    "alertMoveButton": "Déplacer",
+    "alertCopyButton": "Copier",
+    "loadingHUD_label": "Chargement…",
+    "completeHUD_label": "Terminé",
+    "errorHUD_label": "Erreur",
+    "loadMoreHUD_label": "Relâcher pour afficher plus",
+    "uploadRights_title": "Droits Requis",
+    "uploadRights_message": "Vous devez avoir le droit de télécharger pour pouvoir envoyer des photos ou des vidéos.",
+    "internetErrorGeneral_title": "Erreur de Connexion",
+    "internetErrorGeneral_broken": "Désolé, la communication a été interrompue. Essayez de vous connecter à nouveau.",
+    "internetCancellingConnection_button": "Annulation de la Connexion…",
+    "internetCancelledConnection_button": "Annuler la Connexion",
+    "internetCancelledConnection_title": "Connexion Annulée",
+    "piwigoServer_wrongJSONobject": "Impossible d'analyser l'objet JSON retourné par le serveur Piwigo.",
+    "piwigoServer_invalidJSONobject": "Le serveur Piwigo n'a pas renvoyé un objet JSON valide.",
+    "piwigoServer_emptyJSONobject": "Le serveur Piwigo a retourné un fichier JSON vide.",
+    "coreDataStore_WarningTitle": "Avertissement",
+    "coreDataStore_WarningMessage": "Une erreur sérieuse s'est produite pendant que Piwigo tentait de lire le cache de données. Un nouveau cache a donc été créé.",
+    "coreDataFetch_DigestError": "Impossible de digérer les données récupérées.",
+    "coreDataFetch_TagError": "Echec de la récupération des tags!",
+    "coreDataFetch_TagMissingData": "Trouvé et supprimera un tag n'ayant pas d'identité ou de nom valide.",
+    "coreDataFetch_TagCreateFailed": "Impossible de créer un nouvel objet Tag.",
+    "coreDataFetch_UploadCreateFailed": "Impossible de créer un nouvel objet Upload.",
+    "coreDataFetch_UploadMissingAsset": "Impossible de récupérer les photos.",
+    "login": "Connexion",
+    "login_serverPlaceholder": "exemple.com",
+    "login_userPlaceholder": "Identifiant (optionnel)",
+    "login_passwordPlaceholder": "Mot de Passe (optionnel)",
+    "login_loggingIn": "Connexion en cours...",
+    "login_connecting": "Connexion en cours",
+    "login_newSession": "Ouverture de la Session",
+    "login_communityParameters": "Paramètres Community",
+    "login_serverParameters": "Paramètres Piwigo",
+    "login_advancedParameters": "Paramètres de connexion",
+    "login_connectionChanged": "Connexion Modifiée !",
+    "login_rememberCredentials": "Mémoriser les identifiants",
+    "loginHTTP_title": "Identification HTTP",
+    "loginHTTP_message": "L'authentification HTTP est requise par le serveur Piwigo:",
+    "loginHTTP_enable": "Activer HTTP Basic",
+    "loginHTTPuser_placeholder": "Identifiant",
+    "loginHTTPpwd_placeholder": "Mot de Passe",
+    "loginCert_title": "Certificats auto-signés",
+    "loginCert_enable": "Authoriser les SSL",
+    "loginCertFailed_title": "Connexion Non Privée",
+    "loginCertFailed_message": "Piwigo vous avertit lorsqu'un site web a un certificat non valide. Voulez-vous toujours accepter ce certificat ?",
+    "loginHTTPSfailed_title": "Échec de la Connexion Sécurisée",
+    "loginHTTPSfailed_message": "Piwigo ne peut pas établir une connexion sécurisée. Voulez-vous essayer d'établir une connexion non sécurisée ?",
+    "serverURLerror_title": "URL Incorrecte",
+    "serverURLerror_message": "Veuillez corriger l'adresse du serveur Web Piwigo.",
+    "serverMethodsError_title": "Méthodes Inconnues",
+    "serverMethodsError_message": "Impossible d’obtenir les méthodes du serveur. Problème avec le serveur Piwigo ?",
+    "serverInvalidMethodError_message": "Echec de l'appel de la méthode du serveur.",
+    "serverMissingParamError_message": "Échec de l'exécution de la méthode du serveur avec un paramètre manquant.",
+    "serverInvalidParamError_message": "Echec de l'appel de la méthode du serveur avec les paramètres fournis.",
+    "serverUnknownError_message": "Une erreur inattendue s'est produite lors de l'appel de la méthode du serveur avec les paramètres fournis.",
+    "loginError_title": "Échec de Connexion",
+    "loginError_message": "Les nom d’utilisateur et mot de passe ne correspondent pas à l’adresse donnée",
+    "loginEmptyServer_title": "Entrez une Adresse Web",
+    "loginEmptyServer_message": "S’il vous plaît, sélectionnez un protocole et entrez une adresse de serveur Piwigo pour continuer.",
+    "serverConnectionError_title": "Échec de la Connexion",
+    "serverConnectionError_message": "Une connexion HTTPS sécurisée n'a pas pu être établie. S'il vous plaît, vérifier l'adresse ou essayez en mode HTTP non crypté?",
+    "serverVersionNotCompatible_title": "Serveur Incompatible",
+    "serverVersionNotCompatible_message": "La version de votre serveur Piwigo est {version}. Piwigo NG requiert une version supérieure à 2.7. Veuillez mettre à jour votre serveur pour utiliser Piwigo NG. Voulez-vous quand même continuer ?",
+    "@serverVersionNotCompatible_message": {
+        "placeholders": {
+            "version": {}
+        }
+    },
+    "sessionStatusError_title": "Échec d'Authentification",
+    "sessionStatusError_message": "L’authentification avec le serveur a échoué. Essayez de vous connecter à nouveau.",
+    "serverCommunityError_title": "Erreur avec Community",
+    "serverCommunityError_message": "Impossible d’obtenir les réglages de l’extension Community. Essayez de vous connecter à nouveau.",
+    "logoutConfirmation_title": "Déconnexion",
+    "logoutConfirmation_message": "Êtes-vous sûr de vouloir vous déconnecter ?",
+    "logoutFail_title": "Echec de la Déconnexion",
+    "albumCount": "{count, plural, =0{0 albums} =1{1 album} other{{count} albums}}",
+    "@albumCount": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "subAlbumCount": "{count, plural, =0{0 sous-albums} =1{1 sous-album} other{{count} sous-albums}}",
+    "@subAlbumCount": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "showMore": "Plus… ({count})",
+    "@showMore": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "showPhotos": "Afficher les Photos",
+    "categoryMainEmpty": "Pas encore d'albums dans votre Piwigo.\nVous pouvez tirer vers le bas pour actualiser ou vous reconnecter.",
+    "categoryImageList_selectButton": "Sélectionner",
+    "categoryImageList_deselectButton": "Désélectionner",
+    "categoryImageList_noDataError": "Erreur Aucune Donnée",
+    "categoryDiscover_title": "Découvrir",
+    "categoryDiscoverVisits_title": "Plus vues",
+    "categoryDiscoverVisits_legend": "vues",
+    "categoryDiscoverBest_title": "Mieux notées",
+    "categoryDiscoverRecent_title": "Photos récentes",
+    "categoryDiscoverFavorites_title": "Mes favorites",
+    "categorySort_nameAscending": "Titre de la photo, A → Z",
+    "categorySort_nameDescending": "Titre de la Photo, Z → A",
+    "categorySort_fileNameAscending": "Nom de Fichier, A → Z",
+    "categorySort_fileNameDescending": "Nom de Fichier, Z → A",
+    "categorySort_dateCreatedDescending": "Date de Création, récent → ancien",
+    "categorySort_dateCreatedAscending": "Date de Création, ancien → récent",
+    "categorySort_datePostedDescending": "Date d'Ajout, récent → ancien",
+    "categorySort_datePostedAscending": "Date d'Ajout, ancien → récent",
+    "categorySort_ratingScoreDescending": "Note, haute → basse",
+    "categorySort_ratingScoreAscending": "Note, basse → haute",
+    "categorySort_visitsDescending": "Nombre de visites, élevé → faible",
+    "categorySort_visitsAscending": "Nombre de visites, faible → élevé",
+    "categorySort_manual": "Tri manuel",
+    "categorySort_random": "Ordre Aléatoire",
+    "categorySort_videosOnly": "Vidéos Uniquement",
+    "categorySort_imagesOnly": "Photos uniquement",
+    "categorySelection_title": "Album",
+    "categorySelection_titleSub": "Sous-Albums",
+    "categorySelection_root": "Album Racine",
+    "categorySelection_root375pt": "Racine",
+    "categorySelection_action": "Choisissez une action pour cet album",
+    "categorySelectionHUD_label": "Récupération des Données d'Albums…",
+    "categorySelection_allAlbums": "Tous les albums",
+    "categoryUpload_noSubAlbum": "Il n'y a pas de sous-album qui puisse recevoir des photos",
+    "categoryUpload_chooseAlbum": "Sélectionnez le sous-album recevant les photos",
+    "categoryUpload_LocalAlbums": "Albums Locaux",
+    "categoryUpload_chooseLocalAlbum": "Sélectionnez l'album local qui contient les photos à envoyer",
+    "categoryUpload_sharedAlbums": "Albums partagés",
+    "categoryUpload_mediaTypes": "Types de média",
+    "categoryUpload_otherAlbums": "Autres albums",
+    "categoryUpload_pasteboard": "Presse papiers",
+    "categoryUpload_loadSubCategories": "charger",
+    "categoryUpload_images": "Transférer des photos",
+    "categoryUpload_videos": "Transférer des Videos",
+    "categoryUpload_camera": "Caméra",
+    "categoryUpload_takePhoto": "Prendre une photo",
+    "categoryUpload_takeVideo": "Prendre une Vidéo",
+    "uploadList_title": "État du transfert",
+    "uploadList_uploading": "Transfert en cours",
+    "uploadList_history": "Historique",
+    "uploadList_empty": "Vide",
+    "setDefaultCategory_select": "Veuillez sélectionner un album ou un sous-album qui deviendra le nouvel album racine.",
+    "setDefaultCategory_title": "Album par Défaut",
+    "setDefaultCategory_message": "Etes-vous sûr de vouloir définir l'album {album} comme Album par Défaut ?",
+    "@setDefaultCategory_message": {
+        "placeholders": {
+            "album": {}
+        }
+    },
+    "createNewAlbum_title": "Nouvel Album",
+    "createNewAlbum_message": "Entrez un nom pour cet album :",
+    "createNewAlbum_placeholder": "Nom de l’Album",
+    "createNewAlbumDescription_placeholder": "Description",
+    "createNewAlbumDescription_noDescription": "aucune description",
+    "createNewAlbumHUD_label": "Création de l'Album…",
+    "createNewAlbumHUD_created": "Album créé",
+    "createAlbumError_title": "Echec de la Création d'Album",
+    "createAlbumError_message": "Impossible de créer un nouvel album",
+    "categoryCellOption_rename": "Renomer",
+    "categoryCellOption_move": "Déplacer",
+    "categoryCellOption_delete": "Effacer",
+    "renameCategory_title": "Renommer l'Album",
+    "renameCategory_message": "Entrez un nouveau nom pour cet album",
+    "renameCategory_button": "Renommer",
+    "renameCategoryHUD_label": "Changement du Nom…",
+    "renameCategoryHUD_renamed": "Album renommé",
+    "renameCategoryError_title": "Impossible de renommer",
+    "renameCategoryError_message": "Impossible de renommer l'album",
+    "refreshCategoryHUD_label": "Rafraichissement en cours…",
+    "refreshCategoryError_title": "Impossible d'actualiser",
+    "refreshCategoryError_message": "Impossible d'actualiser la miniature de votre album",
+    "deleteCategory_title": "EFFACER L'ALBUM",
+    "deleteCategory_message": "{count, plural, =0{ÊTES VOUS SÛR DE VOULOIR SUPPRIMER L'ALBUM {album}} =1{ÊTES VOUS SÛR DE VOULOIR SUPPRIMER L'ALBUM {album} ET SA PHOTO} other{ÊTES VOUS SÛR DE VOULOIR SUPPRIMER L'ALBUM {album} ET SES {count} PHOTOS ?}}",
+    "@deleteCategory_message": {
+        "placeholders": {
+            "count": {},
+            "album": {}
+        }
+    },
+    "deleteCategory_empty": "Effacer Album Vide",
+    "deleteCategory_noImages": "Conserver les photos",
+    "deleteCategory_noImages_subtitle": "peut créer des photos orphelines",
+    "deleteCategory_orphanedImages": "Effacer les images orphelines",
+    "deleteCategory_orphanedImages_subtitle": "Mode par défaut, ne supprime que les photos liées à aucun autre album",
+    "deleteCategory_allImages": "{count, plural, =0{Effacer les photos} =1{Effacer la photo} other{Effacer {count} photos}}",
+    "@deleteCategory_allImages": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "deleteCategory_allImages_subtitle": "Supprimer toutes les photos, même celles liées à d'autres albums",
+    "deleteCategoryConfirm_title": "Etes-vous sûr ?",
+    "deleteCategoryConfirm_message": "Veuillez entrer le nombre de photos afin de supprimer cet album. Nombre de photos : {count}",
+    "@deleteCategoryConfirm_message": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "deleteCategoryConfirm_deleteButton": "SUPPRIMER",
+    "deleteCategoryHUD_label": "Suppression de l'Album…",
+    "deleteCategoryHUD_deleted": "Album supprimé",
+    "deleteCategoryMatchError_title": "Nombre Incorrect",
+    "deleteCategoryMatchError_message": "Le nombre de photos que vous avez entré ne correspond pas au nombre de photos dans l'album. S’il vous plaît, essayez de nouveau si vous désirez supprimer cet album",
+    "deleteCategoryError_title": "Echec",
+    "deleteCategoryError_message": "Impossible de supprimer votre album",
+    "moveCategory": "Déplacer l'Album",
+    "moveCategory_select": "Veuillez sélectionner un album ou un sous-album où déplacer l'album {album}.",
+    "@moveCategory_select": {
+        "placeholders": {
+            "album": {}
+        }
+    },
+    "moveCategory_message": "Êtes-vous certain de vouloir déplacer {album} dans l’album {parent} ?",
+    "@moveCategory_message": {
+        "placeholders": {
+            "album": {},
+            "parent": {}
+        }
+    },
+    "moveCategoryHUD_moving": "Déplacement de l'Album…",
+    "moveCategoryHUD_moved": "Album déplacé",
+    "moveCategoryError_title": "Echec",
+    "moveCategoryError_message": "Impossible de déplacer votre album",
+    "categoryPrivacy": "Gérer les permissions",
+    "categoryPrivacy_subtitle": "Gérer les permissions d'accès à \"{album_name}\".",
+    "@categoryPrivacy_subtitle": {
+        "placeholders": {
+            "album_name": {}
+        }
+    },
+    "categoryPrivacyMode_public": "Publique",
+    "categoryPrivacyMode_publicMessage": "Tous les utilisateurs peuvent voir cet album.",
+    "categoryPrivacyMode_private": "Privé",
+    "categoryPrivacyMode_privateMessage": "Les visiteurs doivent se connecter et avoir les permissions nécessaires pour voir cet album.",
+    "categoryPrivacyGroups": "Permissions de groupe",
+    "categoryPrivacyGroups_add": "Autoriser des groupes",
+    "categoryPrivacyUsers": "Permissions utilisateur",
+    "categoryPrivacyUsers_message": "Pour gérer les permissions des utilisateurs, rendez-vous dans votre administration web.",
+    "categoryPrivacyRecursive": "Appliquer aux sous-albums",
+    "categoryPrivacyRecursive_message": "Après confirmation, toutes les modifications seront appliquées aux sous-albums.",
+    "categorySelection_setThumbnail": "Veuillez sélectionner l'album qui utilisera la photo {photo} comme vignette.",
+    "@categorySelection_setThumbnail": {
+        "placeholders": {
+            "photo": {}
+        }
+    },
+    "categorySelection_current": "Sélectionnez l’album en cours pour cette photo",
+    "categorySelection_one": "Sélectionnez un des albums contenant cette photo",
+    "categorySelection_other": "Ou sélectionnez un autre album pour cette photo",
+    "categoryImageSet_title": "Vignette d'Album",
+    "categoryImageSet_message": "Êtes-vous certain de vouloir affecter cette photo à l’album {album} ?",
+    "@categoryImageSet_message": {
+        "placeholders": {
+            "album": {}
+        }
+    },
+    "categoryImageSetHUD_updating": "Modification de la Vignette…",
+    "categoryImageSetError_title": "Echec d'affectation",
+    "categoryImageSetError_message": "Impossible de changer la photo de l’album",
+    "singleImage": "Photo",
+    "imageCount": "{count, plural, =0{0 photos} =1{1 photo} other{{count} photos}}",
+    "@imageCount": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "singleVideo": "Vidéo",
+    "singleAudio": "Audio",
+    "severalImages": "Photos",
+    "all_Photos": "Toutes les photos",
+    "severalVideos": "Vidéos",
+    "noImages": "Pas de photos",
+    "pullToRefresh": "Rechargement des photos",
+    "andMore": " & plus",
+    "months": "Mois",
+    "weeks": "Semaines",
+    "days": "Jours",
+    "date": "Date",
+    "albumPhotoError_title": "Photos d'Album Non Récupérées",
+    "albumPhotoError_message": "Echec du chargement des photos de l'album (fichier endommagé dans votre album ?)",
+    "sortBy": "Trier par",
+    "imageSortTitle": "Trier les photos",
+    "imageSortMessage": "Veuillez sélectionner comment vous souhaitez trier les photos",
+    "imageSortingHUD": "Tri des photos…",
+    "imageSelectingHUD": "Sélection des photos…",
+    "imageDeselectingHUD": "Désélection des photos…",
+    "imageOptions_title": "Options",
+    "imageOptions_edit": "Editer",
+    "imageOptions_download": "Télécharger",
+    "imageOptions_share": "Partager",
+    "imageOptions_addFavorites": "Ajouter aux favoris",
+    "imageOptions_removeFavorites": "Retirer des favoris",
+    "imageOptions_setAlbumImage": "Définir comme vignette d’album",
+    "imageDetailsView_title": "Propriétés",
+    "editImageDetails_title": "Titre",
+    "editImageDetails_titlePlaceholder": "Titre de l'image",
+    "editImageDetails_author": "Auteur",
+    "editImageDetails_tags": "Tags",
+    "editImageDetails_privacyLevel": "Qui peut voir cette photo ?",
+    "editImageDetails_description": "Description",
+    "editImageDetails_descriptionPlaceholder": "Description de la photo",
+    "editImageDetails_comments": "Commentaires",
+    "editImageDetails_dateCreation": "Date de création",
+    "editImageDetails_dateUnset": "Non défini",
+    "editImageDetails_dateToday": "Aujourd'hui",
+    "editImageDetails_dateMonthInc": "+1 Mois",
+    "editImageDetails_dateMonthDec": "-1 Mois",
+    "editImageDetails_dateYearInc": "+1 An",
+    "editImageDetails_dateYearDec": "-1 An",
+    "editImageDetailsHUD_updating": "{count, plural, =1{Mise à jour de la photo…} other{Mise à jour des photos…}}",
+    "@editImageDetailsHUD_updating": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "editImageDetailsError_title": "Échec de la Modification",
+    "editImageDetailsError_message": "Echec de l'enregistrement des modifications sur votre serveur. Ré-essayez ?",
+    "imageDetailsFetchError_title": "Échec de la récupération des propriétés",
+    "imageDetailsFetchError_retryMessage": "La récupération des données de la photo a échoué. Ré-essayer ?",
+    "imageDetailsFetchError_continueMessage": "La récupération des données de la photo a échoué. Continuer ?",
+    "imageDetails_dateCreated": "Créée le {date} à {time}",
+    "@imageDetails_dateCreated": {
+        "placeholders": {
+            "date": {},
+            "time": {}
+        }
+    },
+    "imageDetails_dateAvailable": "Disponible le {date} à {time}",
+    "@imageDetails_dateAvailable": {
+        "placeholders": {
+            "date": {},
+            "time": {}
+        }
+    },
+    "imageDetails_nbAlbums": "{count, plural, =0{Orpheline} =1{Appartient à 1 album} other{Appartient à {count} albums}}",
+    "@imageDetails_nbAlbums" : {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "privacyLevel": "Niveau de Confidentialité",
+    "privacyLevel_admin": "Admins",
+    "privacyLevel_adminFamily": "Admins, Famille",
+    "privacyLevel_adminsFamilyFriends": "Admins, Famille, Amis",
+    "privacyLevel_adminsFamilyFriendsContacts": "Admins, Famille, Amis, Contacts",
+    "privacyLevel_everybody": "Tout le Monde",
+    "privacyLevel_unchanged": "Inchangé",
+    "none": "aucun",
+    "tag": "Tag",
+    "tags": "Tags",
+    "tagCount": "{count, plural, =0{0 tags} =1{1 tag} other{{count} tags}}",
+    "@tagCount": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "tagsTitle_selectOne": "Sélectionnez un tag",
+    "tagsHeader_selected": "Sélectionné",
+    "tagsHeader_notSelected": "Non sélectionné",
+    "tagsHeader_all": "Tous",
+    "tagsAdd_title": "Ajouter un tag",
+    "tagsAdd_message": "Entrez un nom pour ce nouveau tag",
+    "tagsAdd_placeholder": "Nouveau tag",
+    "tagsAddHUD_label": "Création du tag…",
+    "tagsAddHUD_created": "Tag créé",
+    "group": "Groupe",
+    "groups": "Groupes",
+    "groupsTitle_selectOne": "Sélectionnez un groupe",
+    "groupsHeader_selected": "Sélectionné",
+    "groupsHeader_notSelected": "Non sélectionné",
+    "groupsHeader_all": "Tous les groupes",
+    "groupsAdd_title": "Ajouter un groupe",
+    "groupsAdd_message": "Entrez un nom pour ce groupe",
+    "groupsAdd_placeholder": "Nouveau groupe",
+    "groupsAddHUD_label": "Création du groupe…",
+    "groupsAddHUD_created": "Groupe créé",
+    "tagsAddError_message": "Impossible de créer un nouveau tag",
+    "tagsAddError_title": "Échec de la Création",
+    "selectImages": "Sélectionnez",
+    "selectImageSelectedCount": "{count, plural, =0{0 photos sélectionnées} =1{1 photo sélectionnée} other{{count} photos sélectionnées}}",
+    "@selectImageSelectedCount": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "selectAll": "Tout Sélectionner",
+    "selectLimit": "Limite de sélection atteinte",
+    "renameImage_title": "Fichier d'origine",
+    "renameImage_message": "Entrez un nouveau nom de fichier pour cette photo \"{file}\"",
+    "@renameImage_message": {
+        "placeholders": {
+            "file": {}
+        }
+    },
+    "renameImageHUD_label": "Changement du Nom…",
+    "renameImageHUD_renamed": "{count, plural, =0{0 fichiers renommés} =1{fichier renommé} other{{count} fichiers renommés}}",
+    "@renameImageHUD_renamed": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "renameImageError_message": "Échec lors du renommage du fichier",
+    "deleteImage_delete": "Supprimer",
+    "deleteImageProgress_title": "Suppression {progress}",
+    "@deleteImageProgress_title": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "deleteImageCount_title": "{count, plural, =0{Effacer les photos} =1{Effacer la photo} other{Effacer {count} photos}}",
+    "@deleteImageCount_title": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "deleteImageHUD_deleting": "{count, plural, =0{Effacement…} =1{Effacement de la photo…} other{Effacement des photos…}}",
+    "@deleteImageHUD_deleting": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "removeSingleImage_title": "Supprimer de cet album",
+    "removeSingleImage_subtitle": "Certaines photos sont affectées à d'autres albums",
+    "removeImageHUD_removing": "{count, plural, =0{Suppression…} =1{Suppression de la photo…} other{Suppression de {count} photos…}}",
+    "@removeImageHUD_removing": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "deleteImage_message": "{count, plural, =1{Êtes-vous sûr de vouloir supprimer cette photo ? Opération irréversible !} other{Êtes-vous sûr de vouloir effacer la sélection de {count} photos ? Opération irréversible !}}",
+    "@deleteImage_message": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "deleteImageFail_title": "Echec de la Suppression",
+    "deleteImageFail_message": "La photo n’a pas pu être effacée.",
+    "deleteImageSuccess_message": "{count, plural, =0{0 photos éffacées avec succès} =1{1 photo éffacée avec succès} other{{count} photos éffacées avec succès}}",
+    "@deleteImageSuccess_message": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "removeSelectedImage_title": "Enlever l'image sélectionnée",
+    "removeSelectedImage_message": "Êtes vous sûr de vouloir retirer l'image de la sélection ?",
+    "downloadImage_title": "{count, plural, =0{Télécharger les photos} =1{Télécharger la photo} other{Télécharger {count} photos}}",
+    "@downloadImage_title": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "downloadImage_confirmation": "{count, plural, =1{Êtes-vous sûr de vouloir télécharger la photo sélectionnée ?} other{Êtes-vous sûr de vouloir télécharger les {count} photos sélectionnées ?}}",
+    "@downloadImage_confirmation": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "downloadingImages": "{count, plural, =1{Téléchargement de la photo} other{Téléchargement des photos}}",
+    "@downloadingImages": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "downloadingVideos": "{count, plural, =1{Téléchargement de la video} other{Téléchargement des videos}}",
+    "@downloadingVideos": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "downloadImageSuccess_title": "Fichiers téléchargés",
+    "downloadImageSuccess_message": "Tous les fichiers ont été téléchargés avec succès",
+    "downloadImageFail_title": "Echec du Téléchargement",
+    "downloadImageFail_message": "Impossible de télécharger la photo !",
+    "downloadVideoFail_message": "Impossible de télécharger la vidéo !",
+    "downloadVideoFail_Photos": "Format vidéo non accepté par Photos !",
+    "imageSaveError_title": "Photo non enregistrée",
+    "imageSaveError_message": "Impossible d’enregistrer la photo.",
+    "videoSaveError_title": "Vidéo non Enregistrée",
+    "videoSaveError_message": "Impossible d’enregistrer la vidéo.",
+    "videoLoadError_message": "Impossible de charger la vidéo",
+    "moveOrCopyImage_title": "{count, plural, =1{Voulez-vous déplacer ou copier cette image ?} other{Voulez-vous déplacer ou copier {count} images ?}}",
+    "@moveOrCopyImage_title": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "moveImage_title": "Déplacer vers un Album",
+    "moveImage_selectAlbum": "{count, plural, =1{Veuillez sélectionner l'album dans lequel vous souhaitez déplacer la photo {photo}.} other{Veuillez sélectionner l'album dans lequel vous souhaitez déplacer les photos.}}",
+    "@moveImage_selectAlbum": {
+        "placeholders": {
+            "count": {},
+            "photo": {}
+        }
+    },
+    "moveImage_message": "{count, plural, =1{Êtes-vous certain de vouloir déplacer la photo {photo} dans l’album {album} ?} other{Êtes-vous certain de vouloir déplacer les photos dans l’album {album} ?}}",
+    "@moveImage_message": {
+        "placeholders": {
+            "count": {},
+            "photo": {},
+            "album": {}
+        }
+    },
+    "moveImageHUD_moving": "{count, plural, =1{Déplacement de la photo…} other{Déplacement des photos…}}",
+    "@moveImageHUD_moving": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "moveImageHUD_moved": "{count, plural, =1{Photo déplacée} other{Photos déplacées}}",
+    "@moveImageHUD_moved": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "moveImageError_title": "Échec du déplacement",
+    "moveImageError_message": "{count, plural, =1{Impossible de déplacer votre photo} other{Impossible de déplacer certaines photos}}",
+    "@moveImageError_message": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "copyImage_title": "Copier dans un Album",
+    "copyImage_selectAlbum": "{count, plural, =1{Veuillez sélectionner l'album dans lequel vous souhaitez copier la photo {photo}.} other{Veuillez sélectionner l'album dans lequel vous souhaitez copier les photos.}}",
+    "@copyImage_selectAlbum": {
+        "placeholders": {
+            "count": {},
+            "photo": {}
+        }
+    },
+    "copyImage_message": "{count, plural, =1{Êtes-vous certain de vouloir copier la photo {photo} dans l’album {album} ?} other{Êtes-vous certain de vouloir copier les photos dans l’album {album} ?}}",
+    "@copyImage_message": {
+        "placeholders": {
+            "count": {},
+            "photo": {},
+            "album": {}
+        }
+    },
+    "copyImageHUD_copying": "{count, plural, =1{Copie de la photo…} other{Copie des photos…}}",
+    "@copyImageHUD_copying": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "copyImageHUD_copied": "{count, plural, =1{Photo assignée} other{Photos assignées}}",
+    "@copyImageHUD_copied": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "copyImageError_title": "Échec de la copie",
+    "copyImageError_message": "{count, plural, =1{Impossible de copier votre photo} other{Impossible de copier certaines photos}}",
+    "@copyImageError_message": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "imageUploadHeader": "Veuillez sélectionner l'album ou le sous-album à partir duquel les photos et les vidéos de votre appareil seront téléchargées.",
+    "imageUploadHeaderTitle_images": "Paramètres des photos",
+    "imageUploadHeaderText_images": "Veuillez définir les paramètres à appliquer à la sélection des photos/vidéos",
+    "imageUploadHeaderTitle_upload": "Réglage des transferts",
+    "imageUploadHeaderText_upload": "Veuillez définir les paramètres de transfert à appliquer à la sélection des photos/vidéos",
+    "imageUploadDetails_title": "Titre :",
+    "imageUploadDetails_author": "Auteur :",
+    "imageUploadDetails_privacy": "Qui :",
+    "imageUploadDetails_tags": "Tags :",
+    "imageUploadDetails_description": "Description :",
+    "imageUploadDetailsView_title": "Photos",
+    "imageUploadDetailsButton_title": "Envoyer",
+    "imageUploadDetailsEdit_title": "Éditer les photos à télécharger",
+    "imageUploadDetailsUploading_title": "Images en cours d'envoi",
+    "imageUploadDetailsCell_uploadComplete": "Envoyée ! Vérification...",
+    "imageUploadRemove": "Suppression des photos téléchargées",
+    "imageUploadTableCell_waiting": "En attente...",
+    "imageUploadTableCell_preparing": "En cours de préparation...",
+    "imageUploadTableCell_prepared": "Prêt à transférer...",
+    "imageUploadTableCell_uploading": "Transfert...",
+    "imageUploadTableCell_uploaded": "Transférée",
+    "imageUploadTableCell_finishing": "Finalisation...",
+    "imageUploadClearFailed": "{count, plural, =1{Effacer transfert échoué} other{Effacer {count} transferts échoués}}",
+    "@imageUploadClearFailed": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "imageUploadClearCompleted": "{count, plural, =1{Effacer transfert terminé} other{Effacer {count} transferts terminés}}",
+    "@imageUploadClearCompleted": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "imageUploadResume": "{count, plural, =1{Relancer le transfert} other{Relancer {count} transferts}}",
+    "@imageUploadResume": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "imageUploadProgressBar_zero": "Transfert 0/0",
+    "imageUploadProgressBar_nonZero": "Transfert {index}/{max}",
+    "@imageUploadProgressBar_nonZero": {
+        "placeholders": {
+            "index": {},
+            "max": {}
+        }
+    },
+    "imageUploadProgressBar_completed": "Terminé",
+    "imageUploadCompleted_title": "Transfert Terminé",
+    "imageUploadCompleted_message": "photo envoyée à votre serveur Piwigo.",
+    "imageUploadCompleted_message1": "photos envoyées à votre serveur Piwigo.",
+    "imageUploadCompleted_warning": "certaines photos n'ont pas pu être transférées.",
+    "uploadError_title": "Echec du Transfert",
+    "uploadError_message": "Echec du Transfert de votre photo",
+    "uploadCancelled_title": "Transfert Annulé",
+    "uploadNoInternetNetwork": "Pas de connexion Internet",
+    "uploadNoWiFiNetwork": "Pas de connexion Wi-Fi",
+    "uploadLowPowerMode": "Mode économie d'énergie activé",
+    "uploadSection_impossible": "Transferts impossibles",
+    "uploadSection_resumable": "Transferts réamorçables",
+    "uploadSection_queue": "File d'attente des transferts",
+    "imageUploadError_title": "Echec du transfert",
+    "imageUploadError_format": "Format de fichier non accepté par le serveur Piwigo.",
+    "imageUploadError_source": "impossible de créer le source de la photo",
+    "imageUploadError_destination": "impossible de créer la destination de la photo",
+    "imageUploadError_iCloud": "Echec de la récupération de la photo.",
+    "audioUploadError_title": "Echec du transfert",
+    "audioUploadError_format": "Désolé, les fichiers audio ne sont pas encore supportés par Piwigo NG.",
+    "videoUploadError_title": "Echec du transfert",
+    "videoUploadError_format": "Désolé, les fichiers de vidéo ayant comme extension .{extension} ne sont pas acceptés par le serveur Piwigo.",
+    "@videoUploadError_format": {
+        "placeholders": {
+            "extension": {}
+        }
+    },
+    "videoUploadError_export": "Désolé, la vidéo n'a pas pu être récupérée pour être téléchargée vers votre Piwigo.",
+    "videoUploadError_unknown": "Désolé, le transfert vers votre Piwigo de la vidéo a échoué pour une erreur inconnue lors de la conversion MP4.",
+    "videoUploadCancelled_message": "Le transfert de la vidéo vers votre Piwigo a été annulé.",
+    "localAlbums": "Bibliothèque de Photos",
+    "localAlbums_accessible": "Photos accessibles",
+    "localAlbums_photosNotAuthorized_title": "Accès Refusé",
+    "localAlbums_photosNiltitle": "Problème Lecture Photos",
+    "localAlbums_photosNnil_msg": "Un problème est rencontré pendant la lecture de votre photothèque locale.",
+    "localAlbums_photosNotAuthorized_msg": "Impossible d’ouvrir la photothèque locale. Allez dans l’application Réglages et activez l’accès pour Piwigo.",
+    "localImages_deleteTitle": "Retirer de la pellicule",
+    "localImages_deleteMessage": "Voulez-vous supprimer les photos ou vidéos téléchargées de la pellicule ? Les photos ou vidéos supprimées resteront disponibles dans la corbeille de l'app Photos pendant 30 jours.",
+    "settingsHeader_server": "Serveur Piwigo {version}",
+    "@settingsHeader_server": {
+        "placeholders": {
+            "version": {}
+        }
+    },
+    "settingsHeader_notSecure": "Site Web Non Sécurisé !",
+    "settings_server": "Adresse",
+    "settings_username": "Identifiant",
+    "settings_notLoggedIn": " - Non Connecté - ",
+    "settings_logout": "Déconnexion",
+    "settingsFooter_formats": "Le serveur accepte les types de fichiers suivants: {types}.",
+    "@settingsFooter_formats": {
+        "placeholders": {
+            "types": {}
+        }
+    },
+    "settingsHeader_general": "Paramètres Généraux",
+    "settingsHeader_thumbnails": "Vignettes",
+    "defaultImageSort": "Tri",
+    "defaultImageSort320px": "Tri",
+    "defaultImageSort414px": "Tri par défaut des photos",
+    "defaultAlbumThumbnailFile414px": "Fichier de Vignette d'Album",
+    "defaultAlbumThumbnailSizeHeader": "Veuillez sélectionner une taille de vignette d'album",
+    "maxNberOfRecentAlbums": "Récent",
+    "maxNberOfRecentAlbums320px": "Albums récents",
+    "maxNberOfRecentAlbums414px": "Nombre d'albums récents",
+    "thumbnailSizeSquare": "Carré",
+    "thumbnailSizeThumbnail": "Miniature",
+    "thumbnailSizeXXSmall": "Minuscule",
+    "thumbnailSizeXSmall": "Très Petit",
+    "thumbnailSizeSmall": "Petit",
+    "thumbnailSizeMedium": "Moyen",
+    "thumbnailSizeLarge": "Grand",
+    "thumbnailSizeXLarge": "Très Grand",
+    "thumbnailSizeXXLarge": "Énorme",
+    "thumbnailSizexFullRes": "Haute Résolution",
+    "settingsHeader_images": "Images",
+    "defaultThumbnailFile": "Fichier",
+    "defaultThumbnailFile320px": "Fichier de Vignette",
+    "defaultThumbnailFile414px": "Fichier de vignette des photos",
+    "defaultThumbnailSize": "Taille",
+    "defaultThumbnailSize320px": "Taille des Vignettes",
+    "defaultThumbnailSize414px": "Taille par Défaut des Vignettes",
+    "defaultNberOfThumbnailsShort": "Nombre par ligne",
+    "defaultNberOfThumbnails": "Nombre de miniatures par lignes",
+    "defaultThumbnailSizeTitle": "Taille par défaut",
+    "defaultThumbnailSizeHeader": "Veuillez sélectionner une taille de vignette de photo",
+    "settings_displayTitles": "Afficher Titres sur Vignettes",
+    "settings_displayTitles320px": "Afficher les Titres sur les Vignettes",
+    "defaultPreviewFile": "Aperçu",
+    "defaultPreviewFile320px": "Fichier de Prévisualisation",
+    "defaultPreviewFile414px": "Fichier de prévisualisation des photos",
+    "defaultImageSize": "Photos",
+    "defaultImageSize320px": "Taille des photos",
+    "defaultImageSize414px": "Taille par défaut des photos",
+    "defaultImageSizeTitle": "Taille par Défaut",
+    "defaultImageSizeHeader": "Veuillez sélectionner une taille de photo",
+    "defaultImageSize_recommended": " (recommandé)",
+    "defaultSize_disabled": " (désactivé sur le serveur)",
+    "defaultSizeFooter": "Les tailles grisées ne sont pas conseillées ou indisponibles sur le serveur Piwigo.",
+    "settings_shareGPSdata": "Partager Métadonnées Privées",
+    "settings_shareGPSdata375px": "Partager avec des Métadonnées Privées",
+    "imageSizeSquare": "Carré",
+    "imageSizeThumbnail": "Miniature",
+    "imageSizeXXSmall": "Minuscule",
+    "imageSizeXSmall": "Très Petit",
+    "imageSizeSmall": "Petit",
+    "imageSizeMedium": "Moyen",
+    "imageSizeLarge": "Grand",
+    "imageSizeXLarge": "Très Grand",
+    "imageSizeXXLarge": "Énorme",
+    "imageSizexFullRes": "Haute Résolution",
+    "settingsHeader_upload": "Paramètres de transfert",
+    "settings_defaultAuthor": "Auteur",
+    "settings_defaultAuthor320px": "Nom d'Auteur",
+    "settings_defaultAuthorPlaceholder": "Nom de l'Auteur",
+    "settings_defaultPrivacy": "Qui voit ?",
+    "settings_defaultPrivacy414px": "Veuillez sélectionner qui pourra visualiser les photos",
+    "settings_stripGPSdata": "Suppr. Métadonnées Privées",
+    "settings_stripGPSdata375px": "Supprimer les Métadonnées privées avant Envoi",
+    "settings_photoResize": "Réduire avant transfert",
+    "settings_photoSize": "Taille",
+    "settings_placeholderSize": "Entrez une Taille de Photo de 5 à 100",
+    "settings_photoCompress": "Compresser avant Envoi",
+    "settings_photoCompress375px": "Compresser la photo avant envoi",
+    "settings_photoQuality": "Qualité",
+    "settings_placeholderQuality": "Entrez une qualité de photo entre 50 et 98",
+    "settings_prefixFilename414px": "Préfixer le nom du fichier photo avant transfert",
+    "settings_prefixFilename375px": "Préfixer le nom du fichier avant transfert",
+    "settings_prefixFilename": "Préfixer nom du fichier",
+    "settings_defaultPrefix": "Préfixe",
+    "settings_defaultPrefix320px": "Préfixe du fichier",
+    "settings_defaultPrefixPlaceholder": "Préfixe",
+    "settings_deleteImage375px": "Effacer la photo après envoi",
+    "settings_wifiOnly": "Wi-Fi uniquement",
+    "settings_deleteImage": "Effacer après Envoi",
+    "settings_uploadNotification": "Notifications de transfert",
+    "settings_downloadNotification": "Notification de téléchargement",
+    "settings_downloadDestination": "Dossier de téléchargement",
+    "settings_autoUpload": "Télécharger automatiquement",
+    "settings_autoUpload414px": "Télécharger automatiquement des photos",
+    "settings_autoUploadEnabled": "Activé",
+    "settings_autoUploadEnabledInfo": "Les photos seront automatiquement téléchargées sur votre Piwigo.",
+    "settings_autoUploadEnabledInfoAll": "Les photos et les vidéos seront automatiquement téléchargées sur votre Piwigo.",
+    "settings_autoUploadDisabled": "Désactivé",
+    "settings_autoUploadDisabledInfo": "Les photos ne seront pas automatiquement téléchargées sur votre Piwigo.",
+    "settings_autoUploadSource": "Source",
+    "settings_autoUploadSourceInvalid": "Album source invalide",
+    "settings_autoUploadSourceInfo": "Veuillez sélectionner l'album ou le sous-album à partir duquel les photos et les vidéos de votre appareil seront automatiquement téléchargées.",
+    "settings_autoUploadDestination": "Destination",
+    "settings_autoUploadDestinationInvalid": "Album de destination invalide",
+    "settings_autoUploadDestinationInfo": "Veuillez sélectionner l'album ou le sous-album dans lequel les photos et les vidéos seront automatiquement téléchargées.",
+    "settings_autoUploadDuplicateInfo": "Les photos qui sont déjà dans ce Piwigo ne seront pas transférées.",
+    "settings_autoUploadFrequency": "Toutes les",
+    "settings_autoUploadFrequencyMinutes": "{count, plural, =1{1 minute} other{{count} minutes}}",
+    "@settings_autoUploadFrequencyMinutes": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "settings_autoUploadFrequencyHours": "{count, plural, =1{1 heure} other{{count} heures}}",
+    "@settings_autoUploadFrequencyHours": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "settings_autoUploadFrequencyDays": "{count, plural, =1{1 jour} other{{count} jours}}",
+    "@settings_autoUploadFrequencyDays": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "autoUploadError_Disabled": "Le transfert automatique est désactivé dans les paramètres de l'application.",
+    "autoUploadError_Failed": "Plusieurs transferts ont échoué et la file d'attente est en pause. Veuillez vérifier dans l'application s'il vous plaît.",
+    "uploadPhotoSize_title": "Taille maximale des photos",
+    "uploadPhotoSize_header": "Veuillez sélectionner la taille maximale des photos qui seront téléchargées.",
+    "uploadPhotoSize_resolution": "Résolution maximale des caméras intégrées :",
+    "uploadVideoSize_title": "Taille maximale des vidéos",
+    "uploadVideoSize_header": "Veuillez sélectionner la taille maximale des vidéos qui seront téléchargées.",
+    "uploadVideoSize_resolution": "Performances maximales des caméras intégrées :",
+    "uploadPhotoSize_original": "Sans réduction",
+    "settingsHeader_cache": "Paramètres de Cache (Utilisé/Total)",
+    "settings_cacheDisk": "Disque",
+    "settings_cacheMemory": "Mémoire",
+    "settings_cacheSize": "Taille du cache",
+    "settings_cacheMegabytes": "Mo",
+    "settings_cacheClear": "Vider le cache",
+    "settings_cacheClearAll": "Vider le cache des photos",
+    "settings_cacheClearMsg": "Êtes-vous sûr de vouloir effacer le cache des photos? Les photos et les albums mettront un certain temps à se recharger.",
+    "settingsHeader_appearance": "Apparence",
+    "settingsHeader_theme": "Thème Sombre",
+    "settings_switchPalette": "Automatique",
+    "settings_brightness": "Luminosité",
+    "settings_brightnessHelp": "En cas de faible luminosité ambiante, l'option Automatique utilise une palette de couleurs plus foncées pour faire ressortir les photos sur des arrière-plans plus sombres.",
+    "userCount": "{count, plural, =0{0 utilisateurs} =1{1 utilisateur} other{{count} utilisateurs}}",
+    "@userCount": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "groupCount": "{count, plural, =0{0 groupes} =1{1 groupe} other{{count} groupes}}",
+    "@groupCount": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "commentCount": "{count, plural, =0{0 commentaires} =1{1 commentaire} other{{count} commentaires}}",
+    "@commentCount": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "settings_appName": "Piwigo NG",
+    "settings_language": "Choisir la langue",
+    "settingsHeader_about": "Informations",
+    "settings_twitter": "@piwigo",
+    "settings_contactUs": "Contactez-nous",
+    "settings_feedback": "Retour d'information",
+    "settings_supportForum": "Forum d'Aide",
+    "settings_releaseNotes": "Notes de Versions",
+    "settings_rateInAppStore": "Noter Piwigo NG",
+    "settings_translateWithCrowdin": "Traduire Piwigo NG",
+    "settings_acknowledgements": "Remerciements",
+    "settings_privacy": "Politique de Confidentialité",
+    "settings_unknownVersion": "Version inconnue",
+    "settings_privacyLocale": "&lang=fr_FR",
+    "@settings_privacyLocale": {
+        "description": "The language and country code for the url to Piwigo Mobile apps privacy policy: https://piwigo.org/mobile-apps-privacy-policy&webview&lang=en_EN"
+    }
+}
