@@ -38,7 +38,18 @@ class _ImageFavoritesPageState extends State<ImageFavoritesPage> {
   @override
   void initState() {
     super.initState();
-    _imageFuture = fetchFavorites();
+    _imageFuture = fetchFavorites().then((response) {
+      if (response.hasData) {
+        setState(() {
+          final int? total = response.data!['total_count'];
+          if (total != null) {
+            _nbImages = total;
+          }
+          _imageList = response.data!['images'].cast<ImageModel>() ?? [];
+        });
+      }
+      return response;
+    });
   }
 
   @override
