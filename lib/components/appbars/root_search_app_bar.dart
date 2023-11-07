@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:piwigo_ng/components/dialogs/tags_dialogs.dart';
 import 'package:piwigo_ng/components/notification_dot.dart';
 import 'package:piwigo_ng/components/popup_list_item.dart';
 import 'package:piwigo_ng/services/preferences_service.dart';
@@ -145,6 +146,15 @@ class _RootSearchAppBarState extends State<RootSearchAppBar> {
                     }),
                   ),
                 ],
+              ),
+            ),
+            PopupMenuItem(
+              onTap: () => (
+                  showChooseTagSheet(context)
+              ),
+              child: PopupListItem(
+                icon: Icons.local_offer_outlined,
+                text: appStrings.tags,
               ),
             ),
             if (Preferences.getUserStatus != 'guest')
