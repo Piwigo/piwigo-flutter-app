@@ -6,7 +6,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 2.2.3+223
 
 environment:
-  sdk: ">=2.17.6 <3.0.0"
+  sdk: ">=2.17.6"
 
 dependencies:
   flutter:
@@ -24,15 +24,18 @@ dependencies:
   auto_size_text: ^3.0.0 # Text that auto-sizes (image thumbnail title)
   cupertino_icons: ^1.0.2 # iOS style icons (might be useless)
   font_awesome_flutter: ^10.1.0 # Font awesome icons (might be useless)
-  flutter_slidable: ^2.0.0 # Album card's sliding cations
+  flutter_slidable: ^3.0.1 # Album card's sliding cations
   drag_select_grid_view: ^0.6.1 # Drag to select image grid
-  rounded_loading_button: ^2.1.0 # Loading button animation
+  rounded_loading_button: # Loading button animation
+    git:
+      url: https://github.com/scopendo/flutter_rounded_loading_button # A custom fork that can work with the latest flutter SDK
+      ref: dd4b76a
   modal_bottom_sheet: ^3.0.0-pre # Custom modals (might be useless)
   cached_network_image: ^3.2.2 # Better cache for images (used for album's thumbnail)
   flutter_speed_dial: ^6.1.0+1 # Speed dial
   pull_to_refresh: ^2.0.0 # Top and bottom refresh gestures
   photo_view: ^0.14.0 # Zoom on fullscreen photos
-  extended_text: ^11.0.0 # Text overflow on left side
+  extended_text: ^13.0.0 # Text overflow on left side
   flutter_easyloading: ^3.0.5 # Show loading dialog
 
   # Storage
