@@ -562,6 +562,7 @@ class _ImagePageState extends State<ImagePage> {
             debugPrint("$o\n$s");
             return const Icon(Icons.broken_image_outlined);
           },
+          filterQuality: FilterQuality.medium,
         );
       },
     );
