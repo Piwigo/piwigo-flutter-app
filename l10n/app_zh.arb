@@ -20,7 +20,7 @@
     "loadingHUD_label": "正在加载…",
     "completeHUD_label": "完成",
     "errorHUD_label": "出错",
-    "loadMoreHUD_label": "释放加载更多",
+    "loadMoreHUD_label": "松开以加载更多",
     "uploadRights_title": "需要上传权限",
     "uploadRights_message": "您必须拥有上传权限才能上传照片或视频。",
     "internetErrorGeneral_title": "连接出错",
