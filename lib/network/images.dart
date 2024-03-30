@@ -167,6 +167,49 @@ Future<ApiResponse<Map>> fetchFavorites([
   return ApiResponse(error: ApiErrors.error);
 }
 
+Future<ApiResponse<Map>> fetchTagImages(int tagID, [int page = 0]) async {
+  Map<String, String> query = {
+    "format": "json",
+    "method": "pwg.tags.getImages",
+    "tag_id": tagID.toString(),
+    "per_page": "100",
+    "page": page.toString(),
+  };
+
+  try {
+    Response response = await ApiClient.get(queryParameters: query);
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> result = json.decode(response.data);
+      if (result['stat'] == 'fail') {
+        return ApiResponse<Map>(data: {
+          'total_count': 0,
+          'images': [],
+        });
+      }
+      final jsonImages = result['result']['images'];
+      List<ImageModel> images = List<ImageModel>.from(
+        jsonImages.map((image) {
+          image['tags'] = null;
+          return ImageModel.fromJson(image);
+        }),
+      );
+
+      print(result['result']['paging']);
+
+      return ApiResponse<Map>(data: {
+        'total_count': result['result']['paging']['total_count'],
+        'images': images,
+      });
+    }
+  } on DioError catch (e) {
+    debugPrint('Fetch tag images: ${e.message}');
+  } on Error catch (e) {
+    debugPrint('Fetch tag images: ${e.stackTrace}');
+  }
+  return ApiResponse(error: ApiErrors.error);
+}
+
 Future<String?> pickDirectoryPath() async {
   return await FilePicker.platform.getDirectoryPath();
 }
