@@ -3,6 +3,7 @@ import 'package:piwigo_ng/components/lists/image_grid_view.dart';
 import 'package:piwigo_ng/components/popup_list_item.dart';
 import 'package:piwigo_ng/models/album_model.dart';
 import 'package:piwigo_ng/models/image_model.dart';
+import 'package:piwigo_ng/models/tag_model.dart';
 import 'package:piwigo_ng/network/api_error.dart';
 import 'package:piwigo_ng/network/images.dart';
 import 'package:piwigo_ng/services/preferences_service.dart';
@@ -12,18 +13,23 @@ import 'package:piwigo_ng/utils/settings.dart';
 import 'package:piwigo_ng/views/image/image_page.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
-class ImageFavoritesPage extends StatefulWidget {
-  const ImageFavoritesPage({Key? key, this.isAdmin = false}) : super(key: key);
+class ImageTagsPage extends StatefulWidget {
+  const ImageTagsPage({
+    Key? key,
+    required this.tag,
+    this.isAdmin = false
+  }) : super(key: key);
 
-  static const String routeName = '/images/favorites';
+  static const String routeName = '/images/tags';
 
+  final TagModel tag;
   final bool isAdmin;
 
   @override
-  State<ImageFavoritesPage> createState() => _ImageFavoritesPageState();
+  State<ImageTagsPage> createState() => _ImageTagsPageState();
 }
 
-class _ImageFavoritesPageState extends State<ImageFavoritesPage> {
+class _ImageTagsPageState extends State<ImageTagsPage> {
   final RefreshController _refreshController =
       RefreshController(initialRefresh: false);
   final ScrollController _scrollController = ScrollController();
@@ -38,7 +44,7 @@ class _ImageFavoritesPageState extends State<ImageFavoritesPage> {
   @override
   void initState() {
     super.initState();
-    _imageFuture = fetchFavorites().then((response) {
+    _imageFuture = fetchTagImages(widget.tag.id).then((response) {
       if (response.hasData) {
         setState(() {
           final int? total = response.data!['total_count'];
@@ -73,7 +79,7 @@ class _ImageFavoritesPageState extends State<ImageFavoritesPage> {
   }
 
   Future<void> _onRefresh() async {
-    final ApiResponse<Map> result = await fetchFavorites();
+    final ApiResponse<Map> result = await fetchTagImages(widget.tag.id);
     if (!result.hasData) {
       _refreshController.refreshFailed();
       await Future.delayed(const Duration(milliseconds: 500));
@@ -93,7 +99,7 @@ class _ImageFavoritesPageState extends State<ImageFavoritesPage> {
 
   Future<void> _loadMoreImages() async {
     if (_imageList == null || _nbImages <= _imageList!.length) return;
-    ApiResponse<Map> result = await fetchFavorites(_page + 1);
+    ApiResponse<Map> result = await fetchTagImages(widget.tag.id, _page + 1);
     if (result.hasError || !result.hasData) {
       _refreshController.loadFailed();
       await Future.delayed(const Duration(milliseconds: 500));
@@ -169,7 +175,7 @@ class _ImageFavoritesPageState extends State<ImageFavoritesPage> {
               slivers: [
                 _appBar,
                 SliverToBoxAdapter(
-                  child: _favoriteGrid,
+                  child: _taggedImageGrid,
                 ),
               ],
             ),
@@ -194,7 +200,8 @@ class _ImageFavoritesPageState extends State<ImageFavoritesPage> {
       leading: BackButton(
         onPressed: () => Navigator.of(context).pop(),
       ),
-      title: Text(appStrings.categoryDiscoverFavorites_title),
+      // title: Text(appStrings.categoryDiscoverFavorites_title),
+      title: Text(widget.tag.name),
       actions: [
         if (_selectedList.isNotEmpty)
           IconButton(
@@ -249,7 +256,7 @@ class _ImageFavoritesPageState extends State<ImageFavoritesPage> {
     );
   }
 
-  Widget get _favoriteGrid {
+  Widget get _taggedImageGrid {
     return FutureBuilder<ApiResponse<Map>>(
       future: _imageFuture,
       builder: (context, snapshot) {

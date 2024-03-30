@@ -29,8 +29,7 @@ class ImageSearchPage extends StatefulWidget {
 
 class _ImageSearchPageState extends State<ImageSearchPage> {
   final TextEditingController _searchController = TextEditingController();
-  final RefreshController _refreshController =
-      RefreshController(initialRefresh: false);
+  final RefreshController _refreshController = RefreshController(initialRefresh: false);
   final ScrollController _scrollController = ScrollController();
   final FocusNode _focusNode = FocusNode();
 
@@ -62,8 +61,7 @@ class _ImageSearchPageState extends State<ImageSearchPage> {
     super.dispose();
   }
 
-  bool get _hasNonFavorites =>
-      _selectedList.where((image) => !image.favorite).isNotEmpty;
+  bool get _hasNonFavorites => _selectedList.where((image) => !image.favorite).isNotEmpty;
 
   Future<bool> _onWillPop() async {
     if (_selectedList.isNotEmpty) {
@@ -132,8 +130,7 @@ class _ImageSearchPageState extends State<ImageSearchPage> {
         if (images == null || images is! List<ImageModel>) return;
         setState(() {
           _searchList = images;
-          _page =
-              ((images.length - 1) / Settings.defaultElementPerPage).floor();
+          _page = ((images.length - 1) / Settings.defaultElementPerPage).floor();
         });
       });
 
@@ -144,8 +141,7 @@ class _ImageSearchPageState extends State<ImageSearchPage> {
         }
       });
 
-  void _onLikePhotos() => onLikePhotos(_selectedList, _hasNonFavorites)
-      .whenComplete(() => _onRefresh());
+  void _onLikePhotos() => onLikePhotos(_selectedList, _hasNonFavorites).whenComplete(() => _onRefresh());
 
   _onDeletePhotos() => onDeletePhotos(context, _selectedList).then((success) {
         if (success) _onRefresh();
@@ -160,9 +156,7 @@ class _ImageSearchPageState extends State<ImageSearchPage> {
           child: SmartRefresher(
             controller: _refreshController,
             scrollController: _scrollController,
-            enablePullUp: _searchList != null &&
-                _searchList!.isNotEmpty &&
-                _nbImages > _searchList!.length,
+            enablePullUp: _searchList != null && _searchList!.isNotEmpty && _nbImages > _searchList!.length,
             onLoading: _loadMoreImages,
             onRefresh: _onRefresh,
             header: MaterialClassicHeader(
@@ -219,7 +213,6 @@ class _ImageSearchPageState extends State<ImageSearchPage> {
             controller: _searchController,
             focusNode: _focusNode,
             prefix: const Icon(Icons.search),
-            hint: "Search...",
             onChanged: (value) => setState(() {
               _searchText = value;
               _onRefresh();
@@ -263,9 +256,7 @@ class _ImageSearchPageState extends State<ImageSearchPage> {
                     _onLikePhotos,
                   ),
                   child: PopupListItem(
-                    icon: _hasNonFavorites
-                        ? Icons.favorite_border
-                        : Icons.favorite,
+                    icon: _hasNonFavorites ? Icons.favorite_border : Icons.favorite,
                     text: _hasNonFavorites
                         ? appStrings.imageOptions_addFavorites
                         : appStrings.imageOptions_removeFavorites,
@@ -335,14 +326,11 @@ class _ImageSearchPageState extends State<ImageSearchPage> {
       return AnimatedContainer(
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
-        height: _selectedList.isEmpty || orientation == Orientation.landscape
-            ? 0
-            : 56.0,
+        height: _selectedList.isEmpty || orientation == Orientation.landscape ? 0 : 56.0,
         child: BottomAppBar(
           height: 56.0,
           child: Row(
-            children:
-                _actions.map((action) => Expanded(child: action)).toList(),
+            children: _actions.map((action) => Expanded(child: action)).toList(),
           ),
         ),
       );
@@ -371,9 +359,7 @@ class _ImageSearchPageState extends State<ImageSearchPage> {
       if (Preferences.getUserStatus != 'guest') // Todo: enum roles
         IconButton(
           onPressed: _onLikePhotos,
-          tooltip: _hasNonFavorites
-              ? appStrings.imageOptions_addFavorites
-              : appStrings.imageOptions_removeFavorites,
+          tooltip: _hasNonFavorites ? appStrings.imageOptions_addFavorites : appStrings.imageOptions_removeFavorites,
           isSelected: !_hasNonFavorites,
           selectedIcon: Icon(Icons.favorite),
           icon: Icon(Icons.favorite_border),

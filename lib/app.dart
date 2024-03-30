@@ -16,6 +16,7 @@ import 'package:piwigo_ng/views/image/edit_image_page.dart';
 import 'package:piwigo_ng/views/image/image_favorites_page.dart';
 import 'package:piwigo_ng/views/image/image_page.dart';
 import 'package:piwigo_ng/views/image/image_search_page.dart';
+import 'package:piwigo_ng/views/image/image_tags_page.dart';
 import 'package:piwigo_ng/views/image/video_player_page.dart';
 import 'package:piwigo_ng/views/settings/auto_upload_page.dart';
 import 'package:piwigo_ng/views/settings/privacy_policy_page.dart';
@@ -144,6 +145,14 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       return MaterialPageRoute(
         builder: (_) => ImageSearchPage(
           isAdmin: arguments['isAdmin'] ?? isAdmin,
+        ),
+        settings: settings,
+      );
+    case ImageTagsPage.routeName:
+      return MaterialPageRoute(
+        builder: (_) => ImageTagsPage(
+          isAdmin: arguments['isAdmin'] ?? isAdmin,
+          tag: arguments["tag"],
         ),
         settings: settings,
       );
