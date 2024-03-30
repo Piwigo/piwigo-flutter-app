@@ -345,7 +345,7 @@ class _ImagePageState extends State<ImagePage> {
                       ),
                       Expanded(
                         child: AutoSizeText(
-                          '${_currentImage.name}',
+                          '${_currentImage.name ?? ""}',
                           softWrap: true,
                           maxLines: 1,
                           maxFontSize: 16.0,

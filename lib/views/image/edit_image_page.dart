@@ -51,7 +51,7 @@ class _EditImagePageState extends State<EditImagePage> {
     _authorController =
         TextEditingController(text: Preferences.getUploadAuthor);
     if (_imageList.length == 1) {
-      _titleController.text = _imageList.first.name;
+      _titleController.text = _imageList.first.name ?? "";
       _descriptionController.text = _imageList.first.comment ?? '';
       _tags = _imageList.first.tags;
     }
