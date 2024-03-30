@@ -68,8 +68,8 @@ class AlbumCard extends StatelessWidget {
           icon: Icons.edit,
         ),
         AlbumCardAction(
-          backgroundColor:
-              const Color(0xFF4B4B4B), // Todo: Theme grey action color
+          backgroundColor: const Color(0xFF4B4B4B),
+          // Todo: Theme grey action color
           foregroundColor: Colors.white,
           autoClose: true,
           onPressed: onMove,
@@ -102,8 +102,7 @@ class AlbumCard extends StatelessWidget {
                 width: ALBUM_ANCHOR_RADIUS * 2.0 + 1.0,
                 decoration: BoxDecoration(
                   color: Theme.of(context).primaryColor,
-                  border: Border.all(
-                      color: Theme.of(context).primaryColor, width: 1.0),
+                  border: Border.all(color: Theme.of(context).primaryColor, width: 1.0),
                 ),
               ),
             ),
@@ -123,8 +122,7 @@ class AlbumCard extends StatelessWidget {
               padding: const EdgeInsets.all(8.0).copyWith(right: 0.0),
               decoration: BoxDecoration(
                 color: Theme.of(context).cardColor,
-                border:
-                    Border.all(color: Theme.of(context).cardColor, width: 1.0),
+                border: Border.all(color: Theme.of(context).cardColor, width: 1.0),
               ),
               child: AlbumCardContent(
                 album: album,
@@ -226,8 +224,7 @@ class AlbumCardContent extends StatelessWidget {
                   album.name,
                   maxLines: 1,
                   textAlign: TextAlign.center,
-                  maxFontSize:
-                      Theme.of(context).textTheme.titleLarge!.fontSize!,
+                  maxFontSize: Theme.of(context).textTheme.titleLarge!.fontSize!,
                   minFontSize: 10.0,
                   overflow: TextOverflow.ellipsis,
                   style: Theme.of(context).textTheme.titleLarge,
@@ -240,8 +237,7 @@ class AlbumCardContent extends StatelessWidget {
                       child: Builder(builder: (context) {
                         return AutoSizeText(
                           album.comment ?? '',
-                          maxFontSize:
-                              Theme.of(context).textTheme.bodySmall!.fontSize!,
+                          maxFontSize: Theme.of(context).textTheme.bodySmall!.fontSize!,
                           minFontSize: 10.0,
                           overflow: TextOverflow.fade,
                           style: Theme.of(context).textTheme.bodySmall,
@@ -254,8 +250,7 @@ class AlbumCardContent extends StatelessWidget {
                   appStrings.imageCount(album.nbTotalImages),
                   maxLines: 1,
                   textAlign: TextAlign.center,
-                  maxFontSize:
-                      Theme.of(context).textTheme.labelSmall!.fontSize!,
+                  maxFontSize: Theme.of(context).textTheme.labelSmall!.fontSize!,
                   minFontSize: 8.0,
                   overflow: TextOverflow.ellipsis,
                   style: Theme.of(context).textTheme.labelSmall,
