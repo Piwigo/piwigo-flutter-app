@@ -11,6 +11,31 @@ import 'api_client.dart';
 Future<ApiResponse<List<TagModel>>> getTags() async {
   Map<String, String> queries = {
     'format': 'json',
+    'method': 'pwg.tags.getList',
+  };
+
+  Response response = await ApiClient.get(queryParameters: queries);
+
+  try {
+    if (response.statusCode == 200) {
+      var data = json.decode(response.data);
+      if (data['stat'] == 'fail') {
+        return ApiResponse(error: ApiErrors.error);
+      }
+      List<TagModel> tags = data['result']['tags'].map<TagModel>((tag) => TagModel.fromJson(tag)).toList();
+      return ApiResponse(data: tags);
+    }
+  } on DioError catch (e) {
+    debugPrint('Get tags: ${e.message}');
+  } on Error catch (e) {
+    debugPrint('Get tags: $e\n${e.stackTrace}');
+  }
+  return ApiResponse(error: ApiErrors.error);
+}
+
+Future<ApiResponse<List<TagModel>>> getAdminTags() async {
+  Map<String, String> queries = {
+    'format': 'json',
     'method': 'pwg.tags.getAdminList',
   };
 
@@ -22,9 +47,7 @@ Future<ApiResponse<List<TagModel>>> getTags() async {
       if (data['stat'] == 'fail') {
         return ApiResponse(error: ApiErrors.error);
       }
-      List<TagModel> tags = data['result']['tags']
-          .map<TagModel>((tag) => TagModel.fromJson(tag))
-          .toList();
+      List<TagModel> tags = data['result']['tags'].map<TagModel>((tag) => TagModel.fromJson(tag)).toList();
       return ApiResponse(data: tags);
     }
   } on DioError catch (e) {
@@ -72,10 +95,7 @@ Future<dynamic> editTag(int tagId, String tagName) async {
     "new_name": tagName,
     'pwg_token': appPreferences.getString('PWG_TOKEN'),
   });
-  Response response = await ApiClient.post(
-      data: formData,
-      queryParameters: queries
-  );
+  Response response = await ApiClient.post(data: formData, queryParameters: queries);
 
   try {
     if (response.statusCode == 200) {
