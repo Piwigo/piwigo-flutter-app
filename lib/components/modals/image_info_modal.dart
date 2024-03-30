@@ -45,7 +45,7 @@ class ImageInfoModal extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Text(
-                image.name,
+                image.name ?? "",
                 style: Theme.of(context).textTheme.titleMedium,
               ),
             ),
