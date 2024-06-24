@@ -82,11 +82,9 @@ class _ImagePageState extends State<ImagePage> {
   void initState() {
     _imageList = widget.images.sublist(0);
     _album = widget.album;
-    _imagePage =
-        ((_imageList.length - 1) / Settings.defaultElementPerPage).floor();
+    _imagePage = ((_imageList.length - 1) / Settings.defaultElementPerPage).floor();
 
-    final ImageModel? startImage =
-        _imageList.firstWhere((image) => image.id == widget.startId);
+    final ImageModel? startImage = _imageList.firstWhere((image) => image.id == widget.startId);
     if (startImage != null) {
       _page = _imageList.indexOf(startImage);
       if (_imageList.last == startImage) {
@@ -117,9 +115,7 @@ class _ImagePageState extends State<ImagePage> {
       systemNavigationBarColor: Colors.black.withOpacity(0.001),
       statusBarColor: Colors.black.withOpacity(0.001),
       statusBarIconBrightness:
-          App.appKey.currentContext?.read<ThemeNotifier>().isDark ?? false
-              ? Brightness.light
-              : Brightness.dark,
+          App.appKey.currentContext?.read<ThemeNotifier>().isDark ?? false ? Brightness.light : Brightness.dark,
     ));
     super.dispose();
   }
@@ -129,8 +125,7 @@ class _ImagePageState extends State<ImagePage> {
   Future<void> _loadMoreImages() async {
     if (_album.id == -1) return;
     if (_album.nbImages <= _imageList.length) return;
-    ApiResponse<List<ImageModel>> result =
-        await fetchImages(_album.id, _imagePage + 1);
+    ApiResponse<List<ImageModel>> result = await fetchImages(_album.id, _imagePage + 1);
     if (result.hasError || !result.hasData) return;
     setState(() {
       _imagePage += 1;
@@ -145,10 +140,8 @@ class _ImagePageState extends State<ImagePage> {
     if (serverUrl == null) return {};
 
     // Get server cookies
-    List<Cookie> cookies =
-        await ApiClient.cookieJar.loadForRequest(Uri.parse(serverUrl));
-    String cookiesStr =
-        cookies.map((cookie) => '${cookie.name}=${cookie.value}').join('; ');
+    List<Cookie> cookies = await ApiClient.cookieJar.loadForRequest(Uri.parse(serverUrl));
+    String cookiesStr = cookies.map((cookie) => '${cookie.name}=${cookie.value}').join('; ');
 
     // Get HTTP Basic id
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -354,9 +347,7 @@ class _ImagePageState extends State<ImagePage> {
                           style: TextStyle(fontSize: 16.0, color: Colors.white),
                         ),
                       ),
-                      if (MediaQuery.of(context).orientation ==
-                          Orientation.landscape)
-                        ..._actions,
+                      if (MediaQuery.of(context).orientation == Orientation.landscape) ..._actions,
                       if (widget.isAdmin)
                         PopupMenuButton(
                           position: PopupMenuPosition.under,
@@ -385,9 +376,7 @@ class _ImagePageState extends State<ImagePage> {
                                   _onLike,
                                 ),
                                 child: PopupListItem(
-                                  icon: !_currentImage.favorite
-                                      ? Icons.favorite_border
-                                      : Icons.favorite,
+                                  icon: !_currentImage.favorite ? Icons.favorite_border : Icons.favorite,
                                   text: !_currentImage.favorite
                                       ? appStrings.imageOptions_addFavorites
                                       : appStrings.imageOptions_removeFavorites,
@@ -495,10 +484,7 @@ class _ImagePageState extends State<ImagePage> {
           imageUrl = image.elementUrl;
           imageUrl = HtmlUnescape().convert(imageUrl);
         } else {
-          imageUrl = image
-                  .getDerivativeFromString(Preferences.getImageFullScreenSize)
-                  ?.url ??
-              '';
+          imageUrl = image.getDerivativeFromString(Preferences.getImageFullScreenSize)?.url ?? '';
         }
 
         // ApiClient.cookieJar.loadForRequest(Uri.parse(imageUrl));
@@ -520,10 +506,8 @@ class _ImagePageState extends State<ImagePage> {
                   child: IconButton(
                     color: Colors.white,
                     style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.resolveWith(
-                          (states) => Colors.black.withOpacity(0.5)),
-                      shape: MaterialStateProperty.resolveWith(
-                          (states) => CircleBorder()),
+                      backgroundColor: MaterialStateProperty.resolveWith((states) => Colors.black.withOpacity(0.5)),
+                      shape: MaterialStateProperty.resolveWith((states) => CircleBorder()),
                     ),
                     onPressed: () {
                       Navigator.of(context).pushNamed(
@@ -562,6 +546,7 @@ class _ImagePageState extends State<ImagePage> {
             debugPrint("$o\n$s");
             return const Icon(Icons.broken_image_outlined);
           },
+          filterQuality: FilterQuality.medium,
         );
       },
     );
@@ -601,14 +586,11 @@ class _ImagePageState extends State<ImagePage> {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         _pagination,
-                        if (MediaQuery.of(context).orientation ==
-                            Orientation.portrait)
+                        if (MediaQuery.of(context).orientation == Orientation.portrait)
                           SizedBox(
                             height: 56.0,
                             child: Row(
-                              children: _actions
-                                  .map((action) => Expanded(child: action))
-                                  .toList(),
+                              children: _actions.map((action) => Expanded(child: action)).toList(),
                             ),
                           ),
                       ],
@@ -667,8 +649,7 @@ class _ImagePageState extends State<ImagePage> {
           duration: _overlayAnimationDuration,
           curve: _overlayAnimationCurve,
           child: Builder(builder: (context) {
-            if (_currentImage.comment == null || _currentImage.comment!.isEmpty)
-              return const SizedBox();
+            if (_currentImage.comment == null || _currentImage.comment!.isEmpty) return const SizedBox();
             return GestureDetector(
               behavior: HitTestBehavior.opaque,
               onTap: _showImageDetails,
