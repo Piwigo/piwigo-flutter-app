@@ -16,7 +16,7 @@ dependencies:
   # Network
   url_launcher: ^6.1.5 # Open links with device's applications
   webview_flutter: ^3.0.4 # Show web page (CGU)
-  dio: ^4.0.6 # Requests to API
+  dio: ^5.4.3+1 # Requests to API
   dio_cookie_manager: ^2.0.0 # Compatibility between dio and cookie_far
   cookie_jar: ^3.0.1 # Handles cookies
   connectivity_plus: ^3.0.2 # Check if Wifi is enabled

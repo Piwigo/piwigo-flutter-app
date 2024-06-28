@@ -91,7 +91,11 @@ class UploadRequest {
         'chunk': i,
         'chunk_sum': chunkSums[i],
         'original_sum': originalSum,
-        'file': MultipartFile(chunkStream, end - start, filename: fileName),
+        'file': MultipartFile.fromStream(
+          () => chunkStream,
+          end - start,
+          filename: fileName,
+        ),
         ...data
       });
 
@@ -108,16 +112,14 @@ class UploadRequest {
         onSendProgress: (current, total) => _updateProgress(i, current, total),
       );
 
-      if (response.data != null &&
-          json.decode(response.data)?['result']?['id'] != null) {
+      if (response.data != null && json.decode(response.data)?['result']?['id'] != null) {
         finalResponse = response;
       }
     }
     return finalResponse;
   }
 
-  Stream<List<int>> _getChunkStream(int start, int end) =>
-      _file.openRead(start, end);
+  Stream<List<int>> _getChunkStream(int start, int end) => _file.openRead(start, end);
 
   _updateProgress(int chunkIndex, int chunkCurrent, int chunkTotal) {
     int totalUploadedSize = (chunkIndex * _maxChunkSize) + chunkCurrent;
@@ -127,11 +129,9 @@ class UploadRequest {
 
   int _getChunkStart(int chunkIndex) => chunkIndex * _maxChunkSize;
 
-  int _getChunkEnd(int chunkIndex) =>
-      min((chunkIndex + 1) * _maxChunkSize, _fileSize);
+  int _getChunkEnd(int chunkIndex) => min((chunkIndex + 1) * _maxChunkSize, _fileSize);
 
-  Map<String, dynamic> _getHeaders(int start, int end) =>
-      {'Content-Range': 'bytes $start-${end - 1}/$_fileSize'};
+  Map<String, dynamic> _getHeaders(int start, int end) => {'Content-Range': 'bytes $start-${end - 1}/$_fileSize'};
 
   int get _chunksCount => (_fileSize / _maxChunkSize).ceil();
 }

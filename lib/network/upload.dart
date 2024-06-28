@@ -137,7 +137,7 @@ Future<List<int>> uploadPhotos(
           // todo: delete real file path, not the cached one.
         }
       }
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       debugPrint("${e.message}");
       debugPrint("${e.stackTrace}");
       uploadNotifier.itemUploadCompleted(item, error: true);
@@ -164,7 +164,7 @@ Future<List<int>> uploadPhotos(
     if (await methodExist('community.images.uploadCompleted')) {
       await communityUploadCompleted(result, albumId);
     }
-  } on DioError catch (e) {
+  } on DioException catch (e) {
     debugPrint(e.message);
   }
 
@@ -202,7 +202,7 @@ Future<Response?> uploadChunk({
   if (info['name'] != '' && info['name'] != null) fields['name'] = info['name'];
   if (info['comment'] != '' && info['comment'] != null) fields['comment'] = info['comment'];
   if (info['tag_ids']?.isNotEmpty ?? false) fields['tag_ids'] = info['tag_ids'].join(',');
-  if (info['level'] != -1) fields['level'] = info['level'];
+  if (info['level'] != -1 && info['level'] != null) fields['level'] = info['level'];
 
   // Create dio client
   Dio dio = Dio(
@@ -247,7 +247,7 @@ Future<bool> uploadCompleted(List<int> imageId, int categoryId) async {
     if (response.statusCode == 200) {
       return true;
     }
-  } on DioError catch (e) {
+  } on DioException catch (e) {
     debugPrint("$e");
   }
   return false;
@@ -269,7 +269,7 @@ Future<bool> communityUploadCompleted(List<int> imageId, int categoryId) async {
     if (response.statusCode == 200) {
       return true;
     }
-  } on DioError catch (e) {
+  } on DioException catch (e) {
     debugPrint("$e");
   }
   return false;

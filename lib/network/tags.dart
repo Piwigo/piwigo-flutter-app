@@ -25,7 +25,7 @@ Future<ApiResponse<List<TagModel>>> getTags() async {
       List<TagModel> tags = data['result']['tags'].map<TagModel>((tag) => TagModel.fromJson(tag)).toList();
       return ApiResponse(data: tags);
     }
-  } on DioError catch (e) {
+  } on DioException catch (e) {
     debugPrint('Get tags: ${e.message}');
   } on Error catch (e) {
     debugPrint('Get tags: $e\n${e.stackTrace}');
@@ -50,7 +50,7 @@ Future<ApiResponse<List<TagModel>>> getAdminTags() async {
       List<TagModel> tags = data['result']['tags'].map<TagModel>((tag) => TagModel.fromJson(tag)).toList();
       return ApiResponse(data: tags);
     }
-  } on DioError catch (e) {
+  } on DioException catch (e) {
     debugPrint('Get tags: ${e.message}');
   } on Error catch (e) {
     debugPrint('Get tags: $e\n${e.stackTrace}');
@@ -77,7 +77,7 @@ Future<ApiResponse<TagModel>> createTag(String name) async {
         data: TagModel.fromJson(data['result']),
       );
     }
-  } on DioError catch (e) {
+  } on DioException catch (e) {
     debugPrint('Fetch tags: ${e.message}');
   } on Error catch (e) {
     debugPrint('Fetch tags: $e\n${e.stackTrace}');
@@ -105,7 +105,7 @@ Future<dynamic> editTag(int tagId, String tagName) async {
       }
       return ApiResponse(data: true);
     }
-  } on DioError catch (e) {
+  } on DioException catch (e) {
     debugPrint('Get tags: ${e.message}');
   } on Error catch (e) {
     debugPrint('Get tags: $e\n${e.stackTrace}');

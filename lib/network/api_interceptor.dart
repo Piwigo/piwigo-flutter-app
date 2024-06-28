@@ -21,8 +21,7 @@ class ApiInterceptor extends Interceptor {
     if (prefs.getBool(Preferences.enableBasicAuthKey) ?? false) {
       String? username = prefs.getString(Preferences.basicUsernameKey) ?? '';
       String? password = prefs.getString(Preferences.basicPasswordKey) ?? '';
-      String basicAuth =
-          "Basic ${base64.encode(utf8.encode('$username:$password'))}";
+      String basicAuth = "Basic ${base64.encode(utf8.encode('$username:$password'))}";
       options.headers['authorization'] = basicAuth;
     }
     return super.onRequest(options, handler);
@@ -33,18 +32,16 @@ class ApiInterceptor extends Interceptor {
     Response response,
     ResponseInterceptorHandler handler,
   ) async {
-    debugPrint(
-        "[${response.statusCode}] ${response.requestOptions.queryParameters['method']}");
+    debugPrint("[${response.statusCode}] ${response.requestOptions.queryParameters['method']}");
     return super.onResponse(response, handler);
   }
 
   @override
   void onError(
-    DioError err,
+    DioException err,
     ErrorInterceptorHandler handler,
   ) async {
-    debugPrint(
-        "[${err.response?.statusCode}] ${err.requestOptions.queryParameters['method']}");
+    debugPrint("[${err.response?.statusCode}] ${err.requestOptions.queryParameters['method']}");
     debugPrint('${err.error}\n${err.response?.data}\n${err.stackTrace}');
 
     switch (err.response?.statusCode) {
@@ -61,8 +58,7 @@ class ApiInterceptor extends Interceptor {
         if (err.error is HandshakeException) {
           HandshakeException handshakeError = err.error as HandshakeException;
           String? message = handshakeError.osError?.message;
-          if (message != null &&
-              message.contains('CERTIFICATE_VERIFY_FAILED')) {
+          if (message != null && message.contains('CERTIFICATE_VERIFY_FAILED')) {
             App.scaffoldMessengerKey.currentState?.showSnackBar(
               errorSnackBar(
                 message: appStrings.loginCertFailed_title,
