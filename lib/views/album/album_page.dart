@@ -197,83 +197,95 @@ class _AlbumPageState extends State<AlbumPage> {
     }).then((value) => _refreshController.requestRefresh());
   }
 
+  void _onWillPop(bool pop) {
+    if (_selectedList.isNotEmpty) {
+      setState(() {
+        _selectedList.clear();
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: SmartRefresher(
-          controller: _refreshController,
-          scrollController: _scrollController,
-          enablePullUp: _enableLoad,
-          onLoading: _loadMoreImages,
-          onRefresh: _onRefresh,
-          header: MaterialClassicHeader(
-            backgroundColor: Theme.of(context).cardColor,
-            color: Theme.of(context).colorScheme.secondary,
-          ),
-          footer: ClassicFooter(
-            loadingText: appStrings.loadingHUD_label,
-            noDataText: appStrings.categoryImageList_noDataError,
-            failedText: appStrings.errorHUD_label,
-            idleText: '',
-            canLoadingText: appStrings.loadMoreHUD_label,
-          ),
-          child: CustomScrollView(
-            controller: _scrollController,
-            slivers: [
-              _appBar,
-              SliverToBoxAdapter(
-                child: FutureBuilder<List<ApiResponse>>(
-                  future: _data,
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData) {
-                      if (snapshot.data!.first.hasError && snapshot.data!.last.hasError) {
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                          child: Text(
-                            appStrings.categoryImageList_noDataError,
-                            textAlign: TextAlign.center,
-                          ),
-                        );
-                      }
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          _albumGrid(snapshot),
-                          _imageGrid(snapshot),
-                          SizedBox(
-                            height: 72.0,
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                appStrings.imageCount(_currentAlbum.nbTotalImages),
-                                style: Theme.of(context).textTheme.titleSmall,
+    return PopScope(
+      canPop: _selectedList.isEmpty,
+      onPopInvoked: _onWillPop,
+      child: Scaffold(
+        body: SafeArea(
+          child: SmartRefresher(
+            controller: _refreshController,
+            scrollController: _scrollController,
+            enablePullUp: _enableLoad,
+            onLoading: _loadMoreImages,
+            onRefresh: _onRefresh,
+            header: MaterialClassicHeader(
+              backgroundColor: Theme.of(context).cardColor,
+              color: Theme.of(context).colorScheme.secondary,
+            ),
+            footer: ClassicFooter(
+              loadingText: appStrings.loadingHUD_label,
+              noDataText: appStrings.categoryImageList_noDataError,
+              failedText: appStrings.errorHUD_label,
+              idleText: '',
+              canLoadingText: appStrings.loadMoreHUD_label,
+            ),
+            child: CustomScrollView(
+              controller: _scrollController,
+              slivers: [
+                _appBar,
+                SliverToBoxAdapter(
+                  child: FutureBuilder<List<ApiResponse>>(
+                    future: _data,
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        if (snapshot.data!.first.hasError && snapshot.data!.last.hasError) {
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                            child: Text(
+                              appStrings.categoryImageList_noDataError,
+                              textAlign: TextAlign.center,
+                            ),
+                          );
+                        }
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            _albumGrid(snapshot),
+                            _imageGrid(snapshot),
+                            SizedBox(
+                              height: 72.0,
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  appStrings.imageCount(_currentAlbum.nbTotalImages),
+                                  style: Theme.of(context).textTheme.titleSmall,
+                                ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        );
+                      }
+                      return const Center(
+                        child: Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: CircularProgressIndicator(),
+                        ),
                       );
-                    }
-                    return const Center(
-                      child: Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: CircularProgressIndicator(),
-                      ),
-                    );
-                  },
+                    },
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
+        bottomNavigationBar: AnimatedSlide(
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+          offset: _selectedList.isEmpty ? Offset(0, 1) : Offset.zero,
+          child: _bottomBar,
+        ),
+        floatingActionButton: _adminActionsSpeedDial,
       ),
-      bottomNavigationBar: AnimatedSlide(
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
-        offset: _selectedList.isEmpty ? Offset(0, 1) : Offset.zero,
-        child: _bottomBar,
-      ),
-      floatingActionButton: _adminActionsSpeedDial,
     );
   }
 
