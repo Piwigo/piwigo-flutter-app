@@ -43,8 +43,8 @@ class _VideoViewState extends State<VideoView> {
   @override
   void initState() {
     super.initState();
-    _controller = VideoPlayerController.network(
-      widget.videoUrl ?? '',
+    _controller = VideoPlayerController.networkUrl(
+      Uri.parse(widget.videoUrl!),
       videoPlayerOptions: VideoPlayerOptions(),
     )..initialize().then((_) {
         debugPrint("---- controller initialized");
@@ -79,8 +79,7 @@ class _VideoViewState extends State<VideoView> {
       final Duration position = controller.value.position;
       if (!mounted) return;
       setState(() {
-        _progress = position.inMilliseconds.ceilToDouble() /
-            controller.value.duration.inMilliseconds.ceilToDouble();
+        _progress = position.inMilliseconds.ceilToDouble() / controller.value.duration.inMilliseconds.ceilToDouble();
       });
     }
   }
@@ -90,8 +89,7 @@ class _VideoViewState extends State<VideoView> {
   void _checkControllerEnd() async {
     if (!mounted) return;
     if (_controller.value.position.inMilliseconds > 0 &&
-        _controller.value.position.inSeconds >=
-            _controller.value.duration.inSeconds) {
+        _controller.value.position.inSeconds >= _controller.value.duration.inSeconds) {
       setState(() {
         _isEnd = true;
         if (!widget.showOverlay) {
@@ -190,8 +188,7 @@ class _VideoViewState extends State<VideoView> {
   Future<void> _onVideoTimeChangeEnd(double value) async {
     // Parse slider time
     final double newValue = max(0, min(value, 99)) * 0.01;
-    final int millis =
-        (_controller.value.duration.inMilliseconds * newValue).toInt();
+    final int millis = (_controller.value.duration.inMilliseconds * newValue).toInt();
     // Change time
     await _controller.seekTo(Duration(milliseconds: millis));
     // Resume player
@@ -212,9 +209,7 @@ class _VideoViewState extends State<VideoView> {
     }
     int hours = duration.inHours;
     int minutes = (duration - Duration(hours: hours)).inMinutes;
-    int seconds =
-        (duration - Duration(hours: hours) - Duration(minutes: minutes))
-            .inSeconds;
+    int seconds = (duration - Duration(hours: hours) - Duration(minutes: minutes)).inSeconds;
     return '${hours > 0 ? '$hours:' : ''}${minutes < 10 ? '0$minutes' : '$minutes'}:${seconds < 10 ? '0$seconds' : '$seconds'}';
   }
 
@@ -271,8 +266,7 @@ class _VideoViewState extends State<VideoView> {
   /// * Fast forward
   Widget get _overlayCenter {
     // Check if the player is processing / loading.
-    if ((_controller.value.isBuffering && !_isEnd) ||
-        (_isEnd && _controller.value.isPlaying)) {
+    if ((_controller.value.isBuffering && !_isEnd) || (_isEnd && _controller.value.isPlaying)) {
       return Center(child: CircularProgressIndicator());
     }
     // If player has ended, show the replay button
@@ -362,10 +356,7 @@ class _VideoViewState extends State<VideoView> {
                 padding: const EdgeInsets.all(8.0),
                 child: Text(
                   _durationText,
-                  style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.white,
-                      fontWeight: FontWeight.w500),
+                  style: TextStyle(fontSize: 14, color: Colors.white, fontWeight: FontWeight.w500),
                 ),
               ),
               Expanded(
@@ -431,8 +422,7 @@ class _VideoViewState extends State<VideoView> {
           ),
         ),
         // Loading...
-        if (!_controller.value.isInitialized)
-          Center(child: CircularProgressIndicator()),
+        if (!_controller.value.isInitialized) Center(child: CircularProgressIndicator()),
         // Error while loading the video
         if (_controller.value.hasError)
           Center(
@@ -494,7 +484,7 @@ class _VideoPlayerViewState extends State<VideoPlayerView> {
 
   Future<void> initializePlayer() async {
     if (widget.videoUrl == null) return;
-    _videoPlayerController = VideoPlayerController.network(widget.videoUrl!);
+    _videoPlayerController = VideoPlayerController.networkUrl(Uri.parse(widget.videoUrl!));
     await _videoPlayerController.initialize();
     _createChewieController();
     setState(() {});
@@ -518,8 +508,7 @@ class _VideoPlayerViewState extends State<VideoPlayerView> {
         child: Text(appStrings.errorHUD_label),
       );
     }
-    if (_chewieController == null ||
-        !_chewieController!.videoPlayerController.value.isInitialized) {
+    if (_chewieController == null || !_chewieController!.videoPlayerController.value.isInitialized) {
       return Center(
         child: CircularProgressIndicator(),
       );

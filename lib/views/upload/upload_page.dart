@@ -22,8 +22,7 @@ import 'package:rounded_loading_button/rounded_loading_button.dart';
 import 'package:video_player/video_player.dart';
 
 class UploadPage extends StatefulWidget {
-  const UploadPage({Key? key, required this.imageList, required this.albumId})
-      : super(key: key);
+  const UploadPage({Key? key, required this.imageList, required this.albumId}) : super(key: key);
 
   static const String routeName = '/upload';
   final List<XFile> imageList;
@@ -33,15 +32,13 @@ class UploadPage extends StatefulWidget {
   State<UploadPage> createState() => _UploadGalleryViewPage();
 }
 
-class _UploadGalleryViewPage extends State<UploadPage>
-    with SingleTickerProviderStateMixin {
+class _UploadGalleryViewPage extends State<UploadPage> with SingleTickerProviderStateMixin {
   static const double maxCarouselElementWidth = 300.0;
   static const double carouselHeight = 128.0;
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   late final TextEditingController _authorController;
-  final RoundedLoadingButtonController _btnController =
-      RoundedLoadingButtonController();
+  final RoundedLoadingButtonController _btnController = RoundedLoadingButtonController();
 
   final List<DropdownMenuItem<int?>> _levelItems = [];
   List<TagModel> _tags = [];
@@ -52,8 +49,7 @@ class _UploadGalleryViewPage extends State<UploadPage>
   @override
   void initState() {
     _imageList = List.from(widget.imageList);
-    _authorController =
-        TextEditingController(text: Preferences.getUploadAuthor);
+    _authorController = TextEditingController(text: Preferences.getUploadAuthor);
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       setState(() {
@@ -126,17 +122,10 @@ class _UploadGalleryViewPage extends State<UploadPage>
     });
   }
 
-  void _onDeselectTag(TagModel tag) {
-    setState(() {
-      _tags.remove(tag);
-    });
-  }
-
   Future<void> _onUpload() async {
     _btnController.start();
     List<int> tagIds = _tags.map<int>((tag) => tag.id).toList();
-    List<XFile> filesToUpload =
-        _imageList.where((e) => !_imageExistList.contains(e.path)).toList();
+    List<XFile> filesToUpload = _imageList.where((e) => !_imageExistList.contains(e.path)).toList();
     var result = await uploadPhotos(filesToUpload, widget.albumId, info: {
       'name': _titleController.text,
       'comment': _descriptionController.text,
@@ -219,9 +208,7 @@ class _UploadGalleryViewPage extends State<UploadPage>
                 disabled: _imageList.isEmpty,
                 onPressed: _onUpload,
                 child: Text(
-                  _imageList.isEmpty
-                      ? appStrings.noImages
-                      : appStrings.imageUploadDetailsButton_title,
+                  _imageList.isEmpty ? appStrings.noImages : appStrings.imageUploadDetailsButton_title,
                   style: Theme.of(context).textTheme.displaySmall,
                 ),
               ),
@@ -343,8 +330,7 @@ class _UploadGalleryViewPage extends State<UploadPage>
                 right: index == _imageList.length - 1 ? 8.0 : 0.0,
               ),
               child: Builder(builder: (context) {
-                List<String>? mimeType =
-                    mime(file.path.split('/').last)?.split('/');
+                List<String>? mimeType = mime(file.path.split('/').last)?.split('/');
                 if (mimeType?.first == 'video') {
                   return LocalVideoDetailsCard(
                     video: File(file.path),
@@ -397,9 +383,7 @@ class _VideoUploadItemState extends State<VideoUploadItem> {
     final Duration duration = _controller.value.duration;
     int hours = duration.inHours;
     int minutes = (duration - Duration(hours: hours)).inMinutes;
-    int seconds =
-        (duration - Duration(hours: hours) - Duration(minutes: minutes))
-            .inSeconds;
+    int seconds = (duration - Duration(hours: hours) - Duration(minutes: minutes)).inSeconds;
     return '${hours > 0 ? '$hours:' : ''}${minutes < 10 ? '0$minutes' : '$minutes'}:${seconds < 10 ? '0$seconds' : '$seconds'}';
   }
 
@@ -438,15 +422,11 @@ class _VideoUploadItemState extends State<VideoUploadItem> {
             left: 2,
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(5),
-                  color: AppColors.black.withOpacity(0.7)),
+              decoration:
+                  BoxDecoration(borderRadius: BorderRadius.circular(5), color: AppColors.black.withOpacity(0.7)),
               child: Text(
                 _duration,
-                style: TextStyle(
-                    color: AppColors.white,
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold),
+                style: TextStyle(color: AppColors.white, fontSize: 10, fontWeight: FontWeight.bold),
               ),
             ),
           ),

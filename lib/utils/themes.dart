@@ -19,7 +19,7 @@ final ThemeData lightTheme = ThemeData.light(useMaterial3: true).copyWith(
     primary: AppColors.white,
     secondary: AppColors.accent,
     error: AppColors.error,
-    background: AppColors.backgroundLight,
+    surface: AppColors.backgroundLight,
     outline: AppColors.fieldLight,
   ),
   progressIndicatorTheme: const ProgressIndicatorThemeData(
@@ -101,12 +101,12 @@ final ThemeData lightTheme = ThemeData.light(useMaterial3: true).copyWith(
     backgroundColor: Colors.black.withOpacity(0),
   ),
   switchTheme: SwitchThemeData(
-    thumbColor: MaterialStateProperty.all(AppColors.backgroundLight),
-    overlayColor: MaterialStateProperty.all(AppColors.backgroundLight),
-    trackColor: MaterialStateProperty.resolveWith((states) {
-      if (states.contains(MaterialState.selected)) {
+    thumbColor: WidgetStateProperty.all(AppColors.backgroundLight),
+    overlayColor: WidgetStateProperty.all(AppColors.backgroundLight),
+    trackColor: WidgetStateProperty.resolveWith((states) {
+      if (states.contains(WidgetState.selected)) {
         return AppColors.accent;
-      } else if (states.contains(MaterialState.disabled)) {
+      } else if (states.contains(WidgetState.disabled)) {
         return AppColors.disabled;
       }
       return AppColors.fieldLight;
@@ -190,7 +190,7 @@ final ThemeData darkTheme = ThemeData.dark(useMaterial3: true).copyWith(
     primary: AppColors.white,
     secondary: AppColors.accent,
     error: AppColors.error,
-    background: AppColors.backgroundDark,
+    surface: AppColors.backgroundDark,
     outline: AppColors.fieldDark,
   ),
   progressIndicatorTheme: const ProgressIndicatorThemeData(
@@ -272,11 +272,11 @@ final ThemeData darkTheme = ThemeData.dark(useMaterial3: true).copyWith(
     backgroundColor: Colors.black.withOpacity(0),
   ),
   switchTheme: SwitchThemeData(
-    thumbColor: MaterialStateProperty.all(const Color(0x80FFFFFF)),
-    trackColor: MaterialStateProperty.resolveWith((states) {
-      if (states.contains(MaterialState.selected)) {
+    thumbColor: WidgetStateProperty.all(const Color(0x80FFFFFF)),
+    trackColor: WidgetStateProperty.resolveWith((states) {
+      if (states.contains(WidgetState.selected)) {
         return AppColors.accent;
-      } else if (states.contains(MaterialState.disabled)) {
+      } else if (states.contains(WidgetState.disabled)) {
         return AppColors.disabled;
       }
       return AppColors.backgroundDark;

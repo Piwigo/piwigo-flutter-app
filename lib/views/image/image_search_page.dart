@@ -63,14 +63,12 @@ class _ImageSearchPageState extends State<ImageSearchPage> {
 
   bool get _hasNonFavorites => _selectedList.where((image) => !image.favorite).isNotEmpty;
 
-  Future<bool> _onWillPop() async {
+  void _onWillPop(bool pop) {
     if (_selectedList.isNotEmpty) {
       setState(() {
         _selectedList.clear();
       });
-      return false;
     }
-    return true;
   }
 
   Future<void> _onRefresh() async {
@@ -149,8 +147,9 @@ class _ImageSearchPageState extends State<ImageSearchPage> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: _onWillPop,
+    return PopScope(
+      canPop: _selectedList.isEmpty,
+      onPopInvoked: _onWillPop,
       child: Scaffold(
         body: SafeArea(
           child: SmartRefresher(

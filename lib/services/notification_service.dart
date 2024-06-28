@@ -10,16 +10,13 @@ import 'package:piwigo_ng/utils/localizations.dart';
 import 'package:piwigo_ng/utils/settings.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-final FlutterLocalNotificationsPlugin localNotification =
-    FlutterLocalNotificationsPlugin();
+final FlutterLocalNotificationsPlugin localNotification = FlutterLocalNotificationsPlugin();
 
 Future<void> initLocalNotifications() async {
-  const AndroidInitializationSettings initializationSettingsAndroid =
-      AndroidInitializationSettings(
+  const AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings(
     '@mipmap/ic_launcher',
   );
-  final initSettings =
-      InitializationSettings(android: initializationSettingsAndroid);
+  final initSettings = InitializationSettings(android: initializationSettingsAndroid);
   localNotification.initialize(
     initSettings,
     onDidReceiveNotificationResponse: onSelectNotification,
@@ -36,9 +33,8 @@ Future<void> onSelectNotification(NotificationResponse response) async {
 
 Future<bool?> askNotificationPermissions() async {
   return localNotification
-      .resolvePlatformSpecificImplementation<
-          AndroidFlutterLocalNotificationsPlugin>()
-      ?.requestPermission();
+      .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+      ?.requestNotificationsPermission();
 }
 
 Future<void> showLocalNotification({
@@ -88,9 +84,7 @@ Future<void> showUploadNotification([int nbError = 0, int nbImage = 0]) async {
   } else if (nbError == 0 && nbImage > 0) {
     // Upload completed
     title = appStrings.imageUploadCompleted_title;
-    message = nbImage == 1
-        ? appStrings.imageUploadCompleted_message
-        : appStrings.imageUploadCompleted_message1;
+    message = nbImage == 1 ? appStrings.imageUploadCompleted_message : appStrings.imageUploadCompleted_message1;
   } else if (nbError > 0 && nbImage != nbError) {
     // Upload partially completed
     title = appStrings.coreDataStore_WarningTitle;
@@ -118,10 +112,8 @@ Future<void> showAutoUploadNotification([
   if (!(prefs.getBool(AutoUploadPreferences.notificationKey) ?? false)) return;
 
   // Find localizations
-  Locale locale = Locale(prefs.getString(LocaleNotifier.key) ??
-      Platform.localeName.split('_').first);
-  AppLocalizations backgroundStrings =
-      await AppLocalizations.delegate.load(locale);
+  Locale locale = Locale(prefs.getString(LocaleNotifier.key) ?? Platform.localeName.split('_').first);
+  AppLocalizations backgroundStrings = await AppLocalizations.delegate.load(locale);
 
   // Init notifications
   final android = AndroidNotificationDetails(
@@ -139,9 +131,8 @@ Future<void> showAutoUploadNotification([
   if (nbError == 0 && nbImage > 0) {
     // Upload completed
     title = backgroundStrings.imageUploadCompleted_title;
-    message = nbImage == 1
-        ? backgroundStrings.imageUploadCompleted_message
-        : backgroundStrings.imageUploadCompleted_message1;
+    message =
+        nbImage == 1 ? backgroundStrings.imageUploadCompleted_message : backgroundStrings.imageUploadCompleted_message1;
   } else if (nbError > 0 && nbImage != nbError) {
     // Upload partially completed
     title = backgroundStrings.coreDataStore_WarningTitle;

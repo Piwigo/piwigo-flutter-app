@@ -24,8 +24,7 @@ class ImageFavoritesPage extends StatefulWidget {
 }
 
 class _ImageFavoritesPageState extends State<ImageFavoritesPage> {
-  final RefreshController _refreshController =
-      RefreshController(initialRefresh: false);
+  final RefreshController _refreshController = RefreshController(initialRefresh: false);
   final ScrollController _scrollController = ScrollController();
 
   late final Future<ApiResponse<Map>> _imageFuture;
@@ -59,17 +58,14 @@ class _ImageFavoritesPageState extends State<ImageFavoritesPage> {
     super.dispose();
   }
 
-  bool get _hasNonFavorites =>
-      _selectedList.where((image) => !image.favorite).isNotEmpty;
+  bool get _hasNonFavorites => _selectedList.where((image) => !image.favorite).isNotEmpty;
 
-  Future<bool> _onWillPop() async {
+  void _onWillPop(bool pop) async {
     if (_selectedList.isNotEmpty) {
       setState(() {
         _selectedList.clear();
       });
-      return false;
     }
-    return true;
   }
 
   Future<void> _onRefresh() async {
@@ -125,26 +121,28 @@ class _ImageFavoritesPageState extends State<ImageFavoritesPage> {
         if (images == null || images is! List<ImageModel>) return;
         setState(() {
           _imageList = images;
-          _page =
-              ((images.length - 1) / Settings.defaultElementPerPage).floor();
+          _page = ((images.length - 1) / Settings.defaultElementPerPage).floor();
         });
       });
+
   void _onEditPhotos() => onEditPhotos(context, _selectedList).then((success) {
         if (success == true) {
           _selectedList.clear();
           _onRefresh();
         }
       });
-  void _onLikePhotos() =>
-      onLikePhotos(_selectedList, false).whenComplete(() => _onRefresh());
+
+  void _onLikePhotos() => onLikePhotos(_selectedList, false).whenComplete(() => _onRefresh());
+
   _onDeletePhotos() => onDeletePhotos(context, _selectedList).then((success) {
         if (success) _onRefresh();
       });
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: _onWillPop,
+    return PopScope(
+      canPop: _selectedList.isEmpty,
+      onPopInvoked: _onWillPop,
       child: Scaffold(
         body: SafeArea(
           child: SmartRefresher(
@@ -276,8 +274,7 @@ class _ImageFavoritesPageState extends State<ImageFavoritesPage> {
       _imageList = result.data!['images'].cast<ImageModel>() ?? [];
     }
 
-    _selectedList =
-        _imageList!.where((image) => _selectedList.contains(image)).toList();
+    _selectedList = _imageList!.where((image) => _selectedList.contains(image)).toList();
 
     if (_imageList!.isEmpty) {
       return Center(
@@ -305,14 +302,11 @@ class _ImageFavoritesPageState extends State<ImageFavoritesPage> {
       return AnimatedContainer(
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
-        height: _selectedList.isEmpty || orientation == Orientation.landscape
-            ? 0
-            : 56.0,
+        height: _selectedList.isEmpty || orientation == Orientation.landscape ? 0 : 56.0,
         child: BottomAppBar(
           height: 56.0,
           child: Row(
-            children:
-                _actions.map((action) => Expanded(child: action)).toList(),
+            children: _actions.map((action) => Expanded(child: action)).toList(),
           ),
         ),
       );
@@ -341,9 +335,7 @@ class _ImageFavoritesPageState extends State<ImageFavoritesPage> {
       if (Preferences.getUserStatus != 'guest') // Todo: enum roles
         IconButton(
           onPressed: _onLikePhotos,
-          tooltip: _hasNonFavorites
-              ? appStrings.imageOptions_addFavorites
-              : appStrings.imageOptions_removeFavorites,
+          tooltip: _hasNonFavorites ? appStrings.imageOptions_addFavorites : appStrings.imageOptions_removeFavorites,
           isSelected: !_hasNonFavorites,
           selectedIcon: Icon(Icons.favorite),
           icon: Icon(Icons.favorite_border),

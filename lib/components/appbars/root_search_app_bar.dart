@@ -104,7 +104,7 @@ class _RootSearchAppBarState extends State<RootSearchAppBar> {
         ),
         title: Text(
           appStrings.tabBar_albums,
-          textScaleFactor: 1,
+          textScaler: TextScaler.linear(1),
           style: Theme.of(context).appBarTheme.titleTextStyle,
         ),
       ),
