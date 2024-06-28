@@ -27,12 +27,10 @@ Future<ApiResponse<List<AlbumModel>>> fetchAlbums(int albumID) async {
     );
 
     if (response.statusCode == 200) {
-      List<dynamic> jsonAlbums =
-          tryParseJson(response.data)['result']['categories'];
+      List<dynamic> jsonAlbums = tryParseJson(response.data)['result']['categories'];
       List<AlbumModel> albums = List<AlbumModel>.from(jsonAlbums.map(
         (album) {
-          bool canUpload =
-              appPreferences.getBool(Preferences.isAdminKey) ?? false;
+          bool canUpload = appPreferences.getBool(Preferences.isAdminKey) ?? false;
           album['can_upload'] = canUpload;
           return AlbumModel.fromJson(album);
         },
@@ -47,8 +45,7 @@ Future<ApiResponse<List<AlbumModel>>> fetchAlbums(int albumID) async {
         }
         if (communityResult.hasData) {
           for (AlbumModel communityAlbum in communityResult.data) {
-            int index =
-                albums.indexWhere((album) => album.id == communityAlbum.id);
+            int index = albums.indexWhere((album) => album.id == communityAlbum.id);
             if (index >= 0) {
               AlbumModel newAlbum = albums.elementAt(index);
               newAlbum.canUpload = true;
@@ -65,7 +62,7 @@ Future<ApiResponse<List<AlbumModel>>> fetchAlbums(int albumID) async {
         data: albums,
       );
     }
-  } on DioError catch (e) {
+  } on DioException catch (e) {
     debugPrint(e.message);
   } catch (e) {
     debugPrint("$e");
@@ -86,8 +83,7 @@ Future<ApiResponse<List<AlbumModel>>> fetchCommunityAlbums(int albumID) async {
     );
 
     if (response.statusCode == 200) {
-      List<dynamic> jsonAlbums =
-          json.decode(response.data)['result']['categories'];
+      List<dynamic> jsonAlbums = json.decode(response.data)['result']['categories'];
       List<AlbumModel> albums = List<AlbumModel>.from(jsonAlbums.map(
         (album) => AlbumModel.fromJson(album),
       ));
@@ -96,7 +92,7 @@ Future<ApiResponse<List<AlbumModel>>> fetchCommunityAlbums(int albumID) async {
         data: albums,
       );
     }
-  } on DioError catch (e) {
+  } on DioException catch (e) {
     debugPrint(e.message);
   } catch (e) {
     debugPrint("$e");
@@ -129,7 +125,7 @@ Future<ApiResponse<List<AlbumModel>>> getAlbumTree([int? startId]) async {
         data: albums,
       );
     }
-  } on DioError catch (e) {
+  } on DioException catch (e) {
     debugPrint(e.message);
   } catch (e) {
     debugPrint("$e");
@@ -164,7 +160,7 @@ Future<ApiResponse<bool>> addAlbum({
       }
       return ApiResponse(data: true);
     }
-  } on DioError catch (e) {
+  } on DioException catch (e) {
     debugPrint(e.message);
   } catch (e) {
     debugPrint("$e");
@@ -197,7 +193,7 @@ Future<ApiResponse<bool>> moveAlbum(int catId, int parentCatId) async {
       }
       return ApiResponse(data: true);
     }
-  } on DioError catch (e) {
+  } on DioException catch (e) {
     debugPrint("${e.message}");
   } catch (e) {
     debugPrint("$e");
@@ -239,7 +235,7 @@ Future<ApiResponse<bool>> editAlbum({
       print(data);
       return ApiResponse(data: true);
     }
-  } on DioError catch (e) {
+  } on DioException catch (e) {
     debugPrint("${e.message}");
   } catch (e) {
     debugPrint("$e");
@@ -276,7 +272,7 @@ Future<ApiResponse<bool>> deleteAlbum(
       }
       return ApiResponse(data: true);
     }
-  } on DioError catch (e) {
+  } on DioException catch (e) {
     debugPrint("${e.message}");
   } catch (e) {
     debugPrint("$e");

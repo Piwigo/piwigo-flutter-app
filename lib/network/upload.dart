@@ -85,8 +85,7 @@ Future<List<int>> uploadPhotos(
   if (url == null) return [];
   String? username = await storage.read(key: Preferences.usernameKey);
   String? password = await storage.read(key: Preferences.passwordKey);
-  UploadNotifier uploadNotifier =
-      App.appKey.currentContext!.read<UploadNotifier>();
+  UploadNotifier uploadNotifier = App.appKey.currentContext!.read<UploadNotifier>();
   int nbError = 0;
 
   // Creates Upload Item list for the upload notifier
@@ -106,8 +105,7 @@ Future<List<int>> uploadPhotos(
   App.navigatorKey.currentState?.popAndPushNamed(UploadStatusPage.routeName);
 
   // Iterate on each item
-  await Future.wait(List<Future<void>>.generate(items.length, (index) async {
-    UploadItem item = items[index];
+  for (UploadItem item in items) {
     try {
       // Upload image
       Response? response = await uploadChunk(
@@ -139,7 +137,7 @@ Future<List<int>> uploadPhotos(
           // todo: delete real file path, not the cached one.
         }
       }
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       debugPrint("${e.message}");
       debugPrint("${e.stackTrace}");
       uploadNotifier.itemUploadCompleted(item, error: true);
@@ -152,7 +150,7 @@ Future<List<int>> uploadPhotos(
       uploadNotifier.itemUploadCompleted(item, error: true);
       nbError++;
     }
-  }));
+  }
 
   // Send notifications
   showUploadNotification(nbError, result.length);
@@ -166,7 +164,7 @@ Future<List<int>> uploadPhotos(
     if (await methodExist('community.images.uploadCompleted')) {
       await communityUploadCompleted(result, albumId);
     }
-  } on DioError catch (e) {
+  } on DioException catch (e) {
     debugPrint(e.message);
   }
 
@@ -202,11 +200,9 @@ Future<Response?> uploadChunk({
 
   // Filter fields
   if (info['name'] != '' && info['name'] != null) fields['name'] = info['name'];
-  if (info['comment'] != '' && info['comment'] != null)
-    fields['comment'] = info['comment'];
-  if (info['tag_ids']?.isNotEmpty ?? false)
-    fields['tag_ids'] = info['tag_ids'].join(',');
-  if (info['level'] != -1) fields['level'] = info['level'];
+  if (info['comment'] != '' && info['comment'] != null) fields['comment'] = info['comment'];
+  if (info['tag_ids']?.isNotEmpty ?? false) fields['tag_ids'] = info['tag_ids'].join(',');
+  if (info['level'] != -1 && info['level'] != null) fields['level'] = info['level'];
 
   // Create dio client
   Dio dio = Dio(
@@ -247,12 +243,11 @@ Future<bool> uploadCompleted(List<int> imageId, int categoryId) async {
   });
 
   try {
-    Response response =
-        await ApiClient.post(data: formData, queryParameters: queries);
+    Response response = await ApiClient.post(data: formData, queryParameters: queries);
     if (response.statusCode == 200) {
       return true;
     }
-  } on DioError catch (e) {
+  } on DioException catch (e) {
     debugPrint("$e");
   }
   return false;
@@ -270,12 +265,11 @@ Future<bool> communityUploadCompleted(List<int> imageId, int categoryId) async {
     'category_id': categoryId,
   });
   try {
-    Response response =
-        await ApiClient.post(data: formData, queryParameters: queries);
+    Response response = await ApiClient.post(data: formData, queryParameters: queries);
     if (response.statusCode == 200) {
       return true;
     }
-  } on DioError catch (e) {
+  } on DioException catch (e) {
     debugPrint("$e");
   }
   return false;

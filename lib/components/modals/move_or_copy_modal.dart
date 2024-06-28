@@ -26,7 +26,6 @@ class MoveOrCopyModal extends StatefulWidget {
 }
 
 class _MoveOrCopyModalState extends State<MoveOrCopyModal> {
-  final ScrollController _scrollController = ScrollController();
   late final Future<ApiResponse<List<AlbumModel>>> _albumFuture;
   late final List<int> _disabledAlbums;
 
@@ -39,8 +38,7 @@ class _MoveOrCopyModalState extends State<MoveOrCopyModal> {
     _disabledAlbums = [
       if (widget.album != null) widget.album!.id,
       if (parentAlbums.length == 1 || widget.isImage) 0,
-      if (!widget.isImage && parentAlbums.length > 1)
-        int.parse(parentAlbums[parentAlbums.length - 2]),
+      if (!widget.isImage && parentAlbums.length > 1) int.parse(parentAlbums[parentAlbums.length - 2]),
     ];
 
     super.initState();
@@ -213,9 +211,7 @@ class _ExpansionAlbumTileState extends State<ExpansionAlbumTile> {
                     child: Text(
                       "${List.generate(widget.index, (index) => '.').join()}${widget.index > 0 ? ' ' : ''}${widget.album.name}",
                       overflow: TextOverflow.ellipsis,
-                      style: _disabled
-                          ? Theme.of(context).textTheme.bodySmall
-                          : Theme.of(context).textTheme.bodyMedium,
+                      style: _disabled ? Theme.of(context).textTheme.bodySmall : Theme.of(context).textTheme.bodyMedium,
                     ),
                   ),
                 ),
@@ -235,9 +231,7 @@ class _ExpansionAlbumTileState extends State<ExpansionAlbumTile> {
                           child: Text(
                             appStrings.albumCount(widget.album.nbCategories),
                             style: TextStyle(
-                              color: Theme.of(context)
-                                  .primaryColor
-                                  .withOpacity(0.7),
+                              color: Theme.of(context).primaryColor.withOpacity(0.7),
                               fontSize: 14,
                             ),
                           ),

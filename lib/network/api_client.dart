@@ -2,8 +2,8 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:cookie_jar/cookie_jar.dart';
-import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
+import 'package:dio/io.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter/foundation.dart';
 import 'package:piwigo_ng/services/preferences_service.dart';
@@ -17,13 +17,9 @@ class ApiClient {
     ..interceptors.add(CookieManager(cookieJar))
     ..httpClientAdapter = sslHttpClientAdapter;
 
-  static HttpClientAdapter get sslHttpClientAdapter {
-    return DefaultHttpClientAdapter()
-      ..onHttpClientCreate = (HttpClient client) {
-        client.badCertificateCallback = piwigoSSLBypass;
-        return client;
-      };
-  }
+  static HttpClientAdapter get sslHttpClientAdapter => IOHttpClientAdapter(
+        createHttpClient: () => HttpClient()..badCertificateCallback = piwigoSSLBypass,
+      );
 
   static bool piwigoSSLBypass(X509Certificate cert, String host, int port) {
     if (Preferences.getEnableSSL) {
@@ -138,8 +134,7 @@ class ApiClient {
 class SSLHttpOverrides extends HttpOverrides {
   @override
   HttpClient createHttpClient(SecurityContext? context) {
-    return super.createHttpClient(context)
-      ..badCertificateCallback = ApiClient.piwigoSSLBypass;
+    return super.createHttpClient(context)..badCertificateCallback = ApiClient.piwigoSSLBypass;
   }
 }
 

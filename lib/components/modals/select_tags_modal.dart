@@ -41,11 +41,10 @@ class _SelectTagsModalState extends State<SelectTagsModal> {
     super.dispose();
   }
 
-  List<TagModel> get _unselectedTagList =>
-      _tagList!.where((t) => !_selectedTagList.contains(t)).toList();
+  List<TagModel> get _unselectedTagList => _tagList!.where((t) => !_selectedTagList.contains(t)).toList();
 
   Future<void> _onRefresh() async {
-    final ApiResponse<List<TagModel>> result = await getTags();
+    final ApiResponse<List<TagModel>> result = await getAdminTags();
     if (!result.hasData) return;
     setState(() {
       _tagList = result.data!;

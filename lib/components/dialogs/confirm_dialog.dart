@@ -27,12 +27,10 @@ class ConfirmDialog extends StatelessWidget {
       actions: [
         TextButton(
           style: ButtonStyle(
-            foregroundColor: MaterialStateColor.resolveWith(
-              (states) =>
-                  Theme.of(context).textTheme.bodySmall?.color ??
-                  AppColors.disabled,
+            foregroundColor: WidgetStateColor.resolveWith(
+              (states) => Theme.of(context).textTheme.bodySmall?.color ?? AppColors.disabled,
             ),
-            overlayColor: MaterialStateColor.resolveWith(
+            overlayColor: WidgetStateColor.resolveWith(
               (states) => AppColors.accent.withOpacity(0.3),
             ),
           ),
@@ -43,10 +41,10 @@ class ConfirmDialog extends StatelessWidget {
         ),
         TextButton(
           style: ButtonStyle(
-            foregroundColor: MaterialStateColor.resolveWith(
+            foregroundColor: WidgetStateColor.resolveWith(
               (states) => confirmColor ?? AppColors.accent,
             ),
-            overlayColor: MaterialStateColor.resolveWith(
+            overlayColor: WidgetStateColor.resolveWith(
               (states) => AppColors.accent.withOpacity(0.3),
             ),
           ),

@@ -10,8 +10,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 Future<AlbumPermissionModel?> getAlbumPermissions(
   int albumId,
 ) async {
-  List<AlbumPermissionModel>? permissions =
-      await getPermissions(byAlbum: albumId);
+  List<AlbumPermissionModel>? permissions = await getPermissions(byAlbum: albumId);
   if (permissions == null || permissions.isEmpty) {
     return null;
   }
@@ -52,13 +51,12 @@ Future<List<AlbumPermissionModel>?> getPermissions({
       Map<String, dynamic> data = json.decode(response.data);
       var jsonPermissions = data['result']['categories'];
       List<AlbumPermissionModel> permissions = List<AlbumPermissionModel>.from(
-        jsonPermissions
-            .map((permission) => AlbumPermissionModel.fromJson(permission)),
+        jsonPermissions.map((permission) => AlbumPermissionModel.fromJson(permission)),
       );
 
       return permissions;
     }
-  } on DioError catch (e) {
+  } on DioException catch (e) {
     debugPrint('Fetch permissions: ${e.message}');
   } on Error catch (e) {
     debugPrint('Fetch permissions: ${e.stackTrace}');
@@ -103,7 +101,7 @@ Future<bool> addPermission({
       }
       return false;
     }
-  } on DioError catch (e) {
+  } on DioException catch (e) {
     debugPrint('Add permission: ${e.message}');
   } on Error catch (e) {
     debugPrint('Add permission: ${e.stackTrace}');
@@ -146,7 +144,7 @@ Future<bool> removePermission({
       }
       return false;
     }
-  } on DioError catch (e) {
+  } on DioException catch (e) {
     debugPrint('Add permission: ${e.message}');
   } on Error catch (e) {
     debugPrint('Add permission: ${e.stackTrace}');

@@ -32,8 +32,7 @@ class _LoginFormViewState extends State<LoginFormView> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final GlobalKey _urlKey = GlobalKey();
-  final RoundedLoadingButtonController _btnController =
-      RoundedLoadingButtonController();
+  final RoundedLoadingButtonController _btnController = RoundedLoadingButtonController();
 
   String _url = '';
   String _username = '';
@@ -169,8 +168,7 @@ class _LoginFormViewState extends State<LoginFormView> {
           AppField(
             key: _urlKey,
             margin: const EdgeInsets.symmetric(vertical: 4.0),
-            padding:
-                const EdgeInsets.symmetric(vertical: 16.0, horizontal: 8.0),
+            padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 8.0),
             controller: _urlController,
             onChanged: (value) {
               bool isError = !_urlValidator(value);
@@ -189,8 +187,7 @@ class _LoginFormViewState extends State<LoginFormView> {
           ),
           AppField(
             margin: const EdgeInsets.symmetric(vertical: 4.0),
-            padding:
-                const EdgeInsets.symmetric(vertical: 16.0, horizontal: 8.0),
+            padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 8.0),
             controller: _usernameController,
             onChanged: (value) {
               if (_idError) {
@@ -224,8 +221,7 @@ class _LoginFormViewState extends State<LoginFormView> {
           ),
           AppField(
             margin: const EdgeInsets.symmetric(vertical: 4.0),
-            padding:
-                const EdgeInsets.symmetric(vertical: 16.0, horizontal: 8.0),
+            padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 8.0),
             controller: _passwordController,
             onFieldSubmitted: (String value) {
               FocusScope.of(context).unfocus();
@@ -282,7 +278,7 @@ class _LoginFormViewState extends State<LoginFormView> {
           ),
           TextButton(
             style: ButtonStyle(
-              foregroundColor: MaterialStateProperty.resolveWith(
+              foregroundColor: WidgetStateProperty.resolveWith(
                 (states) => Theme.of(context).colorScheme.secondary,
               ),
             ),
@@ -319,10 +315,7 @@ class _LoginFormViewState extends State<LoginFormView> {
                 top: Theme.of(context).textTheme.bodyMedium?.fontSize,
                 child: Text(
                   !_isSecured ? 'https' : 'http',
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodyMedium
-                      ?.copyWith(fontSize: 11),
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: 11),
                 ),
               ),
             ],

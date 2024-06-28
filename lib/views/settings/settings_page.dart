@@ -47,9 +47,7 @@ class _SettingsPageState extends State<SettingsPage> {
   late SortMethods _imageSort;
   late bool _stripMetadata;
   late String _author;
-  late bool _compressBeforeUpload;
   late bool _wifiOnly;
-  late bool _deleteAfterUpload;
   late bool _downloadNotification;
   late bool _uploadNotification;
   late bool _autoUploadEnabled;
@@ -67,8 +65,6 @@ class _SettingsPageState extends State<SettingsPage> {
     _availablePreviewSizes = Preferences.getAvailableSizes;
     _author = Preferences.getUploadAuthor ?? '';
     _stripMetadata = Preferences.getRemoveMetadata;
-    _compressBeforeUpload = Preferences.getCompressUpload;
-    _deleteAfterUpload = Preferences.getDeleteAfterUpload;
     _wifiOnly = Preferences.getWifiUpload;
     _quality = Preferences.getUploadQuality;
     _downloadNotification = Preferences.getDownloadNotification;
@@ -108,9 +104,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
     try {
       if (cacheDir.existsSync()) {
-        cacheDir
-            .listSync(recursive: true, followLinks: false)
-            .forEach((FileSystemEntity entity) {
+        cacheDir.listSync(recursive: true, followLinks: false).forEach((FileSystemEntity entity) {
           if (entity is File) {
             totalSize = totalSize! + entity.lengthSync();
           }
@@ -171,14 +165,11 @@ class _SettingsPageState extends State<SettingsPage> {
                 delegate: SliverChildListDelegate([
                   _serverSection,
                   _logoutSection,
-                  if (appPreferences.getString(Preferences.fileTypesKey) !=
-                      null)
-                    _supportedFilesSection,
+                  if (appPreferences.getString(Preferences.fileTypesKey) != null) _supportedFilesSection,
                   _albumsSection,
                   _photosSection,
                   // Hide upload section for non admin / community users
-                  if (appPreferences.getBool(Preferences.isAdminKey) ?? false)
-                    _uploadSection,
+                  if (appPreferences.getBool(Preferences.isAdminKey) ?? false) _uploadSection,
                   // _privacySection,
                   _appearanceSection,
                   _cacheSection,
@@ -194,8 +185,7 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Widget get _serverSection => SettingsSection(
-        title: appStrings
-            .settingsHeader_server(appPreferences.getString('VERSION') ?? ''),
+    title: appStrings.settingsHeader_server(appPreferences.getString('VERSION') ?? ''),
         children: [
           SettingsSectionItemInfo(
             title: appStrings.settings_server,
@@ -210,6 +200,7 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
         ],
       );
+
   Widget get _logoutSection => SettingsSection(
         children: [
           SettingsSectionButton(
@@ -229,8 +220,9 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
         ],
       );
+
   Widget get _supportedFilesSection {
-    String fileTypes = Preferences.getAvailableFileTypes.join(', ') ?? '';
+    String fileTypes = Preferences.getAvailableFileTypes.join(', ');
     return SettingsSection(
       color: Colors.transparent,
       children: [
@@ -258,9 +250,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   if (size != null) {
                     setState(() {
                       _albumThumbnailSize = size;
-                      appPreferences.setString(
-                          Preferences.albumThumbnailSizeKey,
-                          _albumThumbnailSize);
+                      appPreferences.setString(Preferences.albumThumbnailSizeKey, _albumThumbnailSize);
                     });
                   }
                 },
@@ -289,6 +279,7 @@ class _SettingsPageState extends State<SettingsPage> {
           // ),
         ],
       );
+
   Widget get _photosSection => Column(
         children: [
           SettingsSection(
@@ -301,8 +292,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   if (size == null) return;
                   setState(() {
                     _imageThumbnailSize = size;
-                    appPreferences.setString(
-                        Preferences.imageThumbnailSizeKey, _imageThumbnailSize);
+                    appPreferences.setString(Preferences.imageThumbnailSizeKey, _imageThumbnailSize);
                   });
                 },
                 selectedItemBuilder: (context) {
@@ -329,8 +319,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   if (size == null) return;
                   setState(() {
                     _imageFullScreenSize = size;
-                    appPreferences.setString(Preferences.imageFullScreenSizeKey,
-                        _imageFullScreenSize);
+                    appPreferences.setString(Preferences.imageFullScreenSizeKey, _imageFullScreenSize);
                   });
                 },
                 selectedItemBuilder: (context) {
@@ -357,8 +346,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   if (sort == null) return;
                   setState(() {
                     _imageSort = sort;
-                    appPreferences.setString(
-                        Preferences.imageSortKey, _imageSort.value);
+                    appPreferences.setString(Preferences.imageSortKey, _imageSort.value);
                   });
                 },
                 selectedItemBuilder: (context) {
@@ -380,10 +368,8 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
               Builder(builder: (context) {
                 final orientation = MediaQuery.of(context).orientation;
-                final int nbImages =
-                    Settings.getImageCrossAxisCount(context, _imageRowNumber);
-                final int maxNbImages =
-                    Settings.getImageCrossAxisCount(context, 6);
+                final int nbImages = Settings.getImageCrossAxisCount(context, _imageRowNumber);
+                final int maxNbImages = Settings.getImageCrossAxisCount(context, 6);
                 return SettingsSectionItemSlider(
                   enableField: false,
                   title: appStrings.defaultNberOfThumbnailsShort,
@@ -391,13 +377,11 @@ class _SettingsPageState extends State<SettingsPage> {
                   textWidth: orientation == Orientation.portrait ? 24.0 : 40.0,
                   min: Settings.minImageRowCount.toDouble(),
                   max: Settings.maxImageRowCount.toDouble(),
-                  divisions:
-                      Settings.maxImageRowCount - Settings.minImageRowCount,
+                  divisions: Settings.maxImageRowCount - Settings.minImageRowCount,
                   value: _imageRowNumber.toDouble(),
                   onChanged: (value) => setState(() {
                     _imageRowNumber = value.round();
-                    appPreferences.setInt(
-                        Preferences.imageRowCountKey, _imageRowNumber);
+                    appPreferences.setInt(Preferences.imageRowCountKey, _imageRowNumber);
                   }),
                 );
               }),
@@ -406,8 +390,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 value: _thumbnailTitle,
                 onChanged: (value) => setState(() {
                   _thumbnailTitle = value;
-                  appPreferences.setBool(
-                      Preferences.showThumbnailTitleKey, _thumbnailTitle);
+                  appPreferences.setBool(Preferences.showThumbnailTitleKey, _thumbnailTitle);
                 }),
               ),
             ],
@@ -419,6 +402,7 @@ class _SettingsPageState extends State<SettingsPage> {
           // ),
         ],
       );
+
   Widget get _uploadSection => SettingsSection(
         title: appStrings.settingsHeader_upload,
         children: [
@@ -488,11 +472,9 @@ class _SettingsPageState extends State<SettingsPage> {
           SettingsSectionItemSwitch(
             title: appStrings.settings_autoUpload,
             value: _autoUploadEnabled,
-            onChanged: (_) => Navigator.of(context)
-                .pushNamed(AutoUploadPage.routeName)
-                .then((_) => setState(() {
-                      _autoUploadEnabled = AutoUploadPreferences.getEnabled;
-                    })),
+            onChanged: (_) => Navigator.of(context).pushNamed(AutoUploadPage.routeName).then((_) => setState(() {
+                  _autoUploadEnabled = AutoUploadPreferences.getEnabled;
+                })),
           ),
           // SettingsSectionItemSwitch(
           //   title: appStrings.settings_deleteImage,
@@ -529,15 +511,7 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
         ],
       );
-  Widget get _privacySection => SettingsSection(
-        title: appStrings.settings_defaultPrivacy,
-        children: [
-          SettingsSectionItemButton(
-            title: "App Lock",
-            text: "Off",
-          ),
-        ],
-      ); // todo: use biometry unlock
+
   Widget get _appearanceSection => SettingsSection(
         title: appStrings.settingsHeader_appearance,
         children: [
@@ -552,6 +526,7 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
         ],
       );
+
   Widget get _cacheSection => SettingsSection(
         title: appStrings.settingsHeader_cache,
         children: [
@@ -560,8 +535,7 @@ class _SettingsPageState extends State<SettingsPage> {
             builder: (context, snapshot) {
               String cacheSize = appStrings.none;
               if (snapshot.hasData && snapshot.data != null) {
-                cacheSize =
-                    '${snapshot.data!.toStringAsFixed(1)} ${appStrings.settings_cacheMegabytes}';
+                cacheSize = '${snapshot.data!.toStringAsFixed(1)} ${appStrings.settings_cacheMegabytes}';
               }
               return SettingsSectionItemInfo(
                 title: appStrings.settings_cacheSize,
@@ -587,6 +561,7 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
         ],
       );
+
   Widget get _infoSection => SettingsSection(
         title: appStrings.settingsHeader_about,
         children: [
@@ -621,8 +596,7 @@ class _SettingsPageState extends State<SettingsPage> {
           SettingsSectionItemButton(
             title: appStrings.settings_language,
             icon: const Icon(Icons.language),
-            onPressed: () =>
-                Navigator.of(context).pushNamed(SelectLanguagePage.routeName),
+            onPressed: () => Navigator.of(context).pushNamed(SelectLanguagePage.routeName),
           ),
           SettingsSectionItemButton(
             title: appStrings.settings_translateWithCrowdin,
@@ -657,6 +631,7 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
         ],
       );
+
   Widget get _content => SettingsSection(
         color: Colors.transparent,
         children: [

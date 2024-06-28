@@ -21,10 +21,8 @@ class _LoginSettingsPageState extends State<LoginSettingsPage> {
 
   @override
   void initState() {
-    _basicAuthUsername =
-        appPreferences.getString(Preferences.basicUsernameKey) ?? '';
-    _basicAuthPassword =
-        appPreferences.getString(Preferences.basicPasswordKey) ?? '';
+    _basicAuthUsername = appPreferences.getString(Preferences.basicUsernameKey) ?? '';
+    _basicAuthPassword = appPreferences.getString(Preferences.basicPasswordKey) ?? '';
     _sslEnabled = Preferences.getEnableSSL;
     _basiAuth = Preferences.getEnableBasicAuth;
     _rememberCredentials = Preferences.getRememberCredentials;
@@ -37,7 +35,7 @@ class _LoginSettingsPageState extends State<LoginSettingsPage> {
       appBar: AppBar(
         title: Text(
           appStrings.tabBar_preferences,
-          textScaleFactor: 1,
+          textScaler: TextScaler.linear(1),
           style: Theme.of(context).appBarTheme.titleTextStyle,
         ),
       ),

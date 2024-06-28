@@ -57,7 +57,7 @@ Future<List<GroupModel>?> getAllGroups({
     }
 
     return groupsResponse;
-  } on DioError catch (e) {
+  } on DioException catch (e) {
     debugPrint('Fetch all groups: ${e.message}');
   } on Error catch (e) {
     debugPrint('Fetch all groups: ${e.stackTrace}');
@@ -89,7 +89,7 @@ Future<ApiResponse<List<GroupModel>?>> getGroups([int page = 0]) async {
         data: groups,
       );
     }
-  } on DioError catch (e) {
+  } on DioException catch (e) {
     debugPrint('Fetch groups: ${e.message}');
   } on Error catch (e) {
     debugPrint('Fetch groups: ${e.stackTrace}');

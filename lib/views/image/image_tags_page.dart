@@ -1,54 +1,55 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:piwigo_ng/components/lists/image_grid_view.dart';
 import 'package:piwigo_ng/components/popup_list_item.dart';
 import 'package:piwigo_ng/models/album_model.dart';
 import 'package:piwigo_ng/models/image_model.dart';
+import 'package:piwigo_ng/models/tag_model.dart';
 import 'package:piwigo_ng/network/api_error.dart';
 import 'package:piwigo_ng/network/images.dart';
 import 'package:piwigo_ng/services/preferences_service.dart';
 import 'package:piwigo_ng/utils/image_actions.dart';
 import 'package:piwigo_ng/utils/localizations.dart';
-import 'package:piwigo_ng/utils/page_routes.dart';
 import 'package:piwigo_ng/utils/settings.dart';
 import 'package:piwigo_ng/views/image/image_page.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
-import '../../components/fields/app_field.dart';
+class ImageTagsPage extends StatefulWidget {
+  const ImageTagsPage({Key? key, required this.tag, this.isAdmin = false}) : super(key: key);
 
-class ImageSearchPage extends StatefulWidget {
-  const ImageSearchPage({Key? key, this.isAdmin = false}) : super(key: key);
+  static const String routeName = '/images/tags';
 
-  static const String routeName = '/images/search';
-
+  final TagModel tag;
   final bool isAdmin;
 
   @override
-  State<ImageSearchPage> createState() => _ImageSearchPageState();
+  State<ImageTagsPage> createState() => _ImageTagsPageState();
 }
 
-class _ImageSearchPageState extends State<ImageSearchPage> {
-  final TextEditingController _searchController = TextEditingController();
+class _ImageTagsPageState extends State<ImageTagsPage> {
   final RefreshController _refreshController = RefreshController(initialRefresh: false);
   final ScrollController _scrollController = ScrollController();
-  final FocusNode _focusNode = FocusNode();
 
   late final Future<ApiResponse<Map>> _imageFuture;
-  List<ImageModel>? _searchList;
+  List<ImageModel>? _imageList;
   List<ImageModel> _selectedList = [];
 
-  String _searchText = '';
   int _nbImages = 0;
   int _page = 0;
 
   @override
   void initState() {
     super.initState();
-    _imageFuture = searchImages(_searchText);
-    SchedulerBinding.instance.addPostFrameCallback((duration) {
-      Future.delayed(SlideUpPageRoute.duration).then(
-        (value) => FocusScope.of(context).requestFocus(_focusNode),
-      );
+    _imageFuture = fetchTagImages(widget.tag.id).then((response) {
+      if (response.hasData) {
+        setState(() {
+          final int? total = response.data!['total_count'];
+          if (total != null) {
+            _nbImages = total;
+          }
+          _imageList = response.data!['images'].cast<ImageModel>() ?? [];
+        });
+      }
+      return response;
     });
   }
 
@@ -56,8 +57,6 @@ class _ImageSearchPageState extends State<ImageSearchPage> {
   void dispose() {
     _refreshController.dispose();
     _scrollController.dispose();
-    _focusNode.dispose();
-    _searchController.dispose();
     super.dispose();
   }
 
@@ -72,42 +71,38 @@ class _ImageSearchPageState extends State<ImageSearchPage> {
   }
 
   Future<void> _onRefresh() async {
-    final String oldSearch = _searchText;
-    final ApiResponse<Map> result = await searchImages(_searchText);
+    final ApiResponse<Map> result = await fetchTagImages(widget.tag.id);
     if (!result.hasData) {
       _refreshController.refreshFailed();
       await Future.delayed(const Duration(milliseconds: 500));
       return _refreshController.refreshCompleted();
     }
-    if (_searchText == oldSearch) {
-      final int? total = result.data!["total_count"];
-      setState(() {
-        _page = 0;
-        if (total != null) {
-          _nbImages = total;
-        }
-        _searchList = result.data!["images"].cast<ImageModel>() ?? [];
-        _selectedList.clear();
-      });
-    }
+    final int? total = result.data!['total_count'];
+    setState(() {
+      _page = 0;
+      if (total != null) {
+        _nbImages = total;
+      }
+      _imageList = result.data!['images'].cast<ImageModel>() ?? [];
+      _selectedList.clear();
+    });
     return _refreshController.refreshCompleted();
   }
 
   Future<void> _loadMoreImages() async {
-    if (_searchList == null && _nbImages <= _searchList!.length) return;
-    ApiResponse<Map> result = await searchImages(_searchText, _page + 1);
+    if (_imageList == null || _nbImages <= _imageList!.length) return;
+    ApiResponse<Map> result = await fetchTagImages(widget.tag.id, _page + 1);
     if (result.hasError || !result.hasData) {
       _refreshController.loadFailed();
       await Future.delayed(const Duration(milliseconds: 500));
       return _refreshController.loadComplete();
     }
-    final int? total = result.data!["total_count"];
+    final int? total = result.data!['total_count'];
     setState(() {
       if (total != null) {
         _nbImages = total;
       }
-      _page += 1;
-      _searchList!.addAll(result.data!["images"].cast<ImageModel>() ?? []);
+      _imageList!.addAll(result.data!['images'].cast<ImageModel>() ?? []);
     });
     _refreshController.loadComplete();
   }
@@ -115,7 +110,7 @@ class _ImageSearchPageState extends State<ImageSearchPage> {
   void _onTapPhoto(ImageModel image) => Navigator.of(context).pushNamed(
         ImagePage.routeName,
         arguments: {
-          'images': _searchList,
+          'images': _imageList,
           'startId': image.id,
           'album': AlbumModel(
             id: -1,
@@ -127,7 +122,7 @@ class _ImageSearchPageState extends State<ImageSearchPage> {
       ).then((images) {
         if (images == null || images is! List<ImageModel>) return;
         setState(() {
-          _searchList = images;
+          _imageList = images;
           _page = ((images.length - 1) / Settings.defaultElementPerPage).floor();
         });
       });
@@ -139,7 +134,7 @@ class _ImageSearchPageState extends State<ImageSearchPage> {
         }
       });
 
-  void _onLikePhotos() => onLikePhotos(_selectedList, _hasNonFavorites).whenComplete(() => _onRefresh());
+  void _onLikePhotos() => onLikePhotos(_selectedList, false).whenComplete(() => _onRefresh());
 
   _onDeletePhotos() => onDeletePhotos(context, _selectedList).then((success) {
         if (success) _onRefresh();
@@ -155,7 +150,7 @@ class _ImageSearchPageState extends State<ImageSearchPage> {
           child: SmartRefresher(
             controller: _refreshController,
             scrollController: _scrollController,
-            enablePullUp: _searchList != null && _searchList!.isNotEmpty && _nbImages > _searchList!.length,
+            enablePullUp: _imageList != null && _nbImages > _imageList!.length,
             onLoading: _loadMoreImages,
             onRefresh: _onRefresh,
             header: MaterialClassicHeader(
@@ -172,9 +167,9 @@ class _ImageSearchPageState extends State<ImageSearchPage> {
             child: CustomScrollView(
               controller: _scrollController,
               slivers: [
-                _searchAppBar,
+                _appBar,
                 SliverToBoxAdapter(
-                  child: _searchGrid,
+                  child: _taggedImageGrid,
                 ),
               ],
             ),
@@ -190,38 +185,17 @@ class _ImageSearchPageState extends State<ImageSearchPage> {
     );
   }
 
-  Widget get _searchAppBar {
+  Widget get _appBar {
     Orientation orientation = MediaQuery.of(context).orientation;
     return SliverAppBar(
       pinned: true,
-      centerTitle: true,
+      centerTitle: false,
       titleSpacing: 0.0,
-      leading: IconButton(
-        onPressed: () {
-          _focusNode.unfocus();
-          Navigator.of(context).pop();
-        },
-        icon: const Icon(Icons.arrow_back),
+      leading: BackButton(
+        onPressed: () => Navigator.of(context).pop(),
       ),
-      title: Hero(
-        tag: '<search-bar>',
-        child: Material(
-          color: Colors.transparent,
-          child: AppField(
-            padding: const EdgeInsets.symmetric(vertical: 8.0),
-            controller: _searchController,
-            focusNode: _focusNode,
-            prefix: const Icon(Icons.search),
-            onChanged: (value) => setState(() {
-              _searchText = value;
-              _onRefresh();
-            }),
-            onFieldSubmitted: (value) {
-              if (value.isEmpty) Navigator.of(context).pop();
-            },
-          ),
-        ),
-      ),
+      // title: Text(appStrings.categoryDiscoverFavorites_title),
+      title: Text(widget.tag.name),
       actions: [
         if (_selectedList.isNotEmpty)
           IconButton(
@@ -255,10 +229,9 @@ class _ImageSearchPageState extends State<ImageSearchPage> {
                     _onLikePhotos,
                   ),
                   child: PopupListItem(
-                    icon: _hasNonFavorites ? Icons.favorite_border : Icons.favorite,
-                    text: _hasNonFavorites
-                        ? appStrings.imageOptions_addFavorites
-                        : appStrings.imageOptions_removeFavorites,
+                    icon: Icons.remove_circle,
+                    text: appStrings.imageOptions_removeFavorites,
+                    color: Theme.of(context).colorScheme.error,
                   ),
                 ),
               PopupMenuItem(
@@ -277,46 +250,53 @@ class _ImageSearchPageState extends State<ImageSearchPage> {
     );
   }
 
-  Widget get _searchGrid {
+  Widget get _taggedImageGrid {
     return FutureBuilder<ApiResponse<Map>>(
       future: _imageFuture,
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          if (_searchList == null) {
-            final ApiResponse<Map> result = snapshot.data!;
-            if (!snapshot.data!.hasData) {
-              return Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(appStrings.categoryImageList_noDataError),
-                ),
-              );
-            }
-            _nbImages = result.data!["total_count"];
-            _searchList = result.data!["images"].cast<ImageModel>() ?? [];
-          }
-          if (_searchList!.isEmpty) {
+          if (!snapshot.data!.hasData) {
             return Center(
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Text(appStrings.noImages),
+                child: Text(appStrings.categoryImageList_noDataError),
               ),
             );
           }
-          return ImageGridView(
-            imageList: _searchList ?? [],
-            selectedList: _selectedList,
-            onSelectImage: (image) => setState(() {
-              _selectedList.add(image);
-            }),
-            onDeselectImage: (image) => setState(() {
-              _selectedList.remove(image);
-            }),
-            onTapImage: _onTapPhoto,
-          );
+          return _buildImageGrid(snapshot);
         }
         return Center(child: CircularProgressIndicator());
       },
+    );
+  }
+
+  Widget _buildImageGrid(AsyncSnapshot snapshot) {
+    final ApiResponse<Map> result = snapshot.data!;
+    if (_imageList == null) {
+      _nbImages = result.data!['total_count'];
+      _imageList = result.data!['images'].cast<ImageModel>() ?? [];
+    }
+
+    _selectedList = _imageList!.where((image) => _selectedList.contains(image)).toList();
+
+    if (_imageList!.isEmpty) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Text(appStrings.noImages),
+        ),
+      );
+    }
+    return ImageGridView(
+      imageList: _imageList!,
+      selectedList: _selectedList,
+      onSelectImage: (image) => setState(() {
+        _selectedList.add(image);
+      }),
+      onDeselectImage: (image) => setState(() {
+        _selectedList.remove(image);
+      }),
+      onTapImage: _onTapPhoto,
     );
   }
 

@@ -81,18 +81,16 @@ class _AlbumPrivacyPageState extends State<AlbumPrivacyPage> {
     if (!editResult.hasData || !editResult.data) return;
 
     if (_selectedMode == AlbumStatus.private) {
-      List<GroupModel> newGroups =
-          _groups.where((e) => !_allowedGroups.contains(e)).toList();
-      List<GroupModel> removedGroups =
-          _allowedGroups.where((e) => !_groups.contains(e)).toList();
+      List<GroupModel> newGroups = _groups.where((e) => !_allowedGroups.contains(e)).toList();
+      List<GroupModel> removedGroups = _allowedGroups.where((e) => !_groups.contains(e)).toList();
 
-      bool addSuccess = await addPermission(
+      await addPermission(
         albumId: widget.album.id,
         groups: newGroups.map((group) => group.id).toList(),
         recursive: _recursive,
       );
 
-      bool removeSuccess = await removePermission(
+      await removePermission(
         albumId: widget.album.id,
         groups: removedGroups.map((group) => group.id).toList(),
       );
@@ -153,8 +151,7 @@ class _AlbumPrivacyPageState extends State<AlbumPrivacyPage> {
                         groupValue: _selectedMode,
                         activeColor: Theme.of(context).colorScheme.secondary,
                         title: Text(appStrings.categoryPrivacyMode_public),
-                        subtitle:
-                            Text(appStrings.categoryPrivacyMode_publicMessage),
+                        subtitle: Text(appStrings.categoryPrivacyMode_publicMessage),
                         onChanged: _onChangeMode,
                       ),
                       RadioListTile(
@@ -162,8 +159,7 @@ class _AlbumPrivacyPageState extends State<AlbumPrivacyPage> {
                         groupValue: _selectedMode,
                         activeColor: Theme.of(context).colorScheme.secondary,
                         title: Text(appStrings.categoryPrivacyMode_private),
-                        subtitle:
-                            Text(appStrings.categoryPrivacyMode_privateMessage),
+                        subtitle: Text(appStrings.categoryPrivacyMode_privateMessage),
                         onChanged: _onChangeMode,
                       ),
                     ],
