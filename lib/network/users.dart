@@ -58,7 +58,7 @@ Future<List<UserModel>?> getAllUsers({
     }
 
     return usersResponse;
-  } on DioError catch (e) {
+  } on DioException catch (e) {
     debugPrint('Fetch all users: ${e.message}');
   } on Error catch (e) {
     debugPrint('Fetch all users: ${e.stackTrace}');
@@ -90,7 +90,7 @@ Future<ApiResponse<List<UserModel>>> getUsers([int page = 0]) async {
         data: users,
       );
     }
-  } on DioError catch (e) {
+  } on DioException catch (e) {
     debugPrint('Fetch users: ${e.message}');
   } on Error catch (e) {
     debugPrint('Fetch users: ${e.stackTrace}');
@@ -140,7 +140,7 @@ Future<ApiResponse<List<UserModel>>> getAllAdmins() async {
     return ApiResponse<List<UserModel>>(
       data: users,
     );
-  } on DioError catch (e) {
+  } on DioException catch (e) {
     debugPrint('Fetch admins: ${e.message}');
   } on Error catch (e) {
     debugPrint('Fetch admins: ${e.stackTrace}');
@@ -167,7 +167,7 @@ Future<ApiResponse<List<ImageModel>>> fetchFavorites(int page) async {
 
       return ApiResponse<List<ImageModel>>(data: images);
     }
-  } on DioError catch (e) {
+  } on DioException catch (e) {
     debugPrint('Fetch favorites: ${e.message}');
   } on Error catch (e) {
     debugPrint('Fetch favorites: ${e.stackTrace}');
@@ -200,7 +200,7 @@ Future<bool> addFavorite(int imageId) async {
     if (response.statusCode == 200) {
       return true;
     }
-  } on DioError catch (e) {
+  } on DioException catch (e) {
     debugPrint('Add favorite: ${e.message}');
   } on Error catch (e) {
     debugPrint('Add favorite: ${e.stackTrace}');
@@ -234,7 +234,7 @@ Future<bool> removeFavorite(int imageId) async {
     if (response.statusCode == 200) {
       return true;
     }
-  } on DioError catch (e) {
+  } on DioException catch (e) {
     debugPrint('Remove favorite: ${e.message}');
   } on Error catch (e) {
     debugPrint('Remove favorite: ${e.stackTrace}');

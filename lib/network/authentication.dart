@@ -23,7 +23,7 @@ Future<ApiResponse<String>> pingAPI() async {
     if (data['stat'] == 'ok') {
       return ApiResponse<String>(data: data['result']);
     }
-  } on DioError catch (e) {
+  } on DioException catch (e) {
     debugPrint(e.message);
   } catch (e) {
     debugPrint('Error $e');
@@ -88,15 +88,14 @@ Future<ApiResponse<bool>> loginUser(
       }
       ApiResponse<StatusModel> status = await sessionStatus();
       if (status.hasData) {
-        Preferences.saveId(status.data!,
-            username: username, password: password);
+        Preferences.saveId(status.data!, username: username, password: password);
       }
       askMediaPermission();
       return ApiResponse<bool>(
         data: true,
       );
     }
-  } on DioError catch (e) {
+  } on DioException catch (e) {
     debugPrint(e.message);
   } catch (e) {
     debugPrint('Error $e');
@@ -108,10 +107,7 @@ Future<ApiResponse<bool>> loginUser(
 }
 
 Future<ApiResponse<StatusModel>> sessionStatus() async {
-  Map<String, String> queries = {
-    'format': 'json',
-    'method': 'pwg.session.getStatus'
-  };
+  Map<String, String> queries = {'format': 'json', 'method': 'pwg.session.getStatus'};
 
   try {
     Response response = await ApiClient.get(queryParameters: queries);
@@ -125,7 +121,7 @@ Future<ApiResponse<StatusModel>> sessionStatus() async {
         data: StatusModel.fromJson(data['result']),
       );
     }
-  } on DioError catch (e) {
+  } on DioException catch (e) {
     debugPrint(e.message);
   } catch (e) {
     debugPrint('Session Status Error: $e');
@@ -139,10 +135,7 @@ Future<ApiResponse<StatusModel>> sessionStatus() async {
 }
 
 Future<String?> communityStatus() async {
-  Map<String, String> queries = {
-    'format': 'json',
-    'method': 'community.session.getStatus'
-  };
+  Map<String, String> queries = {'format': 'json', 'method': 'community.session.getStatus'};
 
   try {
     Response response = await ApiClient.get(queryParameters: queries);
@@ -150,7 +143,7 @@ Future<String?> communityStatus() async {
     if (data['stat'] == 'ok') {
       return data['result']['real_user_status'];
     }
-  } on DioError catch (e) {
+  } on DioException catch (e) {
     debugPrint(e.message);
   } catch (e) {
     debugPrint('Error $e');
@@ -169,7 +162,7 @@ Future<ApiResponse<InfoModel>> getInfo() async {
         data: InfoModel.fromJson(data['result']),
       );
     }
-  } on DioError catch (e) {
+  } on DioException catch (e) {
     debugPrint(e.message);
   } catch (e) {
     debugPrint('Error $e');
@@ -180,18 +173,14 @@ Future<ApiResponse<InfoModel>> getInfo() async {
 }
 
 Future<ApiResponse<List<String>>> getMethods() async {
-  Map<String, String> queries = {
-    'format': 'json',
-    'method': 'reflection.getMethodList'
-  };
+  Map<String, String> queries = {'format': 'json', 'method': 'reflection.getMethodList'};
 
   try {
     Response response = await ApiClient.get(queryParameters: queries);
     Map<String, dynamic> data = json.decode(response.data);
-    final List<String> methods =
-        data['result']['methods'].map<String>((e) => e.toString()).toList();
+    final List<String> methods = data['result']['methods'].map<String>((e) => e.toString()).toList();
     return ApiResponse<List<String>>(data: methods);
-  } on DioError catch (e) {
+  } on DioException catch (e) {
     debugPrint(e.message);
   } catch (e) {
     debugPrint('Error $e');

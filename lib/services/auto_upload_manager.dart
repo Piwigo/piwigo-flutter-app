@@ -56,8 +56,7 @@ class AutoUploadManager {
     // Save a copy of the current account credentials
     await AutoUploadPreferences.saveCredentials();
     // Get task frequency
-    int hours = prefs.getInt(AutoUploadPreferences.frequencyKey) ??
-        Settings.defaultAutoUploadFrequency;
+    int hours = prefs.getInt(AutoUploadPreferences.frequencyKey) ?? Settings.defaultAutoUploadFrequency;
     // Enable auto upload
     prefs.setBool(AutoUploadPreferences.enabledKey, true);
     // Register task
@@ -90,10 +89,7 @@ class AutoUploadManager {
     List<FileSystemEntity> dirFiles = appDocDir.listSync(recursive: true);
 
     // Remove folders and links
-    List<File> files = dirFiles
-        .where((file) => file is File)
-        .map<File>((e) => e as File)
-        .toList();
+    List<File> files = dirFiles.where((file) => file is File).map<File>((e) => e as File).toList();
 
     // Convert .heic files to .jpg
     for (File file in files) {
@@ -138,10 +134,8 @@ class AutoUploadManager {
     cookieJar.delete(Uri.parse(url));
 
     // Get server credentials
-    String? username =
-        await storage.read(key: AutoUploadPreferences.usernameKey);
-    String? password =
-        await storage.read(key: AutoUploadPreferences.passwordKey);
+    String? username = await storage.read(key: AutoUploadPreferences.usernameKey);
+    String? password = await storage.read(key: AutoUploadPreferences.passwordKey);
 
     // Get destination album
     String? albumJson = prefs.getString(AutoUploadPreferences.destinationKey);
@@ -189,7 +183,7 @@ class AutoUploadManager {
             // todo: delete file
           }
         }
-      } on DioError catch (e) {
+      } on DioException catch (e) {
         debugPrint("Dio Error ${e.type}");
         nbError++;
       } on Error catch (e) {
@@ -221,13 +215,10 @@ class AutoUploadManager {
       );
     }
 
-    String? username =
-        await secureStorage.read(key: AutoUploadPreferences.usernameKey);
-    String? password =
-        await secureStorage.read(key: AutoUploadPreferences.passwordKey);
+    String? username = await secureStorage.read(key: AutoUploadPreferences.usernameKey);
+    String? password = await secureStorage.read(key: AutoUploadPreferences.passwordKey);
 
-    if ((username == null || username.isEmpty) &&
-        (password == null || password.isEmpty)) {
+    if ((username == null || username.isEmpty) && (password == null || password.isEmpty)) {
       return ApiResponse<bool>(
         data: false,
         error: ApiErrors.wrongServerUrl,
@@ -278,7 +269,7 @@ class AutoUploadManager {
         data: false,
         error: ApiErrors.wrongLoginId,
       );
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       debugPrint(e.message);
     } catch (e) {
       debugPrint('Error $e');
@@ -290,10 +281,7 @@ class AutoUploadManager {
   }
 
   Future<ApiResponse<StatusModel>> _sessionStatus() async {
-    Map<String, String> queries = {
-      'format': 'json',
-      'method': 'pwg.session.getStatus'
-    };
+    Map<String, String> queries = {'format': 'json', 'method': 'pwg.session.getStatus'};
 
     try {
       Response response = await dio.get('ws.php', queryParameters: queries);
@@ -308,7 +296,7 @@ class AutoUploadManager {
           data: StatusModel.fromJson(data['result']),
         );
       }
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       debugPrint(e.message);
     } catch (e) {
       debugPrint('Error $e');
@@ -319,10 +307,7 @@ class AutoUploadManager {
   }
 
   Future<String?> _communityStatus() async {
-    Map<String, String> queries = {
-      'format': 'json',
-      'method': 'community.session.getStatus'
-    };
+    Map<String, String> queries = {'format': 'json', 'method': 'community.session.getStatus'};
 
     try {
       Response response = await dio.get('ws.php', queryParameters: queries);
@@ -330,7 +315,7 @@ class AutoUploadManager {
       if (data['stat'] == 'ok') {
         return data['result']['real_user_status'];
       }
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       debugPrint(e.message);
     } catch (e) {
       debugPrint('Error $e');
@@ -371,7 +356,7 @@ class AutoUploadManager {
         existResult.removeWhere((key, value) => value != null);
       }
       return existResult.keys.map((md5sum) => md5sumList[md5sum]!).toList();
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       debugPrint('Edit images: ${e.message}');
     } on Error catch (e) {
       debugPrint('Edit images: ${e.stackTrace}');
@@ -386,16 +371,13 @@ class AutoUploadManager {
       if (result.data?.contains('community.images.uploadCompleted') ?? false) {
         await communityAutoUploadCompleted(idList, destinationId);
       }
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       debugPrint(e.message);
     }
   }
 
   Future<ApiResponse<List<String>>> _getMethods() async {
-    Map<String, String> queries = {
-      'format': 'json',
-      'method': 'reflection.getMethodList'
-    };
+    Map<String, String> queries = {'format': 'json', 'method': 'reflection.getMethodList'};
 
     try {
       Response response = await dio.get(
@@ -403,10 +385,9 @@ class AutoUploadManager {
         queryParameters: queries,
       );
       Map<String, dynamic> data = json.decode(response.data);
-      final List<String> methods =
-          data['result']['methods'].map<String>((e) => e.toString()).toList();
+      final List<String> methods = data['result']['methods'].map<String>((e) => e.toString()).toList();
       return ApiResponse<List<String>>(data: methods);
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       debugPrint(e.message);
     } catch (e) {
       debugPrint('Error $e');
@@ -425,8 +406,7 @@ class AutoUploadManager {
     };
     FormData formData = FormData.fromMap({
       'image_id': imageId,
-      'pwg_token':
-          await secureStorage.read(key: AutoUploadPreferences.tokenKey),
+      'pwg_token': await secureStorage.read(key: AutoUploadPreferences.tokenKey),
       'category_id': categoryId,
     });
 
@@ -439,7 +419,7 @@ class AutoUploadManager {
       if (response.statusCode == 200) {
         return true;
       }
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       debugPrint("$e");
     }
     return false;
@@ -456,8 +436,7 @@ class AutoUploadManager {
     };
     FormData formData = FormData.fromMap({
       'image_id': imageId,
-      'pwg_token':
-          await secureStorage.read(key: AutoUploadPreferences.tokenKey),
+      'pwg_token': await secureStorage.read(key: AutoUploadPreferences.tokenKey),
       'category_id': categoryId,
     });
     try {
@@ -469,7 +448,7 @@ class AutoUploadManager {
       if (response.statusCode == 200) {
         return true;
       }
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       debugPrint("$e");
     }
     return false;

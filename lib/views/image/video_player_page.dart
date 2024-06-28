@@ -60,7 +60,7 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
 
   Future<void> initializePlayer() async {
     if (widget.videoUrl == null) return;
-    _videoPlayerController = VideoPlayerController.network(widget.videoUrl!);
+    _videoPlayerController = VideoPlayerController.networkUrl(Uri.parse(widget.videoUrl!));
     await _videoPlayerController.initialize();
     _createChewieController();
     setState(() {});
@@ -85,8 +85,7 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
         child: Text(appStrings.errorHUD_label),
       );
     }
-    if (_chewieController == null ||
-        !_chewieController!.videoPlayerController.value.isInitialized) {
+    if (_chewieController == null || !_chewieController!.videoPlayerController.value.isInitialized) {
       return Center(
         child: CircularProgressIndicator(),
       );

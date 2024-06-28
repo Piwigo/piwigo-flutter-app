@@ -3,7 +3,7 @@ description: A Piwigo Android application
 
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
-version: 2.2.3+223
+version: 2.3.0+230
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
@@ -16,7 +16,7 @@ dependencies:
   # Network
   url_launcher: ^6.1.5 # Open links with device's applications
   webview_flutter: ^3.0.4 # Show web page (CGU)
-  dio: ^4.0.6 # Requests to API
+  dio: ^5.4.3+1 # Requests to API
   dio_cookie_manager: ^2.0.0 # Compatibility between dio and cookie_far
   cookie_jar: ^3.0.1 # Handles cookies
   connectivity_plus: ^3.0.2 # Check if Wifi is enabled
@@ -49,7 +49,7 @@ dependencies:
 
   # Device
   device_info_plus: ^8.2.0 # Get device info (version)
-  flutter_local_notifications: ^12.0.2 # Throws notifications on download or upload
+  flutter_local_notifications: ^17.2.0 # Throws notifications on download or upload
   open_filex: ^4.3.2 # Open files with devices apps
   workmanager: ^0.5.0 # Background processes (auto upload)
   image_gallery_saver: ^2.0.3 # Download images

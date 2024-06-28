@@ -177,15 +177,14 @@ class _ImagePageState extends State<ImagePage> {
   /// Handler before closing the page.
   /// * If overlay is hidden, show it.
   /// * Otherwise, close the page.
-  Future<bool> _onWillPop() async {
+  void _onWillPop(bool pop) {
     if (!_showOverlay) {
       setState(() {
         _showOverlay = true;
       });
-      return false;
+    } else {
+      Navigator.of(context).pop(_imageList);
     }
-    Navigator.of(context).pop(_imageList);
-    return false;
   }
 
   /// Toggle overlay action (orientation was necessary, *see comments*).
@@ -282,8 +281,9 @@ class _ImagePageState extends State<ImagePage> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: _onWillPop,
+    return PopScope(
+      canPop: !_showOverlay,
+      onPopInvoked: _onWillPop,
       child: Scaffold(
         backgroundColor: Colors.black,
         resizeToAvoidBottomInset: true,
@@ -506,8 +506,8 @@ class _ImagePageState extends State<ImagePage> {
                   child: IconButton(
                     color: Colors.white,
                     style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.resolveWith((states) => Colors.black.withOpacity(0.5)),
-                      shape: MaterialStateProperty.resolveWith((states) => CircleBorder()),
+                      backgroundColor: WidgetStateProperty.resolveWith((states) => Colors.black.withOpacity(0.5)),
+                      shape: WidgetStateProperty.resolveWith((states) => CircleBorder()),
                     ),
                     onPressed: () {
                       Navigator.of(context).pushNamed(
