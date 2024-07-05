@@ -7,12 +7,12 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:piwigo_ng/models/album_model.dart';
 import 'package:piwigo_ng/models/image_model.dart';
 import 'package:piwigo_ng/network/api_error.dart';
+import 'package:piwigo_ng/network/upload.dart';
 import 'package:piwigo_ng/services/chunked_uploader.dart';
 import 'package:piwigo_ng/services/notification_service.dart';
 import 'package:piwigo_ng/services/preferences_service.dart';
@@ -292,6 +292,7 @@ Future<XFile?> downloadImage(
   ImageModel image,
 ) async {
   String localPath = path.join(dirPath, image.file);
+  if (!await askMediaPermission()) return null;
   try {
     await ApiClient.download(
       path: image.elementUrl,
