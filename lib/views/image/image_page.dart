@@ -178,6 +178,7 @@ class _ImagePageState extends State<ImagePage> {
   /// * If overlay is hidden, show it.
   /// * Otherwise, close the page.
   void _onWillPop(bool pop) {
+    if (pop) return;
     if (!_showOverlay) {
       setState(() {
         _showOverlay = true;
@@ -282,7 +283,7 @@ class _ImagePageState extends State<ImagePage> {
   @override
   Widget build(BuildContext context) {
     return PopScope(
-      canPop: !_showOverlay,
+      canPop: false,
       onPopInvoked: _onWillPop,
       child: Scaffold(
         backgroundColor: Colors.black,
