@@ -295,7 +295,11 @@ Future<XFile?> downloadImage(
   if (!await askMediaPermission()) return null;
   try {
     await ApiClient.download(
-      path: image.elementUrl,
+      path: 'action.php',
+      queryParameters: {
+        'id': image.id,
+        'part': 'e',
+      },
       outputPath: localPath,
     );
     await ImageGallerySaver.saveFile(
