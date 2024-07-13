@@ -63,10 +63,13 @@ class _ImageTagsPageState extends State<ImageTagsPage> {
   bool get _hasNonFavorites => _selectedList.where((image) => !image.favorite).isNotEmpty;
 
   void _onWillPop(bool pop) {
+    if (pop) return null;
     if (_selectedList.isNotEmpty) {
       setState(() {
         _selectedList.clear();
       });
+    } else {
+      Navigator.of(context).pop();
     }
   }
 
@@ -143,7 +146,7 @@ class _ImageTagsPageState extends State<ImageTagsPage> {
   @override
   Widget build(BuildContext context) {
     return PopScope(
-      canPop: _selectedList.isEmpty,
+      canPop: false,
       onPopInvoked: _onWillPop,
       child: Scaffold(
         body: SafeArea(
