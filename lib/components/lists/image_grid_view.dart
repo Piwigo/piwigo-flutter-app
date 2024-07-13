@@ -31,11 +31,11 @@ class _ImageGridViewState extends State<ImageGridView> {
   void _onTapImage(ImageModel image) {
     final bool selected = widget.selectedList.contains(image);
     if (widget.selectedList.isNotEmpty && !selected) {
-      if (widget.onSelectImage != null) widget.onSelectImage!(image);
+      widget.onSelectImage?.call(image);
     } else if (selected) {
-      if (widget.onDeselectImage != null) widget.onDeselectImage!(image);
+      widget.onDeselectImage?.call(image);
     } else {
-      if (widget.onTapImage != null) widget.onTapImage!(image);
+      widget.onTapImage?.call(image);
     }
   }
 
@@ -43,8 +43,9 @@ class _ImageGridViewState extends State<ImageGridView> {
     if (widget.selectedList.isEmpty) {
       HapticFeedback.mediumImpact();
     }
+    if (widget.selectedList.contains(image)) return;
     setState(() {
-      if (widget.onSelectImage != null) widget.onSelectImage!(image);
+      widget.onSelectImage?.call(image);
     });
   }
 
@@ -69,8 +70,7 @@ class _ImageGridViewState extends State<ImageGridView> {
             return ClipRRect(
               borderRadius: index == widget.imageList.length - 1
                   ? BorderRadius.only(
-                      topRight: widget.imageList.length <
-                              Settings.getImageCrossAxisCount(context)
+                topRight: widget.imageList.length < Settings.getImageCrossAxisCount(context)
                           ? Radius.circular(10.0)
                           : Radius.zero,
                       bottomRight: Radius.circular(10.0),
