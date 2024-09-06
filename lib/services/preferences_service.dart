@@ -26,8 +26,7 @@ class Preferences {
   static const String rememberCredentialsKey = 'REMEMBER_CREDENTIALS';
 
   static bool get getRememberCredentials {
-    return appPreferences.getBool(rememberCredentialsKey) ??
-        Settings.defaultRememberCredentials;
+    return appPreferences.getBool(rememberCredentialsKey) ?? Settings.defaultRememberCredentials;
   }
 
   static const String enableSSLKey = 'ENABLE_SSL';
@@ -39,8 +38,7 @@ class Preferences {
   static const String enableBasicAuthKey = 'ENABLE_BASIC_AUTH';
 
   static bool get getEnableBasicAuth {
-    return appPreferences.getBool(enableBasicAuthKey) ??
-        Settings.defaultEnableHTTPBasic;
+    return appPreferences.getBool(enableBasicAuthKey) ?? Settings.defaultEnableHTTPBasic;
   }
 
   static const String basicUsernameKey = 'BASIC_USERNAME';
@@ -62,6 +60,7 @@ class Preferences {
   static const String isAdminKey = 'IS_USER_ADMIN';
   static const String uploadChunkSizeKey = 'UPLOAD_FORM_CHUNK_SIZE';
   static const String fileTypesKey = 'FILE_TYPES';
+
   static List<String> get getAvailableFileTypes {
     return appPreferences.getString(fileTypesKey)?.split(',') ?? [];
   }
@@ -71,36 +70,31 @@ class Preferences {
   static const String imageRowCountKey = 'IMAGE_ROW_COUNT';
 
   static int get getImageRowCount {
-    return appPreferences.getInt(imageRowCountKey) ??
-        Settings.defaultImageRowCount;
+    return appPreferences.getInt(imageRowCountKey) ?? Settings.defaultImageRowCount;
   }
 
   static const String showThumbnailTitleKey = 'SHOW_THUMBNAIL_TITLE';
 
   static bool get getShowThumbnailTitle {
-    return appPreferences.getBool(showThumbnailTitleKey) ??
-        Settings.defaultShowThumbnailTitle;
+    return appPreferences.getBool(showThumbnailTitleKey) ?? Settings.defaultShowThumbnailTitle;
   }
 
   static const String removeMetadataKey = 'REMOVE_METADATA';
 
   static bool get getRemoveMetadata {
-    return appPreferences.getBool(removeMetadataKey) ??
-        Settings.defaultRemoveMetadata;
+    return appPreferences.getBool(removeMetadataKey) ?? Settings.defaultRemoveMetadata;
   }
 
   static const String imageFullScreenSizeKey = 'IMAGE_FULL_SCREEN_SIZE';
 
   static String get getImageFullScreenSize {
-    return appPreferences.getString(imageFullScreenSizeKey) ??
-        Settings.defaultImageFullScreenSize;
+    return appPreferences.getString(imageFullScreenSizeKey) ?? Settings.defaultImageFullScreenSize;
   }
 
   static const String imageThumbnailSizeKey = 'IMAGE_THUMBNAIL_SIZE';
 
   static String get getImageThumbnailSize {
-    return appPreferences.getString(imageThumbnailSizeKey) ??
-        Settings.defaultImageThumbnailSize;
+    return appPreferences.getString(imageThumbnailSizeKey) ?? Settings.defaultImageThumbnailSize;
   }
 
   static const String imageSortKey = 'IMAGE_SORT';
@@ -116,8 +110,7 @@ class Preferences {
   static const String albumThumbnailSizeKey = 'ALBUM_THUMBNAIL_SIZE';
 
   static String get getAlbumThumbnailSize {
-    return appPreferences.getString(albumThumbnailSizeKey) ??
-        Settings.defaultAlbumThumbnailSize;
+    return appPreferences.getString(albumThumbnailSizeKey) ?? Settings.defaultAlbumThumbnailSize;
   }
 
   static const String uploadAuthorKey = 'UPLOAD_AUTHOR_NAME';
@@ -131,15 +124,13 @@ class Preferences {
   static const String compressUploadKey = 'COMPRESS_BEFORE_UPLOAD';
 
   static bool get getCompressUpload {
-    return appPreferences.getBool(compressUploadKey) ??
-        Settings.defaultCompress;
+    return appPreferences.getBool(compressUploadKey) ?? Settings.defaultCompress;
   }
 
   static const String deleteAfterUploadKey = 'DELETE_AFTER_UPLOAD';
 
   static bool get getDeleteAfterUpload {
-    return appPreferences.getBool(deleteAfterUploadKey) ??
-        Settings.defaultDeleteAfterUpload;
+    return appPreferences.getBool(deleteAfterUploadKey) ?? Settings.defaultDeleteAfterUpload;
   }
 
   static const String wifiUploadKey = 'UPLOAD_WIFI_ONLY';
@@ -151,8 +142,7 @@ class Preferences {
   static const String uploadQualityKey = 'UPLOAD_QUALITY';
 
   static double get getUploadQuality {
-    return appPreferences.getDouble(uploadQualityKey) ??
-        Settings.defaultUploadQuality;
+    return appPreferences.getDouble(uploadQualityKey) ?? Settings.defaultUploadQuality;
   }
 
   static const String downloadDestinationKey = 'DOWNLOAD_DESTINATION';
@@ -202,10 +192,14 @@ class Preferences {
       prefs.setString(communityStatusKey, status.status);
       status.status = status.realStatus!;
     }
+    if (status.uploadFileTypes != null) {
+      prefs.setString(fileTypesKey, status.uploadFileTypes!);
+    } else {
+      prefs.remove(fileTypesKey);
+    }
     if (['admin', 'webmaster'].contains(status.status)) {
       prefs.setBool(isAdminKey, true);
       prefs.setInt(uploadChunkSizeKey, status.uploadFormChunkSize ?? 0);
-      prefs.setString(fileTypesKey, status.uploadFileTypes ?? '');
     } else {
       prefs.setBool(isAdminKey, false);
     }
@@ -285,15 +279,13 @@ class AutoUploadPreferences {
   }
 
   static Future<bool> setDestination(AlbumModel album) async {
-    return appPreferences.setString(
-        destinationKey, json.encode(album.toJson()));
+    return appPreferences.setString(destinationKey, json.encode(album.toJson()));
   }
 
   static const String frequencyKey = 'AUTO_UPLOAD_FREQUENCY';
 
   static Duration get getFrequency {
-    int hours = appPreferences.getInt(frequencyKey) ??
-        Settings.defaultAutoUploadFrequency;
+    int hours = appPreferences.getInt(frequencyKey) ?? Settings.defaultAutoUploadFrequency;
     return Duration(hours: hours);
   }
 
