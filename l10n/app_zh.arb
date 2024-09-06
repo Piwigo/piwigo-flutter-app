@@ -339,6 +339,26 @@
     "imageDetailsFetchError_title": "照片信息获取失败",
     "imageDetailsFetchError_retryMessage": "无法获取照片信息，是否重试？",
     "imageDetailsFetchError_continueMessage": "无法获取照片信息，是否继续？",
+    "imageDetails_dateCreated": "Created on {date} at {time}",
+    "@imageDetails_dateCreated": {
+        "placeholders": {
+            "date": {},
+            "time": {}
+        }
+    },
+    "imageDetails_dateAvailable": "Available on {date} at {time}",
+    "@imageDetails_dateAvailable": {
+        "placeholders": {
+            "date": {},
+            "time": {}
+        }
+    },
+    "imageDetails_nbAlbums": "{count, plural, =0{Orphan} =1{Belongs to 1 album} other{Belongs to {count} albums}}",
+    "@imageDetails_nbAlbums": {
+        "placeholders": {
+            "count": {}
+        }
+    },
     "privacyLevel": "隐私级别",
     "privacyLevel_admin": "管理员",
     "privacyLevel_adminFamily": "管理员，家庭",
