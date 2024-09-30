@@ -848,7 +848,7 @@
     "settings_acknowledgements": "鸣谢",
     "settings_privacy": "隐私政策",
     "settings_unknownVersion": "未知版本",
-    "settings_privacyLocale": "&lang=en_EN",
+    "settings_privacyLocale": "&lang=zh_CN",
     "@settings_privacyLocale": {
         "description": "The language and country code for the url to Piwigo Mobile apps privacy policy: https://piwigo.org/mobile-apps-privacy-policy&webview&lang=en_EN"
     }
