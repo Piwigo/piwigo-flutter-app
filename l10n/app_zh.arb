@@ -817,7 +817,7 @@
     "settings_switchPalette": "自动",
     "settings_brightness": "亮度",
     "settings_brightnessHelp": "在环境亮度低的情况下，自动选项会使用暗色外观来使照片在黑暗背景下易于观看",
-    "userCount": "{count, plural, =0{0 个用户} =1{1 个用户} other{{count} 个用户}}",
+    "userCount": "{count, plural, =0{0 位用户} =1{1 位用户} other{{count} 位用户}}",
     "@userCount": {
         "placeholders": {
             "count": {}
@@ -829,7 +829,7 @@
             "count": {}
         }
     },
-    "commentCount": "{count, plural, =0{0 个评论} =1{1 个评论} other{{count} 个评论}}",
+    "commentCount": "{count, plural, =0{0 条评论} =1{1 条评论} other{{count} 条评论}}",
     "@commentCount": {
         "placeholders": {
             "count": {}
