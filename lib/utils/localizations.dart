@@ -65,6 +65,8 @@ String getLanguageFromCode(String code) {
       return 'Slovenčina';
     case 'zh':
       return '中文';
+     case 'ja':
+      return '日本語';
     default:
       return code;
   }
