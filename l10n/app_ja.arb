@@ -1,0 +1,855 @@
+{
+  "tabBar_albums": "アルバム",
+  "tabBar_upload": "アップロード",
+  "tabBar_preferences": "設定",
+  "alertOkButton": "OK",
+  "alertDismissButton": "閉じる",
+  "alertYesButton": "はい",
+  "alertNoButton": "いいえ",
+  "alertTryAgainButton": "再試行",
+  "alertCancelButton": "キャンセル",
+  "alertAddButton": "追加",
+  "alertRetryButton": "再試行",
+  "alertNextButton": "次の写真",
+  "alertTryButton": "試す",
+  "alertClearButton": "クリア",
+  "alertConfirmButton": "確認",
+  "alertRemoveButton": "削除",
+  "alertMoveButton": "移動",
+  "alertCopyButton": "コピー",
+  "loadingHUD_label": "読み込み中…",
+  "completeHUD_label": "完了",
+  "errorHUD_label": "エラー",
+  "loadMoreHUD_label": "さらに読み込むにはリリース",
+  "uploadRights_title": "アップロード権限が必要",
+  "uploadRights_message": "写真やビデオをアップロードするには、アップロード権限が必要です。",
+  "internetErrorGeneral_title": "接続エラー",
+  "internetErrorGeneral_broken": "申し訳ありませんが、通信が途切れました。再度ログインしてください。",
+  "internetCancellingConnection_button": "接続をキャンセル中…",
+  "internetCancelledConnection_button": "接続をキャンセル",
+  "internetCancelledConnection_title": "接続がキャンセルされました",
+  "piwigoServer_wrongJSONobject": "Piwigoサーバーから返されたJSONオブジェクトを解析できませんでした。",
+  "piwigoServer_invalidJSONobject": "Piwigoサーバーは有効なJSONオブジェクトを返しませんでした。",
+  "piwigoServer_emptyJSONobject": "Piwigoサーバーは空のJSONオブジェクトを返しました。",
+  "coreDataStore_WarningTitle": "警告",
+  "coreDataStore_WarningMessage": "Piwigoがデータキャッシュを読み取ろうとした際に重大なアプリケーションエラーが発生しました。そのため、新しいキャッシュが作成されました。",
+  "coreDataFetch_DigestError": "取得したデータを解析できませんでした。",
+  "coreDataFetch_TagError": "タグ取得エラー！",
+  "coreDataFetch_TagMissingData": "有効なコードまたは名前がないタグを見つけ、破棄します。",
+  "coreDataFetch_TagCreateFailed": "新しいタグオブジェクトの作成に失敗しました。",
+  "coreDataFetch_UploadCreateFailed": "新しいアップロードオブジェクトの作成に失敗しました。",
+  "coreDataFetch_UploadMissingAsset": "写真の取得に失敗しました。",
+  "login": "ログイン",
+  "login_serverPlaceholder": "example.com",
+  "login_userPlaceholder": "ユーザー名（任意）",
+  "login_passwordPlaceholder": "パスワード（任意）",
+  "login_loggingIn": "ログイン中...",
+  "login_connecting": "接続中",
+  "login_newSession": "セッションを開いています",
+  "login_communityParameters": "コミュニティパラメータ",
+  "login_serverParameters": "Piwigoパラメータ",
+  "login_advancedParameters": "認証設定",
+  "login_connectionChanged": "接続が変更されました！",
+  "login_rememberCredentials": "資格情報を記憶する",
+  "loginHTTP_title": "HTTP資格情報",
+  "loginHTTP_message": "Piwigoサーバーによって基本アクセス認証が必要です：",
+  "loginHTTP_enable": "HTTP基本認証を有効にする",
+  "loginHTTPuser_placeholder": "ユーザー名",
+  "loginHTTPpwd_placeholder": "パスワード",
+  "loginCert_title": "自己署名証明書",
+  "loginCert_enable": "SSLを許可",
+  "loginCertFailed_title": "接続がプライベートではありません",
+  "loginCertFailed_message": "Piwigoは、証明書が有効でないウェブサイトを警告します。それでもこの証明書を受け入れますか？",
+  "loginHTTPSfailed_title": "安全な接続に失敗しました",
+  "loginHTTPSfailed_message": "Piwigoは安全な接続を確立できません。安全でない接続を試みますか？",
+  "serverURLerror_title": "URLが正しくありません",
+  "serverURLerror_message": "Piwigoウェブサーバーのアドレスを修正してください。",
+  "serverMethodsError_title": "不明なメソッド",
+  "serverMethodsError_message": "サーバーメソッドの取得に失敗しました。Piwigoサーバーに問題がありますか？",
+  "serverInvalidMethodError_message": "サーバーメソッドの呼び出しに失敗しました。",
+  "serverMissingParamError_message": "パラメータが不足しているサーバーメソッドの実行に失敗しました。",
+  "serverInvalidParamError_message": "提供されたパラメータでサーバーメソッドの呼び出しに失敗しました。",
+  "serverUnknownError_message": "提供されたパラメータでサーバーメソッドを呼び出す際に予期しないエラーが発生しました。",
+  "loginError_title": "ログイン失敗",
+  "loginError_message": "指定されたウェブアドレスでユーザー名とパスワードが一致しません",
+  "loginEmptyServer_title": "ウェブアドレスを入力",
+  "loginEmptyServer_message": "プロトコルを選択し、Piwigoウェブアドレスを入力して続行してください。",
+  "serverConnectionError_title": "接続失敗",
+  "serverConnectionError_message": "安全なHTTPS接続を確立できませんでした。アドレスを確認するか、暗号化されていないHTTPモードで試してください。",
+  "serverVersionNotCompatible_title": "サーバー非互換",
+  "serverVersionNotCompatible_message": "あなたのPiwigoサーバーバージョンは{version}です。Piwigo NGは少なくともバージョン2.8をサポートしています。Piwigo NGを使用するにはサーバーを更新してください。それでも続行しますか？",
+  "@serverVersionNotCompatible_message": {
+    "placeholders": {
+      "version": {}
+    }
+  },
+  "sessionStatusError_title": "認証失敗",
+  "sessionStatusError_message": "サーバーとの認証に失敗しました。再度ログインしてください。",
+  "serverCommunityError_title": "コミュニティエラー",
+  "serverCommunityError_message": "コミュニティ拡張パラメータの取得に失敗しました。再度ログインしてください。",
+  "logoutConfirmation_title": "ログアウト",
+  "logoutConfirmation_message": "本当にログアウトしますか？",
+  "logoutFail_title": "ログアウト失敗",
+  "albumCount" : "{count, plural, =0{0アルバム} =1{1アルバム} other{{count}アルバム}}",
+  "@albumCount" : {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "subAlbumCount" : "{count, plural,=0{0サブアルバム} =1{1サブアルバム} other{{count}サブアルバム}}",
+  "@subAlbumCount" : {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "showMore": "さらに表示… ({count})",
+  "@showMore" : {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "showPhotos": "写真を表示",
+  "categoryMainEmpty": "まだPiwigoにアルバムがありません。リフレッシュするか、再ログインしてください。",
+  "categoryImageList_selectButton": "選択",
+  "categoryImageList_deselectButton": "選択解除",
+  "categoryImageList_noDataError": "データなしエラー",
+  "categoryDiscover_title": "発見",
+  "categoryDiscoverVisits_title": "最も訪問された",
+  "categoryDiscoverVisits_legend": "ヒット",
+  "categoryDiscoverBest_title": "最高評価",
+  "categoryDiscoverRecent_title": "最近の写真",
+  "categoryDiscoverFavorites_title": "お気に入り",
+  "categorySort_nameAscending": "写真タイトル、A → Z",
+  "categorySort_nameDescending": "写真タイトル、Z → A",
+  "categorySort_fileNameAscending": "ファイル名、A → Z",
+  "categorySort_fileNameDescending": "ファイル名、Z → A",
+  "categorySort_dateCreatedDescending": "作成日、新しい → 古い",
+  "categorySort_dateCreatedAscending": "作成日、古い → 新しい",
+  "categorySort_datePostedDescending": "投稿日、新しい → 古い",
+  "categorySort_datePostedAscending": "投稿日、古い → 新しい",
+  "categorySort_ratingScoreDescending": "評価スコア、高い → 低い",
+  "categorySort_ratingScoreAscending": "評価スコア、低い → 高い",
+  "categorySort_visitsDescending": "訪問数、高い → 低い",
+  "categorySort_visitsAscending": "訪問数、低い → 高い",
+  "categorySort_manual": "手動順",
+  "categorySort_random": "ランダム順",
+  "categorySort_videosOnly": "ビデオのみ",
+  "categorySort_imagesOnly": "写真のみ",
+  "categorySelection_title": "アルバム",
+  "categorySelection_titleSub": "サブアルバム",
+  "categorySelection_root": "ルートアルバム",
+  "categorySelection_root375pt": "ルート",
+  "categorySelection_action": "このアルバムのアクションを選択",
+  "categorySelectionHUD_label": "アルバムデータを取得中…",
+  "categorySelection_allAlbums": "すべてのアルバム",
+  "categoryUpload_noSubAlbum": "写真をアップロードするサブアルバムがありません",
+  "categoryUpload_chooseAlbum": "写真をアップロードするサブアルバムを選択",
+  "categoryUpload_LocalAlbums": "ローカルアルバム",
+  "categoryUpload_chooseLocalAlbum": "写真を取得するアルバムを選択",
+  "categoryUpload_sharedAlbums": "共有アルバム",
+  "categoryUpload_mediaTypes": "メディアタイプ",
+  "categoryUpload_otherAlbums": "その他のアルバム",
+  "categoryUpload_pasteboard": "クリップボード",
+  "categoryUpload_loadSubCategories": "読み込み",
+  "categoryUpload_images": "写真をアップロード",
+  "categoryUpload_videos": "ビデオをアップロード",
+  "categoryUpload_camera": "カメラ",
+  "categoryUpload_takePhoto": "写真を撮る",
+  "categoryUpload_takeVideo": "ビデオを撮る",
+  "uploadList_title": "アップロードステータス",
+  "uploadList_uploading": "アップロード中",
+  "uploadList_history": "履歴",
+  "uploadList_empty": "空",
+  "setDefaultCategory_select": "新しいルートアルバムになるアルバムまたはサブアルバムを選択してください。",
+  "setDefaultCategory_title": "デフォルトアルバム",
+  "setDefaultCategory_message": "アルバム {album} をデフォルトアルバムに設定してもよろしいですか？",
+  "@setDefaultCategory_message" : {
+    "placeholders": {
+      "album": {}
+    }
+  },
+  "createNewAlbum_title": "新しいアルバム",
+  "createNewAlbum_message": "このアルバムの名前を入力してください:",
+  "createNewAlbum_placeholder": "アルバム名",
+  "createNewAlbumDescription_placeholder": "説明",
+  "createNewAlbumDescription_noDescription": "説明なし",
+  "createNewAlbumHUD_label": "アルバムを作成中…",
+  "createNewAlbumHUD_created": "アルバムが作成されました",
+  "createAlbumError_title": "アルバム作成エラー",
+  "createAlbumError_message": "新しいアルバムの作成に失敗しました",
+  "categoryCellOption_rename": "名前を変更",
+  "categoryCellOption_move": "移動",
+  "categoryCellOption_delete": "削除",
+  "renameCategory_title": "アルバムの名前を変更",
+  "renameCategory_message": "このアルバムの新しい名前を入力してください",
+  "renameCategory_button": "名前を変更",
+  "renameCategoryHUD_label": "アルバムの名前を変更中…",
+  "renameCategoryHUD_renamed": "アルバムの名前が変更されました",
+  "renameCategoryError_title": "名前変更失敗",
+  "renameCategoryError_message": "アルバムの名前の変更に失敗しました",
+  "refreshCategoryHUD_label": "代表を更新中…",
+  "refreshCategoryError_title": "更新失敗",
+  "refreshCategoryError_message": "アルバムの代表の更新に失敗しました",
+  "deleteCategory_title": "アルバムを削除",
+  "deleteCategory_message": "{count, plural, =0{アルバム {album} を削除してもよろしいですか？} =1{アルバム {album} とその写真を削除してもよろしいですか？} other{アルバム {album} とすべての {count} 枚の写真を削除してもよろしいですか？}}",
+  "@deleteCategory_message" : {
+    "placeholders": {
+      "count": {},
+      "album": {}
+    }
+  },
+  "deleteCategory_empty": "空のアルバムを削除",
+  "deleteCategory_noImages": "写真を保持",
+  "deleteCategory_noImages_subtitle": "孤立した写真を作成する可能性があります",
+  "deleteCategory_orphanedImages": "孤立した写真を削除",
+  "deleteCategory_orphanedImages_subtitle": "デフォルトモードでは、他のアルバムにリンクされていない写真のみを削除します",
+  "deleteCategory_allImages": "{count, plural, =0{写真を削除} =1{写真を削除} other{ {count} 枚の写真を削除}}",
+  "@deleteCategory_allImages" : {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "deleteCategory_allImages_subtitle": "他のアルバムにリンクされている写真も含めてすべての写真を削除します",
+  "deleteCategoryConfirm_title": "本当に削除しますか？",
+  "deleteCategoryConfirm_message": "このアルバムを削除するために、写真の数を入力してください。写真の数: {count}",
+  "@deleteCategoryConfirm_message" : {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "deleteCategoryConfirm_deleteButton": "削除",
+  "deleteCategoryHUD_label": "アルバムを削除中…",
+  "deleteCategoryHUD_deleted": "アルバムが削除されました",
+  "deleteCategoryMatchError_title": "数が一致しません",
+  "deleteCategoryMatchError_message": "入力した写真の数がカテゴリ内の写真の数と一致しません。アルバムを削除したい場合は、もう一度試してください",
+  "deleteCategoryError_title": "削除失敗",
+  "deleteCategoryError_message": "アルバムの削除に失敗しました",
+  "moveCategory": "アルバムを移動",
+  "moveCategory_select": "アルバム {album} を移動するアルバムまたはサブアルバムを選択してください。",
+  "@moveCategory_select" : {
+    "placeholders": {
+      "album": {}
+    }
+  },
+  "moveCategory_message": "アルバム {album} をアルバム {parent} に移動してもよろしいですか？",
+  "@moveCategory_message" : {
+    "placeholders": {
+      "album": {},
+      "parent": {}
+    }
+  },
+  "moveCategoryHUD_moving": "アルバムを移動中…",
+  "moveCategoryHUD_moved": "アルバムが移動されました",
+  "moveCategoryError_title": "移動失敗",
+  "moveCategoryError_message": "アルバムの移動に失敗しました",
+  "categoryPrivacy": "権限を管理",
+  "categoryPrivacy_subtitle": "\"{album_name}\" のアクセス権限を管理します。",
+  "@categoryPrivacy_subtitle" : {
+    "placeholders": {
+      "album_name": {}
+    }
+  },
+  "categoryPrivacyMode_public": "公開",
+  "categoryPrivacyMode_publicMessage": "すべてのユーザーがこのアルバムを見ることができます。",
+  "categoryPrivacyMode_private": "非公開",
+  "categoryPrivacyMode_privateMessage": "訪問者はログインし、必要な権限を持っている必要があります。",
+  "categoryPrivacyGroups": "グループ権限",
+  "categoryPrivacyGroups_add": "グループを承認",
+  "categoryPrivacyUsers": "ユーザー権限",
+  "categoryPrivacyUsers_message": "ユーザー権限を管理するには、ウェブ管理にアクセスしてください。",
+  "categoryPrivacyRecursive": "サブアルバムに適用",
+  "categoryPrivacyRecursive_message": "確認後、すべての変更がサブアルバムに適用されます。",
+  "categorySelection_setThumbnail": "写真 {photo} をサムネイルとして使用するアルバムを選択してください。",
+  "@categorySelection_setThumbnail" : {
+    "placeholders": {
+      "photo": {}
+    }
+  },
+  "categorySelection_current": "この写真の現在のアルバムを選択",
+  "categorySelection_one": "この写真を含むアルバムの1つを選択",
+  "categorySelection_other": "または、この写真の別のアルバムを選択",
+  "categoryImageSet_title": "アルバムサムネイル",
+  "categoryImageSet_message": "この写真をアルバム {album} に適用してもよろしいですか？",
+  "@categoryImageSet_message" : {
+    "placeholders": {
+      "album": {}
+    }
+  },
+  "categoryImageSetHUD_updating": "アルバムサムネイルを更新中…",
+  "categoryImageSetError_title": "写真設定エラー",
+  "categoryImageSetError_message": "アルバム写真の設定に失敗しました",
+  "singleImage": "写真",
+  "imageCount": "{count, plural, =0{0 枚の写真} =1{1 枚の写真} other{{count} 枚の写真}}",
+  "@imageCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "singleVideo": "ビデオ",
+  "singleAudio": "オーディオ",
+  "severalImages": "写真",
+  "all_Photos": "すべての写真",
+  "severalVideos": "ビデオ",
+  "noImages": "写真なし",
+  "pullToRefresh": "写真を再読み込み",
+  "andMore": " & もっと",
+  "months": "月",
+  "weeks": "週",
+  "days": "日",
+  "date": "日付",
+  "albumPhotoError_title": "アルバム写真取得エラー",
+  "albumPhotoError_message": "アルバム写真の取得に失敗しました（アルバム内の写真が破損している可能性があります）",
+  "sortBy": "並び替え",
+  "imageSortTitle": "写真の並び替え",
+  "imageSortMessage": "写真の並び替え方法を選択してください",
+  "imageSortingHUD": "写真を並び替え中…",
+  "imageSelectingHUD": "写真を選択中…",
+  "imageDeselectingHUD": "写真の選択を解除中…",
+  "imageOptions_title": "写真オプション",
+  "imageOptions_edit": "編集",
+  "imageOptions_download": "ダウンロード",
+  "imageOptions_share": "共有",
+  "imageOptions_addFavorites": "お気に入りに追加",
+  "imageOptions_removeFavorites": "お気に入りから削除",
+  "imageOptions_setAlbumImage": "アルバムサムネイルに設定",
+  "imageDetailsView_title": "プロパティ",
+  "editImageDetails_title": "タイトル",
+  "editImageDetails_titlePlaceholder": "画像タイトル",
+  "editImageDetails_author": "作者",
+  "editImageDetails_tags": "タグ",
+  "editImageDetails_privacyLevel": "この写真を見ることができるのは誰ですか？",
+  "editImageDetails_description": "説明",
+  "editImageDetails_descriptionPlaceholder": "画像の説明",
+  "editImageDetails_comments": "コメント",
+  "editImageDetails_dateCreation": "作成日",
+  "editImageDetails_dateUnset": "未設定",
+  "editImageDetails_dateToday": "今日",
+  "editImageDetails_dateMonthInc": "+1ヶ月",
+  "editImageDetails_dateMonthDec": "-1ヶ月",
+  "editImageDetails_dateYearInc": "+1年",
+  "editImageDetails_dateYearDec": "-1年",
+  "editImageDetailsHUD_updating": "{count, plural, =1{写真を更新中…} other{写真を更新中…}}",
+  "@editImageDetailsHUD_updating" : {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "editImageDetailsError_title": "更新失敗",
+  "editImageDetailsError_message": "サーバーへの変更の更新に失敗しました。再試行しますか？",
+  "imageDetailsFetchError_title": "写真の詳細取得失敗",
+  "imageDetailsFetchError_retryMessage": "写真データの取得に失敗しました。再試行しますか？",
+  "imageDetailsFetchError_continueMessage": "写真データの取得に失敗しました。続行しますか？",
+  "imageDetails_dateCreated": "{date} に {time} に作成されました",
+  "@imageDetails_dateCreated": {
+    "placeholders": {
+      "date": {},
+      "time": {}
+    }
+  },
+  "imageDetails_dateAvailable": "{date} に {time} 利用可能",
+  "@imageDetails_dateAvailable": {
+    "placeholders": {
+      "date": {},
+      "time": {}
+    }
+  },
+  "imageDetails_nbAlbums": "{count, plural, =0{孤立} =1{1つのアルバムに所属} other{{count} のアルバムに所属}}",
+  "@imageDetails_nbAlbums" : {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "privacyLevel": "プライバシーレベル",
+  "privacyLevel_admin": "管理者",
+  "privacyLevel_adminFamily": "管理者、家族",
+  "privacyLevel_adminsFamilyFriends": "管理者、家族、友人",
+  "privacyLevel_adminsFamilyFriendsContacts": "管理者、家族、友人、連絡先",
+  "privacyLevel_everybody": "全員",
+  "privacyLevel_unchanged": "変更なし",
+  "none": "なし",
+  "tag" : "タグ",
+  "tags": "タグ",
+  "tagCount": "{count, plural, =0{0個のタグ} =1{1個のタグ} other{{count}個のタグ}}",
+  "@tagCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "tagsTitle_selectOne": "タグを選択",
+  "tagsHeader_selected": "選択済み",
+  "tagsHeader_notSelected": "未選択",
+  "tagsHeader_all": "すべて",
+  "tagsAdd_title": "タグを追加",
+  "tagsAdd_message": "新しいタグの名前を入力してください",
+  "tagsAdd_placeholder": "新しいタグ",
+  "tagsAddHUD_label": "タグを作成中…",
+  "tagsAddHUD_created": "タグが作成されました",
+  "group" : "グループ",
+  "groups": "グループ",
+  "groupsTitle_selectOne": "グループを選択",
+  "groupsHeader_selected": "選択済み",
+  "groupsHeader_notSelected": "未選択",
+  "groupsHeader_all": "すべて",
+  "groupsAdd_title": "グループを追加",
+  "groupsAdd_message": "新しいグループの名前を入力してください",
+  "groupsAdd_placeholder": "新しいグループ",
+  "groupsAddHUD_label": "グループを作成中…",
+  "groupsAddHUD_created": "グループが作成されました",
+  "tagsAddError_message": "新しいタグの作成に失敗しました",
+  "tagsAddError_title": "作成失敗",
+  "selectImages": "写真を選択",
+  "selectImageSelectedCount": "{count, plural, =0{0枚の写真が選択されました} =1{1枚の写真が選択されました} other{{count}枚の写真が選択されました}}",
+  "@selectImageSelectedCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "selectAll": "すべて選択",
+  "selectLimit": "選択制限に達しました",
+  "renameImage_title": "元のファイル",
+  "renameImage_message": "この写真の新しいファイル名を入力してください \"{file}\"",
+  "@renameImage_message": {
+    "placeholders": {
+      "file": {}
+    }
+  },
+  "renameImageHUD_label": "ファイル名を変更中…",
+  "renameImageHUD_renamed": "{count, plural, =0{0ファイルの名前が変更されました} =1{ファイルの名前が変更されました} other{{count}ファイルの名前が変更されました}}",
+  "@renameImageHUD_renamed": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "renameImageError_message": "写真ファイルの名前変更に失敗しました",
+  "deleteImage_delete": "削除",
+  "deleteImageProgress_title": "削除中 {progress}% 完了",
+  "@deleteImageProgress_title": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "deleteImageCount_title": "{count, plural, =0{写真を削除} =1{写真を削除} other{写真を{count}削除}}",
+  "@deleteImageCount_title": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "deleteImageHUD_deleting": "{count, plural, =0{写真を削除中…} =1{写真を削除中…} other{写真を削除中…}}",
+  "@deleteImageHUD_deleting": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "removeSingleImage_title": "アルバムから削除",
+  "removeSingleImage_subtitle": "一部の写真は他のアルバムに割り当てられています",
+  "removeImageHUD_removing": "{count, plural, =0{写真を削除中…} =1{写真を削除中…} other{写真を削除中…}}",
+  "@removeImageHUD_removing": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "deleteImage_message": "{count, plural, =1{この写真を削除してもよろしいですか？この操作は元に戻せません！} other{選択した{count}枚の写真を削除してもよろしいですか？この操作は元に戻せません！}}",
+  "@deleteImage_message": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "deleteImageFail_title": "削除失敗",
+  "deleteImageFail_message": "写真を削除できませんでした。",
+  "deleteImageSuccess_message": "{count, plural, =0{0枚の写真が正常に削除されました} =1{1枚の写真が正常に削除されました} other{{count}枚の写真が正常に削除されました}}",
+  "@deleteImageSuccess_message": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "removeSelectedImage_title": "選択した画像を削除",
+  "removeSelectedImage_message": "この画像を選択から削除してもよろしいですか？",
+  "downloadImage_title": "{count, plural, =0{写真をダウンロード} =1{写真をダウンロード} other{写真を{count}ダウンロード}}",
+  "@downloadImage_title": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "downloadImage_confirmation": "{count, plural, =1{選択した写真をダウンロードしてもよろしいですか？} other{選択した{count}枚の写真をダウンロードしてもよろしいですか？}}",
+  "@downloadImage_confirmation": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "downloadingImages": "{count, plural, =1{写真をダウンロード中} other{写真をダウンロード中}}",
+  "@downloadingImages": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "downloadingVideos": "{count, plural, =1{ビデオをダウンロード中} other{ビデオをダウンロード中}}",
+  "@downloadingVideos": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "downloadImageSuccess_title": "ファイルがダウンロードされました",
+  "downloadImageSuccess_message": "すべてのファイルが正常にダウンロードされました",
+  "downloadImageFail_title": "ダウンロード失敗",
+  "downloadImageFail_message": "写真のダウンロードに失敗しました！",
+  "downloadVideoFail_message": "ビデオのダウンロードに失敗しました！",
+  "downloadVideoFail_Photos": "ビデオ形式がPhotosで受け入れられません！",
+  "imageSaveError_title": "写真の保存に失敗",
+  "imageSaveError_message": "写真の保存に失敗しました",
+  "videoSaveError_title": "ビデオの保存に失敗",
+  "videoSaveError_message": "ビデオの保存に失敗しました",
+  "videoLoadError_message": "ビデオの読み込みに失敗しました",
+  "moveOrCopyImage_title": "{count, plural, =1{この画像を移動またはコピーしますか？} other{この{count}枚の画像を移動またはコピーしますか？}}",
+  "@moveOrCopyImage_title": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "moveImage_title": "アルバムに移動",
+  "moveImage_selectAlbum": "{count, plural, =1{写真{photo}を移動するアルバムを選択してください。} other{写真を移動するアルバムを選択してください。}}",
+  "@moveImage_selectAlbum": {
+    "placeholders": {
+      "count": {},
+      "photo": {}
+    }
+  },
+  "moveImage_message": "{count, plural, =1{写真{photo}をアルバム{album}に移動してもよろしいですか？} other{写真をアルバム{album}に移動してもよろしいですか？}}",
+  "@moveImage_message": {
+    "placeholders": {
+      "count": {},
+      "photo": {},
+      "album": {}
+    }
+  },
+  "moveImageHUD_moving": "{count, plural, =1{写真を移動中…} other{写真を移動中…}}",
+  "@moveImageHUD_moving": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "moveImageHUD_moved": "{count, plural, =1{写真を移動しました} other{写真を移動しました}}",
+  "@moveImageHUD_moved": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "moveImageError_title": "移動に失敗",
+  "moveImageError_message": "{count, plural, =1{写真の移動に失敗しました} other{一部の写真の移動に失敗しました}}",
+  "@moveImageError_message": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "copyImage_title": "アルバムにコピー",
+  "copyImage_selectAlbum": "{count, plural, =1{写真{photo}をコピーするアルバムを選択してください。} other{写真をコピーするアルバムを選択してください。}}",
+  "@copyImage_selectAlbum": {
+    "placeholders": {
+      "count": {},
+      "photo": {}
+    }
+  },
+  "copyImage_message": "{count, plural, =1{写真{photo}をアルバム{album}にコピーしてもよろしいですか？} other{写真をアルバム{album}にコピーしてもよろしいですか？}}",
+  "@copyImage_message": {
+    "placeholders": {
+      "count": {},
+      "photo": {},
+      "album": {}
+    }
+  },
+  "copyImageHUD_copying": "{count, plural, =1{写真をコピー中…} other{写真をコピー中…}}",
+  "@copyImageHUD_copying": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "copyImageHUD_copied": "{count, plural, =1{写真をコピーしました} other{写真をコピーしました}}",
+  "@copyImageHUD_copied": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "copyImageError_title": "コピーに失敗",
+  "copyImageError_message": "{count, plural, =1{写真のコピーに失敗しました} other{一部の写真のコピーに失敗しました}}",
+  "@copyImageError_message": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "imageUploadHeader": "デバイスの写真やビデオをアップロードするアルバムまたはサブアルバムを選択してください。",
+  "imageUploadHeaderTitle_images": "写真のパラメータ",
+  "imageUploadHeaderText_images": "写真/ビデオの選択に適用するパラメータを設定してください",
+  "imageUploadHeaderTitle_upload": "アップロード設定",
+  "imageUploadHeaderText_upload": "写真/ビデオの選択に適用するアップロードパラメータを設定してください",
+  "imageUploadDetails_title": "タイトル:",
+  "imageUploadDetails_author": "作成者:",
+  "imageUploadDetails_privacy": "プライバシー:",
+  "imageUploadDetails_tags": "タグ:",
+  "imageUploadDetails_description": "説明:",
+  "imageUploadDetailsView_title": "写真",
+  "imageUploadDetailsButton_title": "アップロード",
+  "imageUploadDetailsEdit_title": "アップロードする写真を編集",
+  "imageUploadDetailsUploading_title": "アップロード中の写真",
+  "imageUploadDetailsCell_uploadComplete": "完了！仕上げ中...",
+  "imageUploadRemove": "アップロードされた写真を削除",
+  "imageUploadTableCell_waiting": "待機中...",
+  "imageUploadTableCell_preparing": "準備中...",
+  "imageUploadTableCell_prepared": "アップロード準備完了...",
+  "imageUploadTableCell_uploading": "アップロード中...",
+  "imageUploadTableCell_uploaded": "アップロード完了",
+  "imageUploadTableCell_finishing": "仕上げ中...",
+  "imageUploadClearFailed": "{count, plural, =1{失敗したアップロードをクリア} other{失敗した{count}件のアップロードをクリア}}",
+  "@imageUploadClearFailed": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "imageUploadClearCompleted": "{count, plural, =1{完了したアップロードをクリア} other{完了した{count}件のアップロードをクリア}}",
+  "@imageUploadClearCompleted": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "imageUploadResume": "{count, plural, =1{アップロードを再開} other{アップロード{count}件を再開}}",
+  "@imageUploadResume": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "imageUploadProgressBar_zero": "0/0をアップロード中",
+  "imageUploadProgressBar_nonZero": "{index}/{max}をアップロード中",
+  "@imageUploadProgressBar_nonZero": {
+    "placeholders": {
+      "index": {},
+      "max": {}
+    }
+  },
+  "imageUploadProgressBar_completed": "完了",
+  "imageUploadCompleted_title": "アップロード完了",
+  "imageUploadCompleted_message": "写真がPiwigoサーバーにアップロードされました。",
+  "imageUploadCompleted_message1": "写真がPiwigoサーバーにアップロードされました。",
+  "imageUploadCompleted_warning": "一部の写真をアップロードできませんでした。",
+  "uploadError_title": "アップロードエラー",
+  "uploadError_message": "写真をアップロードできませんでした。",
+  "uploadCancelled_title": "アップロードがキャンセルされました",
+  "uploadNoInternetNetwork": "インターネット接続なし",
+  "uploadNoWiFiNetwork": "Wi-Fi接続なし",
+  "uploadLowPowerMode": "低電力モードが有効",
+  "uploadSection_impossible": "不可能なアップロード",
+  "uploadSection_resumable": "再開可能なアップロード",
+  "uploadSection_queue": "アップロードキュー",
+  "imageUploadError_title": "写真アップロードエラー",
+  "imageUploadError_format": "Piwigoサーバーで受け入れられないファイル形式です。",
+  "imageUploadError_source": "写真ソースを作成できません",
+  "imageUploadError_destination": "写真の保存先を作成できません",
+  "imageUploadError_iCloud": "写真を取得できませんでした。",
+  "audioUploadError_title": "オーディオアップロードエラー",
+  "audioUploadError_format": "申し訳ありませんが、Piwigo NGではオーディオファイルはまだサポートされていません。",
+  "videoUploadError_title": "ビデオアップロードエラー",
+  "videoUploadError_format": "申し訳ありませんが、拡張子.{extension}のビデオファイルはPiwigoサーバーで受け入れられません。",
+  "@videoUploadError_format": {
+    "placeholders": {
+      "extension": {}
+    }
+  },
+  "videoUploadError_export": "申し訳ありませんが、ビデオをアップロード用に取得できませんでした。",
+  "videoUploadError_unknown": "申し訳ありませんが、MP4変換中に不明なエラーが発生し、ビデオのアップロードに失敗しました。",
+  "videoUploadCancelled_message": "ビデオのアップロードがキャンセルされました。",
+  "localAlbums": "フォトライブラリ",
+  "localAlbums_accessible": "アクセス可能な写真",
+  "localAlbums_photosNotAuthorized_title": "アクセスなし",
+  "localAlbums_photosNiltitle": "写真の読み取りに問題があります",
+  "localAlbums_photosNnil_msg": "ローカルフォトライブラリの読み取りに問題があります。",
+  "localAlbums_photosNotAuthorized_msg": "ローカルフォトライブラリを開けません。設定アプリに移動して、Piwigoへのアクセスを有効にしてください。",
+  "localImages_deleteTitle": "カメラロールから削除",
+  "localImages_deleteMessage": "アップロードされた写真やビデオをカメラロールから削除しますか？削除された写真やビデオはiOSの写真ゴミ箱に30日間残ります。",
+  "settingsHeader_server": "Piwigoサーバー {version}",
+  "@settingsHeader_server": {
+    "placeholders": {
+      "version": {}
+    }
+  },
+  "settingsHeader_notSecure": "ウェブサイトが安全ではありません！",
+  "settings_server": "アドレス",
+  "settings_username": "ユーザー名",
+  "settings_notLoggedIn": " - ログインしていません - ",
+  "settings_logout": "ログアウト",
+  "settingsFooter_formats": "サーバーは次のファイルタイプを受け入れます: {types}。",
+  "@settingsFooter_formats": {
+    "placeholders": {
+      "types": {}
+    }
+  },
+  "settingsHeader_general": "一般設定",
+  "settingsHeader_thumbnails": "サムネイル",
+  "defaultImageSort": "並べ替え",
+  "defaultImageSort320px": "デフォルトの並べ替え",
+  "defaultImageSort414px": "写真のデフォルトの並べ替え",
+  "defaultAlbumThumbnailFile414px": "アルバムのサムネイルファイル",
+  "defaultAlbumThumbnailSizeHeader": "アルバムのサムネイルサイズを選択してください",
+  "maxNberOfRecentAlbums": "最近",
+  "maxNberOfRecentAlbums320px": "最近のアルバム",
+  "maxNberOfRecentAlbums414px": "最近のアルバムの数",
+  "thumbnailSizeSquare": "正方形",
+  "thumbnailSizeThumbnail": "サムネイル",
+  "thumbnailSizeXXSmall": "XXSサイズ",
+  "thumbnailSizeXSmall": "XSサイズ",
+  "thumbnailSizeSmall": "Sサイズ",
+  "thumbnailSizeMedium": "Mサイズ",
+  "thumbnailSizeLarge": "Lサイズ",
+  "thumbnailSizeXLarge": "XLサイズ",
+  "thumbnailSizeXXLarge": "XXLサイズ",
+  "thumbnailSizexFullRes": "フル解像度",
+  "settingsHeader_images": "写真",
+  "defaultThumbnailFile": "ファイル",
+  "defaultThumbnailFile320px": "サムネイルファイル",
+  "defaultThumbnailFile414px": "写真のサムネイルファイル",
+  "defaultThumbnailSize": "サイズ",
+  "defaultThumbnailSize320px": "サムネイルのサイズ",
+  "defaultThumbnailSize414px": "サムネイルのデフォルトサイズ",
+  "defaultNberOfThumbnailsShort": "1行あたりの数",
+  "defaultNberOfThumbnails": "1行あたりのサムネイル数",
+  "defaultThumbnailSizeTitle": "デフォルトサイズ",
+  "defaultThumbnailSizeHeader": "写真のサムネイルサイズを選択してください",
+  "settings_displayTitles": "サムネイルにタイトルを表示",
+  "settings_displayTitles320px": "サムネイルにタイトルを表示",
+  "defaultPreviewFile": "プレビュー",
+  "defaultPreviewFile320px": "プレビューファイル",
+  "defaultPreviewFile414px": "写真のプレビューファイル",
+  "defaultImageSize": "写真",
+  "defaultImageSize320px": "写真のサイズ",
+  "defaultImageSize414px": "写真のデフォルトサイズ",
+  "defaultImageSizeTitle": "デフォルトサイズ",
+  "defaultImageSizeHeader": "写真のサイズを選択してください",
+  "defaultImageSize_recommended": " (推奨)",
+  "defaultSize_disabled": " (サーバーで無効)",
+  "defaultSizeFooter": "グレーアウトされたサイズは推奨されないか、Piwigoサーバーで利用できません。",
+  "settings_shareGPSdata": "プライベートメタデータを共有",
+  "settings_shareGPSdata375px": "プライベートメタデータと共有",
+  "imageSizeSquare": "正方形",
+  "imageSizeThumbnail": "サムネイル",
+  "imageSizeXXSmall": "XXSサイズ",
+  "imageSizeXSmall": "XSサイズ",
+  "imageSizeSmall": "Sサイズ",
+  "imageSizeMedium": "Mサイズ",
+  "imageSizeLarge": "Lサイズ",
+  "imageSizeXLarge": "XLサイズ",
+  "imageSizeXXLarge": "XXLサイズ",
+  "imageSizexFullRes": "フル解像度",
+  "settingsHeader_upload": "デフォルトのアップロード設定",
+  "settings_defaultAuthor": "作成者",
+  "settings_defaultAuthor320px": "作成者名",
+  "settings_defaultAuthorPlaceholder": "作成者名",
+  "settings_defaultPrivacy": "プライバシー",
+  "settings_defaultPrivacy414px": "写真を閲覧できる人を選択してください",
+  "settings_stripGPSdata": "プライベートメタデータを削除",
+  "settings_stripGPSdata375px": "アップロード前にプライベートメタデータを削除",
+  "settings_photoResize": "アップロード前にサイズ変更",
+  "settings_photoSize": "サイズ",
+  "settings_placeholderSize": "5 - 100の写真サイズを入力",
+  "settings_photoCompress": "アップロード前に圧縮",
+  "settings_photoCompress375px": "アップロード前に写真を圧縮",
+  "settings_photoQuality": "品質",
+  "settings_placeholderQuality": "50 - 98の写真品質を入力",
+  "settings_prefixFilename414px": "アップロード前に写真のファイル名にプレフィックスを追加",
+  "settings_prefixFilename375px": "アップロード前にファイル名にプレフィックスを追加",
+  "settings_prefixFilename": "写真のファイル名にプレフィックスを追加",
+  "settings_defaultPrefix": "プレフィックス",
+  "settings_defaultPrefix320px": "ファイル名のプレフィックス",
+  "settings_defaultPrefixPlaceholder": "プレフィックス",
+  "settings_deleteImage375px": "アップロード後に写真を削除",
+  "settings_wifiOnly": "Wi-Fiのみ",
+  "settings_deleteImage": "アップロード後に削除",
+  "settings_uploadNotification": "アップロード通知",
+  "settings_downloadNotification": "ダウンロード通知",
+  "settings_downloadDestination": "ダウンロードフォルダ",
+  "settings_autoUpload": "自動アップロード",
+  "settings_autoUpload414px": "写真を自動アップロード",
+  "settings_autoUploadEnabled": "オン",
+  "settings_autoUploadEnabledInfo": "写真は自動的にPiwigoにアップロードされます。",
+  "settings_autoUploadEnabledInfoAll": "写真とビデオは自動的にPiwigoにアップロードされます。",
+  "settings_autoUploadDisabled": "オフ",
+  "settings_autoUploadDisabledInfo": "写真は自動的にPiwigoにアップロードされません。",
+  "settings_autoUploadSource": "ソース",
+  "settings_autoUploadSourceInvalid": "無効なソースアルバム",
+  "settings_autoUploadSourceInfo": "デバイスの写真やビデオが自動アップロードされるアルバムまたはサブアルバムを選択してください。",
+  "settings_autoUploadDestination": "宛先",
+  "settings_autoUploadDestinationInvalid": "無効な宛先アルバム",
+  "settings_autoUploadDestinationInfo": "写真やビデオが自動アップロードされるアルバムまたはサブアルバムを選択してください。",
+  "settings_autoUploadDuplicateInfo": "このPiwigoに既にある写真はアップロードされません。",
+  "settings_autoUploadFrequency": "頻度",
+  "settings_autoUploadFrequencyMinutes": "{count, plural, =1{1分} other{{count}分}}",
+  "@settings_autoUploadFrequencyMinutes" : {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "settings_autoUploadFrequencyHours": "{count, plural, =1{1時間} other{{count}時間}}",
+  "@settings_autoUploadFrequencyHours" : {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "settings_autoUploadFrequencyDays": "{count, plural, =1{1日} other{{count}日}}",
+  "@settings_autoUploadFrequencyDays" : {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "autoUploadError_Disabled": "アプリ設定で自動アップロードオプションが無効になっています。",
+  "autoUploadError_Failed": "いくつかの転送に失敗し、アップロードキューが保留されています。アプリで確認してください。",
+  "uploadPhotoSize_title": "最大写真サイズ",
+  "uploadPhotoSize_header": "アップロードされる写真の最大サイズを選択してください。",
+  "uploadPhotoSize_resolution": "内蔵カメラの最大解像度:",
+  "uploadVideoSize_title": "最大ビデオサイズ",
+  "uploadVideoSize_header": "アップロードされるビデオの最大サイズを選択してください。",
+  "uploadVideoSize_resolution": "内蔵カメラの最大仕様:",
+  "uploadPhotoSize_original": "サイズ変更なし",
+  "settingsHeader_cache": "キャッシュ設定",
+  "settings_cacheDisk": "ディスク",
+  "settings_cacheMemory": "メモリ",
+  "settings_cacheSize": "キャッシュサイズ",
+  "settings_cacheMegabytes": "MB",
+  "settings_cacheClear": "キャッシュをクリア",
+  "settings_cacheClearAll": "写真キャッシュをクリア",
+  "settings_cacheClearMsg": "写真キャッシュをクリアしてもよろしいですか？これにより、アルバムや写真の読み込みに時間がかかるようになります。",
+  "settingsHeader_appearance": "外観",
+  "settingsHeader_theme": "ダークテーマ",
+  "settings_switchPalette": "自動",
+  "settings_brightness": "明るさ",
+  "settings_brightnessHelp": "周囲の明るさが低い場合、自動オプションは暗い背景に対して写真を際立たせるために暗いカラーパレットを使用します。",
+  "userCount": "{count, plural, =0{0ユーザー} =1{1ユーザー} other{{count}ユーザー}}",
+  "@userCount" : {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "groupCount": "{count, plural, =0{0グループ} =1{1グループ} other{{count}グループ}}",
+  "@groupCount" : {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "commentCount": "{count, plural, =0{0コメント} =1{1コメント} other{{count}コメント}}",
+  "@commentCount" : {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "settings_appName": "Piwigo NG",
+  "settings_language": "言語を選択",
+  "settingsHeader_about": "情報",
+  "settings_twitter": "@piwigo",
+  "settings_contactUs": "お問い合わせ",
+  "settings_feedback": "フィードバック",
+  "settings_supportForum": "サポートフォーラム",
+  "settings_releaseNotes": "リリースノート",
+  "settings_rateInAppStore": "Playストアで評価",
+  "settings_translateWithCrowdin": "Piwigo NGを翻訳",
+  "settings_acknowledgements": "謝辞",
+  "settings_privacy": "プライバシーポリシー",
+  "settings_unknownVersion": "不明なバージョン",
+  "settings_privacyLocale": "&lang=ja_JP",
+  "@settings_privacyLocale": {
+    "description": "PiwigoモバイルアプリのプライバシーポリシーのURLの言語と国コード: https://piwigo.org/mobile-apps-privacy-policy&webview&lang=ja_JP"
+  }
+}
