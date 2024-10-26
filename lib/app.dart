@@ -60,6 +60,7 @@ class App extends StatelessWidget {
             Locale('lt'),
             Locale('sk'),
             Locale('zh'),
+            Locale('ja'),
           ],
           locale: localNotifier.locale,
           themeMode: themeNotifier.isDark ? ThemeMode.dark : ThemeMode.light,
