@@ -79,6 +79,8 @@ class _CreateAlbumModalState extends State<CreateAlbumModal> {
               child: AppField(
                 controller: _descriptionController,
                 hint: appStrings.createNewAlbumDescription_placeholder,
+                minLines: 5,
+                maxLines: 10,
               ),
             ),
             Padding(
