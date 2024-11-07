@@ -64,6 +64,7 @@ dependencies:
   flutter_cache_manager: ^3.3.0 # Handles network image cache
   heic_to_jpg: ^0.2.0 # Convert heic files to jpg
   provider: ^6.0.3 # Notifiers for theme and language changes
+  receive_sharing_intent: ^1.4.0 # Receive sharing from other apps
 
   # Translations
   flutter_localizations:

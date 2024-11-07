@@ -8,12 +8,14 @@ import 'package:piwigo_ng/network/api_client.dart';
 import 'package:piwigo_ng/services/auto_upload_manager.dart';
 import 'package:piwigo_ng/services/notification_service.dart';
 import 'package:piwigo_ng/services/preferences_service.dart';
+import 'package:piwigo_ng/services/receive_sharing.dart';
 import 'package:piwigo_ng/services/theme_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   _setUITheme();
+  await SharedIntent.receiveSharedData();
   HttpOverrides.global = SSLHttpOverrides();
   appPreferences = await SharedPreferences.getInstance();
   runApp(const App());
