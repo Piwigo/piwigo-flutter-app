@@ -10,7 +10,7 @@ import 'package:piwigo_ng/components/dialogs/confirm_dialog.dart';
 import 'package:piwigo_ng/components/modals/choose_camera_picker_modal.dart';
 import 'package:piwigo_ng/components/modals/choose_move_option_modal.dart';
 import 'package:piwigo_ng/components/modals/delete_images_modal.dart';
-import 'package:piwigo_ng/components/modals/move_or_copy_modal.dart';
+import 'package:piwigo_ng/components/modals/select_move_or_copy_modal.dart';
 import 'package:piwigo_ng/components/modals/piwigo_modal.dart';
 import 'package:piwigo_ng/components/snackbars.dart';
 import 'package:piwigo_ng/models/album_model.dart';

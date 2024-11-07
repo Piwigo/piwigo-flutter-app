@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:piwigo_ng/components/modals/move_or_copy_modal.dart';
+import 'package:piwigo_ng/components/modals/select_move_or_copy_modal.dart';
 import 'package:piwigo_ng/components/modals/piwigo_modal.dart';
 import 'package:piwigo_ng/components/sections/settings_section.dart';
 import 'package:piwigo_ng/models/album_model.dart';

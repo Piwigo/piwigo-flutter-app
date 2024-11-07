@@ -10,7 +10,7 @@ import 'package:piwigo_ng/components/cards/image_details_card.dart';
 import 'package:piwigo_ng/components/cards/piwigo_chip.dart';
 import 'package:piwigo_ng/components/dialogs/confirm_dialog.dart';
 import 'package:piwigo_ng/components/fields/app_field.dart';
-import 'package:piwigo_ng/components/modals/move_or_copy_modal.dart';
+import 'package:piwigo_ng/components/modals/select_move_or_copy_modal.dart';
 import 'package:piwigo_ng/components/modals/piwigo_modal.dart';
 import 'package:piwigo_ng/components/modals/select_tags_modal.dart';
 import 'package:piwigo_ng/components/sections/form_section.dart';
