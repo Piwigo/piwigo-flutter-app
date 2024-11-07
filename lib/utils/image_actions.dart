@@ -184,7 +184,7 @@ Future<dynamic> onMovePhotos(BuildContext context, List<ImageModel> images,
   }
   return showPiwigoModal(
     context: context,
-    builder: (_) => MoveOrCopyModal(
+    builder: (_) => SelectMoveOrCopyModal(
       title: appStrings.moveImage_title,
       subtitle: appStrings.moveImage_selectAlbum(
         images.length,

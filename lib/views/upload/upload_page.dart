@@ -8,7 +8,10 @@ import 'package:mime_type/mime_type.dart';
 import 'package:piwigo_ng/components/buttons/animated_piwigo_button.dart';
 import 'package:piwigo_ng/components/cards/image_details_card.dart';
 import 'package:piwigo_ng/components/cards/piwigo_chip.dart';
+import 'package:piwigo_ng/components/dialogs/confirm_dialog.dart';
 import 'package:piwigo_ng/components/fields/app_field.dart';
+import 'package:piwigo_ng/components/modals/move_or_copy_modal.dart';
+import 'package:piwigo_ng/components/modals/piwigo_modal.dart';
 import 'package:piwigo_ng/components/modals/select_tags_modal.dart';
 import 'package:piwigo_ng/components/sections/form_section.dart';
 import 'package:piwigo_ng/models/tag_model.dart';
@@ -22,11 +25,11 @@ import 'package:rounded_loading_button/rounded_loading_button.dart';
 import 'package:video_player/video_player.dart';
 
 class UploadPage extends StatefulWidget {
-  const UploadPage({Key? key, required this.imageList, required this.albumId}) : super(key: key);
+  const UploadPage({Key? key, required this.imageList, this.albumId}) : super(key: key);
 
   static const String routeName = '/upload';
   final List<XFile> imageList;
-  final int albumId;
+  final int? albumId;
 
   @override
   State<UploadPage> createState() => _UploadGalleryViewPage();
@@ -45,12 +48,38 @@ class _UploadGalleryViewPage extends State<UploadPage> with SingleTickerProvider
   List<XFile> _imageList = [];
   List<String> _imageExistList = [];
   int? _privacyLevel;
+  late int _albumDestination;
+
+  Future<void> _selectAlbum() async {
+    await showPiwigoModal(
+      context: context,
+      builder: (_) => SelectMoveOrCopyModal(
+        title: appStrings.selectCategory,
+        subtitle: appStrings.selectCategory_select,
+        isImage: true,
+        onSelected: (album) async {
+          if (!await showConfirmDialog(context,
+          title: appStrings.selectCategory,
+          message: appStrings.selectCategory_message(
+            widget.imageList.length,
+            album.name,
+          ),
+          )) return false;
+          setState(() {
+            _albumDestination = album.id;
+          });
+          return true;
+        },
+      ),
+    );
+  }
 
   @override
   void initState() {
     _imageList = List.from(widget.imageList);
     _authorController = TextEditingController(text: Preferences.getUploadAuthor);
     super.initState();
+
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       setState(() {
         PrivacyLevel.values.forEach((privacy) {
@@ -63,6 +92,11 @@ class _UploadGalleryViewPage extends State<UploadPage> with SingleTickerProvider
           ));
         });
       });
+      if (widget.albumId != null) {
+        _albumDestination = widget.albumId!;
+      } else {
+        _selectAlbum();
+      }
       checkImageExist();
     });
   }
@@ -126,7 +160,7 @@ class _UploadGalleryViewPage extends State<UploadPage> with SingleTickerProvider
     _btnController.start();
     List<int> tagIds = _tags.map<int>((tag) => tag.id).toList();
     List<XFile> filesToUpload = _imageList.where((e) => !_imageExistList.contains(e.path)).toList();
-    var result = await uploadPhotos(filesToUpload, widget.albumId, info: {
+    var result = await uploadPhotos(filesToUpload, _albumDestination, info: {
       'name': _titleController.text,
       'comment': _descriptionController.text,
       'author': _authorController.text,

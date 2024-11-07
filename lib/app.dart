@@ -5,6 +5,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:piwigo_ng/services/app_providers.dart';
 import 'package:piwigo_ng/services/preferences_service.dart';
+import 'package:piwigo_ng/services/receive_sharing.dart';
 import 'package:piwigo_ng/utils/overscroll_behavior.dart';
 import 'package:piwigo_ng/utils/themes.dart';
 import 'package:piwigo_ng/views/album/album_page.dart';
@@ -92,10 +93,9 @@ class App extends StatelessWidget {
 }
 
 Route<dynamic> generateRoute(RouteSettings settings) {
+  String? routeName;
   Map<String, dynamic> arguments = {};
-  if (settings.arguments != null) {
-    arguments = settings.arguments as Map<String, dynamic>;
-  }
+  bool externalAppSharedFiles = SharedIntent.sharedFiles != null && SharedIntent.sharedFiles!.isNotEmpty;
 
   bool isAdmin = appPreferences.getBool(Preferences.isAdminKey) ?? false;
 
@@ -107,7 +107,14 @@ Route<dynamic> generateRoute(RouteSettings settings) {
     );
   }
 
-  switch (settings.name) {
+  if (externalAppSharedFiles) {
+    routeName = UploadPage.routeName;
+  } else {
+    routeName = settings.name;
+    arguments = _extractArguments(settings);
+  }
+
+  switch (routeName) {
     case LoginPage.routeName:
       return MaterialPageRoute(
         builder: (_) => const LoginPage(),
@@ -164,13 +171,7 @@ Route<dynamic> generateRoute(RouteSettings settings) {
         settings: settings,
       );
     case UploadPage.routeName:
-      return MaterialPageRoute(
-        builder: (_) => UploadPage(
-          imageList: arguments["images"] ?? <XFile>[],
-          albumId: arguments["category"],
-        ),
-        settings: settings,
-      );
+      return _createUploadPageRoute(settings, externalAppSharedFiles);
     case UploadStatusPage.routeName:
       return MaterialPageRoute(
         builder: (_) => UploadStatusPage(),
@@ -226,5 +227,43 @@ Route<dynamic> generateRoute(RouteSettings settings) {
         builder: (_) => UnknownRoutePage(route: settings),
         settings: settings,
       );
+  }
+}
+
+Map<String, dynamic> _extractArguments(RouteSettings settings) {
+  if (settings.arguments != null) {
+    return settings.arguments as Map<String, dynamic>;
+  }
+  return {};
+}
+
+MaterialPageRoute<dynamic> _createUploadPageRoute(RouteSettings settings, bool externalAppSharedFiles) {
+  Map<String, dynamic> arguments = {};
+
+  if (externalAppSharedFiles) {
+    arguments['images'] = SharedIntent.sharedFiles;
+    SharedIntent.cleanupSharedFiles();
+
+    // Create new RouteSettings with updated arguments
+    return MaterialPageRoute(
+      builder: (_) => UploadPage(
+        imageList: arguments["images"] ?? <XFile>[],
+        albumId: arguments["category"],
+      ),
+      settings: RouteSettings( // Create new RouteSettings here
+        name: UploadPage.routeName,
+        arguments: arguments,
+      ),
+    );
+  } else {
+    // For other cases, use original settings
+    arguments = _extractArguments(settings);
+    return MaterialPageRoute(
+      builder: (_) => UploadPage(
+        imageList: arguments["images"] ?? <XFile>[],
+        albumId: arguments["category"],
+      ),
+      settings: settings,
+    );
   }
 }

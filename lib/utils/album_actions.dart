@@ -43,7 +43,7 @@ Future<void> onEditAlbum(BuildContext context, AlbumModel album) async {
 Future<void> onMoveAlbum(BuildContext context, AlbumModel album) async {
   await showPiwigoModal(
     context: context,
-    builder: (_) => MoveOrCopyModal(
+    builder: (_) => SelectMoveOrCopyModal(
       title: appStrings.moveCategory,
       subtitle: appStrings.moveCategory_select(album.name),
       album: album,

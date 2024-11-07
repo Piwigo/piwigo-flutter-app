@@ -96,7 +96,7 @@ class _AutoUploadPageState extends State<AutoUploadPage> {
                 onPressed: () async {
                   await showPiwigoModal(
                     context: context,
-                    builder: (_) => MoveOrCopyModal(
+                    builder: (_) => SelectMoveOrCopyModal(
                       title: appStrings.settings_autoUploadDestination,
                       subtitle: appStrings.settings_autoUploadDestinationInfo,
                       isImage: true,
