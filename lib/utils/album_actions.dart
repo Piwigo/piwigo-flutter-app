@@ -3,7 +3,7 @@ import 'package:piwigo_ng/components/dialogs/confirm_dialog.dart';
 import 'package:piwigo_ng/components/modals/create_album_modal.dart';
 import 'package:piwigo_ng/components/modals/delete_album_mode_modal.dart';
 import 'package:piwigo_ng/components/modals/edit_album_modal.dart';
-import 'package:piwigo_ng/components/modals/move_or_copy_modal.dart';
+import 'package:piwigo_ng/components/modals/select_move_or_copy_modal.dart';
 import 'package:piwigo_ng/components/modals/piwigo_modal.dart';
 import 'package:piwigo_ng/components/snackbars.dart';
 import 'package:piwigo_ng/models/album_model.dart';
@@ -43,7 +43,7 @@ Future<void> onEditAlbum(BuildContext context, AlbumModel album) async {
 Future<void> onMoveAlbum(BuildContext context, AlbumModel album) async {
   await showPiwigoModal(
     context: context,
-    builder: (_) => MoveOrCopyModal(
+    builder: (_) => SelectMoveOrCopyModal(
       title: appStrings.moveCategory,
       subtitle: appStrings.moveCategory_select(album.name),
       album: album,

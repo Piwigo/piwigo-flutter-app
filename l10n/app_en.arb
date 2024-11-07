@@ -313,6 +313,16 @@
     "moveCategoryError_title": "Move Fail",
     "moveCategoryError_message": "Failed to move your album",
 
+    "selectCategory": "Select Album",
+    "selectCategory_select": "Please select an album or sub-album.",
+    "selectCategory_message": "{count, plural, =1{Are you sure you want to upload the image into the album {parent} ?} other{Are you sure you want to upload the images into the album {parent} ?}}",
+    "@selectCategory_message" : {
+        "placeholders": {
+            "count": {},
+            "parent": {}
+        }
+    },
+
 
     "categoryPrivacy": "Manage Permissions",
     "categoryPrivacy_subtitle": "Manage access permissions of \"{album_name}\".",
