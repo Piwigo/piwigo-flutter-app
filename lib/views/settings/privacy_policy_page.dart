@@ -14,10 +14,12 @@ class PrivacyPolicyPage extends StatefulWidget {
 
 class _PrivacyPolicyPageState extends State<PrivacyPolicyPage> {
   late final String _url;
+  var ctrl = WebViewController();
 
   @override
   void initState() {
-    WebView.platform = AndroidWebView();
+    ctrl.loadRequest(Uri.parse( _url + appStrings.settings_privacyLocale));
+    ctrl.setNavigationDelegate(_navigation as NavigationDelegate);
     _url = Settings.privacyPolicyUrl;
     super.initState();
   }
@@ -39,10 +41,7 @@ class _PrivacyPolicyPageState extends State<PrivacyPolicyPage> {
       ),
       body: Stack(
         children: [
-          WebView(
-            initialUrl: _url + appStrings.settings_privacyLocale,
-            navigationDelegate: _navigation,
-          ),
+          WebViewWidget(controller: this.ctrl),
         ],
       ),
     );

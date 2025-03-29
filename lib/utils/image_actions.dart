@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
-import 'package:heic_to_jpg/heic_to_jpg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:piwigo_ng/components/dialogs/confirm_dialog.dart';
@@ -51,7 +50,7 @@ Future<File> compressImage(File file,
     );
 
     debugPrint("Upload Compress $result");
-    return result ?? file;
+    //return result ?? file;
   } catch (e) {
     debugPrint(e.toString());
   }
@@ -82,14 +81,6 @@ Future<List<XFile>?> onPickFiles() async {
     List<XFile> uploadFiles = [];
     for (PlatformFile file in result.files) {
       String? filePath = file.path;
-      if (file.extension == 'heic' && filePath != null) {
-        debugPrint("$filePath is Heic !");
-        File oldFile = File(file.path!);
-        filePath = await HeicToJpg.convert(
-          file.path!,
-        );
-        oldFile.delete();
-      }
       if (filePath != null) {
         uploadFiles.add(XFile(
           filePath,
@@ -116,11 +107,6 @@ Future<List<XFile>?> onPickImages() async {
       if (Preferences.getAvailableFileTypes
           .contains(file.name.split('.').last)) {
         files.add(file);
-      } else if (file.name.endsWith('.heic')) {
-        String? jpgPath = await HeicToJpg.convert(file.path);
-        if (jpgPath != null) {
-          files.add(XFile(jpgPath));
-        }
       }
     }
     return files;
@@ -145,12 +131,6 @@ Future<XFile?> onTakePhoto(BuildContext context) async {
           imageQuality: (Preferences.getUploadQuality * 100).round(),
           requestFullMetadata: !Preferences.getRemoveMetadata,
         );
-        if (image != null) {
-          String? jpgPath = await HeicToJpg.convert(image.path);
-          if (jpgPath != null) {
-            image = XFile(jpgPath);
-          }
-        }
         break;
       case 1:
         image = await _picker.pickVideo(source: ImageSource.camera);

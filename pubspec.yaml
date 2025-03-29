@@ -15,11 +15,11 @@ dependencies:
 
   # Network
   url_launcher: ^6.1.5 # Open links with device's applications
-  webview_flutter: ^3.0.4 # Show web page (CGU)
+  webview_flutter: ^4.10.0 # Show web page (CGU)
   dio: ^5.4.3+1 # Requests to API
   dio_cookie_manager: ^2.0.0 # Compatibility between dio and cookie_far
   cookie_jar: ^3.0.1 # Handles cookies
-  connectivity_plus: ^3.0.2 # Check if Wifi is enabled
+  connectivity_plus: ^4.0.2 # Check if Wifi is enabled
 
   # UI
   auto_size_text: ^3.0.0 # Text that auto-sizes (image thumbnail title)
@@ -36,14 +36,14 @@ dependencies:
   flutter_speed_dial: ^6.1.0+1 # Speed dial
   pull_to_refresh: ^2.0.0 # Top and bottom refresh gestures
   photo_view: ^0.14.0 # Zoom on fullscreen photos
-  extended_text: ^13.0.0 # Text overflow on left side
+  extended_text: ^14.2.2 # Text overflow on left side
   flutter_easyloading: ^3.0.5 # Show loading dialog
 
   # Storage
   package_info_plus: ^8.0.0 # Get project info (version)
   path_provider: ^2.0.11 # Get application documents
   shared_preferences: ^2.0.15 # Base local storage
-  flutter_secure_storage: ^6.0.0 # Local storage secured for logins
+  flutter_secure_storage: ^8.1.0 # Local storage secured for logins
   image_picker: ^0.8.5+3 # Pick images from camera
   file_picker: ^5.2.5 # Pick images and videos at a time for upload
 
@@ -52,17 +52,16 @@ dependencies:
   flutter_local_notifications: ^17.2.0 # Throws notifications on download or upload
   open_filex: ^4.4.0 # Open files with devices apps
   workmanager: ^0.5.0 # Background processes (auto upload)
-  image_gallery_saver: ^2.0.3 # Download images
+  gal: ^2.3.1 # Download images
 
   # Utils
   mime_type: ^1.0.0 # Check mime type of files (differentiate photos from videos)
   video_player: ^2.4.7 # Read video files in fullscreen mode
   chewie: ^1.8.1 # Video player with options
-  flutter_image_compress: ^1.1.3 # Remove metadata
+  flutter_image_compress: ^2.4.0 # Remove metadata
   permission_handler: ^10.2.0 # Check and asks for permissions
-  share_plus: ^9.0.0 # Share files
+  share_plus: ^10.1.4 # Share files
   flutter_cache_manager: ^3.3.0 # Handles network image cache
-  heic_to_jpg: ^0.2.0 # Convert heic files to jpg
   provider: ^6.0.3 # Notifiers for theme and language changes
 
   # Translations
