@@ -6,5 +6,5 @@
 /.flutter-plugins
 /.flutter-plugins-dependencies
 /.packages
-
+/lib/l10n/app_localizations*.dart
 *.env

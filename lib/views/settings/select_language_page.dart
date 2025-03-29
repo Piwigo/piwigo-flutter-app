@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:piwigo_ng/services/locale_provider.dart';
 import 'package:piwigo_ng/utils/localizations.dart';
 import 'package:provider/provider.dart';
+
+import '../../l10n/app_localizations.dart';
 
 class SelectLanguagePage extends StatefulWidget {
   const SelectLanguagePage({Key? key}) : super(key: key);

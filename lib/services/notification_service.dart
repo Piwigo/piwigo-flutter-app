@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import '../l10n/app_localizations.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:piwigo_ng/services/locale_provider.dart';
@@ -26,9 +26,12 @@ Future<void> initLocalNotifications() async {
 
 Future<void> onSelectNotification(NotificationResponse response) async {
   debugPrint("Notification payload: ${response.payload}");
-  if (response.payload == null) return;
-  OpenResult result = await OpenFilex.open(response.payload);
-  debugPrint(result.message);
+  var responsePayload = response.payload;
+  if (responsePayload == null) return;
+  else {
+    OpenResult result = await OpenFilex.open(responsePayload);
+    debugPrint(result.message);
+  }
 }
 
 Future<bool?> askNotificationPermissions() async {
