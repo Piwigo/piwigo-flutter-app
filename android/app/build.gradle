@@ -71,6 +71,7 @@ android {
             signingConfig signingConfigs.release
         }
     }
+    namespace 'com.remi.piwigo_ng'
 }
 
 flutter {
