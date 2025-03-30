@@ -44,10 +44,48 @@ git checkout d8a9f9a
 git switch -
 ```
 
-## IDE - Android studio 
+### Enabling Android support :
 
-Install the flutter android studio plugin.
-Before running the app check that the dart sdk as been found.
+You will need to accept the license to use flutter for Android :
+
+```sh
+flutter doctor --android-licenses
+flutter --disable-analytics # Optional, disable telemetry
+```
+
+### IDE - Android studio :
+
+(This tutorial assume a non-flatpak version)
+
+#### IDE Setup :
+
+Install the flutter android studio plugin. Ensure you are using the `Android SDK 35` and the following tools are installed :
+
+- Android SDK Command-line Tools
+- Android SDK Build-Tools
+- Android SDK Platform-Tools
+- Android Emulator
+
+You can check in **File > Settings > Languages & Framework > Android SDK**
+
+Before opening the project, check if flutter find your SDKs
+```sh
+flutter doctor
+```
+
+*( Optional : )*
+
+```sh
+# Enable chrome support without installing google-chrome :
+# Install a chromium based browser
+flatpak install io.github.ungoogled_software.ungoogled_chromium
+# Set the Chrome variable (in fish)
+set -Ux CHROME_EXECUTABLE "/var/lib/flatpak/app/io.github.ungoogled_software.ungoogled_chromium/current/active/export/bin/io.github.ungoogled_software.ungoogled_chromium"
+```
+
+#### Running the project :
+
+Open the project, before running the app check that the dart sdk as been found.
 
 Go to **File > Settings > Languages & Framework > Dart**
 Enable dart for the project and check that the SDK location is in the flutter directory :
@@ -56,3 +94,5 @@ Enable dart for the project and check that the SDK location is in the flutter di
 # Exemple :
 /home/_username_/.local/share/flutter/bin/cache/dart-sdk
 ```
+
+After that the config should be automatically detect and a option to run `main.dart` should be available.
