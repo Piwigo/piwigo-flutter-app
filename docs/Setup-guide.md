@@ -28,7 +28,7 @@ echo 'export PATH="$HOME/development/flutter/bin:$PATH"' >> ~/.bash_profile
 
 ```sh
 # Add flutter to PATH (fish)
-fish_add_path -g -p ~/.local/share/flutter/bin
+fish_add_path -p ~/.local/share/flutter/bin
 ```
 
 More shells at the [Add Flutter to your PATH](https://docs.flutter.dev/get-started/install/linux/android#add-flutter-to-your-path) section
