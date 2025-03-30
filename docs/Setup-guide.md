@@ -23,7 +23,7 @@ tar -xf ~/Downloads/flutter_linux_3.29.2-stable.tar.xz -C ~/.local/share/
 
 ```sh
 # Add flutter to PATH (bash) :
-echo 'export PATH="$HOME/development/flutter/bin:$PATH"' >> ~/.bash_profile
+echo 'export PATH="$HOME/.local/share/flutter/bin:$PATH"' >> ~/.bash_profile
 ```
 
 ```sh
