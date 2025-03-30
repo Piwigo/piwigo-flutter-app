@@ -45,7 +45,7 @@ dependencies:
   shared_preferences: ^2.0.15 # Base local storage
   flutter_secure_storage: ^8.1.0 # Local storage secured for logins
   image_picker: ^0.8.5+3 # Pick images from camera
-  file_picker: ^5.2.5 # Pick images and videos at a time for upload
+  file_picker: ^8.3.7 # Pick images and videos at a time for upload
 
   # Device
   device_info_plus: ^10.1.0 # Get device info (version)
