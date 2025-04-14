@@ -15,7 +15,7 @@ dependencies:
 
   # Network
   url_launcher: ^6.1.5 # Open links with device's applications
-  webview_flutter: ^3.0.4 # Show web page (CGU)
+  webview_flutter: ^4.10.0 # Show web page (CGU)
   dio: ^5.4.3+1 # Requests to API
   dio_cookie_manager: ^2.0.0 # Compatibility between dio and cookie_far
   cookie_jar: ^3.0.1 # Handles cookies
@@ -48,7 +48,7 @@ dependencies:
   file_picker: ^8.3.7 # Pick images and videos at a time for upload
 
   # Device
-  device_info_plus: ^10.1.0 # Get device info (version)
+  device_info_plus: ^10.1.0 # Get device info (version
   flutter_local_notifications: ^17.2.4 # Throws notifications on download or upload
   open_filex: ^4.4.0 # Open files with devices apps
   workmanager: ^0.5.2 # Background processes (auto upload)
