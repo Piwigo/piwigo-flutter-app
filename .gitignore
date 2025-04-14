@@ -11,3 +11,7 @@
 # FVM Version Cache
 .fvm/
 /.dart_tool/
+
+# Localizations
+/lib/l10n/app_localizations*.dart
+/l10n/untranslated.json
