@@ -58,7 +58,7 @@ dependencies:
   mime_type: ^1.0.0 # Check mime type of files (differentiate photos from videos)
   video_player: ^2.4.7 # Read video files in fullscreen mode
   chewie: ^1.8.1 # Video player with options
-  flutter_image_compress: ^1.1.3 # Remove metadata
+  flutter_image_compress: ^2.4.0 # Remove metadata
   permission_handler: ^10.2.0 # Check and asks for permissions
   share_plus: ^10.1.4 # Share files
   flutter_cache_manager: ^3.3.0 # Handles network image cache
