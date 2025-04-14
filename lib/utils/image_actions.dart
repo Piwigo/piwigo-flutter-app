@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
-import 'package:heic_to_jpg/heic_to_jpg.dart';
+import 'package:heif_converter/heif_converter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:piwigo_ng/components/dialogs/confirm_dialog.dart';
@@ -51,7 +51,11 @@ Future<File> compressImage(File file,
     );
 
     debugPrint("Upload Compress $result");
-    return result ?? file;
+    if (result != null) {
+      return File(result.path);
+    } else {
+      return file;
+    }
   } catch (e) {
     debugPrint(e.toString());
   }
@@ -82,12 +86,10 @@ Future<List<XFile>?> onPickFiles() async {
     List<XFile> uploadFiles = [];
     for (PlatformFile file in result.files) {
       String? filePath = file.path;
-      if (file.extension == 'heic' && filePath != null) {
-        debugPrint("$filePath is Heic !");
+      if ((file.extension == 'heic' || file.extension == 'heif') && filePath != null) {
+        debugPrint("$filePath is Heic/Heif !");
         File oldFile = File(file.path!);
-        filePath = await HeicToJpg.convert(
-          file.path!,
-        );
+        filePath = await HeifConverter.convert(file.path!, format: 'jpg');
         oldFile.delete();
       }
       if (filePath != null) {
@@ -116,8 +118,8 @@ Future<List<XFile>?> onPickImages() async {
       if (Preferences.getAvailableFileTypes
           .contains(file.name.split('.').last)) {
         files.add(file);
-      } else if (file.name.endsWith('.heic')) {
-        String? jpgPath = await HeicToJpg.convert(file.path);
+      } else if (file.name.endsWith('.heic') || file.name.endsWith('.heif')) {
+        String? jpgPath = await HeifConverter.convert(file.path, format: 'jpg');
         if (jpgPath != null) {
           files.add(XFile(jpgPath));
         }
@@ -146,7 +148,7 @@ Future<XFile?> onTakePhoto(BuildContext context) async {
           requestFullMetadata: !Preferences.getRemoveMetadata,
         );
         if (image != null) {
-          String? jpgPath = await HeicToJpg.convert(image.path);
+          String? jpgPath = await HeifConverter.convert(image.path, format: 'jpg');
           if (jpgPath != null) {
             image = XFile(jpgPath);
           }

@@ -62,7 +62,7 @@ dependencies:
   permission_handler: ^10.2.0 # Check and asks for permissions
   share_plus: ^10.1.4 # Share files
   flutter_cache_manager: ^3.3.0 # Handles network image cache
-  heic_to_jpg: ^0.2.0 # Convert heic files to jpg
+  heif_converter: ^1.0.1 # Convert heic files to jpg
   provider: ^6.0.3 # Notifiers for theme and language changes
 
   # Translations
