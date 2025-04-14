@@ -52,7 +52,7 @@ dependencies:
   flutter_local_notifications: ^17.2.4 # Throws notifications on download or upload
   open_filex: ^4.4.0 # Open files with devices apps
   workmanager: ^0.5.2 # Background processes (auto upload)
-  image_gallery_saver: ^2.0.3 # Download images
+  gal: ^2.3.1 # Download images
 
   # Utils
   mime_type: ^1.0.0 # Check mime type of files (differentiate photos from videos)
