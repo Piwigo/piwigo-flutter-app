@@ -14,7 +14,7 @@ android {
     namespace 'com.remi.piwigo_ng'
     //compileSdkVersion flutter.compileSdkVersion
     //ndkVersion = flutter.ndkVersion
-    compileSdkVersion 35
+    compileSdkVersion 36
     ndkVersion "28.0.13004108"
 
     compileOptions {
