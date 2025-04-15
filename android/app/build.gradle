@@ -4,24 +4,6 @@ plugins {
     id "dev.flutter.flutter-gradle-plugin"
 }
 
-def localProperties = new Properties()
-def localPropertiesFile = rootProject.file('local.properties')
-if (localPropertiesFile.exists()) {
-    localPropertiesFile.withReader('UTF-8') { reader ->
-        localProperties.load(reader)
-    }
-}
-
-def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
-if (flutterVersionCode == null) {
-    flutterVersionCode = '1'
-}
-
-def flutterVersionName = localProperties.getProperty('flutter.versionName')
-if (flutterVersionName == null) {
-    flutterVersionName = '1.0'
-}
-
 def keystoreProperties = new Properties()
 def keystorePropertiesFile = rootProject.file('key.properties')
 if (keystorePropertiesFile.exists()) {
@@ -29,7 +11,11 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
+    namespace 'com.remi.piwigo_ng'
+    //compileSdkVersion flutter.compileSdkVersion
+    //ndkVersion = flutter.ndkVersion
     compileSdkVersion 35
+    ndkVersion "28.0.13004108"
 
     compileOptions {
         // Flag to enable support for the new language APIs
@@ -52,8 +38,8 @@ android {
         applicationId "com.piwigo.piwigo_ng"
         minSdkVersion 21
         targetSdkVersion 34
-        versionCode flutterVersionCode.toInteger()
-        versionName flutterVersionName
+        versionCode = flutter.versionCode
+        versionName = flutter.versionName
     }
 
     signingConfigs {
@@ -70,7 +56,6 @@ android {
             signingConfig signingConfigs.release
         }
     }
-    namespace 'com.remi.piwigo_ng'
 }
 
 flutter {
