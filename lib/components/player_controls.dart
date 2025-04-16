@@ -256,7 +256,7 @@ class _PlayerControlsState extends State<PlayerControls>
                   duration: const Duration(milliseconds: 300),
                   opacity: notifier.hideStuff ? 0.0 : 1.0,
                   child: Material(
-                    color: Colors.black.withOpacity(0.5),
+                    color: Colors.black.withValues(alpha: 0.5),
                   ),
                 ),
               ),
@@ -477,7 +477,7 @@ class _PlayerControlsState extends State<PlayerControls>
             text: '/ ${formatDuration(duration)}',
             style: TextStyle(
               fontSize: 14.0,
-              color: Colors.white.withOpacity(.75),
+              color: Colors.white.withValues(alpha: 0.75),
               fontWeight: FontWeight.normal,
             ),
           )
@@ -510,10 +510,10 @@ class _PlayerControlsState extends State<PlayerControls>
         _startHideTimer();
       },
       colors: ChewieProgressColors(
-        playedColor: Theme.of(context).colorScheme.secondary.withOpacity(0.7),
+        playedColor: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.7),
         handleColor: Theme.of(context).colorScheme.secondary,
-        bufferedColor: Theme.of(context).colorScheme.primary.withOpacity(0.5),
-        backgroundColor: Theme.of(context).disabledColor.withOpacity(0.3),
+        bufferedColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
+        backgroundColor: Theme.of(context).disabledColor.withValues(alpha: 0.3),
       ),
     );
   }

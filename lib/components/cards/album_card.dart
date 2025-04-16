@@ -115,7 +115,7 @@ class AlbumCard extends StatelessWidget {
               isAdmin: true,
             ),
             shadow: Shadow(
-              color: Colors.black.withOpacity(0.3),
+              color: Colors.black.withValues(alpha: 0.3),
               blurRadius: 3.0,
               offset: const Offset(1.0, 0.0),
             ),

@@ -197,7 +197,7 @@ class _AlbumPageState extends State<AlbumPage> {
     }).then((value) => _refreshController.requestRefresh());
   }
 
-  void _onWillPop(bool pop) {
+  void _onWillPop(bool pop,Object? result) {
     if (pop) return;
     if (_selectedList.isNotEmpty) {
       setState(() {
@@ -212,7 +212,7 @@ class _AlbumPageState extends State<AlbumPage> {
   Widget build(BuildContext context) {
     return PopScope(
       canPop: false,
-      onPopInvoked: _onWillPop,
+      onPopInvokedWithResult: _onWillPop,
       child: Scaffold(
         body: SafeArea(
           child: SmartRefresher(
@@ -460,7 +460,7 @@ class _AlbumPageState extends State<AlbumPage> {
             return FloatingActionButton(
               tooltip: uploading ? appStrings.uploadList_title : appStrings.categorySelection_root,
               shape: uploading ? CircleBorder() : null,
-              backgroundColor: Theme.of(context).disabledColor.withOpacity(0.7),
+              backgroundColor: Theme.of(context).disabledColor.withValues(alpha: 0.7),
               onPressed: () {
                 if (uploading) {
                   Navigator.of(context).pushNamed(UploadStatusPage.routeName);

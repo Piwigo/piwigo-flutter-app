@@ -37,8 +37,8 @@ Future<void> _setUITheme() async {
   bool isDark = sharedPreferences.getBool(ThemeNotifier.themeKey) ??
       (ThemeMode.system == ThemeMode.dark);
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-    systemNavigationBarColor: Colors.black.withOpacity(0.001),
-    statusBarColor: Colors.black.withOpacity(0.001),
+    systemNavigationBarColor: Colors.black.withValues(alpha: 0.001),
+    statusBarColor: Colors.black.withValues(alpha: 0.001),
     statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
   ));
 }
