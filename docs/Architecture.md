@@ -22,9 +22,10 @@ Upgrading the `AGP (Android Gradle Plugin)` open the `android` directory with An
 
 Translations are hosted on [crowdin](https://crowdin.com/project/piwigo-ng), everything is translated from english.  
 Flutter take the `app_%%.arb` files and generate dart code inside the `lib/l10n` directory.   
+`untranslated.json` is generated at compile time to indicate missing string.
 
 ```sh
-# %% = country code
+# %% = country code, one file per translation
 .
 ├── crowdin.yml
 ├── l10n
@@ -34,5 +35,6 @@ Flutter take the `app_%%.arb` files and generate dart code inside the `lib/l10n`
 └── l10n.yaml
    └── l10n
       ├── app_localizations.dart
+      ├── app_localizations_en.dart
       └── app_localizations_%%.dart
 ```
