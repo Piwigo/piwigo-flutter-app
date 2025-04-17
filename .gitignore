@@ -15,3 +15,6 @@
 # Localizations
 /lib/l10n/app_localizations*.dart
 /l10n/untranslated.json
+
+# Disable targeting web :
+/lib/generated_plugin_registrant.dart
