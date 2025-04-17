@@ -3,6 +3,28 @@
 This file document the different directory of this project.
 Each section will contain explanation and a directory tree.
 
+## Flutter :
+
+### Dependencies and generated files :
+
+The `.fvmrc` is used by [fvm](https://fvm.app/) to specify the flutter version.  
+`lib/` contain the flutter code.  
+`pubspec.lock` is a lock file to handle dependencies.  
+`pubspec.yaml` is configuration file specifying :
+
+- the app version
+- the flutter sdk requirement
+- the dependencies
+- the asset directory 
+
+```
+├── .fvmrc
+├── lib
+├── pubspec.lock
+└── pubspec.yaml
+```
+
+
 ## Android :
 
 The android directory contain all elements necessary to target Android, most of it is gradle configuration.
@@ -33,6 +55,7 @@ Flutter take the `app_%%.arb` files and generate dart code inside the `lib/l10n`
 │  ├── app_%%.arb
 │  └── untranslated.json
 └── l10n.yaml
+	├── lib
    └── l10n
       ├── app_localizations.dart
       ├── app_localizations_en.dart
