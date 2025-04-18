@@ -99,8 +99,8 @@ class _ImagePageState extends State<ImagePage> {
     _headers = _getHeaders();
 
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light.copyWith(
-      systemNavigationBarColor: Colors.black.withOpacity(0.1),
-      statusBarColor: Colors.black.withOpacity(0.1),
+      systemNavigationBarColor: Colors.black.withValues(alpha: 0.1),
+      statusBarColor: Colors.black.withValues(alpha: 0.1),
     ));
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       _getImagesInfo(_imageList);
@@ -112,8 +112,8 @@ class _ImagePageState extends State<ImagePage> {
   void dispose() {
     _pageController.dispose();
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-      systemNavigationBarColor: Colors.black.withOpacity(0.001),
-      statusBarColor: Colors.black.withOpacity(0.001),
+      systemNavigationBarColor: Colors.black.withValues(alpha: 0.001),
+      statusBarColor: Colors.black.withValues(alpha: 0.001),
       statusBarIconBrightness:
           App.appKey.currentContext?.read<ThemeNotifier>().isDark ?? false ? Brightness.light : Brightness.dark,
     ));
@@ -177,7 +177,7 @@ class _ImagePageState extends State<ImagePage> {
   /// Handler before closing the page.
   /// * If overlay is hidden, show it.
   /// * Otherwise, close the page.
-  void _onWillPop(bool pop) {
+  void _onWillPop(bool pop,Object? result) {
     if (pop) return;
     if (!_showOverlay) {
       setState(() {
@@ -284,7 +284,7 @@ class _ImagePageState extends State<ImagePage> {
   Widget build(BuildContext context) {
     return PopScope(
       canPop: false,
-      onPopInvoked: _onWillPop,
+      onPopInvokedWithResult: _onWillPop,
       child: Scaffold(
         backgroundColor: Colors.black,
         resizeToAvoidBottomInset: true,
@@ -325,7 +325,7 @@ class _ImagePageState extends State<ImagePage> {
           opacity: _showOverlay ? 1 : 0,
           child: Container(
             decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.5),
+              color: Colors.black.withValues(alpha: 0.5),
             ),
             child: Column(
               children: [
@@ -507,7 +507,7 @@ class _ImagePageState extends State<ImagePage> {
                   child: IconButton(
                     color: Colors.white,
                     style: ButtonStyle(
-                      backgroundColor: WidgetStateProperty.resolveWith((states) => Colors.black.withOpacity(0.5)),
+                      backgroundColor: WidgetStateProperty.resolveWith((states) => Colors.black.withValues(alpha: 0.5)),
                       shape: WidgetStateProperty.resolveWith((states) => CircleBorder()),
                     ),
                     onPressed: () {
@@ -577,7 +577,7 @@ class _ImagePageState extends State<ImagePage> {
               _comment,
               Container(
                 decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.5),
+                  color: Colors.black.withValues(alpha: 0.5),
                 ),
                 child: AnimatedSize(
                   duration: _overlayAnimationDuration,
@@ -643,7 +643,7 @@ class _ImagePageState extends State<ImagePage> {
       child: Container(
         constraints: BoxConstraints(maxHeight: 80),
         decoration: BoxDecoration(
-          color: Theme.of(context).cardColor.withOpacity(0.8),
+          color: Theme.of(context).cardColor.withValues(alpha: 0.8),
           borderRadius: BorderRadius.circular(10.0),
         ),
         child: AnimatedSize(

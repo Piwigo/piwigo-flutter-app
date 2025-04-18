@@ -1,9 +1,8 @@
 import 'dart:io';
 
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
-import 'package:heic_to_jpg/heic_to_jpg.dart';
+import 'package:heif_converter/heif_converter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:piwigo_ng/components/dialogs/confirm_dialog.dart';
@@ -17,7 +16,6 @@ import 'package:piwigo_ng/models/album_model.dart';
 import 'package:piwigo_ng/models/image_model.dart';
 import 'package:piwigo_ng/network/albums.dart';
 import 'package:piwigo_ng/network/images.dart';
-import 'package:piwigo_ng/network/upload.dart';
 import 'package:piwigo_ng/network/users.dart';
 import 'package:piwigo_ng/services/preferences_service.dart';
 import 'package:piwigo_ng/utils/localizations.dart';
@@ -51,58 +49,15 @@ Future<File> compressImage(File file,
     );
 
     debugPrint("Upload Compress $result");
-    return result ?? file;
+    if (result != null) {
+      return File(result.path);
+    } else {
+      return file;
+    }
   } catch (e) {
     debugPrint(e.toString());
   }
   return file;
-}
-
-// Deprecated
-Future<List<XFile>?> onPickFiles() async {
-  try {
-    FilePicker.platform.clearTemporaryFiles();
-    if (!await askMediaPermission()) return null;
-    final Directory cacheDir = await getTemporaryDirectory();
-    if (cacheDir.existsSync()) {
-      cacheDir.deleteSync(recursive: true);
-    }
-
-    final FilePickerResult? result = await FilePicker.platform.pickFiles(
-      allowedExtensions: appPreferences.getString('FILE_TYPES')?.split(','),
-      allowMultiple: true,
-      withData: false,
-      withReadStream: false,
-      type: FileType.custom,
-      onFileLoading: (status) {
-        debugPrint("File picker status ${status.name}");
-      },
-    );
-    if (result == null) return null;
-    List<XFile> uploadFiles = [];
-    for (PlatformFile file in result.files) {
-      String? filePath = file.path;
-      if (file.extension == 'heic' && filePath != null) {
-        debugPrint("$filePath is Heic !");
-        File oldFile = File(file.path!);
-        filePath = await HeicToJpg.convert(
-          file.path!,
-        );
-        oldFile.delete();
-      }
-      if (filePath != null) {
-        uploadFiles.add(XFile(
-          filePath,
-          name: file.name,
-          bytes: file.bytes,
-        ));
-      }
-    }
-    return uploadFiles;
-  } catch (e) {
-    debugPrint('${e.toString()}');
-  }
-  return null;
 }
 
 Future<List<XFile>?> onPickImages() async {
@@ -116,8 +71,8 @@ Future<List<XFile>?> onPickImages() async {
       if (Preferences.getAvailableFileTypes
           .contains(file.name.split('.').last)) {
         files.add(file);
-      } else if (file.name.endsWith('.heic')) {
-        String? jpgPath = await HeicToJpg.convert(file.path);
+      } else if (file.name.endsWith('.heic') || file.name.endsWith('.heif')) {
+        String? jpgPath = await HeifConverter.convert(file.path, format: 'jpg');
         if (jpgPath != null) {
           files.add(XFile(jpgPath));
         }
@@ -146,7 +101,7 @@ Future<XFile?> onTakePhoto(BuildContext context) async {
           requestFullMetadata: !Preferences.getRemoveMetadata,
         );
         if (image != null) {
-          String? jpgPath = await HeicToJpg.convert(image.path);
+          String? jpgPath = await HeifConverter.convert(image.path, format: 'jpg');
           if (jpgPath != null) {
             image = XFile(jpgPath);
           }

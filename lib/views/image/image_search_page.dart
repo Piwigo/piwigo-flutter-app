@@ -63,7 +63,7 @@ class _ImageSearchPageState extends State<ImageSearchPage> {
 
   bool get _hasNonFavorites => _selectedList.where((image) => !image.favorite).isNotEmpty;
 
-  void _onWillPop(bool pop) {
+  void _onWillPop(bool pop,Object? result) {
     if (pop) return;
     if (_selectedList.isNotEmpty) {
       setState(() {
@@ -152,7 +152,7 @@ class _ImageSearchPageState extends State<ImageSearchPage> {
   Widget build(BuildContext context) {
     return PopScope(
       canPop: false,
-      onPopInvoked: _onWillPop,
+      onPopInvokedWithResult: _onWillPop,
       child: Scaffold(
         body: SafeArea(
           child: SmartRefresher(

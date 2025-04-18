@@ -31,7 +31,7 @@ class ConfirmDialog extends StatelessWidget {
               (states) => Theme.of(context).textTheme.bodySmall?.color ?? AppColors.disabled,
             ),
             overlayColor: WidgetStateColor.resolveWith(
-              (states) => AppColors.accent.withOpacity(0.3),
+              (states) => AppColors.accent.withValues(alpha: 0.3),
             ),
           ),
           onPressed: () => Navigator.of(context).pop(false),
@@ -45,7 +45,7 @@ class ConfirmDialog extends StatelessWidget {
               (states) => confirmColor ?? AppColors.accent,
             ),
             overlayColor: WidgetStateColor.resolveWith(
-              (states) => AppColors.accent.withOpacity(0.3),
+              (states) => AppColors.accent.withValues(alpha: 0.3),
             ),
           ),
           onPressed: () => Navigator.of(context).pop(true),
