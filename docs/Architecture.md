@@ -1,21 +1,21 @@
 # Architecture
 
-This file document the different directory of this project.
-Each section will contain explanation and a directory tree.
+This file documents the different directories of this project.
+Each section will contain explanations and a corresponding directory tree.
 
 ## Flutter
 
 ### Dependencies and generated files
 
 The `.fvmrc` is used by [fvm](https://fvm.app/) to specify the flutter version.  
-`lib/` contain the flutter code.  
-`pubspec.lock` is a lock file to handle dependencies.  
-`pubspec.yaml` is configuration file specifying :
+`lib/` contains the flutter code.  
+`pubspec.lock` is a lock file to handle dependency versions.  
+`pubspec.yaml` is a configuration file that specifies :
 
 - the app version
 - the flutter sdk requirement
-- the dependencies
-- the asset directory 
+- the project dependencies
+- the assets directory 
 
 ```
 ├── .fvmrc
@@ -26,8 +26,8 @@ The `.fvmrc` is used by [fvm](https://fvm.app/) to specify the flutter version.
 
 ### Flutter code
 
-Contain the flutter code that make the app.  
-Follow a view-model structure where `components` contain reusable parts.
+This directory contains the flutter code that builds the app.  
+This project follows a view-model structure where `components` contain reusable UI parts.
 
 ```sh
 .
@@ -45,8 +45,8 @@ Follow a view-model structure where `components` contain reusable parts.
 
 ## Android
 
-The android directory contain all elements necessary to target Android, most of it is gradle configuration.
-Upgrading the `AGP (Android Gradle Plugin)` open the `android` directory with Android Studio and use **Tools > AGP Upgrade Assitant** or manually update the gradle configuration at your own risk.
+The android directory contain all elements needed to build the app for Android, primarily Gradle configurations.
+to upgrade the `AGP (Android Gradle Plugin)` open the `android` directory with Android Studio and use **Tools > AGP Upgrade Assitant** or manually update the Gradle configuration files (at your own risk).
 
 ```
 .
@@ -60,9 +60,9 @@ Upgrading the `AGP (Android Gradle Plugin)` open the `android` directory with An
 
 ## Translations
 
-Translations are hosted on [crowdin](https://crowdin.com/project/piwigo-ng), everything is translated from english.  
-Flutter take the `app_%%.arb` files and generate dart code inside the `lib/l10n` directory.   
-`untranslated.json` is generated at compile time to indicate missing string.
+Translations are managed on [crowdin](https://crowdin.com/project/piwigo-ng), with all translations based on English.  
+Flutter processes the `app_%%.arb` files and generate Dart code in the `lib/l10n` directory.   
+An `untranslated.json` is generated at compile time to indicate any missing translations.
 
 ```sh
 # %% = country code, one file per translation
