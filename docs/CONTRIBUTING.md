@@ -1,8 +1,8 @@
-# CONTRIBUTING :
+# CONTRIBUTING
 
-## Environment setup :
+## Environment setup
 
-### Flutter :
+### Flutter
 
 Install and configure flutter using the [Official Flutter documentation](https://docs.flutter.dev/get-started/install).  
 Check `pubspec.yaml` or `.fvmrc` and change the flutter version accordingly
@@ -12,7 +12,7 @@ Using git and the [commit hash of the release](https://docs.flutter.dev/release/
 cd <flutter path>
 git checkout d8a9f9a # Commit hash of the release
 flutter --version
-# Optional : disable analytics/telemetry :
+# Optional disable analytics/telemetry
 flutter config --no-analytics
 ```
 
@@ -23,7 +23,7 @@ cd <Project-dir>
 fvm use 2.27.4
 ```
 
-### Android Studio :
+### Android Studio
 
 *(Optional - enable wayland support)* : Add `-Dawt.toolkit.name=WLToolkit` to the Custom VM Options.
 
@@ -36,7 +36,7 @@ Install the flutter plugin and restart, then go to **Settings > Languages & Fram
 - Android SDK Platform-Tools
 - Android Emulator
 
-**Enable flutter android support :**
+**Enable flutter android support**
 ```sh
 flutter doctor --android-licenses # Accept the Android License
 # Check that Android toolchain is working
@@ -48,7 +48,7 @@ If Android studio doesn't pickup the path of the flutter toolchain or dart :
 In **Settings > Languages & Framework > Flutter** set the flutter SDK path using the absolute path of your install.  
 And in **Settings > Languages & Framework > Dart** specify the Dark SDK path `<Absolute-Flutter-Path>/bin/cache/dart-sdk`
 
-## Contributing guidelines :
+## Contributing guidelines
 
 Contribution must target the `develop` branch and must have documented changes.
 
