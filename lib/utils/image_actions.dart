@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:heif_converter/heif_converter.dart';
@@ -17,7 +16,6 @@ import 'package:piwigo_ng/models/album_model.dart';
 import 'package:piwigo_ng/models/image_model.dart';
 import 'package:piwigo_ng/network/albums.dart';
 import 'package:piwigo_ng/network/images.dart';
-import 'package:piwigo_ng/network/upload.dart';
 import 'package:piwigo_ng/network/users.dart';
 import 'package:piwigo_ng/services/preferences_service.dart';
 import 'package:piwigo_ng/utils/localizations.dart';
@@ -60,51 +58,6 @@ Future<File> compressImage(File file,
     debugPrint(e.toString());
   }
   return file;
-}
-
-// Deprecated
-Future<List<XFile>?> onPickFiles() async {
-  try {
-    FilePicker.platform.clearTemporaryFiles();
-    if (!await askMediaPermission()) return null;
-    final Directory cacheDir = await getTemporaryDirectory();
-    if (cacheDir.existsSync()) {
-      cacheDir.deleteSync(recursive: true);
-    }
-
-    final FilePickerResult? result = await FilePicker.platform.pickFiles(
-      allowedExtensions: appPreferences.getString('FILE_TYPES')?.split(','),
-      allowMultiple: true,
-      withData: false,
-      withReadStream: false,
-      type: FileType.custom,
-      onFileLoading: (status) {
-        debugPrint("File picker status ${status.name}");
-      },
-    );
-    if (result == null) return null;
-    List<XFile> uploadFiles = [];
-    for (PlatformFile file in result.files) {
-      String? filePath = file.path;
-      if ((file.extension == 'heic' || file.extension == 'heif') && filePath != null) {
-        debugPrint("$filePath is Heic/Heif !");
-        File oldFile = File(file.path!);
-        filePath = await HeifConverter.convert(file.path!, format: 'jpg');
-        oldFile.delete();
-      }
-      if (filePath != null) {
-        uploadFiles.add(XFile(
-          filePath,
-          name: file.name,
-          bytes: file.bytes,
-        ));
-      }
-    }
-    return uploadFiles;
-  } catch (e) {
-    debugPrint('${e.toString()}');
-  }
-  return null;
 }
 
 Future<List<XFile>?> onPickImages() async {
