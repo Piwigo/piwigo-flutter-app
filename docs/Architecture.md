@@ -24,6 +24,24 @@ The `.fvmrc` is used by [fvm](https://fvm.app/) to specify the flutter version.
 └── pubspec.yaml
 ```
 
+### Flutter code :
+
+Contain the flutter code that make the app.  
+Follow a view-model structure where `components` contain reusable parts.
+
+```sh
+.
+├── lib
+│  ├── app.dart
+│  ├── components
+│  ├── l10n		# see Translations
+│  ├── main.dart
+│  ├── models
+│  ├── network
+│  ├── services
+│  ├── utils
+│  └── views
+```
 
 ## Android :
 
