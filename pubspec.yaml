@@ -33,7 +33,7 @@ dependencies:
       ref: dd4b76a
   modal_bottom_sheet: ^3.0.0-pre # Custom modals (might be useless)
   cached_network_image: ^3.2.2 # Better cache for images (used for album's thumbnail)
-  flutter_speed_dial: ^6.1.0+1 # Speed dial
+  flutter_speed_dial: ^7.0.0 # Speed dial
   pull_to_refresh: ^2.0.0 # Top and bottom refresh gestures
   photo_view: ^0.15.0 # Zoom on fullscreen photos
   extended_text: ^14.2.0 # Text overflow on left side
@@ -44,12 +44,12 @@ dependencies:
   path_provider: ^2.0.11 # Get application documents
   shared_preferences: ^2.0.15 # Base local storage
   flutter_secure_storage: ^9.2.4 # Local storage secured for logins
-  image_picker: ^0.8.5+3 # Pick images from camera
-  file_picker: ^8.3.7 # Pick images and videos at a time for upload
+  image_picker: ^1.1.2 # Pick images from camera
+  file_picker: ^10.1.2 # Pick images and videos at a time for upload
 
   # Device
   device_info_plus: ^10.1.2 # Get device info (version
-  flutter_local_notifications: ^18.0.1 # Throws notifications on download or upload
+  flutter_local_notifications: ^19.1.0 # Throws notifications on download or upload
   open_filex: ^4.4.0 # Open files with devices apps
   workmanager: ^0.5.2 # Background processes (auto upload)
   gal: ^2.3.1 # Download images
