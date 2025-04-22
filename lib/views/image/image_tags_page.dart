@@ -62,7 +62,7 @@ class _ImageTagsPageState extends State<ImageTagsPage> {
 
   bool get _hasNonFavorites => _selectedList.where((image) => !image.favorite).isNotEmpty;
 
-  void _onWillPop(bool pop) {
+  void _onWillPop(bool pop,Object? result) {
     if (pop) return null;
     if (_selectedList.isNotEmpty) {
       setState(() {
@@ -147,7 +147,7 @@ class _ImageTagsPageState extends State<ImageTagsPage> {
   Widget build(BuildContext context) {
     return PopScope(
       canPop: false,
-      onPopInvoked: _onWillPop,
+      onPopInvokedWithResult: _onWillPop,
       child: Scaffold(
         body: SafeArea(
           child: SmartRefresher(

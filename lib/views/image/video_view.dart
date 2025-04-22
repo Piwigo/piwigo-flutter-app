@@ -395,7 +395,7 @@ class _VideoViewState extends State<VideoView> {
   Widget get _overlayBackground {
     return Positioned.fill(
       child: Container(
-        color: Colors.black.withOpacity(0.5),
+        color: Colors.black.withValues(alpha: 0.5),
       ),
     );
   }
@@ -430,7 +430,7 @@ class _VideoViewState extends State<VideoView> {
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(5),
-                color: Colors.black.withOpacity(0.5),
+                color: Colors.black.withValues(alpha: 0.5),
               ),
               child: Text(
                 appStrings.videoLoadError_message,

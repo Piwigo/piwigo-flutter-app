@@ -9,7 +9,7 @@ final ThemeData lightTheme = ThemeData.light(useMaterial3: true).copyWith(
   scaffoldBackgroundColor: AppColors.backgroundLight,
   dialogBackgroundColor: AppColors.backgroundLight,
   focusColor: AppColors.accent,
-  splashColor: AppColors.accent.withOpacity(0.3),
+  splashColor: AppColors.accent.withValues(alpha: 0.3),
   cardColor: AppColors.cardLight,
   shadowColor: Colors.black54,
   chipTheme: ChipThemeData(
@@ -93,12 +93,12 @@ final ThemeData lightTheme = ThemeData.light(useMaterial3: true).copyWith(
   ),
   textSelectionTheme: TextSelectionThemeData(
     cursorColor: AppColors.accent,
-    selectionColor: AppColors.accent.withOpacity(0.3),
+    selectionColor: AppColors.accent.withValues(alpha: 0.3),
     selectionHandleColor: AppColors.accent,
   ),
   bottomSheetTheme: BottomSheetThemeData(
-    surfaceTintColor: Colors.black.withOpacity(0),
-    backgroundColor: Colors.black.withOpacity(0),
+    surfaceTintColor: Colors.black.withValues(alpha: 0),
+    backgroundColor: Colors.black.withValues(alpha: 0),
   ),
   switchTheme: SwitchThemeData(
     thumbColor: WidgetStateProperty.all(AppColors.backgroundLight),
@@ -180,7 +180,7 @@ final ThemeData darkTheme = ThemeData.dark(useMaterial3: true).copyWith(
   scaffoldBackgroundColor: AppColors.backgroundDark,
   dialogBackgroundColor: AppColors.backgroundDark,
   focusColor: AppColors.accent,
-  splashColor: AppColors.accent.withOpacity(0.3),
+  splashColor: AppColors.accent.withValues(alpha: 0.3),
   cardColor: AppColors.cardDark,
   shadowColor: Colors.black54,
   chipTheme: ChipThemeData(
@@ -268,8 +268,8 @@ final ThemeData darkTheme = ThemeData.dark(useMaterial3: true).copyWith(
     selectionHandleColor: AppColors.accent,
   ),
   bottomSheetTheme: BottomSheetThemeData(
-    surfaceTintColor: Colors.black.withOpacity(0),
-    backgroundColor: Colors.black.withOpacity(0),
+    surfaceTintColor: Colors.black.withValues(alpha: 0),
+    backgroundColor: Colors.black.withValues(alpha: 0),
   ),
   switchTheme: SwitchThemeData(
     thumbColor: WidgetStateProperty.all(const Color(0x80FFFFFF)),
