@@ -64,7 +64,7 @@ Future<List<int>> uploadPhotos(
   // Check if Wifi is enabled and working before processing
   if (Preferences.getWifiUpload) {
     var connectivity = await Connectivity().checkConnectivity();
-    if (connectivity != ConnectivityResult.wifi) {
+    if (!connectivity.contains(ConnectivityResult.wifi)) {
       if (!(await showConfirmDialog(
         App.navigatorKey.currentContext!,
         title: appStrings.uploadNoWiFiNetwork,
