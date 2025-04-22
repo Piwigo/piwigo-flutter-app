@@ -36,7 +36,7 @@ android {
     defaultConfig {
         multiDexEnabled true
         applicationId "com.piwigo.piwigo_ng"
-        minSdkVersion 21
+        minSdkVersion 26
         targetSdkVersion 36
         versionCode = flutter.versionCode
         versionName = flutter.versionName
