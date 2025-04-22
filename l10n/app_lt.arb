@@ -339,6 +339,26 @@
     "imageDetailsFetchError_title": "Nepavyko gauti išsamios nuotraukos informacijos",
     "imageDetailsFetchError_retryMessage": "Nepavyko gauti nuotraukos duomenų. Bandyti iš naujo?",
     "imageDetailsFetchError_continueMessage": "Nepavyko gauti nuotraukos duomenų. Tęsti?",
+    "imageDetails_dateCreated": "Created on {date} at {time}",
+    "@imageDetails_dateCreated": {
+        "placeholders": {
+            "date": {},
+            "time": {}
+        }
+    },
+    "imageDetails_dateAvailable": "Available on {date} at {time}",
+    "@imageDetails_dateAvailable": {
+        "placeholders": {
+            "date": {},
+            "time": {}
+        }
+    },
+    "imageDetails_nbAlbums": "{count, plural, =0{Orphan} =1{Belongs to 1 album} other{Belongs to {count} albums}}",
+    "@imageDetails_nbAlbums": {
+        "placeholders": {
+            "count": {}
+        }
+    },
     "privacyLevel": "Privatumo lygis",
     "privacyLevel_admin": "Administratoriai",
     "privacyLevel_adminFamily": "Administratoriai, Šeima",

@@ -339,6 +339,26 @@
     "imageDetailsFetchError_title": "Nepodarilo sa načítať detaily fotky",
     "imageDetailsFetchError_retryMessage": "Nepodarilo sa načítať údaje fotky. Skúsiť znovu?",
     "imageDetailsFetchError_continueMessage": "Nepodarilo sa načítať údaje fotky. Pokračovať?",
+    "imageDetails_dateCreated": "Created on {date} at {time}",
+    "@imageDetails_dateCreated": {
+        "placeholders": {
+            "date": {},
+            "time": {}
+        }
+    },
+    "imageDetails_dateAvailable": "Available on {date} at {time}",
+    "@imageDetails_dateAvailable": {
+        "placeholders": {
+            "date": {},
+            "time": {}
+        }
+    },
+    "imageDetails_nbAlbums": "{count, plural, =0{Orphan} =1{Belongs to 1 album} other{Belongs to {count} albums}}",
+    "@imageDetails_nbAlbums": {
+        "placeholders": {
+            "count": {}
+        }
+    },
     "privacyLevel": "Úroveň súkromia",
     "privacyLevel_admin": "Správcovia",
     "privacyLevel_adminFamily": "Správcovia, Rodina",

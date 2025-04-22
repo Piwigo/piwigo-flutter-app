@@ -90,13 +90,13 @@
     "logoutConfirmation_title": "注销",
     "logoutConfirmation_message": "确定要退出账户吗？",
     "logoutFail_title": "登出失败",
-    "albumCount": "{count, plural,=0{0 albums} =1{1 album} other{{count} sub-albums}}",
+    "albumCount": "{count, plural,=0{0 个相册} =1{1 个相册} other{{count} 个相册}}",
     "@albumCount": {
         "placeholders": {
             "count": {}
         }
     },
-    "subAlbumCount": "{count, plural,=0{0 sub-albums} =1{1 sub-album} other{{count} sub-albums}}",
+    "subAlbumCount": "{count, plural,=0{0 个子相册} =1{1 个子相册} other{{count} 个子相册}}",
     "@subAlbumCount": {
         "placeholders": {
             "count": {}
@@ -279,7 +279,7 @@
     "categoryImageSetError_title": "照片设置出错",
     "categoryImageSetError_message": "设置相册封面失败",
     "singleImage": "照片",
-    "imageCount": "{count, plural,=0{0 photos} =1{1 photo} other{{count} sub-albums}}",
+    "imageCount": "{count, plural,=0{0 张照片} =1{1 张照片} other{{count} 张照片}}",
     "@imageCount": {
         "placeholders": {
             "count": {}
@@ -339,6 +339,26 @@
     "imageDetailsFetchError_title": "照片信息获取失败",
     "imageDetailsFetchError_retryMessage": "无法获取照片信息，是否重试？",
     "imageDetailsFetchError_continueMessage": "无法获取照片信息，是否继续？",
+    "imageDetails_dateCreated": "创建于 {date}{time}",
+    "@imageDetails_dateCreated": {
+        "placeholders": {
+            "date": {},
+            "time": {}
+        }
+    },
+    "imageDetails_dateAvailable": "上传于 {date}{time}",
+    "@imageDetails_dateAvailable": {
+        "placeholders": {
+            "date": {},
+            "time": {}
+        }
+    },
+    "imageDetails_nbAlbums": "{count, plural, =0{不属于任何相册} =1{属于 1 个相册} other{属于 {count} 个相册}}",
+    "@imageDetails_nbAlbums": {
+        "placeholders": {
+            "count": {}
+        }
+    },
     "privacyLevel": "隐私级别",
     "privacyLevel_admin": "管理员",
     "privacyLevel_adminFamily": "管理员，家庭",
@@ -408,7 +428,7 @@
             "count": {}
         }
     },
-    "deleteImageCount_title": "{count, plural, =0{删除图片} =1{图片已删除} other{已删除 {count} 张图片}}",
+    "deleteImageCount_title": "{count, plural, =0{删除照片} =1{删除照片} other{删除 {count} 张照片}}",
     "@deleteImageCount_title": {
         "placeholders": {
             "count": {}
@@ -701,7 +721,7 @@
     "defaultImageSizeTitle": "默认大小",
     "defaultImageSizeHeader": "请选择图片大小",
     "defaultImageSize_recommended": " (推荐)",
-    "defaultSize_disabled": " （在服务器上禁用）",
+    "defaultSize_disabled": " (在服务器上禁用)",
     "defaultSizeFooter": "灰色的尺寸不建议且不被Piwigo服务器支持",
     "settings_shareGPSdata": "分享私密元数据",
     "settings_shareGPSdata375px": "共享时包含私密元数据",
@@ -784,7 +804,7 @@
     "uploadVideoSize_header": "请选择要上传的视频的最大大小",
     "uploadVideoSize_resolution": "内置摄像头最大规格",
     "uploadPhotoSize_original": "不缩小大小",
-    "settingsHeader_cache": "缓存设置 (已使用/总共)",
+    "settingsHeader_cache": "缓存设置（已使用/总共）",
     "settings_cacheDisk": "存储",
     "settings_cacheMemory": "内存",
     "settings_cacheSize": "缓存大小",
@@ -797,7 +817,7 @@
     "settings_switchPalette": "自动",
     "settings_brightness": "亮度",
     "settings_brightnessHelp": "在环境亮度低的情况下，自动选项会使用暗色外观来使照片在黑暗背景下易于观看",
-    "userCount": "{count, plural, =0{0 个用户} =1{1 个用户} other{{count} 个用户}}",
+    "userCount": "{count, plural, =0{0 位用户} =1{1 位用户} other{{count} 位用户}}",
     "@userCount": {
         "placeholders": {
             "count": {}
@@ -809,7 +829,7 @@
             "count": {}
         }
     },
-    "commentCount": "{count, plural, =0{0 个评论} =1{1 个评论} other{{count} 个评论}}",
+    "commentCount": "{count, plural, =0{0 条评论} =1{1 条评论} other{{count} 条评论}}",
     "@commentCount": {
         "placeholders": {
             "count": {}
@@ -828,7 +848,7 @@
     "settings_acknowledgements": "鸣谢",
     "settings_privacy": "隐私政策",
     "settings_unknownVersion": "未知版本",
-    "settings_privacyLocale": "&lang=en_EN",
+    "settings_privacyLocale": "&lang=zh_CN",
     "@settings_privacyLocale": {
         "description": "The language and country code for the url to Piwigo Mobile apps privacy policy: https://piwigo.org/mobile-apps-privacy-policy&webview&lang=en_EN"
     }
