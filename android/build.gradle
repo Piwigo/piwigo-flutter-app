@@ -5,9 +5,9 @@ allprojects {
     }
 }
 
-rootProject.layout.buildDirectory.dir('../build')
+rootProject.layout.buildDirectory.set(layout.projectDirectory.dir("../build"))
 subprojects {
-    project.layout.buildDirectory.map {it.dir("${project.name}")}
+    project.layout.buildDirectory.set(rootProject.layout.buildDirectory.dir("$project.name"))
     project.evaluationDependsOn(':app')
 }
 
