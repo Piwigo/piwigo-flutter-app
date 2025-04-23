@@ -48,7 +48,7 @@ dependencies:
   file_picker: ^10.1.2 # Pick images and videos at a time for upload
 
   # Device
-  device_info_plus: ^10.1.2 # Get device info (version
+  device_info_plus: ^11.3.0 # Get device info (version
   flutter_local_notifications: ^19.1.0 # Throws notifications on download or upload
   open_filex: ^4.4.0 # Open files with devices apps
   workmanager: ^0.5.2 # Background processes (auto upload)
@@ -60,7 +60,7 @@ dependencies:
   chewie: ^1.8.1 # Video player with options
   flutter_image_compress: ^2.4.0 # Remove metadata
   permission_handler: ^12.0.0+1 # Check and asks for permissions
-  share_plus: ^10.1.4 # Share files
+  share_plus: ^11.0.0 # Share files
   flutter_cache_manager: ^3.3.0 # Handles network image cache
   heif_converter: ^1.0.1 # Convert heic files to jpg
   provider: ^6.0.3 # Notifiers for theme and language changes
