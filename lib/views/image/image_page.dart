@@ -708,10 +708,12 @@ class _ImagePageState extends State<ImagePage> {
             },
           ),
         ),
-      IconButton(
-        onPressed: () => downloadImages([_currentImage]),
-        icon: Icon(Icons.download),
-      ),
+      if (_currentImage.elementUrl != "")
+        IconButton(
+          onPressed: () => downloadImages([_currentImage]),
+          icon: Icon(Icons.download),
+        )
+      ,
     ];
 
     return widget.isAdmin ? adminActions : userActions;
