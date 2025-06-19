@@ -7,7 +7,7 @@ version: 2.4.0+240
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
-  flutter: 3.27.4
+  flutter: 3.32.4
 
 dependencies:
   flutter:
@@ -36,7 +36,7 @@ dependencies:
   flutter_speed_dial: ^7.0.0 # Speed dial
   pull_to_refresh: ^2.0.0 # Top and bottom refresh gestures
   photo_view: ^0.15.0 # Zoom on fullscreen photos
-  extended_text: ^14.2.0 # Text overflow on left side
+  extended_text: ^15.0.2 # Text overflow on left side
   flutter_easyloading: ^3.0.5 # Show loading dialog
 
   # Storage
@@ -51,7 +51,7 @@ dependencies:
   device_info_plus: ^11.3.0 # Get device info (version
   flutter_local_notifications: ^19.1.0 # Throws notifications on download or upload
   open_filex: ^4.4.0 # Open files with devices apps
-  workmanager: ^0.5.2 # Background processes (auto upload)
+  workmanager: ^0.6.0 # Background processes (auto upload)
   gal: ^2.3.1 # Download images
 
   # Utils
@@ -68,9 +68,11 @@ dependencies:
   # Translations
   flutter_localizations:
     sdk: flutter
-  intl: ^0.19.0 # Used for translations
+  intl: ^0.20.2 # Used for translations
   html_unescape: ^2.0.0
 
+  path: any
+  crypto: any
 dev_dependencies:
   flutter_test:
     sdk: flutter
