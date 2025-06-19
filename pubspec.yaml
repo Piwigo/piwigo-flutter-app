@@ -48,7 +48,7 @@ dependencies:
   file_picker: ^10.1.2 # Pick images and videos at a time for upload
 
   # Device
-  device_info_plus: ^11.3.0 # Get device info (version
+  device_info_plus: ^11.5.0 # Get device info (version
   flutter_local_notifications: ^19.1.0 # Throws notifications on download or upload
   open_filex: ^4.4.0 # Open files with devices apps
   workmanager: ^0.6.0 # Background processes (auto upload)
@@ -78,7 +78,7 @@ dev_dependencies:
     sdk: flutter
   dependency_validator: ^5.0.2
 
-  flutter_lints: ^5.0.0
+  flutter_lints: ^6.0.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
