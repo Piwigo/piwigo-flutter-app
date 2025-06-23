@@ -10,3 +10,10 @@ GeneratedPluginRegistrant.java
 # See https://flutter.dev/docs/deployment/android#reference-the-keystore-from-the-app
 key.properties
 /build/.last_build_id
+
+# Remove AGP temp files
+/.idea/
+/build/
+
+# Gradle build files
+/app/build/

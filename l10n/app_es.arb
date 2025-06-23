@@ -20,7 +20,7 @@
     "loadingHUD_label": "Cargando…",
     "completeHUD_label": "Completo",
     "errorHUD_label": "Error",
-    "loadMoreHUD_label": "Release to load more",
+    "loadMoreHUD_label": "Soltar para cargar más",
     "uploadRights_title": "Se necesitan derechos de autor",
     "uploadRights_message": "Debes tener derechos de autor para poder subir fotos o vídeos.",
     "internetErrorGeneral_title": "Error de conexión",
@@ -48,20 +48,20 @@
     "login_newSession": "Abriendo sesión",
     "login_communityParameters": "Parámetros de comunidad",
     "login_serverParameters": "Parámetros de Piwigo",
-    "login_advancedParameters": "Authentication Settings",
+    "login_advancedParameters": "Opciones de Autenticación",
     "login_connectionChanged": "¡Conexión cambiada!",
-    "login_rememberCredentials": "Remember credentials",
+    "login_rememberCredentials": "Recordar Credenciales",
     "loginHTTP_title": "Credenciales HTTP",
-    "loginHTTP_message": "Basic access authentification is required by the Piwigo server:",
-    "loginHTTP_enable": "Enable HTTP Basic",
-    "loginHTTPuser_placeholder": "Username",
-    "loginHTTPpwd_placeholder": "Password",
-    "loginCert_title": "Self Signed Certificates",
-    "loginCert_enable": "Allow SSL",
-    "loginCertFailed_title": "Connection Not Private",
-    "loginCertFailed_message": "Piwigo warns you when a website has a certificate that is not valid. Do you still want to accept this certificate?",
-    "loginHTTPSfailed_title": "Secure Connection Failed",
-    "loginHTTPSfailed_message": "Piwigo cannot establish a secure connection. Do you want to try to establish an insecure connection?",
+    "loginHTTP_message": "Autenticación Básica es requerida por el servidor de Piwigo:",
+    "loginHTTP_enable": "Habitar HTTP Básico",
+    "loginHTTPuser_placeholder": "Usuario",
+    "loginHTTPpwd_placeholder": "Contraseña",
+    "loginCert_title": "Certificados autofirmados",
+    "loginCert_enable": "Habilitar SSL",
+    "loginCertFailed_title": "La Conexión no es Privada",
+    "loginCertFailed_message": "Piwigo te avisará cuando el certificado del sitio web sea inválido. Aún quieres aceptar este Certificado?",
+    "loginHTTPSfailed_title": "Conexión Segura Fallida",
+    "loginHTTPSfailed_message": "Piwigo no puede establecer una Conexión Segura. Quieres intentar establecer una Conexión insegura?",
     "serverURLerror_title": "Incorrect URL",
     "serverURLerror_message": "Please correct the Piwigo web server address.",
     "serverMethodsError_title": "Unknown Methods",
@@ -339,6 +339,26 @@
     "imageDetailsFetchError_title": "Error al recuperar los detalles de la foto",
     "imageDetailsFetchError_retryMessage": "No se han podido recuperar los datos de la foto. ¿Volver a intentarlo?",
     "imageDetailsFetchError_continueMessage": "Fetching the photo data failed. Continue?",
+    "imageDetails_dateCreated": "Created on {date} at {time}",
+    "@imageDetails_dateCreated": {
+        "placeholders": {
+            "date": {},
+            "time": {}
+        }
+    },
+    "imageDetails_dateAvailable": "Available on {date} at {time}",
+    "@imageDetails_dateAvailable": {
+        "placeholders": {
+            "date": {},
+            "time": {}
+        }
+    },
+    "imageDetails_nbAlbums": "{count, plural, =0{Orphan} =1{Belongs to 1 album} other{Belongs to {count} albums}}",
+    "@imageDetails_nbAlbums": {
+        "placeholders": {
+            "count": {}
+        }
+    },
     "privacyLevel": "Privacy Level",
     "privacyLevel_admin": "Admins",
     "privacyLevel_adminFamily": "Admins, Family",

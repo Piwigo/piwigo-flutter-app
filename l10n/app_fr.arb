@@ -354,7 +354,7 @@
         }
     },
     "imageDetails_nbAlbums": "{count, plural, =0{Orpheline} =1{Appartient à 1 album} other{Appartient à {count} albums}}",
-    "@imageDetails_nbAlbums" : {
+    "@imageDetails_nbAlbums": {
         "placeholders": {
             "count": {}
         }

@@ -72,7 +72,7 @@ class _UploadStatusPageState extends State<UploadStatusPage> {
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
                     return LinearProgressIndicator(
-                      backgroundColor: Theme.of(context).colorScheme.secondary.withOpacity(0.3),
+                      backgroundColor: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.3),
                       value: min(snapshot.data!, 1.0),
                     );
                   }
@@ -147,7 +147,7 @@ class ScrollUpFloatingButton extends AnimatedWidget {
         curve: showCurve,
         opacity: isHidden ? 0.0 : 1.0,
         child: FloatingActionButton(
-          backgroundColor: Colors.grey.withOpacity(0.8),
+          backgroundColor: Colors.grey.withValues(alpha: 0.8),
           onPressed: () => controller.animateTo(
             0.0,
             duration: scrollDuration,

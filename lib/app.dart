@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:piwigo_ng/services/app_providers.dart';
@@ -26,6 +25,7 @@ import 'package:piwigo_ng/views/unknown_route_page.dart';
 import 'package:piwigo_ng/views/upload/upload_page.dart';
 import 'package:piwigo_ng/views/upload/upload_status_page.dart';
 
+import '/l10n/app_localizations.dart';
 import 'models/image_model.dart';
 
 class App extends StatelessWidget {

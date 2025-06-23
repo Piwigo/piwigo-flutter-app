@@ -74,7 +74,7 @@ class ImageCard extends StatelessWidget {
                         gradient: LinearGradient(
                             colors: [
                               Colors.black,
-                              Colors.black.withOpacity(0),
+                              Colors.black.withValues(alpha: 0),
                             ],
                             begin: Alignment.bottomCenter,
                             end: Alignment.topCenter),
@@ -137,7 +137,7 @@ class ImageCard extends StatelessWidget {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(color: Theme.of(context).primaryColor),
-                    color: Colors.black.withOpacity(0.3),
+                    color: Colors.black.withValues(alpha: 0.3),
                   ),
                 ),
               ),

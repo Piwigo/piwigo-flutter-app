@@ -2,7 +2,7 @@
     "tabBar_albums": "Alben",
     "tabBar_upload": "Hochladen",
     "tabBar_preferences": "Einstellungen",
-    "alertOkButton": "OK",
+    "alertOkButton": "",
     "alertDismissButton": "Verwerfen",
     "alertYesButton": "Ja",
     "alertNoButton": "Nein",
@@ -153,7 +153,7 @@
     "categoryUpload_loadSubCategories": "laden",
     "categoryUpload_images": "Fotos hochladen",
     "categoryUpload_videos": "Videos hochladen",
-    "categoryUpload_camera": "Camera",
+    "categoryUpload_camera": "",
     "categoryUpload_takePhoto": "Foto aufnehmen",
     "categoryUpload_takeVideo": "Video aufnehmen",
     "uploadList_title": "Upload Status",
@@ -339,6 +339,26 @@
     "imageDetailsFetchError_title": "Abrufen der Fotoinformationen fehlgeschlagen",
     "imageDetailsFetchError_retryMessage": "Abrufen der Fotoinformationen fehlgeschlagen. Erneut versuchen?",
     "imageDetailsFetchError_continueMessage": "Abrufen der Fotoinformationen fehlgeschlagen. Fortfahren?",
+    "imageDetails_dateCreated": "Created on {date} at {time}",
+    "@imageDetails_dateCreated": {
+        "placeholders": {
+            "date": {},
+            "time": {}
+        }
+    },
+    "imageDetails_dateAvailable": "Available on {date} at {time}",
+    "@imageDetails_dateAvailable": {
+        "placeholders": {
+            "date": {},
+            "time": {}
+        }
+    },
+    "imageDetails_nbAlbums": "{count, plural, =0{Orphan} =1{Belongs to 1 album} other{Belongs to {count} albums}}",
+    "@imageDetails_nbAlbums": {
+        "placeholders": {
+            "count": {}
+        }
+    },
     "privacyLevel": "Datenschutzstufe",
     "privacyLevel_admin": "Administratoren",
     "privacyLevel_adminFamily": "Administratoren, Familie",

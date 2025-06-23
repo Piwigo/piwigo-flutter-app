@@ -1,5 +1,5 @@
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:piwigo_ng/app.dart';
+import '/l10n/app_localizations.dart';
 
 AppLocalizations get appStrings =>
     AppLocalizations.of(App.scaffoldMessengerKey.currentContext!)!;

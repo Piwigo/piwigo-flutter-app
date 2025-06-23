@@ -423,7 +423,7 @@ class _VideoUploadItemState extends State<VideoUploadItem> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
               decoration:
-                  BoxDecoration(borderRadius: BorderRadius.circular(5), color: AppColors.black.withOpacity(0.7)),
+                  BoxDecoration(borderRadius: BorderRadius.circular(5), color: AppColors.black.withValues(alpha: 0.7)),
               child: Text(
                 _duration,
                 style: TextStyle(color: AppColors.white, fontSize: 10, fontWeight: FontWeight.bold),
