@@ -48,7 +48,7 @@ class ImageModel {
         dateCreation = json['date_creation'],
         dateAvailable = json['date_available'],
         pageUrl = json['page_url'],
-        elementUrl = json['element_url'],
+        elementUrl = json.containsKey("element_url") ? json['element_url'] : "",
         derivatives = Derivatives.fromJson(json['derivatives']),
         categories = json['categories'] ?? [],
         tags = json['tags']

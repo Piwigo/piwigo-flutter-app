@@ -5,8 +5,10 @@
 /.flutter-plugins
 /.flutter-plugins-dependencies
 /.packages
-
 *.env
+
+# May be temporary
+devtools_options.yaml
 
 # FVM Version Cache
 .fvm/
