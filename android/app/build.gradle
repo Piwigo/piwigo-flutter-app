@@ -15,7 +15,7 @@ android {
     //compileSdkVersion flutter.compileSdkVersion
     //ndkVersion = flutter.ndkVersion
     compileSdkVersion 36
-    ndkVersion "28.0.13004108"
+    ndkVersion "29.0.13599879"
 
     compileOptions {
         // Flag to enable support for the new language APIs
