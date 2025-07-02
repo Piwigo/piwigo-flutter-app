@@ -480,9 +480,8 @@ class _ImagePageState extends State<ImagePage> {
       builder: (context, index) {
         final ImageModel image = _imageList[index];
 
-        String imageUrl = '';
-        if (Preferences.getImageFullScreenSize == 'full') {
-          imageUrl = image.elementUrl;
+        String imageUrl = image.elementUrl;
+        if (Preferences.getImageFullScreenSize == 'full' && imageUrl.isNotEmpty) {
           imageUrl = HtmlUnescape().convert(imageUrl);
         } else {
           imageUrl = image.getDerivativeFromString(Preferences.getImageFullScreenSize)?.url ?? '';
@@ -709,10 +708,12 @@ class _ImagePageState extends State<ImagePage> {
             },
           ),
         ),
-      IconButton(
-        onPressed: () => downloadImages([_currentImage]),
-        icon: Icon(Icons.download),
-      ),
+      if (_currentImage.elementUrl != "")
+        IconButton(
+          onPressed: () => downloadImages([_currentImage]),
+          icon: Icon(Icons.download),
+        )
+      ,
     ];
 
     return widget.isAdmin ? adminActions : userActions;

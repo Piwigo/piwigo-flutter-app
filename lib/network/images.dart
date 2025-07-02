@@ -246,7 +246,7 @@ Future<bool> share(
   print(filesPath);
   if (filesPath == null || filesPath.isEmpty) return false;
   try {
-    Share.shareXFiles(filesPath);
+    SharePlus.instance.share(ShareParams(files: filesPath));
     return true;
   } catch (e) {
     debugPrint("$e");

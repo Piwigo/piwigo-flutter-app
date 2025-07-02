@@ -7,7 +7,6 @@ final ThemeData lightTheme = ThemeData.light(useMaterial3: true).copyWith(
   primaryColorDark: AppColors.black,
   disabledColor: AppColors.disabled,
   scaffoldBackgroundColor: AppColors.backgroundLight,
-  dialogBackgroundColor: AppColors.backgroundLight,
   focusColor: AppColors.accent,
   splashColor: AppColors.accent.withValues(alpha: 0.3),
   cardColor: AppColors.cardLight,
@@ -40,7 +39,7 @@ final ThemeData lightTheme = ThemeData.light(useMaterial3: true).copyWith(
     foregroundColor: AppColors.accent,
     titleTextStyle: TextStyle(fontSize: 20.0, color: AppColors.black),
   ),
-  tabBarTheme: TabBarTheme(
+  tabBarTheme: TabBarThemeData(
     dividerColor: Colors.transparent,
     labelStyle: TextStyle(
       fontSize: 16,
@@ -169,7 +168,7 @@ final ThemeData lightTheme = ThemeData.light(useMaterial3: true).copyWith(
       color: AppColors.black,
       fontWeight: FontWeight.normal,
     ),
-  ),
+  ), dialogTheme: DialogThemeData(backgroundColor: AppColors.backgroundLight),
 );
 
 final ThemeData darkTheme = ThemeData.dark(useMaterial3: true).copyWith(
@@ -178,7 +177,6 @@ final ThemeData darkTheme = ThemeData.dark(useMaterial3: true).copyWith(
   primaryColorDark: AppColors.black,
   disabledColor: AppColors.disabled,
   scaffoldBackgroundColor: AppColors.backgroundDark,
-  dialogBackgroundColor: AppColors.backgroundDark,
   focusColor: AppColors.accent,
   splashColor: AppColors.accent.withValues(alpha: 0.3),
   cardColor: AppColors.cardDark,
@@ -211,7 +209,7 @@ final ThemeData darkTheme = ThemeData.dark(useMaterial3: true).copyWith(
     foregroundColor: AppColors.accent,
     titleTextStyle: TextStyle(fontSize: 20.0, color: AppColors.white),
   ),
-  tabBarTheme: TabBarTheme(
+  tabBarTheme: TabBarThemeData(
     dividerColor: Colors.transparent,
     labelStyle: TextStyle(
       fontSize: 16,
@@ -329,5 +327,5 @@ final ThemeData darkTheme = ThemeData.dark(useMaterial3: true).copyWith(
       color: AppColors.white,
       fontWeight: FontWeight.bold,
     ),
-  ),
+  ), dialogTheme: DialogThemeData(backgroundColor: AppColors.backgroundDark),
 );
