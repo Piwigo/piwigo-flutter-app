@@ -56,7 +56,7 @@ dependencies:
 
   # Utils
   mime_type: ^1.0.0 # Check mime type of files (differentiate photos from videos)
-  video_player: ^2.4.7 # Read video files in fullscreen mode
+  video_player: ^2.10.0 # Read video files in fullscreen mode
   chewie: ^1.8.1 # Video player with options
   flutter_image_compress: ^2.4.0 # Remove metadata
   permission_handler: ^12.0.0+1 # Check and asks for permissions
