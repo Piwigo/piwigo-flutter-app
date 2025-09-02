@@ -462,8 +462,5 @@ void callbackDispatcher() {
 }
 
 void initializeWorkManager() {
-  Workmanager().initialize(
-    callbackDispatcher, // The top level function, aka callbackDispatcher
-    isInDebugMode: kDebugMode,
-  );
+  Workmanager().initialize(callbackDispatcher); // The top level function, aka callbackDispatcher
 }

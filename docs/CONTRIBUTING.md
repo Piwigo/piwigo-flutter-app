@@ -18,14 +18,12 @@ flutter config --no-analytics
 
 Using [fvm](https://fvm.app/) :
 ```sh
-fvm install 2.27.4
+fvm install 3.27.4
 cd <Project-dir>
-fvm use 2.27.4
+fvm use 3.27.4
 ```
 
 ### Android Studio
-
-*(Optional - enable wayland support)* : Add `-Dawt.toolkit.name=WLToolkit` to the Custom VM Options.
 
 Install the flutter plugin and restart, then go to **Settings > Languages & Framework > Android SDK > SDK Tools** and install the following :
 
@@ -48,6 +46,13 @@ If Android studio doesn't pickup the path of the flutter toolchain or dart :
 In **Settings > Languages & Framework > Flutter** set the flutter SDK path using the absolute path of your install.  
 And in **Settings > Languages & Framework > Dart** specify the Dark SDK path `<Absolute-Flutter-Path>/bin/cache/dart-sdk`
 
+## Debugging
+
+By default running the app via Android Studio or `flutter run` will use the debug APK (located in `build/app/outputs/flutter-apk/app-debug.apk`).
+Background tasks are done with [workmanager](https://docs.page/fluttercommunity/flutter_workmanager) debugging must be enabled via the kotlin flag `WorkmanagerDebug.setCurrent(LoggingDebugHandler())`
+
+See more info in https://docs.page/fluttercommunity/flutter_workmanager/debugging
+
 ## Contributing guidelines
 
 Contribution must target the `develop` branch and must have documented changes.
@@ -57,5 +62,3 @@ if you are fixing an existing issue or bug, tag it in your merge request (exampl
 if you are doing maintenance work, be sure to add the changelog of the libraries you are updating.
 
 Translation are done via [crowdin](https://crowdin.com/project/piwigo-ng)
-
-
