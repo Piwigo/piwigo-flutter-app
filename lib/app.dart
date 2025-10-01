@@ -17,7 +17,7 @@ import 'package:piwigo_ng/views/image/image_favorites_page.dart';
 import 'package:piwigo_ng/views/image/image_page.dart';
 import 'package:piwigo_ng/views/image/image_search_page.dart';
 import 'package:piwigo_ng/views/image/image_tags_page.dart';
-import 'package:piwigo_ng/views/image/video_player_page.dart';
+import 'package:piwigo_ng/views/image/vlc_video_player.dart';
 import 'package:piwigo_ng/views/settings/auto_upload_page.dart';
 import 'package:piwigo_ng/views/settings/privacy_policy_page.dart';
 import 'package:piwigo_ng/views/settings/select_language_page.dart';
@@ -192,9 +192,9 @@ Route<dynamic> generateRoute(RouteSettings settings) {
         ),
         settings: settings,
       );
-    case VideoPlayerPage.routeName:
+    case VlcVideoPlayer.routeName:
       return MaterialPageRoute(
-        builder: (_) => VideoPlayerPage(
+        builder: (_) => VlcVideoPlayer(
           videoUrl: arguments['videoUrl'],
           thumbnailUrl: arguments['thumbnailUrl'],
         ),

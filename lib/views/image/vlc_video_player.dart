@@ -11,6 +11,8 @@ class VlcVideoPlayer extends StatefulWidget {
   final String videoUrl;
   final String? thumbnailUrl;
 
+  static const String routeName = '/image/video_player';
+
   @override
   State<StatefulWidget> createState() => VlcVideoPlayerState();
 }
