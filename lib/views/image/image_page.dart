@@ -23,7 +23,7 @@ import 'package:piwigo_ng/utils/image_actions.dart';
 import 'package:piwigo_ng/utils/localizations.dart';
 import 'package:piwigo_ng/utils/resources.dart';
 import 'package:piwigo_ng/utils/settings.dart';
-import 'package:piwigo_ng/views/image/video_player_page.dart';
+import 'package:piwigo_ng/views/image/vlc_video_player.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -511,7 +511,7 @@ class _ImagePageState extends State<ImagePage> {
                     ),
                     onPressed: () {
                       Navigator.of(context).pushNamed(
-                        VideoPlayerPage.routeName,
+                        VlcVideoPlayer.routeName,
                         arguments: {
                           'videoUrl': image.elementUrl,
                           'thumbnailUrl': imageUrl,

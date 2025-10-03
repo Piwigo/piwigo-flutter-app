@@ -22,7 +22,6 @@ import 'package:piwigo_ng/utils/image_actions.dart';
 import 'package:piwigo_ng/utils/localizations.dart';
 import 'package:piwigo_ng/utils/resources.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
-import 'package:video_player/video_player.dart';
 
 class UploadPage extends StatefulWidget {
   const UploadPage({Key? key, required this.imageList, this.albumId}) : super(key: key);
@@ -396,43 +395,21 @@ class VideoUploadItem extends StatefulWidget {
 }
 
 class _VideoUploadItemState extends State<VideoUploadItem> {
-  late VideoPlayerController _controller;
+  late Image thumbnail;
 
   @override
   void initState() {
     super.initState();
-    _controller = VideoPlayerController.file(
-      File(widget.path),
-      videoPlayerOptions: VideoPlayerOptions(),
-    )..initialize().then((_) => setState(() {}));
+
   }
 
   @override
   void dispose() {
-    _controller.dispose();
     super.dispose();
-  }
-
-  String get _duration {
-    final Duration duration = _controller.value.duration;
-    int hours = duration.inHours;
-    int minutes = (duration - Duration(hours: hours)).inMinutes;
-    int seconds = (duration - Duration(hours: hours) - Duration(minutes: minutes)).inSeconds;
-    return '${hours > 0 ? '$hours:' : ''}${minutes < 10 ? '0$minutes' : '$minutes'}:${seconds < 10 ? '0$seconds' : '$seconds'}';
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_controller.value.hasError) {
-      return Center(
-        child: Icon(Icons.image_not_supported),
-      );
-    }
-    if (!_controller.value.isInitialized) {
-      return Center(
-        child: CircularProgressIndicator(),
-      );
-    }
     return LayoutBuilder(builder: (context, constraints) {
       return Stack(
         alignment: Alignment.center,
@@ -442,12 +419,9 @@ class _VideoUploadItemState extends State<VideoUploadItem> {
             child: FittedBox(
               fit: BoxFit.cover,
               child: SizedBox(
-                width: _controller.value.size.width,
-                height: _controller.value.size.height,
-                child: AspectRatio(
-                  aspectRatio: _controller.value.aspectRatio,
-                  child: VideoPlayer(_controller),
-                ),
+                width: thumbnail.width,
+                height: thumbnail.height,
+                child: thumbnail,
               ),
             ),
           ),
@@ -459,7 +433,7 @@ class _VideoUploadItemState extends State<VideoUploadItem> {
               decoration:
                   BoxDecoration(borderRadius: BorderRadius.circular(5), color: AppColors.black.withValues(alpha: 0.7)),
               child: Text(
-                _duration,
+                "_duration",
                 style: TextStyle(color: AppColors.white, fontSize: 10, fontWeight: FontWeight.bold),
               ),
             ),

@@ -27,6 +27,7 @@ class VlcVideoPlayerState extends State<VlcVideoPlayer> {
   void initState() {
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
     super.initState();
+    print(widget.videoUrl);
     vlcController = VlcPlayerController.network(
       widget.videoUrl,
       hwAcc: HwAcc.auto,

@@ -14,7 +14,7 @@ import 'package:piwigo_ng/services/preferences_service.dart';
 import 'package:piwigo_ng/utils/resources.dart';
 import 'package:piwigo_ng/utils/settings.dart';
 import 'package:provider/provider.dart';
-import 'package:video_player/video_player.dart';
+import 'package:video_thumbnail/video_thumbnail.dart';
 
 class ImageDetailsCard extends StatelessWidget {
   const ImageDetailsCard({Key? key, required this.image, this.onRemove}) : super(key: key);
@@ -325,29 +325,17 @@ class LocalVideoDetailsCard extends StatefulWidget {
 }
 
 class _LocalVideoDetailsCardState extends State<LocalVideoDetailsCard> {
-  late final VideoPlayerController _controller;
+  late Image thumbnail;
 
   @override
-  void initState() {
-    _controller = VideoPlayerController.file(
-      File(widget.video.path),
-      videoPlayerOptions: VideoPlayerOptions(),
-    )..initialize().then((_) => setState(() {}));
+  Future<void> initState() async {
+    thumbnail = Image.memory((await VideoThumbnail.thumbnailData(video: widget.video.path))!);
     super.initState();
   }
 
   @override
   void dispose() {
-    _controller.dispose();
     super.dispose();
-  }
-
-  String get _duration {
-    final Duration duration = _controller.value.duration;
-    int hours = duration.inHours;
-    int minutes = (duration - Duration(hours: hours)).inMinutes;
-    int seconds = (duration - Duration(hours: hours) - Duration(minutes: minutes)).inSeconds;
-    return '${hours > 0 ? '$hours:' : ''}${minutes < 10 ? '0$minutes' : '$minutes'}:${seconds < 10 ? '0$seconds' : '$seconds'}';
   }
 
   @override
@@ -385,16 +373,6 @@ class _LocalVideoDetailsCardState extends State<LocalVideoDetailsCard> {
             fit: StackFit.expand,
             children: [
               LayoutBuilder(builder: (context, constraints) {
-                if (_controller.value.hasError) {
-                  return Center(
-                    child: Icon(Icons.image_not_supported),
-                  );
-                }
-                if (!_controller.value.isInitialized) {
-                  return Center(
-                    child: CircularProgressIndicator(),
-                  );
-                }
                 return Stack(
                   alignment: Alignment.center,
                   fit: StackFit.expand,
@@ -403,12 +381,9 @@ class _LocalVideoDetailsCardState extends State<LocalVideoDetailsCard> {
                       child: FittedBox(
                         fit: BoxFit.cover,
                         child: SizedBox(
-                          width: _controller.value.size.width,
-                          height: _controller.value.size.height,
-                          child: AspectRatio(
-                            aspectRatio: _controller.value.aspectRatio,
-                            child: VideoPlayer(_controller),
-                          ),
+                          width: thumbnail.width,
+                          height: thumbnail.height,
+                          child: thumbnail,
                         ),
                       ),
                     ),
@@ -420,7 +395,7 @@ class _LocalVideoDetailsCardState extends State<LocalVideoDetailsCard> {
                         decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(5), color: AppColors.black.withValues(alpha: 0.7)),
                         child: Text(
-                          _duration,
+                          "duration",
                           style: TextStyle(color: AppColors.white, fontSize: 10, fontWeight: FontWeight.bold),
                         ),
                       ),
@@ -452,21 +427,11 @@ class _LocalVideoDetailsCardState extends State<LocalVideoDetailsCard> {
       ),
       child: Builder(
         builder: (context) {
-          if (_controller.value.hasError) {
-            return Center(
-              child: Icon(Icons.image_not_supported),
-            );
-          }
-          if (!_controller.value.isInitialized) {
-            return Center(
-              child: CircularProgressIndicator(),
-            );
-          }
           return Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
-                "${_controller.value.size.width.round()}x${_controller.value.size.height.round()} pixels",
+                "${thumbnail.width}x${thumbnail.height} pixels",
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: Theme.of(context).textTheme.bodySmall,
