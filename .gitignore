@@ -1,3 +1,8 @@
+# Remove generated l10n/app_localizations.dart
+/lib/l10n/app_localizations*.dart
+
+## Flutter defaults
+
 # Miscellaneous
 *.class
 *.log
