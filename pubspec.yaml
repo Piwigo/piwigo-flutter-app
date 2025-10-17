@@ -65,7 +65,7 @@ dependencies:
   listen_sharing_intent: ^1.9.2 # Receive sharing from other apps
 
   # Video player
-  flutter_vlc_player: ^7.4.4 # LibVLC player
+  flutter_vlc_player_16kb: ^7.4.6 # LibVLC player
   video_thumbnail: ^0.5.6 # Generate thumbnail
 
   # Translations

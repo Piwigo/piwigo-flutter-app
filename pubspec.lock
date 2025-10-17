@@ -520,14 +520,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  flutter_vlc_player:
+  flutter_vlc_player_16kb:
     dependency: "direct main"
     description:
-      name: flutter_vlc_player
-      sha256: "32c0109cc191a97246df759a8804a1051c4ca6909597833506f13587cb3bf1be"
+      name: flutter_vlc_player_16kb
+      sha256: "69f44e648ad2c1b551d32be452b8e75d54169c9d7f58e23a853964f7e2aee5c5"
       url: "https://pub.dev"
     source: hosted
-    version: "7.4.4"
+    version: "7.4.7"
   flutter_vlc_player_platform_interface:
     dependency: transitive
     description:

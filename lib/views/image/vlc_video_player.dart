@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_vlc_player/flutter_vlc_player.dart';
+import 'package:flutter_vlc_player_16kb/flutter_vlc_player.dart';
 
 class VlcVideoPlayer extends StatefulWidget {
   const VlcVideoPlayer({
@@ -88,17 +88,34 @@ class VlcVideoPlayerState extends State<VlcVideoPlayer> {
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
+    final vlcValue = vlcController.value;
+    // set aspect ratio depending on the screen if VLC doesn't get it right
+    final vlcAspectRatio = vlcValue.aspectRatio == 1
+        ? screenSize.width / screenSize.height
+        : vlcValue.aspectRatio;
+
     return Scaffold(
       backgroundColor: Colors.black,
       body: Stack(
         children: [
-          VlcPlayer(
-            controller: vlcController,
-            placeholder: Center(child: CircularProgressIndicator()),
-            aspectRatio: screenSize.width / screenSize.height,
+          // player
+          Positioned.fill(
+            child: Center(
+              child: AspectRatio(
+                aspectRatio: vlcAspectRatio,
+                child: VlcPlayer(
+                  controller: vlcController,
+                  placeholder: const Center(child: CircularProgressIndicator()),
+                  aspectRatio: vlcAspectRatio,
+                ),
+              ),
+            ),
           ),
+
           // Detect any tap to show or hide controls
-          GestureDetector(onTap: _changeOpacity),
+          Positioned.fill(child: GestureDetector(onTap: _changeOpacity)),
+
+          // controllers
           IgnorePointer(
             // Ignore input when not visible
             ignoring: opacityLevel == 0.0,
