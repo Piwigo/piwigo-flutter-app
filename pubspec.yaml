@@ -19,12 +19,12 @@ dependencies:
   dio: ^5.4.3+1 # Requests to API
   dio_cookie_manager: ^3.2.0 # Compatibility between dio and cookie_jar
   cookie_jar: ^4.0.8 # Handles cookies
-  connectivity_plus: ^6.0.2 # Check if Wifi is enabled
+  connectivity_plus: ^7.0.0 # Check if Wifi is enabled
 
   # UI
   auto_size_text: ^3.0.0 # Text that auto-sizes (image thumbnail title)
   cupertino_icons: ^1.0.2 # iOS style icons (might be useless)
-  font_awesome_flutter: ^10.1.0 # Font awesome icons (might be useless)
+  font_awesome_flutter: ^10.10.0 # Font awesome icons (might be useless)
   flutter_slidable: ^4.0.0 # Album card's sliding cations
   drag_select_grid_view: ^0.6.1 # Drag to select image grid
   rounded_loading_button: # Loading button animation
@@ -40,7 +40,7 @@ dependencies:
   flutter_easyloading: ^3.0.5 # Show loading dialog
 
   # Storage
-  package_info_plus: ^8.0.0 # Get project info (version)
+  package_info_plus: ^9.0.0 # Get project info (version)
   path_provider: ^2.0.11 # Get application documents
   shared_preferences: ^2.0.15 # Base local storage
   flutter_secure_storage: ^9.2.4 # Local storage secured for logins
@@ -48,7 +48,7 @@ dependencies:
   file_picker: ^10.1.2 # Pick images and videos at a time for upload
 
   # Device
-  device_info_plus: ^11.5.0 # Get device info (version
+  device_info_plus: ^12.1.0 # Get device info (version
   flutter_local_notifications: ^19.1.0 # Throws notifications on download or upload
   open_filex: ^4.4.0 # Open files with devices apps
   workmanager: ^0.9.0+3 # Background processes (auto upload)
@@ -58,9 +58,8 @@ dependencies:
   mime_type: ^1.0.0 # Check mime type of files (differentiate photos from videos)
   flutter_image_compress: ^2.4.0 # Remove metadata
   permission_handler: ^12.0.0+1 # Check and asks for permissions
-  share_plus: ^11.0.0 # Share files
+  share_plus: ^12.0.0 # Share files
   flutter_cache_manager: ^3.3.0 # Handles network image cache
-  heif_converter: ^1.0.1 # Convert heic files to jpg
   provider: ^6.0.3 # Notifiers for theme and language changes
   listen_sharing_intent: ^1.9.2 # Receive sharing from other apps
 

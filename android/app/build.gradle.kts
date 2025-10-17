@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.util.Properties
 import java.io.FileInputStream
 
@@ -29,14 +30,23 @@ android {
     //compileSdkVersion flutter.compileSdkVersion
     //ndkVersion = flutter.ndkVersion
     compileSdk = 36
-    ndkVersion = "29.0.13599879"
+    ndkVersion = "29.0.14206865 "
+
+    val compileJavaVersion = JavaVersion.VERSION_17
+    val kotlinJvmTarget = JvmTarget.JVM_17
 
     compileOptions {
         // Flag to enable support for the new language APIs
         isCoreLibraryDesugaringEnabled = true
         // Sets Java compatibility to Java 17
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = compileJavaVersion
+        targetCompatibility = compileJavaVersion
+    }
+
+    kotlin {
+        compilerOptions {
+            jvmTarget = kotlinJvmTarget
+        }
     }
 
     defaultConfig {
@@ -78,6 +88,6 @@ flutter {
 }
 
 dependencies {
-    implementation("androidx.window:window:1.4.0")
+    implementation("androidx.window:window:1.5.0")
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
 }

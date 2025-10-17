@@ -7,7 +7,6 @@ import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:heif_converter/heif_converter.dart';
 import 'package:piwigo_ng/models/album_model.dart';
 import 'package:piwigo_ng/models/status_model.dart';
 import 'package:piwigo_ng/network/api_client.dart';
@@ -91,17 +90,6 @@ class AutoUploadManager {
     // Remove folders and links
     List<File> files = dirFiles.where((file) => file is File).map<File>((e) => e as File).toList();
 
-    // Convert heic/heif files to .jpg
-    for (File file in files) {
-      if (file.path.endsWith('.heic') || file.path.endsWith('.heif')) {
-        debugPrint("${file.path} is Heic/Heif ! Converting to jpg... ");
-        String? jpgPath = await HeifConverter.convert(file.path, format: 'jpg');
-        if (jpgPath != null) {
-          files.remove(file);
-          files.add(File(jpgPath));
-        }
-      }
-    }
     debugPrint("List files: ${files.toString()}");
     await autoUploadPhotos(files);
     return true;

@@ -38,7 +38,8 @@ class _SelectMoveOrCopyModalState extends State<SelectMoveOrCopyModal> {
     _disabledAlbums = [
       if (widget.album != null) widget.album!.id,
       if (parentAlbums.length == 1 || widget.isImage) 0,
-      if (!widget.isImage && parentAlbums.length > 1) int.parse(parentAlbums[parentAlbums.length - 2]),
+      if (!widget.isImage && parentAlbums.length > 1)
+        int.parse(parentAlbums[parentAlbums.length - 2]),
     ];
 
     super.initState();
@@ -199,55 +200,64 @@ class _ExpansionAlbumTileState extends State<ExpansionAlbumTile> {
           widget.onTap?.call(widget.album);
         },
         child: SizedBox(
-          height: 48.0,
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Align(
-                    alignment: Alignment.centerLeft,
+            height: 48.0,
+            child: Row(
+              spacing: 2,
+              children: [
+                Padding(padding: EdgeInsetsGeometry.only(left: 10.0)),
+                if (widget.index > 1) ...[
+                  Padding(
+                      padding: EdgeInsetsGeometry.only(
+                          left: 30.0 * (widget.index - 1)))
+                ],
+                if (widget.album.children.isNotEmpty && !widget.isParent) ...[
+                  GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: () => setState(() {
+                            _expanded = !_expanded;
+                          }),
+                      child: AnimatedRotation(
+                        turns: _expanded ? 0.25 : 0, //Rotate by 90°,
+                        duration: const Duration(milliseconds: 200),
+                        child: Icon(Icons.chevron_right),
+                      )),
+                ],
+                Expanded(
                     child: Text(
-                      "${List.generate(widget.index, (index) => '   ').join()} > ${widget.index > 0 ? ' ' : ''}${widget.album.name}",
-                      overflow: TextOverflow.ellipsis,
-                      style: _disabled ? Theme.of(context).textTheme.bodySmall : Theme.of(context).textTheme.bodyMedium,
-                    ),
-                  ),
-                ),
-              ),
-              if (widget.album.children.isNotEmpty && !widget.isParent)
-                GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onTap: () => setState(() {
-                    _expanded = !_expanded;
-                  }),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Center(
-                          child: Text(
-                            appStrings.albumCount(widget.album.nbCategories),
+                  "${widget.album.name}",
+                  overflow: TextOverflow.ellipsis,
+                  style: _disabled
+                      ? Theme.of(context).textTheme.bodySmall
+                      : Theme.of(context).textTheme.bodyMedium,
+                )),
+                if (widget.album.children.isNotEmpty && !widget.isParent) ...[
+                  DecoratedBox(
+                      decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.surface,
+                          borderRadius: BorderRadius.circular(5)),
+                      child: Padding(
+                        padding: EdgeInsetsGeometry.symmetric(
+                          horizontal: 8,
+                        ),
+                        child: Row(spacing: 4, children: [
+                          Text(
+                            '${widget.album.nbCategories}',
                             style: TextStyle(
-                              color: Theme.of(context).primaryColor.withValues(alpha: 0.7),
+                              color: Theme.of(context).colorScheme.inverseSurface,
                               fontSize: 14,
                             ),
                           ),
-                        ),
-                        AnimatedRotation(
-                          duration: const Duration(milliseconds: 200),
-                          turns: _expanded ? -0.25 : 0.25,
-                          child: Icon(Icons.chevron_right),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-            ],
-          ),
-        ),
+                          Icon(
+                            Icons.folder,
+                            size: 15,
+                            color: Theme.of(context).colorScheme.inverseSurface,
+                          ),
+                        ]),
+                      )),
+                  Padding(padding: EdgeInsetsGeometry.only(right: 8))
+                ],
+              ],
+            )),
       );
 
   Widget get _divider => Divider(

@@ -144,26 +144,26 @@ class _AlbumPrivacyPageState extends State<AlbumPrivacyPage> {
                   padding: const EdgeInsets.symmetric(
                     vertical: 8.0,
                   ),
-                  child: Column(
-                    children: [
-                      RadioListTile<AlbumStatus>(
-                        value: AlbumStatus.public,
-                        groupValue: _selectedMode,
-                        activeColor: Theme.of(context).colorScheme.secondary,
-                        title: Text(appStrings.categoryPrivacyMode_public),
-                        subtitle: Text(appStrings.categoryPrivacyMode_publicMessage),
-                        onChanged: _onChangeMode,
-                      ),
-                      RadioListTile(
-                        value: AlbumStatus.private,
-                        groupValue: _selectedMode,
-                        activeColor: Theme.of(context).colorScheme.secondary,
-                        title: Text(appStrings.categoryPrivacyMode_private),
-                        subtitle: Text(appStrings.categoryPrivacyMode_privateMessage),
-                        onChanged: _onChangeMode,
-                      ),
-                    ],
-                  ),
+                  child: RadioGroup<AlbumStatus>(
+                      onChanged: _onChangeMode,
+                      groupValue: _selectedMode,
+                      child: Column(
+                        children: [
+                          RadioListTile<AlbumStatus>(
+                            value: AlbumStatus.public,
+                            activeColor: Theme.of(context).colorScheme.secondary,
+                            title: Text(appStrings.categoryPrivacyMode_public),
+                            subtitle: Text(appStrings.categoryPrivacyMode_publicMessage),
+                          ),
+                          RadioListTile(
+                            value: AlbumStatus.private,
+                            activeColor: Theme.of(context).colorScheme.secondary,
+                            title: Text(appStrings.categoryPrivacyMode_private),
+                            subtitle: Text(appStrings.categoryPrivacyMode_privateMessage),
+                          ),
+                        ],
+                      )
+                  )
                 ),
                 AnimatedSize(
                   duration: const Duration(milliseconds: 300),

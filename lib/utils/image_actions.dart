@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
-import 'package:heif_converter/heif_converter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:piwigo_ng/components/dialogs/confirm_dialog.dart';
@@ -71,11 +70,6 @@ Future<List<XFile>?> onPickImages() async {
       if (Preferences.getAvailableFileTypes
           .contains(file.name.split('.').last)) {
         files.add(file);
-      } else if (file.name.endsWith('.heic') || file.name.endsWith('.heif')) {
-        String? jpgPath = await HeifConverter.convert(file.path, format: 'jpg');
-        if (jpgPath != null) {
-          files.add(XFile(jpgPath));
-        }
       }
     }
     return files;
@@ -100,12 +94,6 @@ Future<XFile?> onTakePhoto(BuildContext context) async {
           imageQuality: (Preferences.getUploadQuality * 100).round(),
           requestFullMetadata: !Preferences.getRemoveMetadata,
         );
-        if (image != null) {
-          String? jpgPath = await HeifConverter.convert(image.path, format: 'jpg');
-          if (jpgPath != null) {
-            image = XFile(jpgPath);
-          }
-        }
         break;
       case 1:
         image = await _picker.pickVideo(source: ImageSource.camera);
