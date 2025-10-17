@@ -65,7 +65,7 @@ dependencies:
 
   # Video player
   flutter_vlc_player_16kb: ^7.4.6 # LibVLC player
-  video_thumbnail: ^0.5.6 # Generate thumbnail
+  flutter_video_thumbnail_plus: ^1.0.1 # Generate thumbnail
 
   # Translations
   flutter_localizations:

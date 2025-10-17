@@ -14,7 +14,7 @@ import 'package:piwigo_ng/services/preferences_service.dart';
 import 'package:piwigo_ng/utils/resources.dart';
 import 'package:piwigo_ng/utils/settings.dart';
 import 'package:provider/provider.dart';
-import 'package:video_thumbnail/video_thumbnail.dart';
+import 'package:flutter_video_thumbnail_plus/flutter_video_thumbnail_plus.dart';
 
 class ImageDetailsCard extends StatelessWidget {
   const ImageDetailsCard({Key? key, required this.image, this.onRemove}) : super(key: key);
@@ -329,7 +329,7 @@ class _LocalVideoDetailsCardState extends State<LocalVideoDetailsCard> {
 
   @override
   Future<void> initState() async {
-    thumbnail = Image.memory((await VideoThumbnail.thumbnailData(video: widget.video.path))!);
+    thumbnail = Image.memory((await FlutterVideoThumbnailPlus.thumbnailData(video: widget.video.path))!);
     super.initState();
   }
 
