@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'dart:ui' as ui show Image;
 
 import 'package:auto_size_text/auto_size_text.dart';
@@ -17,7 +18,8 @@ import 'package:provider/provider.dart';
 import 'package:flutter_video_thumbnail_plus/flutter_video_thumbnail_plus.dart';
 
 class ImageDetailsCard extends StatelessWidget {
-  const ImageDetailsCard({Key? key, required this.image, this.onRemove}) : super(key: key);
+  const ImageDetailsCard({Key? key, required this.image, this.onRemove})
+      : super(key: key);
 
   final ImageModel image;
   final Function()? onRemove;
@@ -56,7 +58,9 @@ class ImageDetailsCard extends StatelessWidget {
           child: ClipRRect(
             borderRadius: BorderRadius.circular(5.0),
             child: Builder(builder: (context) {
-              final String? imageUrl = image.getDerivativeFromString(Preferences.getImageThumbnailSize)?.url;
+              final String? imageUrl = image
+                  .getDerivativeFromString(Preferences.getImageThumbnailSize)
+                  ?.url;
               return ImageNetworkDisplay(
                 imageUrl: imageUrl,
               );
@@ -88,7 +92,10 @@ class ImageDetailsCard extends StatelessWidget {
               children: [
                 Flexible(
                   child: Text(
-                    image.file.replaceAll('', '\u200B').split(path.extension(image.file)).first,
+                    image.file
+                        .replaceAll('', '\u200B')
+                        .split(path.extension(image.file))
+                        .first,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: Theme.of(context).textTheme.bodySmall,
@@ -106,11 +113,13 @@ class ImageDetailsCard extends StatelessWidget {
           const Spacer(),
           if (image.dateAvailable != null)
             Builder(builder: (context) {
-              LocaleNotifier localeNotifier = Provider.of<LocaleNotifier>(context, listen: false);
+              LocaleNotifier localeNotifier =
+                  Provider.of<LocaleNotifier>(context, listen: false);
               String date =
-                  DateFormat.yMMMMd(localeNotifier.locale.languageCode).format(DateTime.parse(image.dateAvailable!));
-              String time =
-                  DateFormat.Hms(localeNotifier.locale.languageCode).format(DateTime.parse(image.dateAvailable!));
+                  DateFormat.yMMMMd(localeNotifier.locale.languageCode)
+                      .format(DateTime.parse(image.dateAvailable!));
+              String time = DateFormat.Hms(localeNotifier.locale.languageCode)
+                  .format(DateTime.parse(image.dateAvailable!));
               return AutoSizeText(
                 "$date $time",
                 maxLines: 1,
@@ -142,7 +151,8 @@ class ImageDetailsCard extends StatelessWidget {
 }
 
 class LocalImageDetailsCard extends StatefulWidget {
-  const LocalImageDetailsCard({Key? key, required this.image, this.onRemove, this.isDuplicate = false})
+  const LocalImageDetailsCard(
+      {Key? key, required this.image, this.onRemove, this.isDuplicate = false})
       : super(key: key);
 
   final File image;
@@ -205,12 +215,17 @@ class _LocalImageDetailsCardState extends State<LocalImageDetailsCard> {
             fit: StackFit.expand,
             children: [
               LayoutBuilder(builder: (context, constraints) {
-                List<String>? mimeType = mime(widget.image.path.split('/').last)?.split('/');
+                List<String>? mimeType =
+                    mime(widget.image.path.split('/').last)?.split('/');
 
                 if (mimeType?.first == 'image') {
                   _checkMemory();
-                  double? cacheWidth = constraints.maxWidth.isInfinite ? constraints.maxWidth : null;
-                  double? cacheHeight = constraints.maxHeight.isInfinite ? constraints.maxHeight : null;
+                  double? cacheWidth = constraints.maxWidth.isInfinite
+                      ? constraints.maxWidth
+                      : null;
+                  double? cacheHeight = constraints.maxHeight.isInfinite
+                      ? constraints.maxHeight
+                      : null;
                   return Image.file(
                     widget.image,
                     fit: BoxFit.cover,
@@ -313,7 +328,8 @@ class _LocalImageDetailsCardState extends State<LocalImageDetailsCard> {
 }
 
 class LocalVideoDetailsCard extends StatefulWidget {
-  const LocalVideoDetailsCard({Key? key, required this.video, this.onRemove, this.isDuplicate = false})
+  const LocalVideoDetailsCard(
+      {Key? key, required this.video, this.onRemove, this.isDuplicate = false})
       : super(key: key);
 
   final File video;
@@ -328,9 +344,18 @@ class _LocalVideoDetailsCardState extends State<LocalVideoDetailsCard> {
   late Image thumbnail;
 
   @override
-  Future<void> initState() async {
-    thumbnail = Image.memory((await FlutterVideoThumbnailPlus.thumbnailData(video: widget.video.path))!);
+  void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      thumbnail =Image.memory(Uint8List(0));
+      thumbnail = Image.memory(await FlutterVideoThumbnailPlus.thumbnailData(
+              video: widget.video.path) ??
+          ([] as Uint8List));
+    });
     super.initState();
+  }
+
+  Future<void> getThumbnail() async {
+    setState(() {});
   }
 
   @override
@@ -391,12 +416,17 @@ class _LocalVideoDetailsCardState extends State<LocalVideoDetailsCard> {
                       bottom: 2.0,
                       left: 2.0,
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 4, vertical: 2),
                         decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(5), color: AppColors.black.withValues(alpha: 0.7)),
+                            borderRadius: BorderRadius.circular(5),
+                            color: AppColors.black.withValues(alpha: 0.7)),
                         child: Text(
                           "duration",
-                          style: TextStyle(color: AppColors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                              color: AppColors.white,
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold),
                         ),
                       ),
                     ),
