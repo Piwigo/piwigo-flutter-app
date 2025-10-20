@@ -22,6 +22,10 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
+    packaging {
+        jniLibs.pickFirsts.add("lib/**/libc++_shared.so")
+    }
+
     namespace = "com.remi.piwigo_ng"
     //compileSdkVersion flutter.compileSdkVersion
     //ndkVersion = flutter.ndkVersion
@@ -65,6 +69,15 @@ android {
 
     buildTypes {
         release {
+            // Compress libs
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                getDefaultProguardFile("proguard-android.txt"),
+                "proguard-rules.pro"
+            )
+
             signingConfig = signingConfigs.getByName("release")
         }
     }
