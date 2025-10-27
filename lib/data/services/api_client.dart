@@ -10,13 +10,19 @@ class ApiClient {
 
   factory ApiClient.fromURL(String url) {
     var uri = Uri.parse(url);
-    return ApiClient(uri.host,uri.path,uri.scheme == 'https');
+    return ApiClient(uri.host, uri.path, uri.scheme == 'https');
   }
 
   Future<Map<String, dynamic>> getRequest(String method) async {
     var url = useHTTPS
-        ? Uri.https(host, 'ws.php', {'format': 'json', 'method': method})
-        : Uri.https(host, 'ws.php', {'format': 'json', 'method': method});
+        ? Uri.https(host, '$subpath/ws.php', {
+            'format': 'json',
+            'method': method,
+          })
+        : Uri.http(host, '$subpath/ws.php', {
+            'format': 'json',
+            'method': method,
+          });
     var response = await http.get(url);
     if (response.statusCode == 200) {
       return convert.jsonDecode(response.body) as Map<String, dynamic>;
@@ -28,9 +34,7 @@ class ApiClient {
     }
   }
 
-
   // API calls
-
 
   Future<String> getVersion() async {
     return (await getRequest('pwg.getVersion'))['result'] as String;
