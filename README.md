@@ -4,6 +4,11 @@ This branch is dedicated to create a template for implementing cleaner code stan
 
 see https://docs.flutter.dev/app-architecture/
 
+## Main differences 
+
+- Use the native [`http`](https://pub.dev/packages/http) stack instead of [`dio`](https://pub.dev/packages/dio)
+- Implement testing 
+- Use [Go_Router](https://pub.dev/packages/go_router) instead of the deprecated named navigation
 
 ## Architecture 
 
