@@ -13,7 +13,7 @@ class ApiClient {
     return ApiClient(uri.host, uri.path, uri.scheme == 'https');
   }
 
-  Future<Map<String, dynamic>> getRequest(String method) async {
+  Future<Map<String, dynamic>> _getRequest(String method) async {
     var url = useHTTPS
         ? Uri.https(host, '$subpath/ws.php', {
             'format': 'json',
@@ -37,6 +37,6 @@ class ApiClient {
   // API calls
 
   Future<String> getVersion() async {
-    return (await getRequest('pwg.getVersion'))['result'] as String;
+    return (await _getRequest('pwg.getVersion'))['result'] as String;
   }
 }
