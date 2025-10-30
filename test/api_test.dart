@@ -5,7 +5,7 @@ void main() {
 
   var piwigoUrl = {
     'default':'https://demo1.piwigo.com/',
-    'subpath':'http://192.168.122.24/piwigo/'
+    'subpath':'https://static-testing.la-taniere-solidaire.gay/piwigoTest1/'
   };
 
   test('API getVersion HTTPS ',() async {
@@ -16,6 +16,6 @@ void main() {
   test('API getVersion HTTPS (subpath)',() async {
     final apiClient =
     ApiClient.fromURL(piwigoUrl['subpath']!);
-    expect(await apiClient.getVersion(), "15.6.0");
+    expect(await apiClient.getVersion(), "15.7.0");
   });
 }
