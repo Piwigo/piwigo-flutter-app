@@ -10,6 +10,15 @@ see https://docs.flutter.dev/app-architecture/
 - Implement testing 
 - Use [Go_Router](https://pub.dev/packages/go_router) instead of the deprecated named navigation
 
+Secure Storage vs SharedPrefference is still in debate
+
+Secure storage allow encrypted entries but pull an huge amount of useless dependencies (dependencies specific to other platforms)
+SharedPrefference is easier to use and has an dedicated android build but has no internal way of encrypting anything 
+
+If we only store auth token SharedPrefference would be the defacto choice but with API key support this ask a few question.
+
+
+
 ## Architecture 
 
 ```
