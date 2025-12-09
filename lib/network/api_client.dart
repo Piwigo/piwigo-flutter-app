@@ -6,6 +6,7 @@ import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter/foundation.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:piwigo_ng/services/preferences_service.dart';
 
 import 'api_interceptor.dart';
@@ -18,7 +19,8 @@ class ApiClient {
     ..httpClientAdapter = sslHttpClientAdapter;
 
   static HttpClientAdapter get sslHttpClientAdapter => IOHttpClientAdapter(
-        createHttpClient: () => HttpClient()..badCertificateCallback = piwigoSSLBypass,
+        createHttpClient: () =>
+            HttpClient()..badCertificateCallback = piwigoSSLBypass,
       );
 
   static bool piwigoSSLBypass(X509Certificate cert, String host, int port) {
@@ -35,6 +37,9 @@ class ApiClient {
     CancelToken? cancelToken,
     void Function(int, int)? onReceiveProgress,
   }) async {
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    dio.options.headers
+        .addAll({'User-Agent': 'PiwigoNG/${packageInfo.version}'});
     Response response = await dio.get(
       path,
       queryParameters: queryParameters,
@@ -54,6 +59,9 @@ class ApiClient {
     void Function(int, int)? onSendProgress,
     void Function(int, int)? onReceiveProgress,
   }) async {
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    dio.options.headers
+        .addAll({'User-Agent': 'PiwigoNG/${packageInfo.version}'});
     Response response = await dio.post(
       path,
       data: data,
@@ -75,6 +83,9 @@ class ApiClient {
     void Function(int, int)? onSendProgress,
     void Function(int, int)? onReceiveProgress,
   }) async {
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    dio.options.headers
+        .addAll({'User-Agent': 'PiwigoNG/${packageInfo.version}'});
     Response response = await dio.put(
       path,
       data: data,
@@ -96,6 +107,9 @@ class ApiClient {
     void Function(int, int)? onSendProgress,
     void Function(int, int)? onReceiveProgress,
   }) async {
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    dio.options.headers
+        .addAll({'User-Agent': 'PiwigoNG/${packageInfo.version}'});
     Response response = await dio.delete(
       path,
       data: data,
@@ -116,6 +130,8 @@ class ApiClient {
     CancelToken? cancelToken,
     void Function(int, int)? onReceiveProgress,
   }) async {
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    dio.options.headers = {'User-Agent': 'PiwigoNG/${packageInfo.version}'};
     Response response = await dio.download(
       path,
       outputPath,
@@ -134,7 +150,8 @@ class ApiClient {
 class SSLHttpOverrides extends HttpOverrides {
   @override
   HttpClient createHttpClient(SecurityContext? context) {
-    return super.createHttpClient(context)..badCertificateCallback = ApiClient.piwigoSSLBypass;
+    return super.createHttpClient(context)
+      ..badCertificateCallback = ApiClient.piwigoSSLBypass;
   }
 }
 
