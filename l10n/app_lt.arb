@@ -31,6 +31,7 @@
     "piwigoServer_wrongJSONobject": "Nepavyko apdoroti JSON objekto grąžinto iš Piwigo serverio.",
     "piwigoServer_invalidJSONobject": "Piwigo serveris grąžino netinkamą JSON objektą.",
     "piwigoServer_emptyJSONobject": "Piwigo serveris grąžino tuščią JSON objektą.",
+    "noTags": "No tags",
     "coreDataStore_WarningTitle": "Įspėjimas",
     "coreDataStore_WarningMessage": "Įvyko rimta programos klaida Piwigo bandant nuskaityti duomenis iš podėlio. Todėl buvo sukurtas naujas podėlis.",
     "coreDataFetch_DigestError": "Nepavyko apdoroti gautų duomenų.",
