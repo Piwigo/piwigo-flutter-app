@@ -31,6 +31,7 @@
     "piwigoServer_wrongJSONobject": "无法解析 Piwigo 服务器传送的 JSON 对象。",
     "piwigoServer_invalidJSONobject": "Piwigo 服务器没有返回有效的 JSON 对象。",
     "piwigoServer_emptyJSONobject": "Piwigo 服务器返回了空的 JSON 对象。",
+    "noTags": "No tags",
     "coreDataStore_WarningTitle": "警告",
     "coreDataStore_WarningMessage": "Piwigo 尝试读取数据缓存时出现严重错误。 因此将会创建新的缓存。",
     "coreDataFetch_DigestError": "无法解析获取到的数据。",
