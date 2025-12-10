@@ -31,6 +31,7 @@
     "piwigoServer_wrongJSONobject": "Neviem spracovať obsah JSON objektu, ktorý vrátil Piwigo server.",
     "piwigoServer_invalidJSONobject": "Piwigo server nevrátil platný JSON objekt.",
     "piwigoServer_emptyJSONobject": "Piwigo server vrátil prázdny JSON objekt.",
+    "noTags": "No tags",
     "coreDataStore_WarningTitle": "Upozornenie",
     "coreDataStore_WarningMessage": "Nastala aplikačná chyba, keď Piwigo čítal z vyrovnávacej pamäte, preto bude vytvorená znovu.",
     "coreDataFetch_DigestError": "Nie je možné spracovať načítané údaje.",
