@@ -49,7 +49,8 @@ class ImageInfoModal extends StatelessWidget {
                 style: Theme.of(context).textTheme.titleMedium,
               ),
             ),
-            if (image.comment != null) Text(image.comment!),
+            if (image.comment != null) Text("${appStrings.editImageDetails_comments} : ${image.comment!}"),
+            if (image.author != null) Text("${appStrings.editImageDetails_author} : ${image.author!}"),
             const SizedBox(height: 8.0),
             SettingsSection(
               margin: EdgeInsets.zero,

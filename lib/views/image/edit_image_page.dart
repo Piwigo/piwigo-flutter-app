@@ -49,7 +49,7 @@ class _EditImagePageState extends State<EditImagePage> {
   void initState() {
     _imageList = widget.images;
     _authorController =
-        TextEditingController(text: Preferences.getUploadAuthor);
+        TextEditingController(text: _imageList.first.author ?? "");
     if (_imageList.length == 1) {
       _titleController.text = _imageList.first.name ?? "";
       _descriptionController.text = _imageList.first.comment ?? '';
