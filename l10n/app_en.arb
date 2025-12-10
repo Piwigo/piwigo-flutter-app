@@ -39,7 +39,7 @@
     "piwigoServer_emptyJSONobject": "Piwigo server did return an empty JSON object.",
 
 
-
+    "noTags": "No tags",
 
     "coreDataStore_WarningTitle": "Warning",
     "coreDataStore_WarningMessage": "A serious application error occurred while Piwigo tried to read the data cache. A new cache has therefore been created.",

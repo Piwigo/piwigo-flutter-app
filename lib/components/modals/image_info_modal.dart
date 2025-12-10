@@ -93,16 +93,16 @@ class ImageInfoModal extends StatelessWidget {
             FormSection(
               title: appStrings.tags,
               titlePadding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: Wrap(
+              child: image.tags.length < 1 ? Align(child: Text(appStrings.noTags)) : Wrap(
                 spacing: 8.0,
                 children: List.generate(
                   image.tags.length,
-                  (index) => PiwigoChip(
+                      (index) => PiwigoChip(
                     label: image.tags[index].name,
                     backgroundColor:
-                        Theme.of(context).chipTheme.backgroundColor,
+                    Theme.of(context).chipTheme.backgroundColor,
                     foregroundColor:
-                        Theme.of(context).textTheme.bodyMedium?.color,
+                    Theme.of(context).textTheme.bodyMedium?.color,
                   ),
                 ),
               ),

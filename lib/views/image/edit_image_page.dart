@@ -12,7 +12,6 @@ import 'package:piwigo_ng/models/image_model.dart';
 import 'package:piwigo_ng/models/tag_model.dart';
 import 'package:piwigo_ng/network/api_error.dart';
 import 'package:piwigo_ng/network/images.dart';
-import 'package:piwigo_ng/services/preferences_service.dart';
 import 'package:piwigo_ng/utils/localizations.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 
