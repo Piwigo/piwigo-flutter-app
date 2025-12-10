@@ -31,6 +31,7 @@
     "piwigoServer_wrongJSONobject": "Konnte das vom Piwigo-Server zurückgegebene JSON-Objekt nicht auswerten.",
     "piwigoServer_invalidJSONobject": "Der Piwigo-Server hat kein gültiges JSON-Objekt zurückgegeben.",
     "piwigoServer_emptyJSONobject": "Der Piwigo Server hat ein leeres JSON-Objekt zurückgegeben.",
+    "noTags": "No tags",
     "coreDataStore_WarningTitle": "Warnung",
     "coreDataStore_WarningMessage": "Während Piwigo versuchte, den Daten-Cache zu lesen, ist ein schwerwiegender Anwendungsfehler aufgetreten. Ein neuer Zwischenspeicher wurde erstellt.",
     "coreDataFetch_DigestError": "Konnte die abgerufenen Daten nicht verarbeiten.",
