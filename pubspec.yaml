@@ -43,7 +43,7 @@ dependencies:
   package_info_plus: ^9.0.0 # Get project info (version)
   path_provider: ^2.0.11 # Get application documents
   shared_preferences: ^2.0.15 # Base local storage
-  flutter_secure_storage: ^9.2.4 # Local storage secured for logins
+  flutter_secure_storage: ^10.0.0 # Local storage secured for logins
   image_picker: ^1.1.2 # Pick images from camera
   file_picker: ^10.1.2 # Pick images and videos at a time for upload
 
