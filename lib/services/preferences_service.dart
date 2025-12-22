@@ -200,6 +200,8 @@ class Preferences {
     prefs.setStringList(availableSizesKey, status.availableSizes);
     if (status.realStatus != null) {
       prefs.setString(communityStatusKey, status.status);
+      prefs.setInt(uploadChunkSizeKey, status.uploadFormChunkSize ?? 0);
+      prefs.setString(fileTypesKey, status.uploadFileTypes ?? '');
       status.status = status.realStatus!;
     }
     if (['admin', 'webmaster'].contains(status.status)) {
