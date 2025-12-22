@@ -49,7 +49,8 @@ class ImageInfoModal extends StatelessWidget {
                 style: Theme.of(context).textTheme.titleMedium,
               ),
             ),
-            if (image.comment != null) Text(image.comment!),
+            if (image.comment != null) Text("${appStrings.editImageDetails_comments} : ${image.comment!}"),
+            if (image.author != null) Text("${appStrings.editImageDetails_author} : ${image.author!}"),
             const SizedBox(height: 8.0),
             SettingsSection(
               margin: EdgeInsets.zero,
@@ -92,16 +93,16 @@ class ImageInfoModal extends StatelessWidget {
             FormSection(
               title: appStrings.tags,
               titlePadding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: Wrap(
+              child: image.tags.length < 1 ? Align(child: Text(appStrings.noTags)) : Wrap(
                 spacing: 8.0,
                 children: List.generate(
                   image.tags.length,
-                  (index) => PiwigoChip(
+                      (index) => PiwigoChip(
                     label: image.tags[index].name,
                     backgroundColor:
-                        Theme.of(context).chipTheme.backgroundColor,
+                    Theme.of(context).chipTheme.backgroundColor,
                     foregroundColor:
-                        Theme.of(context).textTheme.bodyMedium?.color,
+                    Theme.of(context).textTheme.bodyMedium?.color,
                   ),
                 ),
               ),

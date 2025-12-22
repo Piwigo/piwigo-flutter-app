@@ -9,6 +9,7 @@ class ImageModel {
   bool favorite;
   String file;
   String? name;
+  String? author;
   String? comment;
   String? dateCreation;
   String? dateAvailable;
@@ -44,6 +45,7 @@ class ImageModel {
         favorite = json['is_favorite'] ?? false,
         file = json['file'].toString(),
         name = json['name']?.toString(),
+        author = json['author']?.toString(),
         comment = json['comment'],
         dateCreation = json['date_creation'],
         dateAvailable = json['date_available'],
