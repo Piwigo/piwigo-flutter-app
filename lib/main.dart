@@ -4,12 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:piwigo_ng/app.dart';
-import 'package:piwigo_ng/network/api_client.dart';
-import 'package:piwigo_ng/services/auto_upload_manager.dart';
-import 'package:piwigo_ng/services/notification_service.dart';
-import 'package:piwigo_ng/services/preferences_service.dart';
-import 'package:piwigo_ng/services/receive_sharing.dart';
-import 'package:piwigo_ng/services/theme_provider.dart';
+import 'package:piwigo_ng/data/services/api/api_client.dart';
+import 'package:piwigo_ng/data/services/local/auto_upload_manager.dart';
+import 'package:piwigo_ng/data/services/local/notification_service.dart';
+import 'package:piwigo_ng/data/services/local/preferences_service.dart';
+import 'package:piwigo_ng/data/services/local/receive_sharing.dart';
+import 'package:piwigo_ng/data/services/local/theme_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {

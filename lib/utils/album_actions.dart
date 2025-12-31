@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:piwigo_ng/components/dialogs/confirm_dialog.dart';
-import 'package:piwigo_ng/components/modals/create_album_modal.dart';
-import 'package:piwigo_ng/components/modals/delete_album_mode_modal.dart';
-import 'package:piwigo_ng/components/modals/edit_album_modal.dart';
-import 'package:piwigo_ng/components/modals/select_move_or_copy_modal.dart';
-import 'package:piwigo_ng/components/modals/piwigo_modal.dart';
-import 'package:piwigo_ng/components/snackbars.dart';
-import 'package:piwigo_ng/models/album_model.dart';
-import 'package:piwigo_ng/network/albums.dart';
-import 'package:piwigo_ng/network/api_error.dart';
+import 'package:piwigo_ng/ui/core/ui/dialogs/confirm_dialog.dart';
+import 'package:piwigo_ng/ui/core/ui/modals/create_album_modal.dart';
+import 'package:piwigo_ng/ui/core/ui/modals/delete_album_mode_modal.dart';
+import 'package:piwigo_ng/ui/core/ui/modals/edit_album_modal.dart';
+import 'package:piwigo_ng/ui/core/ui/modals/select_move_or_copy_modal.dart';
+import 'package:piwigo_ng/ui/core/ui/modals/piwigo_modal.dart';
+import 'package:piwigo_ng/ui/core/ui/snackbars.dart';
+import 'package:piwigo_ng/domain/models/album_model.dart';
+import 'package:piwigo_ng/data/services/api/albums.dart';
+import 'package:piwigo_ng/data/services/api/api_error.dart';
 import 'package:piwigo_ng/utils/localizations.dart';
-import 'package:piwigo_ng/views/album/album_page.dart';
-import 'package:piwigo_ng/views/album/album_privacy_page.dart';
+import 'package:piwigo_ng/ui/album/album_page.dart';
+import 'package:piwigo_ng/ui/album/album_privacy_page.dart';
 
 Future<void> onOpenAlbum(BuildContext context, AlbumModel album) async {
   Navigator.of(context).pushNamed(

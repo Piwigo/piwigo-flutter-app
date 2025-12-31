@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:piwigo_ng/services/preferences_service.dart';
+import 'package:piwigo_ng/data/services/local/preferences_service.dart';
 import 'package:piwigo_ng/utils/localizations.dart';
 
 enum SortMethods {
