@@ -2,6 +2,11 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.util.Properties
 import java.io.FileInputStream
 
+/*
+    When AGP 9 is released, we need to migrate the build system using this guide :
+        https://docs.flutter.dev/release/breaking-changes/migrate-to-agp-9
+ */
+
 plugins {
     id("com.android.application")
     id("kotlin-android")
@@ -29,7 +34,6 @@ android {
     ndkVersion = "29.0.14206865 "
 
     val compileJavaVersion = JavaVersion.VERSION_17
-    val kotlinJvmTarget = JvmTarget.JVM_17
 
     compileOptions {
         // Flag to enable support for the new language APIs
@@ -41,9 +45,10 @@ android {
 
     kotlin {
         compilerOptions {
-            jvmTarget = kotlinJvmTarget
+            jvmTarget = JvmTarget.JVM_17
         }
     }
+
 
     defaultConfig {
         applicationId = "com.piwigo.piwigo_ng"
@@ -75,6 +80,6 @@ flutter {
 }
 
 dependencies {
-    implementation("androidx.window:window:1.5.0")
+    implementation("androidx.window:window:1.5.1")
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
 }
