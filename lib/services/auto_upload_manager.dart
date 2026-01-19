@@ -322,14 +322,14 @@ class AutoUploadManager {
 
     final Map<String, String> queries = {
       'format': 'json',
-      'method': 'pwg.images.exist',
-      'md5sum_list': md5sumList.keys.join(','),
+      'method': 'pwg.images.exist'
     };
 
     try {
-      Response response = await dio.get(
+      Response response = await dio.post(
         'ws.php',
         queryParameters: queries,
+        data: {'md5sum_list': md5sumList.keys.join(',')}
       );
 
       Map<String, dynamic> data = json.decode(response.data);
