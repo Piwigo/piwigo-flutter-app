@@ -31,7 +31,7 @@
     "piwigoServer_wrongJSONobject": "无法解析 Piwigo 服务器传送的 JSON 对象。",
     "piwigoServer_invalidJSONobject": "Piwigo 服务器没有返回有效的 JSON 对象。",
     "piwigoServer_emptyJSONobject": "Piwigo 服务器返回了空的 JSON 对象。",
-    "noTags": "No tags",
+    "noTags": "没有标签",
     "coreDataStore_WarningTitle": "警告",
     "coreDataStore_WarningMessage": "Piwigo 尝试读取数据缓存时出现严重错误。 因此将会创建新的缓存。",
     "coreDataFetch_DigestError": "无法解析获取到的数据。",
@@ -243,8 +243,8 @@
     "moveCategoryHUD_moved": "相册已移动",
     "moveCategoryError_title": "移动失败",
     "moveCategoryError_message": "移动相册失败",
-    "selectCategory": "Select Album",
-    "selectCategory_select": "Please select an album or sub-album.",
+    "selectCategory": "选择相册",
+    "selectCategory_select": "请选择相册或子相册。",
     "selectCategory_message": "{count, plural, =1{您确定将图片上传到相册 {parent} 吗？} other{您确定将这些图片上传到相册 {parent} 吗？}}",
     "@selectCategory_message": {
         "placeholders": {
