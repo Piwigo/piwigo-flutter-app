@@ -88,9 +88,9 @@
     "sessionStatusError_message": "验证服务器失败。请尝试重新登录。",
     "serverCommunityError_title": "通讯错误",
     "serverCommunityError_message": "获取通讯扩展参数失败。请尝试再次登录。",
-    "logoutConfirmation_title": "注销",
-    "logoutConfirmation_message": "确定要退出账户吗？",
-    "logoutFail_title": "登出失败",
+    "logoutConfirmation_title": "退出登录",
+    "logoutConfirmation_message": "您确定要退出登录吗？",
+    "logoutFail_title": "退出登录失败",
     "albumCount": "{count, plural,=0{0 个相册} =1{1 个相册} other{{count} 个相册}}",
     "@albumCount": {
         "placeholders": {
@@ -679,10 +679,10 @@
         }
     },
     "settingsHeader_notSecure": "不安全的连接",
-    "settings_server": "地址",
+    "settings_server": "站点地址",
     "settings_username": "用户名",
     "settings_notLoggedIn": " - 未登录 - ",
-    "settings_logout": "注销",
+    "settings_logout": "退出登录",
     "settingsFooter_formats": "服务器接受以下文件类型: {types}",
     "@settingsFooter_formats": {
         "placeholders": {
