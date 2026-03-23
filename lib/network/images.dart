@@ -302,7 +302,11 @@ Future<XFile?> downloadImage(
       },
       outputPath: localPath,
     );
-    await Gal.putImage(localPath);
+    // 只对图片文件调用 Gal.putImage，视频和PDF文件直接返回
+    String? mimeType = mime(image.file);
+    if (mimeType != null && mimeType.startsWith('image')) {
+      await Gal.putImage(localPath);
+    }
     return XFile(localPath);
   } on DioException catch (e) {
     debugPrint("Download images: ${e.message}");
