@@ -18,8 +18,7 @@ Future<void> initLocalNotifications() async {
   );
   final initSettings = InitializationSettings(android: initializationSettingsAndroid);
   localNotification.initialize(
-    initSettings,
-    onDidReceiveNotificationResponse: onSelectNotification,
+    onDidReceiveNotificationResponse: onSelectNotification, settings: initSettings,
   );
   await askNotificationPermissions();
 }
@@ -49,10 +48,10 @@ Future<void> showLocalNotification({
     return;
   }
   await localNotification.show(
-    id,
-    title,
-    body,
-    NotificationDetails(
+    id: id,
+    title: title,
+    body: body,
+    notificationDetails: NotificationDetails(
       android: details ??
           AndroidNotificationDetails(
             'piwigo-ng-notification',
@@ -145,9 +144,9 @@ Future<void> showAutoUploadNotification([
 
   // Send notification
   await localNotification.show(
-    Settings.autoUploadNotificationId,
-    title,
-    message,
-    platform,
+    id: Settings.autoUploadNotificationId,
+    title: title,
+    body: message,
+    notificationDetails: platform,
   );
 }

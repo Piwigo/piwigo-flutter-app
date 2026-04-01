@@ -31,7 +31,7 @@
     "piwigoServer_wrongJSONobject": "无法解析 Piwigo 服务器传送的 JSON 对象。",
     "piwigoServer_invalidJSONobject": "Piwigo 服务器没有返回有效的 JSON 对象。",
     "piwigoServer_emptyJSONobject": "Piwigo 服务器返回了空的 JSON 对象。",
-    "noTags": "No tags",
+    "noTags": "没有标签",
     "coreDataStore_WarningTitle": "警告",
     "coreDataStore_WarningMessage": "Piwigo 尝试读取数据缓存时出现严重错误。 因此将会创建新的缓存。",
     "coreDataFetch_DigestError": "无法解析获取到的数据。",
@@ -88,9 +88,9 @@
     "sessionStatusError_message": "验证服务器失败。请尝试重新登录。",
     "serverCommunityError_title": "通讯错误",
     "serverCommunityError_message": "获取通讯扩展参数失败。请尝试再次登录。",
-    "logoutConfirmation_title": "注销",
-    "logoutConfirmation_message": "确定要退出账户吗？",
-    "logoutFail_title": "登出失败",
+    "logoutConfirmation_title": "退出登录",
+    "logoutConfirmation_message": "您确定要退出登录吗？",
+    "logoutFail_title": "退出登录失败",
     "albumCount": "{count, plural,=0{0 个相册} =1{1 个相册} other{{count} 个相册}}",
     "@albumCount": {
         "placeholders": {
@@ -243,8 +243,8 @@
     "moveCategoryHUD_moved": "相册已移动",
     "moveCategoryError_title": "移动失败",
     "moveCategoryError_message": "移动相册失败",
-    "selectCategory": "Select Album",
-    "selectCategory_select": "Please select an album or sub-album.",
+    "selectCategory": "选择相册",
+    "selectCategory_select": "请选择相册或子相册。",
     "selectCategory_message": "{count, plural, =1{您确定将图片上传到相册 {parent} 吗？} other{您确定将这些图片上传到相册 {parent} 吗？}}",
     "@selectCategory_message": {
         "placeholders": {
@@ -300,7 +300,7 @@
     "severalImages": "照片",
     "all_Photos": "所有照片",
     "severalVideos": "视频",
-    "noImages": "沒有照片",
+    "noImages": "暂无照片",
     "pullToRefresh": "刷新照片",
     "andMore": " & 更多",
     "months": "月",
@@ -679,10 +679,10 @@
         }
     },
     "settingsHeader_notSecure": "不安全的连接",
-    "settings_server": "地址",
+    "settings_server": "站点地址",
     "settings_username": "用户名",
     "settings_notLoggedIn": " - 未登录 - ",
-    "settings_logout": "注销",
+    "settings_logout": "退出登录",
     "settingsFooter_formats": "服务器接受以下文件类型: {types}",
     "@settingsFooter_formats": {
         "placeholders": {
@@ -814,7 +814,7 @@
     "uploadVideoSize_header": "请选择要上传的视频的最大大小",
     "uploadVideoSize_resolution": "内置摄像头最大规格",
     "uploadPhotoSize_original": "不缩小大小",
-    "settingsHeader_cache": "缓存设置（已使用/总共）",
+    "settingsHeader_cache": "缓存设置",
     "settings_cacheDisk": "存储",
     "settings_cacheMemory": "内存",
     "settings_cacheSize": "缓存大小",
