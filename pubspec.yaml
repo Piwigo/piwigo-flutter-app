@@ -3,7 +3,7 @@ description: A Piwigo Android application
 
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
-version: 2.4.2+242
+version: 2.4.3+243
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
@@ -45,7 +45,7 @@ dependencies:
   shared_preferences: ^2.0.15 # Base local storage
   flutter_secure_storage: ^10.0.0 # Local storage secured for logins
   image_picker: ^1.1.2 # Pick images from camera
-  file_picker: ^10.1.2 # Pick images and videos at a time for upload
+  file_picker: ^11.0.2 # Pick images and videos at a time for upload
 
   # Device
   device_info_plus: ^12.1.0 # Get device info (version

@@ -211,7 +211,7 @@ Future<ApiResponse<Map>> fetchTagImages(int tagID, [int page = 0]) async {
 }
 
 Future<String?> pickDirectoryPath() async {
-  return await FilePicker.platform.getDirectoryPath();
+  return await FilePicker.getDirectoryPath();
 }
 
 Future<void> _showDownloadNotification({
