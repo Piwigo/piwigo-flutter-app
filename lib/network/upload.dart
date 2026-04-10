@@ -203,6 +203,7 @@ Future<Response?> uploadChunk({
   if (info['comment'] != '' && info['comment'] != null) fields['comment'] = info['comment'];
   if (info['tag_ids']?.isNotEmpty ?? false) fields['tag_ids'] = info['tag_ids'].join(',');
   if (info['level'] != -1 && info['level'] != null) fields['level'] = info['level'];
+  if (info['author'] != '' && info['author'] != null) fields['author'] = info['author'];
 
   // Create dio client
   Dio dio = Dio(
