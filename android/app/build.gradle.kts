@@ -8,11 +8,6 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(17)
-    }
-}
 // https://docs.flutter.dev/deployment/android#configure-signing-in-gradle
 val keystoreProperties = Properties()
 val keystorePropertiesFile = rootProject.file("key.properties")
@@ -22,7 +17,7 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     namespace = "com.remi.piwigo_ng"
-    compileSdk = flutter.compileSdkVersion
+    compileSdk = 37
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
