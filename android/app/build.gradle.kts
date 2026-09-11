@@ -9,7 +9,6 @@ import java.io.FileInputStream
 
 plugins {
     id("com.android.application")
-    id("kotlin-android")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
 }
@@ -28,10 +27,8 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     namespace = "com.remi.piwigo_ng"
-    //compileSdkVersion flutter.compileSdkVersion
-    //ndkVersion = flutter.ndkVersion
-    compileSdk = 36
-    ndkVersion = "29.0.14206865 "
+    compileSdk = flutter.compileSdkVersion
+    ndkVersion = flutter.ndkVersion
 
     val compileJavaVersion = JavaVersion.VERSION_17
 
