@@ -7,7 +7,7 @@ version: 2.4.3+243
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
-  flutter: 3.41.6
+  flutter: 3.47.3
 
 dependencies:
   flutter:
@@ -27,41 +27,41 @@ dependencies:
   font_awesome_flutter: ^11.0.0 # Font awesome icons (might be useless)
   flutter_slidable: ^4.0.0 # Album card's sliding cations
   drag_select_grid_view: ^0.7.6 # Drag to select image grid
-  rounded_loading_button: # Loading button animation
+  rounded_loading_button:
     git:
-      url: https://github.com/scopendo/flutter_rounded_loading_button # A custom fork that can work with the latest flutter SDK
-      ref: dd4b76a
+      url: https://github.com/scopendo/flutter_rounded_loading_button.git
+      ref: master
   modal_bottom_sheet: ^3.0.0-pre # Custom modals (might be useless)
-  cached_network_image: ^3.2.2 # Better cache for images (used for album's thumbnail)
+  cached_network_image: ^4.0.0 # Better cache for images (used for album's thumbnail)
   flutter_speed_dial: ^7.0.0 # Speed dial
   pull_to_refresh: ^2.0.0 # Top and bottom refresh gestures
   photo_view: ^0.15.0 # Zoom on fullscreen photos
   extended_text: ^15.0.2 # Text overflow on left side
-  flutter_easyloading: ^3.0.5 # Show loading dialog
+  flutter_easyloading: ^4.0.2 # Show loading dialog
 
   # Storage
-  package_info_plus: ^9.0.0 # Get project info (version)
+  package_info_plus: ^10.2.1 # Get project info (version)
   path_provider: ^2.0.11 # Get application documents
   shared_preferences: ^2.0.15 # Base local storage
-  flutter_secure_storage: ^10.0.0 # Local storage secured for logins
+  flutter_secure_storage: ^11.1.0 # Local storage secured for logins
   image_picker: ^1.1.2 # Pick images from camera
-  file_picker: ^11.0.2 # Pick images and videos at a time for upload
+  file_picker: ^12.0.0 # Pick images and videos at a time for upload
 
   # Device
-  device_info_plus: ^12.1.0 # Get device info (version
-  flutter_local_notifications: ^21.0.0 # Throws notifications on download or upload
+  device_info_plus: ^13.2.0 # Get device info (version
+  flutter_local_notifications: ^22.3.0 # Throws notifications on download or upload
   open_filex: ^4.4.0 # Open files with devices apps
-  workmanager: ^0.9.0+3 # Background processes (auto upload)
+  workmanager: ^0.10.10 # Background processes (auto upload)
   gal: ^2.3.1 # Download images
 
   # Utils
   mime_type: ^1.0.0 # Check mime type of files (differentiate photos from videos)
   video_player: ^2.10.0 # Read video files in fullscreen mode
-  chewie: ^1.8.1 # Video player with options
+  chewie: ^1.16.3 # Video player with options
   flutter_image_compress: ^2.4.0 # Remove metadata
-  permission_handler: ^12.0.0+1 # Check and asks for permissions
-  share_plus: ^12.0.0 # Share files
-  flutter_cache_manager: ^3.3.0 # Handles network image cache
+  permission_handler: ^13.0.2 # Check and asks for permissions
+  share_plus: ^13.3.0 # Share files
+  flutter_cache_manager: ^3.4.1 # Handles network image cache
   provider: ^6.0.3 # Notifiers for theme and language changes
   listen_sharing_intent: ^1.9.2 # Receive sharing from other apps
 
