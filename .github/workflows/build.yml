@@ -1,5 +1,8 @@
 name: Build Debug
 
+permissions:
+  contents: read
+
 on:
   pull_request:
   push:
@@ -9,16 +12,19 @@ on:
 
 jobs:
   build:
+    name: Build Debug
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+      - name: Code checkout
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
 
-      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
+      - name: Set up Flutter
+        uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
         with:
           flutter-version: '3.41.6'
 
-      - run: |
+      - name: Fetch dependencies
+        run: |
           set -eu
           flutter config --no-analytics
           flutter pub get
