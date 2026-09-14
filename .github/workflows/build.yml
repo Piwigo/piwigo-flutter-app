@@ -14,7 +14,10 @@ jobs:
         with:
           flutter-version: '3.27.4'
 
-      - run: flutter pub get
+      - run: |
+          set -eu
+          flutter config --no-analytics
+          flutter pub get
 
       - name: Build APK
         run: flutter build apk --release --no-shrink
