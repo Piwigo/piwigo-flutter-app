@@ -1,4 +1,4 @@
-name: Build App
+name: Build Debug
 
 on:
   workflow_dispatch:
@@ -19,11 +19,11 @@ jobs:
           flutter config --no-analytics
           flutter pub get
 
-      - name: Build APK
-        run: flutter build apk --release --no-shrink
+      - name: Build app
+        run: flutter build apk --debug --no-shrink
 
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
+      - name: Upload artifact
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         with:
           name: piwigo-app
-          path: build/app/outputs/flutter-apk/app-release.apk
+          path: build/app/outputs/flutter-apk/app-debug.apk
