@@ -19,8 +19,18 @@ import 'package:piwigo_ng/network/users.dart';
 import 'package:piwigo_ng/services/preferences_service.dart';
 import 'package:piwigo_ng/utils/localizations.dart';
 import 'package:piwigo_ng/views/image/edit_image_page.dart';
+import 'package:image_picker_android/image_picker_android.dart';
+import 'package:image_picker_platform_interface/image_picker_platform_interface.dart';
 
-final ImagePicker _picker = ImagePicker();
+final ImagePickerPlatform imagePickerImplementation = ImagePickerPlatform.instance;
+final ImagePicker _picker = getImagePicker();
+
+ImagePicker getImagePicker() {
+  if (imagePickerImplementation is ImagePickerAndroid) {
+    (imagePickerImplementation as ImagePickerAndroid).useAndroidPhotoPicker = true;
+  }
+  return ImagePicker();
+}
 
 Future<File> compressImage(File file,
     [int? cacheWidth, int? cacheHeight]) async {
