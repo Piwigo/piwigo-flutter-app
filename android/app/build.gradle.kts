@@ -44,6 +44,12 @@ android {
         }
     }
 
+    packaging {
+        jniLibs {
+            useLegacyPackaging = false
+        }
+    }
+
     buildTypes {
         release {
             signingConfig = signingConfigs.getByName("release")
