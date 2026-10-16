@@ -1,0 +1,69 @@
+Categories:
+  - Graphics
+  - Multimedia
+License: GPL-2.0-or-later
+AuthorName: Piwigo Team
+AuthorEmail: android@piwigo.org
+WebSite: https://piwigo.org/
+SourceCode: https://github.com/Piwigo/piwigo-flutter-app
+IssueTracker: https://github.com/Piwigo/piwigo-flutter-app/issues
+Translation: https://crowdin.com/project/piwigo-ng
+
+AutoName: Piwigo NG
+
+RepoType: git
+Repo: https://github.com/Piwigo/piwigo-flutter-app
+Binaries: 
+  https://github.com/Piwigo/piwigo-flutter-app/releases/download/v%v/app-arm64-v8a-release.apk
+
+Builds:
+  - versionName: 2.4.3
+    versionCode: 2243
+    commit: TO_FILL_COMMIT_SHA
+    sudo:
+      - echo "deb https://deb.debian.org/debian bookworm main" > /etc/apt/sources.list.d/bookworm.list
+      - apt-get update
+      - apt-get install -y -t bookworm openjdk-17-jdk-headless
+      - update-java-alternatives -s java-1.17.0-openjdk-amd64
+      - mkdir -p /home/runner/
+      - chown vagrant /home/runner/
+    output: build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
+    srclibs:
+      - flutter@stable
+    prebuild:
+      - flutterVersion=$(sed -n -E "s/^\s+flutter:\s*([0-9.]+)/\1/p" pubspec.yaml)
+      - '[[ $flutterVersion ]] || exit 1'
+      - git -C $$flutter$$ checkout -f $flutterVersion
+      - export repo=/home/runner/work/piwigo-flutter-app
+      - mkdir -p $repo
+      - sed -i -e '/foojay/d' android/settings.gradle.kts
+      - cd ..
+      - mv com.piwigo.piwigo_ng $repo/piwigo-flutter-app
+      - pushd $repo/piwigo-flutter-app
+      - export PUB_CACHE=$(pwd)/.pub-cache
+      - $$flutter$$/bin/flutter config --no-analytics
+      - $$flutter$$/bin/flutter packages pub get --enforce-lockfile
+      - sed -i -E -e 's/-Wl,(--build-id=none,)*/-Wl,--build-id=none,/g' $PUB_CACHE/hosted/*/jni-*/src/CMakeLists.txt
+      - popd
+      - mv $repo/piwigo-flutter-app com.piwigo.piwigo_ng
+    scandelete:
+      - .pub-cache
+    build:
+      - export repo=/home/runner/work/piwigo-flutter-app
+      - cd ..
+      - mv com.piwigo.piwigo_ng $repo/piwigo-flutter-app
+      - pushd $repo/piwigo-flutter-app
+      - export PUB_CACHE=$(pwd)/.pub-cache
+      - $$flutter$$/bin/flutter build apk --split-per-abi
+      - popd
+      - mv $repo/piwigo-flutter-app com.piwigo.piwigo_ng
+
+AllowedAPKSigningKeys: 729aaa9e800cd3bad02b1ffab09adc578d914261cac87eec46d256c6ed4329ac
+
+AutoUpdateMode: Version
+UpdateCheckMode: Tags ^v[a-z0-9.]*$
+VercodeOperation:
+  - 2000 + %c
+UpdateCheckData: pubspec.yaml|version:\s.*\+(\d+)|.|version:\s(.*)\+
+CurrentVersion: 2.4.3
+CurrentVersionCode: 2243
