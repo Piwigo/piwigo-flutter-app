@@ -1,13 +1,13 @@
 name: piwigo_ng
 description: A Piwigo Android application
 
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
 version: 2.4.3+243
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
-  flutter: 3.47.3
+  flutter: 3.47.8
 
 dependencies:
   flutter:
@@ -45,12 +45,12 @@ dependencies:
   shared_preferences: ^2.0.15 # Base local storage
   flutter_secure_storage: ^11.1.0 # Local storage secured for logins
   image_picker: ^1.1.2 # Pick images from camera
-  file_picker: ^12.0.0 # Pick images and videos at a time for upload
+  file_picker: ^13.0.0 # Pick images and videos at a time for upload
 
   # Device
   device_info_plus: ^13.2.0 # Get device info (version
   flutter_local_notifications: ^22.3.0 # Throws notifications on download or upload
-  open_filex: ^4.4.0 # Open files with devices apps
+  open_filex: ^5.0.0 # Open files with devices apps
   workmanager: ^0.10.10 # Background processes (auto upload)
   gal: ^2.3.1 # Download images
 
@@ -85,7 +85,6 @@ dev_dependencies:
 
 # The following section is specific to Flutter.
 flutter:
-
   generate: true
 
   uses-material-design: true
