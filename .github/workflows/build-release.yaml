@@ -1,0 +1,115 @@
+name: Build Release
+
+permissions:
+  attestations: write
+  contents: write
+  id-token: write
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build Release
+    environment: release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Code checkout
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
+        with:
+          cache: true
+          channel: stable
+          flutter-version-file: pubspec.yaml
+
+      - name: Fetch dependencies
+        run: |
+          set -eu
+          flutter config --no-analytics
+          flutter pub get --enforce-lockfile
+
+      - name: Patch JNI build id for reproducible builds
+        shell: bash
+        run: |
+          # libdartjni.so picks up a non-reproducible linker build id unless the
+          # cached jni package injects `--build-id=none` into its native linker flags.
+          # Patch the cached jni package before Android builds so repeated CI
+          # rebuilds produce identical JNI native library outputs.
+          shopt -s nullglob
+          pub_cache_root="${PUB_CACHE:-$HOME/.pub-cache}"
+          jni_cmake_files=("$pub_cache_root"/hosted/*/jni-*/src/CMakeLists.txt)
+          if [[ ${#jni_cmake_files[@]} -eq 0 ]]; then
+            echo "No jni CMakeLists.txt found under $pub_cache_root"
+            exit 1
+          fi
+          for jni_cmake_file in "${jni_cmake_files[@]}"; do
+            echo "Patching $jni_cmake_file"
+            mapfile -t before_matches < <(grep -n -- '-Wl,' "$jni_cmake_file" || true)
+            sed -i -E \
+              -e 's/-Wl,(--build-id=none,)*/-Wl,--build-id=none,/g' \
+              "$jni_cmake_file"
+            for before_match in "${before_matches[@]}"; do
+              line_number="${before_match%%:*}"
+              before_line="${before_match#*:}"
+              after_line=$(sed -n "${line_number}p" "$jni_cmake_file")
+              printf '  %s:%s -> %s\n' "$line_number" "$before_line" "$after_line"
+            done
+          done
+          missing_patches=$(grep -L -- '--build-id=none' "${jni_cmake_files[@]}" || true)
+          if [[ -n "$missing_patches" ]]; then
+            echo "Failed to patch:"
+            echo "$missing_patches"
+            exit 1
+          fi
+
+      - name: Prepare signing
+        env:
+          KEY_ALIAS: piwigong
+          STORE_PASSWORD: '${{ secrets.STORE_PASSWORD }}'
+          STORE_FILE: '${{ runner.temp }}/signing-keystore.jks'
+        shell: bash
+        run: |
+          set -eu
+          echo "keyAlias=${KEY_ALIAS}" > "android/key.properties"
+          echo "keyPassword=${STORE_PASSWORD}" >> "android/key.properties"
+          echo "storePassword=${STORE_PASSWORD}" >> "android/key.properties"
+          echo "storeFile=${STORE_FILE}" >> "android/key.properties"
+
+      - name: Build app
+        env:
+          STORE_FILE: '${{ runner.temp }}/signing-keystore.jks'
+        run: |
+          set -eu
+          trap 'rm -f "${STORE_FILE}" android/key.properties' EXIT
+          echo '${{ secrets.STORE_BASE64 }}' | base64 -d > "${STORE_FILE}"
+          flutter build apk --release --split-per-abi
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        with:
+          name: piwigong-app-arm64-v8a
+          path: build/app/outputs/flutter-apk/app-*-release.apk
+
+      - name: Create GitHub build provenance attestations
+        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
+        with:
+          subject-path: build/app/outputs/flutter-apk/app-*-release.apk
+
+      - name: Determine release tag
+        id: version
+        run: |
+          set -eu
+          VERSION=$(sed -n 's/^version: *\([^+]*\).*/\1/p' pubspec.yaml)
+          echo "tag=v${VERSION}" >> "$GITHUB_OUTPUT"
+
+      - name: Create draft release
+        uses: ncipollo/release-action@339a81892b84b4eeb0f6e744e4574d79d0d9b8dd # v1.21.0
+        with:
+          tag: ${{ steps.version.outputs.tag }}
+          artifacts: "build/app/outputs/flutter-apk/app-*-release.apk"
+          artifactErrorsFailBuild: true
+          name: PiwigoNG ${{ steps.version.outputs.tag }}
+          prerelease: false
+          draft: true
